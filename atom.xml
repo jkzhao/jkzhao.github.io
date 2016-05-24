@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>jkzhao blog</title>
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yoursite.com/"/>
+  <updated>2016-05-24T00:50:29.820Z</updated>
+  <id>http://yoursite.com/</id>
+  
+  <author>
+    <name>Zhao Jiankai</name>
+    <email>jk.zhaocoder@gmail.com</email>
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Linux运维面试总结</title>
+    <link href="http://yoursite.com/2016/05/23/Linux%E8%BF%90%E7%BB%B4%E9%9D%A2%E8%AF%95%E6%80%BB%E7%BB%93/"/>
+    <id>http://yoursite.com/2016/05/23/Linux运维面试总结/</id>
+    <published>2016-05-23T05:29:35.000Z</published>
+    <updated>2016-05-24T00:50:29.820Z</updated>
+    
+    <content type="html">&lt;h1 id=&quot;个人这一年半的运维总结&quot;&gt;&lt;a href=&quot;#个人这一年半的运维总结&quot; class=&quot;headerlink&quot; title=&quot;个人这一年半的运维总结&quot;&gt;&lt;/a&gt;个人这一年半的运维总结&lt;/h1&gt;&lt;hr&gt;
+&lt;p&gt;总体说来，这一年半以来，更多的是做业务运维，对于机房内的一些基础设施，比如交换机、路由器并不知道怎么去设置。看了很多家大型公司的招聘Linux运维工程师的要求，大多都有一条熟悉shell/python/ruby中的 一门或两门语言，遇到大数据这种职位，还会要求你精通java。&lt;/p&gt;
+&lt;p&gt;个人觉得，如果一个运维仅仅停留在对工具的使用上，即便你能够熟练使用多数工具，这远远是不够的。你需要去深入理解这个工具是怎么工作的，如果不适合公司的业务场景，这个时候你可能就需要去阅读源码，很有可能去做定制开发。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;杭州的互联网公司-5000人以上&quot;&gt;&lt;a href=&quot;#杭州的互联网公司-5000人以上&quot; class=&quot;headerlink&quot; title=&quot;杭州的互联网公司(5000人以上)&quot;&gt;&lt;/a&gt;杭州的互联网公司(5000人以上)&lt;/h2&gt;&lt;h3 id=&quot;南京的互联网公司&quot;&gt;&lt;a href=&quot;#南京的互联网公司&quot; class=&quot;headerlink&quot; title=&quot;南京的互联网公司&quot;&gt;&lt;/a&gt;南京的互联网公司&lt;/h3&gt;</content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;个人这一年半的运维总结&quot;&gt;&lt;a href=&quot;#个人这一年半的运维总结&quot; class=&quot;headerlink&quot; title=&quot;个人这一年半的运维总结&quot;&gt;&lt;/a&gt;个人这一年半的运维总结&lt;/h1&gt;&lt;hr&gt;
+&lt;p&gt;总体说来，这一年半以来，更多的是做业务运维，对于机房内的一些基础设施，比如交换机、路由器并不知道怎么去设置。看了很多家大型公司的招聘Linux运维工程师的要求，大多都有一条熟悉shell/python/ruby中的 一门或两门语言，遇到大数据这种职位，还会要求你精通java。&lt;/p&gt;
+&lt;p&gt;个人觉得，如果一个运维仅仅停留在对工具的使用上，即便你能够熟练使用多数工具，这远远是不够的。你需要去深入理解这个工具是怎么工作的，如果不适合公司的业务场景，这个时候你可能就需要去阅读源码，很有可能去做定制开发。&lt;/p&gt;
+&lt;blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="Linux" scheme="http://yoursite.com/tags/Linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="http://yoursite.com/2016/05/23/hello-world/"/>
+    <id>http://yoursite.com/2016/05/23/hello-world/</id>
+    <published>2016-05-23T03:28:16.280Z</published>
+    <updated>2016-05-23T03:28:16.280Z</updated>
+    
+    <content type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;documentation&lt;/a&gt; for more info. If you get any problems when using Hexo, you can find the answer in &lt;a href=&quot;https://hexo.io/docs/troubleshooting.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;troubleshooting&lt;/a&gt; or you can ask me on &lt;a href=&quot;https://github.com/hexojs/hexo/issues&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;Quick-Start&quot;&gt;&lt;a href=&quot;#Quick-Start&quot; class=&quot;headerlink&quot; title=&quot;Quick Start&quot;&gt;&lt;/a&gt;Quick Start&lt;/h2&gt;&lt;h3 id=&quot;Create-a-new-post&quot;&gt;&lt;a href=&quot;#Create-a-new-post&quot; class=&quot;headerlink&quot; title=&quot;Create a new post&quot;&gt;&lt;/a&gt;Create a new post&lt;/h3&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;$ hexo new &lt;span class=&quot;string&quot;&gt;&quot;My New Post&quot;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;More info: &lt;a href=&quot;https://hexo.io/docs/writing.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Writing&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;Run-server&quot;&gt;&lt;a href=&quot;#Run-server&quot; class=&quot;headerlink&quot; title=&quot;Run server&quot;&gt;&lt;/a&gt;Run server&lt;/h3&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;$ hexo server&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;More info: &lt;a href=&quot;https://hexo.io/docs/server.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Server&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;Generate-static-files&quot;&gt;&lt;a href=&quot;#Generate-static-files&quot; class=&quot;headerlink&quot; title=&quot;Generate static files&quot;&gt;&lt;/a&gt;Generate static files&lt;/h3&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;$ hexo generate&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;More info: &lt;a href=&quot;https://hexo.io/docs/generating.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Generating&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;Deploy-to-remote-sites&quot;&gt;&lt;a href=&quot;#Deploy-to-remote-sites&quot; class=&quot;headerlink&quot; title=&quot;Deploy to remote sites&quot;&gt;&lt;/a&gt;Deploy to remote sites&lt;/h3&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;$ hexo deploy&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;More info: &lt;a href=&quot;https://hexo.io/docs/deployment.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Deployment&lt;/a&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.
+    
+    </summary>
+    
+    
+  </entry>
+  
+</feed>
