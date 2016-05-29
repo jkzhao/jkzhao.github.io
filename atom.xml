@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2016-05-24T00:50:29.820Z</updated>
+  <updated>2016-05-29T14:35:21.730Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,58 +16,173 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>Linux运维面试总结</title>
-    <link href="http://yoursite.com/2016/05/23/Linux%E8%BF%90%E7%BB%B4%E9%9D%A2%E8%AF%95%E6%80%BB%E7%BB%93/"/>
-    <id>http://yoursite.com/2016/05/23/Linux运维面试总结/</id>
-    <published>2016-05-23T05:29:35.000Z</published>
-    <updated>2016-05-24T00:50:29.820Z</updated>
+    <title>Nginx、Nignx Plus减轻DDoS攻击(译)</title>
+    <link href="http://yoursite.com/2016/05/25/Nginx%E3%80%81Nignx-Plus%E5%87%8F%E8%BD%BBDDoS%E6%94%BB%E5%87%BB-%E8%AF%91/"/>
+    <id>http://yoursite.com/2016/05/25/Nginx、Nignx-Plus减轻DDoS攻击-译/</id>
+    <published>2016-05-25T01:39:34.000Z</published>
+    <updated>2016-05-29T14:35:21.730Z</updated>
     
-    <content type="html">&lt;h1 id=&quot;个人这一年半的运维总结&quot;&gt;&lt;a href=&quot;#个人这一年半的运维总结&quot; class=&quot;headerlink&quot; title=&quot;个人这一年半的运维总结&quot;&gt;&lt;/a&gt;个人这一年半的运维总结&lt;/h1&gt;&lt;hr&gt;
-&lt;p&gt;总体说来，这一年半以来，更多的是做业务运维，对于机房内的一些基础设施，比如交换机、路由器并不知道怎么去设置。看了很多家大型公司的招聘Linux运维工程师的要求，大多都有一条熟悉shell/python/ruby中的 一门或两门语言，遇到大数据这种职位，还会要求你精通java。&lt;/p&gt;
-&lt;p&gt;个人觉得，如果一个运维仅仅停留在对工具的使用上，即便你能够熟练使用多数工具，这远远是不够的。你需要去深入理解这个工具是怎么工作的，如果不适合公司的业务场景，这个时候你可能就需要去阅读源码，很有可能去做定制开发。&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-&lt;/blockquote&gt;
-&lt;h2 id=&quot;杭州的互联网公司-5000人以上&quot;&gt;&lt;a href=&quot;#杭州的互联网公司-5000人以上&quot; class=&quot;headerlink&quot; title=&quot;杭州的互联网公司(5000人以上)&quot;&gt;&lt;/a&gt;杭州的互联网公司(5000人以上)&lt;/h2&gt;&lt;h3 id=&quot;南京的互联网公司&quot;&gt;&lt;a href=&quot;#南京的互联网公司&quot; class=&quot;headerlink&quot; title=&quot;南京的互联网公司&quot;&gt;&lt;/a&gt;南京的互联网公司&lt;/h3&gt;</content>
+    <content type="html">&lt;p&gt;一个DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。&lt;/p&gt;
+&lt;p&gt;典型的，攻击者尝试通过大量的连接和请求使系统饱和，以使得目标主机无法再接收新的流量，或者响应变慢地不可用。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h1 id=&quot;应用层DDoS攻击特征&quot;&gt;&lt;a href=&quot;#应用层DDoS攻击特征&quot; class=&quot;headerlink&quot; title=&quot;应用层DDoS攻击特征&quot;&gt;&lt;/a&gt;应用层DDoS攻击特征&lt;/h1&gt;&lt;hr&gt;
+&lt;p&gt;应用层(Layer 7/HTTP) DDoS攻击是通过利用特定系统的脆弱点而特制的软件程序来完成。例如，对于不处理大量并发连接请求的系统，仅仅打开大量的连接，并且周期性地发送少量的流量来使得连接存活就会耗尽系统的性能以至于无法响应新连接。其他的攻击可采取发送大量的请求或非常大的请求的形式。因为这些攻击是通过肉鸡完成的，而不是通过真实的用户，攻击者可以轻松地、很快地打开大量数据的连接和发送大量的请求。 &lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;DDoS的攻击特征可以被用来帮助抵御它们，包括下面(这并不意味着以下列出来的是详尽无遗的)：&lt;br&gt;&amp;emsp;&amp;emsp;1.流量正常是来自一个特定的IP地址的集合，属于那么完成攻击的机器。所以，每一个ip地址负责发起许多连接，而不是你想象的它们来自一个真实用户。 &lt;br&gt;&lt;br&gt;&amp;emsp;&amp;emsp;&lt;strong&gt;注意：&lt;/strong&gt;不要认为这些流量情况总是代表一次DDoS攻击。代理服务器转发也会造成这种情况，因为代理服务器的ip地址被作为了所有真实客户端的ip地址。不管怎么样，来自于一个代理服务器转发的连接请求数要比真正DDoS攻击的请求数量少很多。 &lt;br&gt;&lt;br&gt;&amp;emsp;&amp;emsp;2.因为流量是由于肉鸡产生的，而且是为了压垮目标服务器，流量的速率比一个真实用户能产生的要大的多。&lt;br&gt;&lt;br&gt;&amp;emsp;&amp;emsp;3.头部中的User-Agent有时候被设置为一个非标准值。 &lt;br&gt;&lt;br&gt;&amp;emsp;&amp;emsp;4.头部中的Referer有时候被设置为某个值，使你能联想到这是攻击。&lt;/p&gt;
+&lt;h1 id=&quot;用Nginx和Nginx-Plus抵御DDoS攻击&quot;&gt;&lt;a href=&quot;#用Nginx和Nginx-Plus抵御DDoS攻击&quot; class=&quot;headerlink&quot; title=&quot;用Nginx和Nginx Plus抵御DDoS攻击&quot;&gt;&lt;/a&gt;用Nginx和Nginx Plus抵御DDoS攻击&lt;/h1&gt;&lt;hr&gt;
+&lt;p&gt;Nginx和Nginx Plus有许多特性——和上面提到的DDoS攻击的特性相结合——可以成为有效地防御DDoS攻击的一部分。因为它们是代理后端服务器，这些特性通过调节流量的进入和控制流量来防御DDoS攻击。&lt;/p&gt;
+&lt;h2 id=&quot;限制请求速率&quot;&gt;&lt;a href=&quot;#限制请求速率&quot; class=&quot;headerlink&quot; title=&quot;限制请求速率&quot;&gt;&lt;/a&gt;限制请求速率&lt;/h2&gt;&lt;p&gt;你可以限制Nginx和Nginx Plus接收用户的请求速率为一个典型的真实用户请求的速率值。例如，你可以决定一个真正的用户每2秒只能访问登录页面一次。你可以配置Nginx和Nginx Plus允许一个ip地址每2秒可以尝试登录一次(相当于一分钟可以发起30次请求):&lt;/p&gt;
+&lt;pre class=&quot;prettyprint&quot;&gt;
+    &lt;code&gt;
+    limit_req_zone $binary_remote_addr zone=one:10m rate=30r/m;
+
+    server {
+        ...
+        location /login.html {
+            limit_req zone=one;
+        ...
+        }
+    }
+    &lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_limit_req_module.html?&amp;amp;_ga=1.17821497.1466916160.1455516425#limit_req_zone&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;limit\_req\_zone&lt;/a&gt;指令配置一个名字为one的共享区域，用来存储指定的key的请求状态，这种情况下客户端ip地址用变量($binary_remote_addr)来表示。在location /login.html模块中的&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_limit_req_module.html?&amp;amp;_ga=1.256286731.1466916160.1455516425#limit_req&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;limit\_req&lt;/a&gt;指令指定了用到的共享存储区域。&lt;/p&gt;
+&lt;h2 id=&quot;限制连接数&quot;&gt;&lt;a href=&quot;#限制连接数&quot; class=&quot;headerlink&quot; title=&quot;限制连接数&quot;&gt;&lt;/a&gt;限制连接数&lt;/h2&gt;&lt;p&gt;你可以限制一个客户端ip地址可以建立的连接数，指定为一个合适的值。例如，对于你网站的/store资源，你可以允许每个一个客户端ip地址打开不多于10个连接:&lt;/p&gt;
+&lt;pre class=&quot;prettyprint&quot;&gt;
+    &lt;code&gt;
+    limit_conn_zone $binary_remote_addr zone=addr:10m;
+
+    server {
+        ...
+        location /store/ {
+           limit_conn addr 10;
+        ...
+        }
+    }
+    &lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_limit_conn_module.html?&amp;amp;_ga=1.256286731.1466916160.1455516425#limit_conn_zone&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;limit\_conn\_zone&lt;/a&gt;指令配置了一个名为&lt;strong&gt;addr&lt;/strong&gt;的共享区域，用来存储指定的key的请求状态，这种情况下客户端ip用变量$binary_remote_addr来表示。在location /store模块中的&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_limit_conn_module.html?&amp;amp;_ga=1.256286731.1466916160.1455516425#limit_conn&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;limit\_conn&lt;/a&gt;指令指定了共享存储区域和设置一个客户端ip的最大连接数为10。&lt;/p&gt;
+&lt;h2 id=&quot;关闭慢连接&quot;&gt;&lt;a href=&quot;#关闭慢连接&quot; class=&quot;headerlink&quot; title=&quot;关闭慢连接&quot;&gt;&lt;/a&gt;关闭慢连接&lt;/h2&gt;&lt;p&gt;你可以把写数据非常少的连接关闭掉，这些连接尝试着保持连接尽可能长时间(那样会降低服务器接收新连接的能力)。Slowloris就是一个攻击的例子。&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_core_module.html?&amp;amp;_ga=1.247309060.1466916160.1455516425#client_body_timeout&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;client\_body\_timeout&lt;/a&gt;指令控制Nginx等待客户端的发送请求体的时间间隔，&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_core_module.html?&amp;amp;_ga=1.247309060.1466916160.1455516425#client_header_timeout&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;client\_header\_timeout&lt;/a&gt;指令控制Nginx等待客户端发送请求头的时间间隔。默认这两个指令设置的时间是60秒。下面的例子配置Nginx等待请求头和请求体的时间不超过5秒。&lt;/p&gt;
+&lt;pre class=&quot;prettyprint&quot;&gt;
+    &lt;code&gt;
+    server {
+        client_body_timeout 5s;
+        client_header_timeout 5s;
+        ...
+    }
+    &lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;h2 id=&quot;把IP地址列入黑名单&quot;&gt;&lt;a href=&quot;#把IP地址列入黑名单&quot; class=&quot;headerlink&quot; title=&quot;把IP地址列入黑名单&quot;&gt;&lt;/a&gt;把IP地址列入黑名单&lt;/h2&gt;&lt;p&gt;如果你能够确认某个客户端ip地址是用来攻击的，你可以使用deny指令让Nginx和Nginx Plus不接受来自他们的连接或请求。例如，如果你确定攻击来自ip地址范围是123.123.123.1~123.123.123.16:&lt;/p&gt;
+&lt;pre class=&quot;prettyprint&quot;&gt;
+    &lt;code&gt;
+    location / {
+        deny 123.123.123.0/28;
+        ...
+    }
+    &lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;或者如果你确定攻击来自于客户端ip地址123.123.123.3,123.123.123.5和123.123.123.7:&lt;/p&gt;
+&lt;pre class=&quot;prettyprint&quot;&gt;
+    &lt;code&gt;
+    location / {
+       deny 123.123.123.3;
+       deny 123.123.123.5;
+       deny 123.123.123.7;
+       ...
+    }
+    &lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;h2 id=&quot;把IP地址列入白名单&quot;&gt;&lt;a href=&quot;#把IP地址列入白名单&quot; class=&quot;headerlink&quot; title=&quot;把IP地址列入白名单&quot;&gt;&lt;/a&gt;把IP地址列入白名单&lt;/h2&gt;&lt;p&gt;如果仅允许来自某个或某些特定集合范围的客户端ip地址访问你的网站，你可以一起使用allow和deny指令只允许那些ip地址访问你的网站和应用。例如，你可以限定一个指定网络中的ip地址可以访问网站或应用：&lt;/p&gt;
+&lt;pre class=&quot;prettyprint&quot;&gt;
+    &lt;code&gt;
+    location / {
+       allow 192.168.1.0/24;
+       deny all;
+       ...
+    }
+    &lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;这里，deny指令阻止了所有的客户端ip地址的访问，除了allow指令指定的ip地址范围。&lt;/p&gt;
+&lt;h2 id=&quot;使用缓存来缓和流量峰值&quot;&gt;&lt;a href=&quot;#使用缓存来缓和流量峰值&quot; class=&quot;headerlink&quot; title=&quot;使用缓存来缓和流量峰值&quot;&gt;&lt;/a&gt;使用缓存来缓和流量峰值&lt;/h2&gt;&lt;p&gt;你可以配置Nginx和Nginx Plus开启缓存和设置指定的缓存参数来吸收一次攻击中的流量峰值，为后端减轻请求压力。一些有帮助的设置有： &lt;br&gt;&lt;br&gt;&amp;emsp;&amp;emsp;1.&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache_use_stale&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;proxy\_cache\_use\_stale&lt;/a&gt;指令的updating参数告诉Nginx当它需要获取一个陈旧的缓存对象的更新时，它应该只用一个线程去更新缓存对象，并且在线程接收到后端服务器已更新通知的时间段内，所有线程仍然提供陈旧的对象给请求它们的客户端。当一次攻击中有重复请求同一个文件的，这将大大减少对后端服务器的请求数量。 &lt;br&gt;&lt;br&gt;&amp;emsp;&amp;emsp;2.&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_proxy_module.html?&amp;amp;_ga=1.88409883.1466916160.1455516425#proxy_cache_key&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;proxy\_cache\_key&lt;/a&gt;指令定义的key通常由嵌入的变量(默认的key有3个，$scheme$proxy_host$request_uri)。如果值中包含变量&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_core_module.html?&amp;amp;_ga=1.17821497.1466916160.1455516425#var_query_string&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;$query\_string&lt;/a&gt;，那么一次攻击发送随机的查询字符串会导致过多的缓存。我们推荐不要在key中使用变量$query_string，除非你有特殊的理由。&lt;/p&gt;
+&lt;h2 id=&quot;阻塞请求&quot;&gt;&lt;a href=&quot;#阻塞请求&quot; class=&quot;headerlink&quot; title=&quot;阻塞请求&quot;&gt;&lt;/a&gt;阻塞请求&lt;/h2&gt;&lt;p&gt;你可以配置Nginx和Nginx Plus去阻塞几种请求： &lt;br&gt;&lt;br&gt;&amp;emsp;&amp;emsp;1.请求一个似乎是目标的中指定URL &lt;br&gt;&lt;br&gt;&amp;emsp;&amp;emsp;2.请求中的User-Agent头部的值与正常客户端请求的值符合 &lt;br&gt;&lt;br&gt;&amp;emsp;&amp;emsp;3.请求中的Referer头部的值被设置为了一个与攻击有关系的值 &lt;br&gt;&lt;br&gt;&amp;emsp;&amp;emsp;4.请求中的其他头部有与攻击相关的值。 &lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;例如：如果你确定DDoS攻击是攻击目标URL &lt;strong&gt;/foo.php&lt;/strong&gt;，你可以阻止对这个页面的所有请求： &lt;br&gt;&lt;/p&gt;
+&lt;pre class=&quot;prettyprint&quot;&gt;
+    &lt;code&gt;
+    location /foo.php {
+       deny all;
+    }
+    &lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;或者如果你发现DDoS攻击请求中的User-Agent头部的值是foo或bar，你可以拒绝这些请求。 &lt;br&gt;&lt;/p&gt;
+&lt;pre class=&quot;prettyprint&quot;&gt;
+    &lt;code&gt;
+    location / {
+       if ($http_user_agent ~* foo|bar) {
+           return 403;
+       }
+       ...
+    }
+    &lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;变量http_&lt;em&gt;name&lt;/em&gt;引用一个请求头，在上面的例子中就是User-Agent头部。类似的方法可以用在其他的那些可能被用来标识一次攻击的头部上。&lt;/p&gt;
+&lt;h2 id=&quot;限制连入后端服务器的连接数&quot;&gt;&lt;a href=&quot;#限制连入后端服务器的连接数&quot; class=&quot;headerlink&quot; title=&quot;限制连入后端服务器的连接数&quot;&gt;&lt;/a&gt;限制连入后端服务器的连接数&lt;/h2&gt;&lt;p&gt;一个Nginx和Nginx Plus实例通常可以对付的并发数比它正在负载均衡的后端服务器要多。使用Nginx Plus，你可以限制每个后端服务器所接受的请求数。例如，如果你想通过Nginx Plus限制名字叫做&lt;strong&gt;website&lt;/strong&gt;后端服务器组里的两个服务器中每个服务器接受不超过200个连接：&lt;/p&gt;
+&lt;pre class=&quot;prettyprint&quot;&gt;
+    &lt;code&gt;
+    upstream website {
+       server 192.168.100.1:80 max_conns=200;
+       server 192.168.100.2:80 max_conns=200;
+       queue 10 timeout=30s;
+    }
+    &lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_upstream_module.html?&amp;amp;_ga=1.83879958.1466916160.1455516425#max_conns&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;max_conns&lt;/a&gt;参数为每一个后端服务器指定Nginx Plus为它们打开的最大连接数。&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_upstream_module.html?&amp;amp;_ga=1.83799446.1466916160.1455516425#queue&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;queue&lt;/a&gt;指令用于当在后端服务器组里的所有服务器都达到了它们的最大连接限制时，限制排队的请求数目。timeout参数指定了一个请求在队列中保留多久。&lt;/p&gt;
+&lt;h2 id=&quot;对付基于范围的攻击&quot;&gt;&lt;a href=&quot;#对付基于范围的攻击&quot; class=&quot;headerlink&quot; title=&quot;对付基于范围的攻击&quot;&gt;&lt;/a&gt;对付基于范围的攻击&lt;/h2&gt;&lt;p&gt;攻击的一个方法就是发送一个具有非常大的值的范围头部，这可能会导致缓冲区溢出。关于如何使用NGINX和NGINX Plus以一种简单的方式减缓这种类型的攻击，见&lt;a href=&quot;https://www.nginx.com/blog/nginx-protect-cve-2015-1635/?_ga=1.246867972.1466916160.1455516425&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Using NGINX and NGINX Plus to Protect Against CVE-2015-1635&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;对付高负载&quot;&gt;&lt;a href=&quot;#对付高负载&quot; class=&quot;headerlink&quot; title=&quot;对付高负载&quot;&gt;&lt;/a&gt;对付高负载&lt;/h2&gt;&lt;p&gt;DDoS攻击通常会导致很高流量负载。关于调整NGINX或者NGINX Plus以及操作系统让系统能够处理更高的负载，见&lt;a href=&quot;https://www.nginx.com/blog/tuning-nginx/?_ga=1.11987124.1466916160.1455516425&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Tuning NGINX for Performance&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h1 id=&quot;标识DDoS攻击&quot;&gt;&lt;a href=&quot;#标识DDoS攻击&quot; class=&quot;headerlink&quot; title=&quot;标识DDoS攻击&quot;&gt;&lt;/a&gt;标识DDoS攻击&lt;/h1&gt;&lt;hr&gt;
+&lt;p&gt;到目前为主，我们主要关注可以利用NGINX和NGINX Plus减轻DDoS攻击的影响。但是NGINX或者NGINX是如何帮助你发现DDoS攻击？NGINX Plus状态模块提供了对被负载的后端服务器流量的详细度量，你可以使用这些指标发现不正常流量模式。NGINX Plus有一个web页面显示状态信息，生动地描绘了NGINX Plus系统当前的状态(示例见&lt;a href=&quot;http://demo.nginx.com/status.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;demo.nginx.com&lt;/a&gt;)。通过API的方式可以获得同样的指标度量，你可以将这些指标注入自定义或者第三方的监控系统，你可以做历史趋势分析去发现异常模式和启用报警。&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h1 id=&quot;总结&quot;&gt;&lt;a href=&quot;#总结&quot; class=&quot;headerlink&quot; title=&quot;总结&quot;&gt;&lt;/a&gt;总结&lt;/h1&gt;&lt;hr&gt;
+&lt;p&gt;NGINX和NGINX Plus可以作为一个减轻DDoS攻击的重要组成部分，而且NGINX Plus提供额外的特性去抵御DDoS攻击，并且在它们发生时，帮助发现它们。&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;br&gt;&lt;em&gt;原文&lt;/em&gt;：&lt;a href=&quot;https://www.nginx.com/blog/mitigating-ddos-attacks-with-nginx-and-nginx-plus/?mkt_tok=eyJpIjoiT1dVNE56QXlabVk1WmpBMSIsInQiOiIwSkc5NzZhdDllWlIrUkZZSTZqTFwvTFZXVTVXRlhlUlFSTlErV1VtMENKVUNrRnlRTHowUVBINFRcL2Znd00zbjA1WGVTTXRTcExPSDEzRFwvVks2eVRXcFdcLzdCaHYwazJmVDlQN28xUWY5Ymc9In0%3D&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Mitigating DDoS Attacks&lt;/a&gt;&lt;/p&gt;
+</content>
     
     <summary type="html">
     
-      &lt;h1 id=&quot;个人这一年半的运维总结&quot;&gt;&lt;a href=&quot;#个人这一年半的运维总结&quot; class=&quot;headerlink&quot; title=&quot;个人这一年半的运维总结&quot;&gt;&lt;/a&gt;个人这一年半的运维总结&lt;/h1&gt;&lt;hr&gt;
-&lt;p&gt;总体说来，这一年半以来，更多的是做业务运维，对于机房内的一些基础设施，比如交换机、路由器并不知道怎么去设置。看了很多家大型公司的招聘Linux运维工程师的要求，大多都有一条熟悉shell/python/ruby中的 一门或两门语言，遇到大数据这种职位，还会要求你精通java。&lt;/p&gt;
-&lt;p&gt;个人觉得，如果一个运维仅仅停留在对工具的使用上，即便你能够熟练使用多数工具，这远远是不够的。你需要去深入理解这个工具是怎么工作的，如果不适合公司的业务场景，这个时候你可能就需要去阅读源码，很有可能去做定制开发。&lt;/p&gt;
-&lt;blockquote&gt;
+      &lt;p&gt;一个DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。&lt;/p&gt;
+&lt;p&gt;典型的，攻击者尝试通过大量的连接和请求使系统饱和，以使得目标主机无法再接收新的流量，或者响应变慢地不可用。&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="Nginx" scheme="http://yoursite.com/tags/Nginx/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>个人这一年半以来的运维总结</title>
+    <link href="http://yoursite.com/2016/05/23/%E4%B8%AA%E4%BA%BA%E8%BF%99%E4%B8%80%E5%B9%B4%E5%8D%8A%E4%BB%A5%E6%9D%A5%E7%9A%84%E8%BF%90%E7%BB%B4%E6%80%BB%E7%BB%93/"/>
+    <id>http://yoursite.com/2016/05/23/个人这一年半以来的运维总结/</id>
+    <published>2016-05-23T05:29:35.000Z</published>
+    <updated>2016-05-29T09:19:24.135Z</updated>
+    
+    <content type="html">&lt;hr&gt;
+&lt;p&gt;从事了一年半的运维工作，更多的是做业务运维，或者说是应用运维。对于机房内的一些基础设施，比如交换机、路由器并不清楚怎么去配置。&lt;br&gt;&lt;br&gt;对于一个大公司来说，如果有成型的运维体系，运维按照工作内容来看，可分为基础运维、业务运维、产品运维。而我的工作内容就是一些开源组件和商用中间件集群的部署和调优，并写一些脚本做一些简单的自动化部署。&lt;br&gt;&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;最近调到其他产品组开始搞大数据运维，同时也开始着手docker的调研。一个人去做这些事情有好处也有坏处，好处是培养自己解决问题的能力，因为处于研发部，研发人员对运维的工作懂得少之又少，所以遇到问题也只能自己想办法去学习相关的知识或者去google解决；而坏处就是去调研一个东西花的时间较长，而且很多东西只能有自己这一个思维去想，不少问题考虑的不够全面。解决问题花的时间也比较长，我记得最长的一次是花了4天。&lt;br&gt;&lt;br&gt;这一年多以来，加了无数的班，基本没什么事情都是在公司学习。学习Linux基础，学习各种服务的原理和部署，学习各种自动化工具，无论说这些东西公司用到用不到。当然，公司产品组用到的一些，也提供了我场景，让我去应用。但是毕竟不是互联网公司，用到的东西不多，而且业务量不大，所以用的也不深。至于加班不加班这种事情，就看自己怎么想了，你觉得你是为公司加班的，而公司又不给加班费，那么你可能会觉得很不爽。如果你觉得你是为自己提升技术能力加班的，那么可能就不会有这方面的怨言了。当然，我们公司也是没有加班费的。&lt;br&gt;&lt;br&gt;干了一年多，也学了不少东西。但是由于身边也没什么做运维工作的人，所以对自己现在所处的水平也是比较疑惑。于是陆续也查看了各大招聘网站上对于Linux运维工程师的要求，也投出了不少，面试了几家。其中包括杭州的几家互联网公司(基本都是6000上以上的)、南京的一些大小公司。杭州的互联网公司面试时相对比较专业，一般都有好几轮，一面会针对简历上的技术点进行询问，二面就是针对整体架构、设计上的一些询问，平时思考问题的方式等。&lt;br&gt;&lt;br&gt;之前一直对自己的能力也不是很清楚，但是经过这几家的面试，发现即便是杭州的互联网公司，自己还是能够定岗到中级运维工程师，也算是对我这一年多的肯定吧。但是与一些运维资深人员交流下来发现两个问题，第一是对一些开源的东西理解的还不够深入；第二是不懂代码，真的很多事情做不了。就如自己一直想要去做运维开发这块，想要去做运维自动化平台，去解决公司环境部署、版本迭代这些重复劳动的工作。但是由于coding能力不足，人手短缺，这块也只是用jenkins+shell做了简单的持续集成和自动发布。还有就是不懂代码，对一些开源的项目理解不够深入，仅仅会使用是完全不够的。要想想它是怎么实现的，如何实现的，以及为什么要这么来实现。在学习的时候，不能浮于表面，要多思考。&lt;br&gt;&lt;br&gt;纵观大多数大型公司的招聘Linux运维工程师的要求，大多都有一条熟悉shell/python/ruby中的一门或两门语言，遇到大数据这种职位，还会要求你精通java。我也打算从java入手，在学校里也是学过java的，只是没做过什么大项目。正好我这个组也就是在做大数据产品，接下来又要经过一段艰难的时光了。当然运维这块工作还是要由我来做，只是把工作的重心转移到开发上来。&lt;br&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;hr&gt;
+&lt;p&gt;从事了一年半的运维工作，更多的是做业务运维，或者说是应用运维。对于机房内的一些基础设施，比如交换机、路由器并不清楚怎么去配置。&lt;br /&gt;&lt;br&gt;对于一个大公司来说，如果有成型的运维体系，运维按照工作内容来看，可分为基础运维、业务运维、产品运维。而我的工作内容就是一些开源组件和商用中间件集群的部署和调优，并写一些脚本做一些简单的自动化部署。&lt;br /&gt;&lt;br&gt;
     
     </summary>
     
     
       <category term="Linux" scheme="http://yoursite.com/tags/Linux/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="http://yoursite.com/2016/05/23/hello-world/"/>
-    <id>http://yoursite.com/2016/05/23/hello-world/</id>
-    <published>2016-05-23T03:28:16.280Z</published>
-    <updated>2016-05-23T03:28:16.280Z</updated>
-    
-    <content type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;documentation&lt;/a&gt; for more info. If you get any problems when using Hexo, you can find the answer in &lt;a href=&quot;https://hexo.io/docs/troubleshooting.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;troubleshooting&lt;/a&gt; or you can ask me on &lt;a href=&quot;https://github.com/hexojs/hexo/issues&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
-&lt;h2 id=&quot;Quick-Start&quot;&gt;&lt;a href=&quot;#Quick-Start&quot; class=&quot;headerlink&quot; title=&quot;Quick Start&quot;&gt;&lt;/a&gt;Quick Start&lt;/h2&gt;&lt;h3 id=&quot;Create-a-new-post&quot;&gt;&lt;a href=&quot;#Create-a-new-post&quot; class=&quot;headerlink&quot; title=&quot;Create a new post&quot;&gt;&lt;/a&gt;Create a new post&lt;/h3&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;$ hexo new &lt;span class=&quot;string&quot;&gt;&quot;My New Post&quot;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;More info: &lt;a href=&quot;https://hexo.io/docs/writing.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Writing&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&quot;Run-server&quot;&gt;&lt;a href=&quot;#Run-server&quot; class=&quot;headerlink&quot; title=&quot;Run server&quot;&gt;&lt;/a&gt;Run server&lt;/h3&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;$ hexo server&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;More info: &lt;a href=&quot;https://hexo.io/docs/server.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Server&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&quot;Generate-static-files&quot;&gt;&lt;a href=&quot;#Generate-static-files&quot; class=&quot;headerlink&quot; title=&quot;Generate static files&quot;&gt;&lt;/a&gt;Generate static files&lt;/h3&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;$ hexo generate&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;More info: &lt;a href=&quot;https://hexo.io/docs/generating.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Generating&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&quot;Deploy-to-remote-sites&quot;&gt;&lt;a href=&quot;#Deploy-to-remote-sites&quot; class=&quot;headerlink&quot; title=&quot;Deploy to remote sites&quot;&gt;&lt;/a&gt;Deploy to remote sites&lt;/h3&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;$ hexo deploy&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;More info: &lt;a href=&quot;https://hexo.io/docs/deployment.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Deployment&lt;/a&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.
-    
-    </summary>
-    
     
   </entry>
   
