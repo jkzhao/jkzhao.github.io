@@ -112,7 +112,7 @@
 <meta property="og:site_name" content="jkzhao's blog">
 <meta property="og:description" content="一个DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。
 典型的，攻击者尝试通过大量的连接和请求使系统饱和，以使得目标主机无法再接收新的流量，或者响应变慢地不可用。">
-<meta property="og:updated_time" content="2016-05-29T14:35:21.730Z">
+<meta property="og:updated_time" content="2016-05-29T14:58:26.427Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx、Nignx Plus减轻DDoS攻击(译)">
 <meta name="twitter:description" content="一个DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。
@@ -364,7 +364,7 @@
         <p>一个DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。</p>
 <p>典型的，攻击者尝试通过大量的连接和请求使系统饱和，以使得目标主机无法再接收新的流量，或者响应变慢地不可用。<br><a id="more"></a></p>
 <h1 id="应用层DDoS攻击特征"><a href="#应用层DDoS攻击特征" class="headerlink" title="应用层DDoS攻击特征"></a>应用层DDoS攻击特征</h1><hr>
-<p>应用层(Layer 7/HTTP) DDoS攻击是通过利用特定系统的脆弱点而特制的软件程序来完成。例如，对于不处理大量并发连接请求的系统，仅仅打开大量的连接，并且周期性地发送少量的流量来使得连接存活就会耗尽系统的性能以至于无法响应新连接。其他的攻击可采取发送大量的请求或非常大的请求的形式。因为这些攻击是通过肉鸡完成的，而不是通过真实的用户，攻击者可以轻松地、很快地打开大量数据的连接和发送大量的请求。 <br><br><br><br>DDoS的攻击特征可以被用来帮助抵御它们，包括下面(这并不意味着以下列出来的是详尽无遗的)：<br>&emsp;&emsp;1.流量正常是来自一个特定的IP地址的集合，属于那么完成攻击的机器。所以，每一个ip地址负责发起许多连接，而不是你想象的它们来自一个真实用户。 <br><br>&emsp;&emsp;<strong>注意：</strong>不要认为这些流量情况总是代表一次DDoS攻击。代理服务器转发也会造成这种情况，因为代理服务器的ip地址被作为了所有真实客户端的ip地址。不管怎么样，来自于一个代理服务器转发的连接请求数要比真正DDoS攻击的请求数量少很多。 <br><br>&emsp;&emsp;2.因为流量是由于肉鸡产生的，而且是为了压垮目标服务器，流量的速率比一个真实用户能产生的要大的多。<br><br>&emsp;&emsp;3.头部中的User-Agent有时候被设置为一个非标准值。 <br><br>&emsp;&emsp;4.头部中的Referer有时候被设置为某个值，使你能联想到这是攻击。</p>
+<p>应用层(Layer 7/HTTP) DDoS攻击是通过利用特定系统的脆弱点而特制的软件程序来完成。例如，对于不处理大量并发连接请求的系统，仅仅打开大量的连接，并且周期性地发送少量的流量来使得连接存活就会耗尽系统的性能以至于无法响应新连接。其他的攻击可采取发送大量的请求或非常大的请求的形式。因为这些攻击是通过肉鸡完成的，而不是通过真实的用户，攻击者可以轻松地、很快地打开大量数据的连接和发送大量的请求。 <br><br>DDoS的攻击特征可以被用来帮助抵御它们，包括下面(这并不意味着以下列出来的是详尽无遗的)：<br>&emsp;&emsp;1.流量正常是来自一个特定的IP地址的集合，属于那么完成攻击的机器。所以，每一个ip地址负责发起许多连接，而不是你想象的它们来自一个真实用户。<br>&emsp;&emsp;<strong>注意：</strong>不要认为这些流量情况总是代表一次DDoS攻击。代理服务器转发也会造成这种情况，因为代理服务器的ip地址被作为了所有真实客户端的ip地址。不管怎么样，来自于一个代理服务器转发的连接请求数要比真正DDoS攻击的请求数量少很多。<br>&emsp;&emsp;2.因为流量是由于肉鸡产生的，而且是为了压垮目标服务器，流量的速率比一个真实用户能产生的要大的多。<br>&emsp;&emsp;3.头部中的User-Agent有时候被设置为一个非标准值。<br>&emsp;&emsp;4.头部中的Referer有时候被设置为某个值，使你能联想到这是攻击。</p>
 <h1 id="用Nginx和Nginx-Plus抵御DDoS攻击"><a href="#用Nginx和Nginx-Plus抵御DDoS攻击" class="headerlink" title="用Nginx和Nginx Plus抵御DDoS攻击"></a>用Nginx和Nginx Plus抵御DDoS攻击</h1><hr>
 <p>Nginx和Nginx Plus有许多特性——和上面提到的DDoS攻击的特性相结合——可以成为有效地防御DDoS攻击的一部分。因为它们是代理后端服务器，这些特性通过调节流量的进入和控制流量来防御DDoS攻击。</p>
 <h2 id="限制请求速率"><a href="#限制请求速率" class="headerlink" title="限制请求速率"></a>限制请求速率</h2><p>你可以限制Nginx和Nginx Plus接收用户的请求速率为一个典型的真实用户请求的速率值。例如，你可以决定一个真正的用户每2秒只能访问登录页面一次。你可以配置Nginx和Nginx Plus允许一个ip地址每2秒可以尝试登录一次(相当于一分钟可以发起30次请求):</p>
@@ -382,7 +382,7 @@
     </code>
 </pre>
 
-<p><a href="http://nginx.org/en/docs/http/ngx_http_limit_req_module.html?&amp;_ga=1.17821497.1466916160.1455516425#limit_req_zone" target="_blank" rel="external">limit\_req\_zone</a>指令配置一个名字为one的共享区域，用来存储指定的key的请求状态，这种情况下客户端ip地址用变量($binary_remote_addr)来表示。在location /login.html模块中的<a href="http://nginx.org/en/docs/http/ngx_http_limit_req_module.html?&amp;_ga=1.256286731.1466916160.1455516425#limit_req" target="_blank" rel="external">limit\_req</a>指令指定了用到的共享存储区域。</p>
+<p><a href="http://nginx.org/en/docs/http/ngx_http_limit_req_module.html?&amp;_ga=1.17821497.1466916160.1455516425#limit_req_zone" target="_blank" rel="external">limit_req_zone</a>指令配置一个名字为one的共享区域，用来存储指定的key的请求状态，这种情况下客户端ip地址用变量($binary_remote_addr)来表示。在location /login.html模块中的<a href="http://nginx.org/en/docs/http/ngx_http_limit_req_module.html?&amp;_ga=1.256286731.1466916160.1455516425#limit_req" target="_blank" rel="external">limit_req</a>指令指定了用到的共享存储区域。</p>
 <h2 id="限制连接数"><a href="#限制连接数" class="headerlink" title="限制连接数"></a>限制连接数</h2><p>你可以限制一个客户端ip地址可以建立的连接数，指定为一个合适的值。例如，对于你网站的/store资源，你可以允许每个一个客户端ip地址打开不多于10个连接:</p>
 <pre class="prettyprint">
     <code>
@@ -398,8 +398,8 @@
     </code>
 </pre>
 
-<p><a href="http://nginx.org/en/docs/http/ngx_http_limit_conn_module.html?&amp;_ga=1.256286731.1466916160.1455516425#limit_conn_zone" target="_blank" rel="external">limit\_conn\_zone</a>指令配置了一个名为<strong>addr</strong>的共享区域，用来存储指定的key的请求状态，这种情况下客户端ip用变量$binary_remote_addr来表示。在location /store模块中的<a href="http://nginx.org/en/docs/http/ngx_http_limit_conn_module.html?&amp;_ga=1.256286731.1466916160.1455516425#limit_conn" target="_blank" rel="external">limit\_conn</a>指令指定了共享存储区域和设置一个客户端ip的最大连接数为10。</p>
-<h2 id="关闭慢连接"><a href="#关闭慢连接" class="headerlink" title="关闭慢连接"></a>关闭慢连接</h2><p>你可以把写数据非常少的连接关闭掉，这些连接尝试着保持连接尽可能长时间(那样会降低服务器接收新连接的能力)。Slowloris就是一个攻击的例子。<a href="http://nginx.org/en/docs/http/ngx_http_core_module.html?&amp;_ga=1.247309060.1466916160.1455516425#client_body_timeout" target="_blank" rel="external">client\_body\_timeout</a>指令控制Nginx等待客户端的发送请求体的时间间隔，<a href="http://nginx.org/en/docs/http/ngx_http_core_module.html?&amp;_ga=1.247309060.1466916160.1455516425#client_header_timeout" target="_blank" rel="external">client\_header\_timeout</a>指令控制Nginx等待客户端发送请求头的时间间隔。默认这两个指令设置的时间是60秒。下面的例子配置Nginx等待请求头和请求体的时间不超过5秒。</p>
+<p><a href="http://nginx.org/en/docs/http/ngx_http_limit_conn_module.html?&amp;_ga=1.256286731.1466916160.1455516425#limit_conn_zone" target="_blank" rel="external">limit_conn_zone</a>指令配置了一个名为<strong>addr</strong>的共享区域，用来存储指定的key的请求状态，这种情况下客户端ip用变量$binary_remote_addr来表示。在location /store模块中的<a href="http://nginx.org/en/docs/http/ngx_http_limit_conn_module.html?&amp;_ga=1.256286731.1466916160.1455516425#limit_conn" target="_blank" rel="external">limit_conn</a>指令指定了共享存储区域和设置一个客户端ip的最大连接数为10。</p>
+<h2 id="关闭慢连接"><a href="#关闭慢连接" class="headerlink" title="关闭慢连接"></a>关闭慢连接</h2><p>你可以把写数据非常少的连接关闭掉，这些连接尝试着保持连接尽可能长时间(那样会降低服务器接收新连接的能力)。Slowloris就是一个攻击的例子。<a href="http://nginx.org/en/docs/http/ngx_http_core_module.html?&amp;_ga=1.247309060.1466916160.1455516425#client_body_timeout" target="_blank" rel="external">client_body_timeout</a>指令控制Nginx等待客户端的发送请求体的时间间隔，<a href="http://nginx.org/en/docs/http/ngx_http_core_module.html?&amp;_ga=1.247309060.1466916160.1455516425#client_header_timeout" target="_blank" rel="external">client_header_timeout</a>指令控制Nginx等待客户端发送请求头的时间间隔。默认这两个指令设置的时间是60秒。下面的例子配置Nginx等待请求头和请求体的时间不超过5秒。</p>
 <pre class="prettyprint">
     <code>
     server {
@@ -444,8 +444,8 @@
 </pre>
 
 <p>这里，deny指令阻止了所有的客户端ip地址的访问，除了allow指令指定的ip地址范围。</p>
-<h2 id="使用缓存来缓和流量峰值"><a href="#使用缓存来缓和流量峰值" class="headerlink" title="使用缓存来缓和流量峰值"></a>使用缓存来缓和流量峰值</h2><p>你可以配置Nginx和Nginx Plus开启缓存和设置指定的缓存参数来吸收一次攻击中的流量峰值，为后端减轻请求压力。一些有帮助的设置有： <br><br>&emsp;&emsp;1.<a href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache_use_stale" target="_blank" rel="external">proxy\_cache\_use\_stale</a>指令的updating参数告诉Nginx当它需要获取一个陈旧的缓存对象的更新时，它应该只用一个线程去更新缓存对象，并且在线程接收到后端服务器已更新通知的时间段内，所有线程仍然提供陈旧的对象给请求它们的客户端。当一次攻击中有重复请求同一个文件的，这将大大减少对后端服务器的请求数量。 <br><br>&emsp;&emsp;2.<a href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html?&amp;_ga=1.88409883.1466916160.1455516425#proxy_cache_key" target="_blank" rel="external">proxy\_cache\_key</a>指令定义的key通常由嵌入的变量(默认的key有3个，$scheme$proxy_host$request_uri)。如果值中包含变量<a href="http://nginx.org/en/docs/http/ngx_http_core_module.html?&amp;_ga=1.17821497.1466916160.1455516425#var_query_string" target="_blank" rel="external">$query\_string</a>，那么一次攻击发送随机的查询字符串会导致过多的缓存。我们推荐不要在key中使用变量$query_string，除非你有特殊的理由。</p>
-<h2 id="阻塞请求"><a href="#阻塞请求" class="headerlink" title="阻塞请求"></a>阻塞请求</h2><p>你可以配置Nginx和Nginx Plus去阻塞几种请求： <br><br>&emsp;&emsp;1.请求一个似乎是目标的中指定URL <br><br>&emsp;&emsp;2.请求中的User-Agent头部的值与正常客户端请求的值符合 <br><br>&emsp;&emsp;3.请求中的Referer头部的值被设置为了一个与攻击有关系的值 <br><br>&emsp;&emsp;4.请求中的其他头部有与攻击相关的值。 <br><br><br><br>例如：如果你确定DDoS攻击是攻击目标URL <strong>/foo.php</strong>，你可以阻止对这个页面的所有请求： <br></p>
+<h2 id="使用缓存来缓和流量峰值"><a href="#使用缓存来缓和流量峰值" class="headerlink" title="使用缓存来缓和流量峰值"></a>使用缓存来缓和流量峰值</h2><p>你可以配置Nginx和Nginx Plus开启缓存和设置指定的缓存参数来吸收一次攻击中的流量峰值，为后端减轻请求压力。一些有帮助的设置有： <br><br>&emsp;&emsp;1.<a href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache_use_stale" target="_blank" rel="external">proxy_cache_use_stale</a>指令的updating参数告诉Nginx当它需要获取一个陈旧的缓存对象的更新时，它应该只用一个线程去更新缓存对象，并且在线程接收到后端服务器已更新通知的时间段内，所有线程仍然提供陈旧的对象给请求它们的客户端。当一次攻击中有重复请求同一个文件的，这将大大减少对后端服务器的请求数量。 <br><br>&emsp;&emsp;2.<a href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html?&amp;_ga=1.88409883.1466916160.1455516425#proxy_cache_key" target="_blank" rel="external">proxy_cache_key</a>指令定义的key通常由嵌入的变量(默认的key有3个，$scheme$proxy_host$request_uri)。如果值中包含变量<a href="http://nginx.org/en/docs/http/ngx_http_core_module.html?&amp;_ga=1.17821497.1466916160.1455516425#var_query_string" target="_blank" rel="external">$query_string</a>，那么一次攻击发送随机的查询字符串会导致过多的缓存。我们推荐不要在key中使用变量$query_string，除非你有特殊的理由。</p>
+<h2 id="阻塞请求"><a href="#阻塞请求" class="headerlink" title="阻塞请求"></a>阻塞请求</h2><p>你可以配置Nginx和Nginx Plus去阻塞几种请求： <br><br>&emsp;&emsp;1.请求一个似乎是目标的中指定URL<br>&emsp;&emsp;2.请求中的User-Agent头部的值与正常客户端请求的值符合<br>&emsp;&emsp;3.请求中的Referer头部的值被设置为了一个与攻击有关系的值<br>&emsp;&emsp;4.请求中的其他头部有与攻击相关的值。 <br><br>例如：如果你确定DDoS攻击是攻击目标URL <strong>/foo.php</strong>，你可以阻止对这个页面的所有请求： <br></p>
 <pre class="prettyprint">
     <code>
     location /foo.php {
