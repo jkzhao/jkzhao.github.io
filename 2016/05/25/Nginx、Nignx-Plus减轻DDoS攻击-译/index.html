@@ -104,18 +104,18 @@
 
 
 
-<meta name="description" content="一个DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。
+<meta name="description" content="DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。
 典型的，攻击者尝试通过大量的连接和请求使系统饱和，以使得目标主机无法再接收新的流量，或者响应变慢地不可用。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Nginx、Nignx Plus减轻DDoS攻击(译)">
 <meta property="og:url" content="http://yoursite.com/2016/05/25/Nginx、Nignx-Plus减轻DDoS攻击-译/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
-<meta property="og:description" content="一个DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。
+<meta property="og:description" content="DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。
 典型的，攻击者尝试通过大量的连接和请求使系统饱和，以使得目标主机无法再接收新的流量，或者响应变慢地不可用。">
-<meta property="og:updated_time" content="2016-05-29T15:01:21.782Z">
+<meta property="og:updated_time" content="2016-05-30T05:55:29.745Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx、Nignx Plus减轻DDoS攻击(译)">
-<meta name="twitter:description" content="一个DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。
+<meta name="twitter:description" content="DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。
 典型的，攻击者尝试通过大量的连接和请求使系统饱和，以使得目标主机无法再接收新的流量，或者响应变慢地不可用。">
 
 
@@ -361,7 +361,7 @@
       
 
       
-        <p>一个DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。</p>
+        <p>DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。</p>
 <p>典型的，攻击者尝试通过大量的连接和请求使系统饱和，以使得目标主机无法再接收新的流量，或者响应变慢地不可用。<br><a id="more"></a></p>
 <h1 id="应用层DDoS攻击特征"><a href="#应用层DDoS攻击特征" class="headerlink" title="应用层DDoS攻击特征"></a>应用层DDoS攻击特征</h1><hr>
 <p>应用层(Layer 7/HTTP) DDoS攻击是通过利用特定系统的脆弱点而特制的软件程序来完成。例如，对于不处理大量并发连接请求的系统，仅仅打开大量的连接，并且周期性地发送少量的流量来使得连接存活就会耗尽系统的性能以至于无法响应新连接。其他的攻击可采取发送大量的请求或非常大的请求的形式。因为这些攻击是通过肉鸡完成的，而不是通过真实的用户，攻击者可以轻松地、很快地打开大量数据的连接和发送大量的请求。<br>DDoS的攻击特征可以被用来帮助抵御它们，包括下面(这并不意味着以下列出来的是详尽无遗的)：<br>&emsp;&emsp;1.流量正常是来自一个特定的IP地址的集合，属于那么完成攻击的机器。所以，每一个ip地址负责发起许多连接，而不是你想象的它们来自一个真实用户。<br>&emsp;&emsp;<strong>注意：</strong>不要认为这些流量情况总是代表一次DDoS攻击。代理服务器转发也会造成这种情况，因为代理服务器的ip地址被作为了所有真实客户端的ip地址。不管怎么样，来自于一个代理服务器转发的连接请求数要比真正DDoS攻击的请求数量少很多。<br>&emsp;&emsp;2.因为流量是由于肉鸡产生的，而且是为了压垮目标服务器，流量的速率比一个真实用户能产生的要大的多。<br>&emsp;&emsp;3.头部中的User-Agent有时候被设置为一个非标准值。<br>&emsp;&emsp;4.头部中的Referer有时候被设置为某个值，使你能联想到这是攻击。</p>
