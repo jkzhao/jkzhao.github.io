@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2016-05-29T14:58:26.427Z</updated>
+  <updated>2016-05-29T15:01:21.782Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,12 +20,12 @@
     <link href="http://yoursite.com/2016/05/25/Nginx%E3%80%81Nignx-Plus%E5%87%8F%E8%BD%BBDDoS%E6%94%BB%E5%87%BB-%E8%AF%91/"/>
     <id>http://yoursite.com/2016/05/25/Nginx、Nignx-Plus减轻DDoS攻击-译/</id>
     <published>2016-05-25T01:39:34.000Z</published>
-    <updated>2016-05-29T14:58:26.427Z</updated>
+    <updated>2016-05-29T15:01:21.782Z</updated>
     
     <content type="html">&lt;p&gt;一个DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。&lt;/p&gt;
 &lt;p&gt;典型的，攻击者尝试通过大量的连接和请求使系统饱和，以使得目标主机无法再接收新的流量，或者响应变慢地不可用。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h1 id=&quot;应用层DDoS攻击特征&quot;&gt;&lt;a href=&quot;#应用层DDoS攻击特征&quot; class=&quot;headerlink&quot; title=&quot;应用层DDoS攻击特征&quot;&gt;&lt;/a&gt;应用层DDoS攻击特征&lt;/h1&gt;&lt;hr&gt;
-&lt;p&gt;应用层(Layer 7/HTTP) DDoS攻击是通过利用特定系统的脆弱点而特制的软件程序来完成。例如，对于不处理大量并发连接请求的系统，仅仅打开大量的连接，并且周期性地发送少量的流量来使得连接存活就会耗尽系统的性能以至于无法响应新连接。其他的攻击可采取发送大量的请求或非常大的请求的形式。因为这些攻击是通过肉鸡完成的，而不是通过真实的用户，攻击者可以轻松地、很快地打开大量数据的连接和发送大量的请求。 &lt;br&gt;&lt;br&gt;DDoS的攻击特征可以被用来帮助抵御它们，包括下面(这并不意味着以下列出来的是详尽无遗的)：&lt;br&gt;&amp;emsp;&amp;emsp;1.流量正常是来自一个特定的IP地址的集合，属于那么完成攻击的机器。所以，每一个ip地址负责发起许多连接，而不是你想象的它们来自一个真实用户。&lt;br&gt;&amp;emsp;&amp;emsp;&lt;strong&gt;注意：&lt;/strong&gt;不要认为这些流量情况总是代表一次DDoS攻击。代理服务器转发也会造成这种情况，因为代理服务器的ip地址被作为了所有真实客户端的ip地址。不管怎么样，来自于一个代理服务器转发的连接请求数要比真正DDoS攻击的请求数量少很多。&lt;br&gt;&amp;emsp;&amp;emsp;2.因为流量是由于肉鸡产生的，而且是为了压垮目标服务器，流量的速率比一个真实用户能产生的要大的多。&lt;br&gt;&amp;emsp;&amp;emsp;3.头部中的User-Agent有时候被设置为一个非标准值。&lt;br&gt;&amp;emsp;&amp;emsp;4.头部中的Referer有时候被设置为某个值，使你能联想到这是攻击。&lt;/p&gt;
+&lt;p&gt;应用层(Layer 7/HTTP) DDoS攻击是通过利用特定系统的脆弱点而特制的软件程序来完成。例如，对于不处理大量并发连接请求的系统，仅仅打开大量的连接，并且周期性地发送少量的流量来使得连接存活就会耗尽系统的性能以至于无法响应新连接。其他的攻击可采取发送大量的请求或非常大的请求的形式。因为这些攻击是通过肉鸡完成的，而不是通过真实的用户，攻击者可以轻松地、很快地打开大量数据的连接和发送大量的请求。&lt;br&gt;DDoS的攻击特征可以被用来帮助抵御它们，包括下面(这并不意味着以下列出来的是详尽无遗的)：&lt;br&gt;&amp;emsp;&amp;emsp;1.流量正常是来自一个特定的IP地址的集合，属于那么完成攻击的机器。所以，每一个ip地址负责发起许多连接，而不是你想象的它们来自一个真实用户。&lt;br&gt;&amp;emsp;&amp;emsp;&lt;strong&gt;注意：&lt;/strong&gt;不要认为这些流量情况总是代表一次DDoS攻击。代理服务器转发也会造成这种情况，因为代理服务器的ip地址被作为了所有真实客户端的ip地址。不管怎么样，来自于一个代理服务器转发的连接请求数要比真正DDoS攻击的请求数量少很多。&lt;br&gt;&amp;emsp;&amp;emsp;2.因为流量是由于肉鸡产生的，而且是为了压垮目标服务器，流量的速率比一个真实用户能产生的要大的多。&lt;br&gt;&amp;emsp;&amp;emsp;3.头部中的User-Agent有时候被设置为一个非标准值。&lt;br&gt;&amp;emsp;&amp;emsp;4.头部中的Referer有时候被设置为某个值，使你能联想到这是攻击。&lt;/p&gt;
 &lt;h1 id=&quot;用Nginx和Nginx-Plus抵御DDoS攻击&quot;&gt;&lt;a href=&quot;#用Nginx和Nginx-Plus抵御DDoS攻击&quot; class=&quot;headerlink&quot; title=&quot;用Nginx和Nginx Plus抵御DDoS攻击&quot;&gt;&lt;/a&gt;用Nginx和Nginx Plus抵御DDoS攻击&lt;/h1&gt;&lt;hr&gt;
 &lt;p&gt;Nginx和Nginx Plus有许多特性——和上面提到的DDoS攻击的特性相结合——可以成为有效地防御DDoS攻击的一部分。因为它们是代理后端服务器，这些特性通过调节流量的进入和控制流量来防御DDoS攻击。&lt;/p&gt;
 &lt;h2 id=&quot;限制请求速率&quot;&gt;&lt;a href=&quot;#限制请求速率&quot; class=&quot;headerlink&quot; title=&quot;限制请求速率&quot;&gt;&lt;/a&gt;限制请求速率&lt;/h2&gt;&lt;p&gt;你可以限制Nginx和Nginx Plus接收用户的请求速率为一个典型的真实用户请求的速率值。例如，你可以决定一个真正的用户每2秒只能访问登录页面一次。你可以配置Nginx和Nginx Plus允许一个ip地址每2秒可以尝试登录一次(相当于一分钟可以发起30次请求):&lt;/p&gt;
