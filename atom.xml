@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2016-08-04T08:31:18.079Z</updated>
+  <updated>2016-08-04T08:33:35.404Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2016/08/04/%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2Apache%20Hadoop%20(%E6%9C%AC%E5%9C%B0%E6%A8%A1%E5%BC%8F%E5%92%8C%E4%BC%AA%E5%88%86%E5%B8%83%E5%BC%8F)/"/>
     <id>http://yoursite.com/2016/08/04/安装部署Apache Hadoop (本地模式和伪分布式)/</id>
     <published>2016-08-04T00:48:36.000Z</published>
-    <updated>2016-08-04T08:31:18.079Z</updated>
+    <updated>2016-08-04T08:33:35.404Z</updated>
     
     <content type="html">&lt;h1 id=&quot;Hadoop版本&quot;&gt;&lt;a href=&quot;#Hadoop版本&quot; class=&quot;headerlink&quot; title=&quot;Hadoop版本&quot;&gt;&lt;/a&gt;Hadoop版本&lt;/h1&gt;&lt;h2 id=&quot;Hadoop版本种类&quot;&gt;&lt;a href=&quot;#Hadoop版本种类&quot; class=&quot;headerlink&quot; title=&quot;Hadoop版本种类&quot;&gt;&lt;/a&gt;Hadoop版本种类&lt;/h2&gt;&lt;p&gt;目前Hadoop发行版非常多，有华为发行版、Intel发行版、Cloudera发行版（CDH）等，所有这些发行版均是基于Apache Hadoop衍生出来的，之所以有这么多的版本，完全是由&lt;a href=&quot;http://www.apache.org/licenses/LICENSE-2.0&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Apache Hadoop的开源协议&lt;/a&gt;决定的：任何人可以对其进行修改，并作为开源或商业产品发布/销售。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;国内绝大多数公司发行版是收费的，比如Intel发行版、华为发行版等，尽管这些发行版增加了很多开源版本没有的新feature，但绝大多数公司选择Hadoop版本时会将把是否收费作为重要指标，不收费的Hadoop版本主要有三个（均是国外厂商），分别是：Cloudera版本(Cloudera’s Distribution Including Apache Hadoop，简称“CDH”)、Apache基金会hadoop、Hortonworks版本(Hortonworks Data Platform，简称“HDP”)。按顺序代表了，在国内的使用率，CDH和HDP虽然是收费版本，但是他们是开源的，只是收取服务费用。&lt;/p&gt;
