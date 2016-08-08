@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="大数据，Hadoop," />
 
 
 
@@ -104,15 +104,83 @@
 
 
 
-<meta name="description">
-<meta property="og:type" content="website">
-<meta property="og:title" content="jkzhao's blog">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="关于Apache Hadoop的介绍以本地模式、伪分布式安装部署请参见上篇博文，本篇博文主要记录完全分布式部署，并实现NameNode高可用和ResourceManager高可用。
+环境规划
+
+
+主机名
+IP地址
+操作系统版本
+安装软件
+运行的进程
+
+
+
+
+hadoop16
+172.16.206.16
+CentOS 7.2
+JDK1.7、hadoop-2.7.2
+NameNode、DFSZKFai">
+<meta property="og:type" content="article">
+<meta property="og:title" content="安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)">
+<meta property="og:url" content="http://yoursite.com/2016/08/07/安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
-<meta property="og:description">
+<meta property="og:description" content="关于Apache Hadoop的介绍以本地模式、伪分布式安装部署请参见上篇博文，本篇博文主要记录完全分布式部署，并实现NameNode高可用和ResourceManager高可用。
+环境规划
+
+
+主机名
+IP地址
+操作系统版本
+安装软件
+运行的进程
+
+
+
+
+hadoop16
+172.16.206.16
+CentOS 7.2
+JDK1.7、hadoop-2.7.2
+NameNode、DFSZKFai">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/32.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/33.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/34.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/35.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/36.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/37.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/38.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/39.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/40.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/41.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/42.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/43.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/44.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/45.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/46.png">
+<meta property="og:updated_time" content="2016-08-05T07:52:49.302Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="jkzhao's blog">
-<meta name="twitter:description">
+<meta name="twitter:title" content="安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)">
+<meta name="twitter:description" content="关于Apache Hadoop的介绍以本地模式、伪分布式安装部署请参见上篇博文，本篇博文主要记录完全分布式部署，并实现NameNode高可用和ResourceManager高可用。
+环境规划
+
+
+主机名
+IP地址
+操作系统版本
+安装软件
+运行的进程
+
+
+
+
+hadoop16
+172.16.206.16
+CentOS 7.2
+JDK1.7、hadoop-2.7.2
+NameNode、DFSZKFai">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/32.png">
 
 
 
@@ -130,7 +198,7 @@
   };
 </script>
 
-  <title> jkzhao's blog </title>
+  <title> 安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA) | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -151,9 +219,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left 
-   page-home 
- ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -290,9 +356,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
   
@@ -312,10 +378,7 @@
             
             
               
-                
-                <a class="post-title-link" href="/2016/08/07/安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)/" itemprop="url">
-                  安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)
-                </a>
+                安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)
               
             
           </h1>
@@ -362,9 +425,7 @@
       
 
       
-        
-          
-            <p>关于Apache Hadoop的介绍以本地模式、伪分布式安装部署请参见上篇博文，本篇博文主要记录完全分布式部署，并实现NameNode高可用和ResourceManager高可用。</p>
+        <p>关于Apache Hadoop的介绍以本地模式、伪分布式安装部署请参见上篇博文，本篇博文主要记录完全分布式部署，并实现NameNode高可用和ResourceManager高可用。</p>
 <h1 id="环境规划"><a href="#环境规划" class="headerlink" title="环境规划"></a>环境规划</h1><table>
 <thead>
 <tr>
@@ -527,469 +588,58 @@
 <p>停止YARN集群：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[hadoop@hadoop16 ~]$ stop-yarn.sh</span><br></pre></td></tr></table></figure></p>
 <p>停止ResourceManager(Standby)：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[hadoop@hadoop26 ~]$ yarn-daemon.sh stop resourcemanager</span><br></pre></td></tr></table></figure></p>
 
-          
+      
+    </div>
+
+    <div>
+      
         
       
     </div>
 
     <div>
       
-    </div>
+        
 
-    <div>
       
     </div>
 
     <footer class="post-footer">
       
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/08/04/安装部署Apache Hadoop (本地模式和伪分布式)/" itemprop="url">
-                  安装部署Apache Hadoop (本地模式和伪分布式)
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-08-04T08:48:36+08:00" content="2016-08-04">
-              2016-08-04
-            </time>
-          </span>
-
+        <div class="post-tags">
           
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/08/04/安装部署Apache Hadoop (本地模式和伪分布式)/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/04/安装部署Apache Hadoop (本地模式和伪分布式)/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
+            <a href="/tags/大数据，Hadoop/" rel="tag">#大数据，Hadoop</a>
           
         </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          <h1 id="Hadoop版本"><a href="#Hadoop版本" class="headerlink" title="Hadoop版本"></a>Hadoop版本</h1><h2 id="Hadoop版本种类"><a href="#Hadoop版本种类" class="headerlink" title="Hadoop版本种类"></a>Hadoop版本种类</h2><p>目前Hadoop发行版非常多，有华为发行版、Intel发行版、Cloudera发行版（CDH）等，所有这些发行版均是基于Apache Hadoop衍生出来的，之所以有这么多的版本，完全是由<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache Hadoop的开源协议</a>决定的：任何人可以对其进行修改，并作为开源或商业产品发布/销售。<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/08/04/安装部署Apache Hadoop (本地模式和伪分布式)/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/04/安装部署Apache Hadoop (本地模式和伪分布式)/" rel="next" title="安装部署Apache Hadoop (本地模式和伪分布式)">
+                <i class="fa fa-chevron-left"></i> 安装部署Apache Hadoop (本地模式和伪分布式)
+              </a>
+            
           </div>
-        
-      
-    </div>
 
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
+          <div class="post-nav-prev post-nav-item">
             
-            
-              
-                
-                <a class="post-title-link" href="/2016/06/08/使用Github-Pages与Hexo搭建博客/" itemprop="url">
-                  使用Github Pages与Hexo搭建博客
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-06-08T17:58:10+08:00" content="2016-06-08">
-              2016-06-08
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/搭建博客/" itemprop="url" rel="index">
-                    <span itemprop="name">搭建博客</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/06/08/使用Github-Pages与Hexo搭建博客/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/08/使用Github-Pages与Hexo搭建博客/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
+          </div>
         </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          <h1 id="什么是Git-Github-Github-Pages"><a href="#什么是Git-Github-Github-Pages" class="headerlink" title="什么是Git, Github, Github Pages?"></a>什么是Git, Github, Github Pages?</h1><p>1.Git是一个开源的分布式版本控制系统，用以有效、高速的处理从很小到非常大的项目版本管理。<br>2.GitHub是一个具有版本管理功能的代码仓库，每个项目都有一个主页，列出项目的源文件。许多重要的项目都托管在上面。<br>3.GitHub Pages免费的静态站点，三个特点：免费托管、自带主题、支持自制页面和Jekyll。Github Pages 是面向用户、组织和项目开放的公共静态页面搭建托管服务，站点可以被免费托管在 Github 上，你可以选择使用 Github Pages 默认提供的域名 github.io 或者自定义域名来发布站点。<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/06/08/使用Github-Pages与Hexo搭建博客/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </article>
 
 
-    
-      
 
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/05/25/Nginx、Nignx-Plus减轻DDoS攻击-译/" itemprop="url">
-                  Nginx、Nignx Plus减轻DDoS攻击(译)
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-05-25T09:39:34+08:00" content="2016-05-25">
-              2016-05-25
-            </time>
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/05/25/Nginx、Nignx-Plus减轻DDoS攻击-译/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/25/Nginx、Nignx-Plus减轻DDoS攻击-译/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>DDoS攻击是一种对服务的攻击，一般是对网站的攻击，通过使用多台机器连续的流量轰炸目标服务器，以使得提供服务的主机因为资源用尽而不再能够提供有效地提供服务。</p>
-<p>典型的，攻击者尝试通过大量的连接和请求使系统饱和，以使得目标主机无法再接收新的流量，或者响应变慢地不可用。<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/05/25/Nginx、Nignx-Plus减轻DDoS攻击-译/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
+    <div class="post-spread">
       
     </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/05/23/个人这一年半以来的运维总结/" itemprop="url">
-                  个人这一年半以来的运维总结
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-05-23T13:29:35+08:00" content="2016-05-23">
-              2016-05-23
-            </time>
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/05/23/个人这一年半以来的运维总结/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/23/个人这一年半以来的运维总结/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <hr>
-<p>从事了一年半的运维工作，更多的是做业务运维，或者说是应用运维。对于机房内的一些基础设施，比如交换机、路由器并不清楚怎么去配置。<br /><br>对于一个大公司来说，如果有成型的运维体系，运维按照工作内容来看，可分为基础运维、业务运维、监控运维和产品运维。而我的工作内容就是一些开源组件和商用中间件集群的部署和调优，并写一些脚本做一些简单的自动化部署。<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/05/23/个人这一年半以来的运维总结/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-  </section>
-
-  
+  </div>
 
 
           </div>
@@ -997,6 +647,14 @@
 
 
           
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/08/07/安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)/"
+           data-title="安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)" data-url="http://yoursite.com/2016/08/07/安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)/">
+      </div>
+    
+  </div>
+
 
         </div>
         
@@ -1016,8 +674,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -1117,6 +784,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#环境规划"><span class="nav-number">1.</span> <span class="nav-text">环境规划</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置集群各节点hosts文件"><span class="nav-number">2.</span> <span class="nav-text">配置集群各节点hosts文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装JDK1-7"><span class="nav-number">3.</span> <span class="nav-text">安装JDK1.7</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装依赖包ssh和rsync"><span class="nav-number">4.</span> <span class="nav-text">安装依赖包ssh和rsync</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#各节点时间同步"><span class="nav-number">5.</span> <span class="nav-text">各节点时间同步</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#NTP服务端"><span class="nav-number">5.1.</span> <span class="nav-text">NTP服务端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NTP客户端"><span class="nav-number">5.2.</span> <span class="nav-text">NTP客户端</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装Zookeeper集群"><span class="nav-number">6.</span> <span class="nav-text">安装Zookeeper集群</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置zk"><span class="nav-number">6.1.</span> <span class="nav-text">安装配置zk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动和关闭zk"><span class="nav-number">6.2.</span> <span class="nav-text">启动和关闭zk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试zk集群"><span class="nav-number">6.3.</span> <span class="nav-text">测试zk集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#脚本定期清理zk快照和日志文件"><span class="nav-number">6.4.</span> <span class="nav-text">脚本定期清理zk快照和日志文件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#添加Hadoop运行用户"><span class="nav-number">7.</span> <span class="nav-text">添加Hadoop运行用户</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置主节点登录自己和其他节点不需要输入密码"><span class="nav-number">8.</span> <span class="nav-text">配置主节点登录自己和其他节点不需要输入密码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装hadoop"><span class="nav-number">9.</span> <span class="nav-text">安装hadoop</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置master节点-hadoop16主机"><span class="nav-number">9.1.</span> <span class="nav-text">安装配置master节点(hadoop16主机)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置其他节点"><span class="nav-number">9.2.</span> <span class="nav-text">安装配置其他节点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#启动hadoop"><span class="nav-number">10.</span> <span class="nav-text">启动hadoop</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#启动Zookeeper集群"><span class="nav-number">10.1.</span> <span class="nav-text">启动Zookeeper集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动journalnode"><span class="nav-number">10.2.</span> <span class="nav-text">启动journalnode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#格式化HDFS"><span class="nav-number">10.3.</span> <span class="nav-text">格式化HDFS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#格式化ZKFC-仅在hadoop16上执行即可"><span class="nav-number">10.4.</span> <span class="nav-text">格式化ZKFC(仅在hadoop16上执行即可)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动HDFS-在hadoop16上执行"><span class="nav-number">10.5.</span> <span class="nav-text">启动HDFS(在hadoop16上执行)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动YARN"><span class="nav-number">10.6.</span> <span class="nav-text">启动YARN</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#停止hadoop"><span class="nav-number">11.</span> <span class="nav-text">停止hadoop</span></a></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -1220,6 +898,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 
