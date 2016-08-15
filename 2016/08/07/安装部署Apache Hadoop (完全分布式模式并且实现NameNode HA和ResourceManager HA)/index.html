@@ -105,45 +105,13 @@
 
 
 <meta name="description" content="关于Apache Hadoop的介绍以本地模式、伪分布式安装部署请参见上篇博文，本篇博文主要记录完全分布式部署，并实现NameNode高可用和ResourceManager高可用。
-环境规划
-
-
-主机名
-IP地址
-操作系统版本
-安装软件
-运行的进程
-
-
-
-
-hadoop16
-172.16.206.16
-CentOS 7.2
-JDK1.7、hadoop-2.7.2
-NameNode、DFSZKFai">
+环境规划">
 <meta property="og:type" content="article">
 <meta property="og:title" content="安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)">
 <meta property="og:url" content="http://yoursite.com/2016/08/07/安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
 <meta property="og:description" content="关于Apache Hadoop的介绍以本地模式、伪分布式安装部署请参见上篇博文，本篇博文主要记录完全分布式部署，并实现NameNode高可用和ResourceManager高可用。
-环境规划
-
-
-主机名
-IP地址
-操作系统版本
-安装软件
-运行的进程
-
-
-
-
-hadoop16
-172.16.206.16
-CentOS 7.2
-JDK1.7、hadoop-2.7.2
-NameNode、DFSZKFai">
+环境规划">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/32.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/33.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/34.png">
@@ -159,27 +127,11 @@ NameNode、DFSZKFai">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/44.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/45.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/46.png">
-<meta property="og:updated_time" content="2016-08-05T07:52:49.302Z">
+<meta property="og:updated_time" content="2016-08-15T02:09:45.172Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)">
 <meta name="twitter:description" content="关于Apache Hadoop的介绍以本地模式、伪分布式安装部署请参见上篇博文，本篇博文主要记录完全分布式部署，并实现NameNode高可用和ResourceManager高可用。
-环境规划
-
-
-主机名
-IP地址
-操作系统版本
-安装软件
-运行的进程
-
-
-
-
-hadoop16
-172.16.206.16
-CentOS 7.2
-JDK1.7、hadoop-2.7.2
-NameNode、DFSZKFai">
+环境规划">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/32.png">
 
 
@@ -426,7 +378,8 @@ NameNode、DFSZKFai">
 
       
         <p>关于Apache Hadoop的介绍以本地模式、伪分布式安装部署请参见上篇博文，本篇博文主要记录完全分布式部署，并实现NameNode高可用和ResourceManager高可用。</p>
-<h1 id="环境规划"><a href="#环境规划" class="headerlink" title="环境规划"></a>环境规划</h1><table>
+<h1 id="环境规划"><a href="#环境规划" class="headerlink" title="环境规划"></a>环境规划</h1><a id="more"></a>
+<table>
 <thead>
 <tr>
 <th>主机名</th>
