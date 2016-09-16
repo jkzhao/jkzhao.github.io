@@ -161,7 +161,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/49.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/50.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/51.png">
-<meta property="og:updated_time" content="2016-09-16T14:16:10.616Z">
+<meta property="og:updated_time" content="2016-09-16T14:24:55.068Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="vpn简介及openvpn搭建">
 <meta name="twitter:description" content="VPN介绍VPN概述VPN(全称Virtual Private Network)虚拟专用网络，是依靠ISP和其他的NSP，在公共网络中建立专用的数据通信网络的技术，可以为企业之间或者个人与企业之间提供安全的数据传输隧道服务。在VPN中任意两点之间的连接并没有传统专网所需的端到端的物理链路，而是利用公共网络资源动态组成的，可以理解为通过私有的隧道技术在公共数据网络上模拟出来的和专网有同样功能的点到点">
@@ -447,51 +447,26 @@
 <h2 id="配置vpn-server时间同步"><a href="#配置vpn-server时间同步" class="headerlink" title="配置vpn server时间同步"></a>配置vpn server时间同步</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# /usr/sbin/ntpdate pool.ntp.org</span><br></pre></td></tr></table></figure>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/1.png" alt=""><br>加入到定时任务:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# echo &apos;#time sync&apos; &gt;&gt; /var/spool/cron/root</span><br><span class="line">[root@odsee ~]#  echo &apos;*/5 * * * * /usr/sbin/ntpdate pool.ntp.org &gt;/dev/null 2&gt;&amp;1&apos; &gt;&gt;/var/spool/cron/root</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/2.png" alt=""><br><strong>注意:</strong>如果vpn服务器和拨号的计算机客户端时间不一致，可能会导致VPN连接失败。</p>
-<h2 id="安装openvpn"><a href="#安装openvpn" class="headerlink" title="安装openvpn"></a>安装openvpn</h2><ol>
-<li>建立openvpn软件存放目录，并上传软件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# cd /usr/local/</span><br><span class="line">[root@odsee local]# mkdir openvpn</span><br><span class="line">[root@odsee local]# cd openvpn/</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
+<h2 id="安装openvpn"><a href="#安装openvpn" class="headerlink" title="安装openvpn"></a>安装openvpn</h2><p>1.建立openvpn软件存放目录，并上传软件 <br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# cd /usr/local/</span><br><span class="line">[root@odsee local]# mkdir openvpn</span><br><span class="line">[root@odsee local]# cd openvpn/</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/3.png" alt=""><br><strong>注意:</strong>openvpn网上用的最多的是lzo-2.0.2和openvpn-2.0.9，这两个也是最稳定的。</p>
-<ol>
-<li><p>安装lzo压缩模块</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn]# tar zxf lzo-2.06.tar.gz</span><br><span class="line">[root@odsee openvpn]# cd lzo-2.06</span><br><span class="line">[root@odsee lzo-2.06]# ./configure</span><br><span class="line">[root@odsee lzo-2.06]# make</span><br><span class="line">[root@odsee lzo-2.06]# make install</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>安装openvpn软件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee lzo-2.06]# cd ..</span><br><span class="line">[root@odsee openvpn]# tar zxf openvpn-2.2.2.tar.gz</span><br><span class="line">[root@odsee openvpn]# cd openvpn-2.2.2</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
+<p>2.安装lzo压缩模块 <br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn]# tar zxf lzo-2.06.tar.gz</span><br><span class="line">[root@odsee openvpn]# cd lzo-2.06</span><br><span class="line">[root@odsee lzo-2.06]# ./configure</span><br><span class="line">[root@odsee lzo-2.06]# make</span><br><span class="line">[root@odsee lzo-2.06]# make install</span><br></pre></td></tr></table></figure></p>
+<p>3.安装openvpn软件 <br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee lzo-2.06]# cd ..</span><br><span class="line">[root@odsee openvpn]# tar zxf openvpn-2.2.2.tar.gz</span><br><span class="line">[root@odsee openvpn]# cd openvpn-2.2.2</span><br></pre></td></tr></table></figure></p>
 <p>查看依赖包有没有安装，openvpn需要ssl支持：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn-2.2.2]# rpm -qa|grep openssl</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/4.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn-2.2.2]# ./configure --with-lzo-headers=/usr/local/include --with-lzo-lib=/usr/local/lib</span><br><span class="line">[root@odsee openvpn-2.2.2]# make</span><br><span class="line">[root@odsee openvpn-2.2.2]# make install</span><br></pre></td></tr></table></figure></p>
-<ol>
-<li>配置openvpn server，建立CA证书<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn-2.2.2]# cd easy-rsa/2.0/</span><br><span class="line">[root@odsee 2.0]# cp vars.bak vars20151204.bak</span><br><span class="line">[root@odsee 2.0]# vim vars</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
+<p>4.配置openvpn server，建立CA证书 <br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn-2.2.2]# cd easy-rsa/2.0/</span><br><span class="line">[root@odsee 2.0]# cp vars.bak vars20151204.bak</span><br><span class="line">[root@odsee 2.0]# vim vars</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/5.png" alt=""><br>修改完vars文件后，执行source vars使修改生效：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/6.png" alt=""><br>清除所有证书keys：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# ./clean-all</span><br></pre></td></tr></table></figure></p>
 <p>创建新的ca证书：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/7.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/8.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# vim vars</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/9.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# source vars</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/10.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# ./clean-all</span><br><span class="line">[root@odsee 2.0]# ./build-ca</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/11.png" alt=""><br>查看生成的证书：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/12.png" alt=""></p>
-<ol>
-<li><p>生成服务器端证书和密钥key文件<br>[root@odsee 2.0]# ./build-key-server server<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/13.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/14.png" alt=""><br>也可以输入密码。 <br><br>查看创建的服务端证书：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/15.png" alt=""></p>
-</li>
-<li><p>生成客户端证书和key文件<br>生成client证书和key文件。若建立多个客户端证书，则重复如下步骤即可。只需修改Common Name项的名称。 <br><br>在openvpn中，这种配置方法是每一个登陆的VPN客户端需要一个证书，每个证书在同一时刻只能供一个客户端连接。下面建立1份客户端证书，key的名字叫test。在工作中一般名字为人的名字。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/16.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/17.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/18.png" alt=""><br>.crt是证书，.key是密钥文件。这两个都是客户端需要的。 <br><br><strong>注意:</strong>使用build-key给客户端生成证书和密钥，客户端拨号是不需要密码的。但是也可以加密码，使用build-key-pass脚本创建证书和密钥文件，这样你在客户端拨号的时候需要加密码，密码是拨号vpn的密码。 <br><br>下面使用build-key-pass创建另一个客户端证书和密钥文件。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# cd /usr/local/openvpn/openvpn-2.2.2/easy-rsa/2.0</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
+<p>5.生成服务器端证书和密钥key文件 <br><br>[root@odsee 2.0]# ./build-key-server server<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/13.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/14.png" alt=""><br>也可以输入密码。 <br><br>查看创建的服务端证书：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/15.png" alt=""></p>
+<p>6.生成客户端证书和key文件 <br><br>生成client证书和key文件。若建立多个客户端证书，则重复如下步骤即可。只需修改Common Name项的名称。 <br><br>在openvpn中，这种配置方法是每一个登陆的VPN客户端需要一个证书，每个证书在同一时刻只能供一个客户端连接。下面建立1份客户端证书，key的名字叫test。在工作中一般名字为人的名字。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/16.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/17.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/18.png" alt=""><br>.crt是证书，.key是密钥文件。这两个都是客户端需要的。 <br><br><strong>注意:</strong>使用build-key给客户端生成证书和密钥，客户端拨号是不需要密码的。但是也可以加密码，使用build-key-pass脚本创建证书和密钥文件，这样你在客户端拨号的时候需要加密码，密码是拨号vpn的密码。 <br><br>下面使用build-key-pass创建另一个客户端证书和密钥文件。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# cd /usr/local/openvpn/openvpn-2.2.2/easy-rsa/2.0</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/19.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/20.png" alt=""></p>
-<ol>
-<li>生成vpn密钥协议交换文件<br>生成传输进行密钥交换时用到的交换密钥协议文件：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# ./build-dh</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
+<p>7.生成vpn密钥协议交换文件 <br><br>生成传输进行密钥交换时用到的交换密钥协议文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# ./build-dh</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/21.png" alt=""><br>查看生成的文件：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/22.png" alt=""></p>
-<ol>
-<li>详解服务器及客户端的证书各文件用途<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/23.png" alt=""><br>为了防止恶意攻击(如DOS、UDP port flooding)，我们生成一个“HMAC firewall”：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# openvpn --genkey --secret keys/ta.key</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
+<p>8.详解服务器及客户端的证书各文件用途 <br><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/23.png" alt=""><br>为了防止恶意攻击(如DOS、UDP port flooding)，我们生成一个“HMAC firewall”：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# openvpn --genkey --secret keys/ta.key</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/24.png" alt=""><br>到此文件生成工作完成了。</p>
-<ol>
-<li>详解服务器端VPN重要命令</li>
-</ol>
+<p>9.详解服务器端VPN重要命令 <br></p>
 <ul>
 <li>vars脚本：是用来创建环境变量，设置所需要的变量的脚本</li>
 <li>clean-all脚本：清理生成ca证书及密钥文件</li>
@@ -502,9 +477,7 @@
 <li>build-dh脚本：脚本生成Diffie-Hellman文件(交互)</li>
 <li>pkitool脚本：直接使用vars的环境变量设置，直接生成证书(非交互)</li>
 </ul>
-<ol>
-<li>详解openvpn服务端重要配置参数</li>
-</ol>
+<p>10.详解openvpn服务端重要配置参数 <br></p>
 <ul>
 <li>拷贝keys及配置<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# mkdir /etc/openvpn/</span><br><span class="line">[root@odsee 2.0]# cp -ap keys/ /etc/openvpn/</span><br><span class="line">[root@odsee 2.0]# cd /usr/local/openvpn/openvpn-2.2.2/sample-config-files/</span><br><span class="line">[root@odsee sample-config-files]# cp client.conf server.conf /etc/openvpn/</span><br></pre></td></tr></table></figure>
 </li>
@@ -605,29 +578,15 @@
 </tr>
 </tbody>
 </table>
-<h2 id="配置调试vpn并运行vpn服务"><a href="#配置调试vpn并运行vpn服务" class="headerlink" title="配置调试vpn并运行vpn服务"></a>配置调试vpn并运行vpn服务</h2><ol>
-<li><p>取消防火墙对vpnserver端口的限制以及允许服务转发。或者先关闭防火墙，调好VPN，在开启防火墙。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# service iptables stop</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>开启内核转发功能</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# sed -i &apos;s#net.ipv4.ip_forward = 0#net.ipv4.ip_forward = 1#&apos; /etc/sysctl.conf</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
+<h2 id="配置调试vpn并运行vpn服务"><a href="#配置调试vpn并运行vpn服务" class="headerlink" title="配置调试vpn并运行vpn服务"></a>配置调试vpn并运行vpn服务</h2><p>1.取消防火墙对vpnserver端口的限制以及允许服务转发。或者先关闭防火墙，调好VPN，在开启防火墙 <br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# service iptables stop</span><br></pre></td></tr></table></figure></p>
+<p>2.开启内核转发功能 <br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# sed -i &apos;s#net.ipv4.ip_forward = 0#net.ipv4.ip_forward = 1#&apos; /etc/sysctl.conf</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/27.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# sysctl -p</span><br></pre></td></tr></table></figure></p>
 <p><strong>注意:</strong>iptables和内核的ip_forward都需要开启允许转发。</p>
-<ol>
-<li>关闭SELinux<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# setenforce 0</span><br><span class="line">[root@odsee ~]# vim /etc/sysconfig/selinux</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
+<p>3.关闭SELinux <br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# setenforce 0</span><br><span class="line">[root@odsee ~]# vim /etc/sysconfig/selinux</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/28.png" alt=""></p>
-<ol>
-<li>启动服务端的VPN服务<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn]# /usr/local/sbin/openvpn --config /etc/openvpn/server.conf &amp;</span><br><span class="line">[root@odsee openvpn]# netstat -anp|grep vpn</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
+<p>4.启动服务端的VPN服务 <br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn]# /usr/local/sbin/openvpn --config /etc/openvpn/server.conf &amp;</span><br><span class="line">[root@odsee openvpn]# netstat -anp|grep vpn</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/29.png" alt=""><br>查看日志：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/30.png" alt=""></p>
-<ol>
-<li>服务端查看虚拟网卡<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/31.png" alt=""></li>
-</ol>
+<p>5.服务端查看虚拟网卡 <br><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/31.png" alt=""></p>
 <h1 id="安装windows-VPN客户端，配置VPN连接"><a href="#安装windows-VPN客户端，配置VPN连接" class="headerlink" title="安装windows VPN客户端，配置VPN连接"></a>安装windows VPN客户端，配置VPN连接</h1><h2 id="下载安装客户端"><a href="#下载安装客户端" class="headerlink" title="下载安装客户端"></a>下载安装客户端</h2><p>下载地址：<a href="http://swupdate.openvpn.org/community/releases/openvpn-2.2.2-install.exe" target="_blank" rel="external">http://swupdate.openvpn.org/community/releases/openvpn-2.2.2-install.exe</a> <br><br>安装过程中，有一步骤需要信任，见下图：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/32.png" alt=""></p>
 <h2 id="配置客户端证书"><a href="#配置客户端证书" class="headerlink" title="配置客户端证书"></a>配置客户端证书</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee keys]# cd /usr/local/openvpn/openvpn-2.2.2/easy-rsa/2.0/keys/</span><br></pre></td></tr></table></figure>
 <p>先从vpnserver上把那个登录不需要密码的证书和密钥传下来：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee keys]# sz ca.crt test.crt test.key</span><br><span class="line">[root@odsee keys]# cd /usr/local/openvpn/openvpn-2.2.2/sample-config-files/</span><br><span class="line">[root@odsee sample-config-files]# sz client.conf</span><br></pre></td></tr></table></figure></p>
@@ -635,17 +594,10 @@
 <h2 id="配置客户端的配置文件Client-conf"><a href="#配置客户端的配置文件Client-conf" class="headerlink" title="配置客户端的配置文件Client.conf"></a>配置客户端的配置文件Client.conf</h2><p>备份配置文件：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/36.png" alt=""><br>可以在服务器上过滤配置文件，查看默认配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn]# egrep -v &quot;^#|^;|^$&quot; client.conf</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/37.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/38.png" alt=""><br>新建一个文件test.ovpn文件，然后贴入下面的内容：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/39.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">client</span><br><span class="line">dev tun</span><br><span class="line">proto tcp</span><br><span class="line">remote 172.16.4.81 52115</span><br><span class="line">resolv-retry infinite</span><br><span class="line">nobind</span><br><span class="line">persist-key</span><br><span class="line">persist-tun</span><br><span class="line">ca ca.crt</span><br><span class="line">cert test.crt</span><br><span class="line">key test.key</span><br><span class="line">ns-cert-type server</span><br><span class="line">comp-lzo</span><br><span class="line">verb 3</span><br></pre></td></tr></table></figure></p>
 <h2 id="拨号连接调试"><a href="#拨号连接调试" class="headerlink" title="拨号连接调试"></a>拨号连接调试</h2><p>在windows上拨号远程连接openvpn服务，先双击如下图标：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/40.png" alt=""><br>然后右下角右击图标，点击connect：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/41.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/42.png" alt=""><br>但是发现上不了网，能连上，查看连接vpn前的路由和连接vpn后的路由：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/43.png" alt=""><br>测试vpn客户端连接vpn server连通性的方法：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/44.png" alt=""><br>原因是：没有设置客户端的默认网关通过vpn出去：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/45.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/46.png" alt=""><br>最后改完的配置如下：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/47.png" alt=""><br>为什么dns不用8.8.8.8？因为这台vpn server(172.16.4.81) ping不通8.8.8.8</p>
-<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><ol>
-<li><p>拨号后地址也获取到了，但是就是访问别人时地址，别人那边看到的访问记录还是你原来的ip地址？<br>解决：以管理员身份运行软件，在拨号上网。</p>
-</li>
-<li><p>长时间不去生成证书，再次生成证书时如下：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/48.png" alt=""><br>解决：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# source vars</span><br><span class="line">NOTE: If you run ./clean-all, I will be doing a rm -rf on /usr/local/openvpn/openvpn-2.2.2/easy-rsa/2.0/keys</span><br><span class="line">[root@odsee 2.0]# ./build-key-pass ldh</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
+<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><p>1.拨号后地址也获取到了，但是就是访问别人时地址，别人那边看到的访问记录还是你原来的ip地址？ <br><br>解决：以管理员身份运行软件，在拨号上网。</p>
+<p>2.长时间不去生成证书，再次生成证书时如下： <br><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/48.png" alt=""><br>解决：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# source vars</span><br><span class="line">NOTE: If you run ./clean-all, I will be doing a rm -rf on /usr/local/openvpn/openvpn-2.2.2/easy-rsa/2.0/keys</span><br><span class="line">[root@odsee 2.0]# ./build-key-pass ldh</span><br></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/49.png" alt=""><br>把生成的3个证书copy到/etc/openvpn/keys目录下。然后给别人用时给.crt .key以及ca.crt3个文件。</p>
-<ol>
-<li>win10启动openvpn报错：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/50.png" alt=""><br>解决：<br>到openvpn安装后的bin下依次以管理员身份执行：delalltap.bat和addtap.bat <br><br>如果解决上面的问题，还是报错：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/51.png" alt=""><br>解决：<br>以管理员运行openvpn客户端。</li>
-</ol>
+<p>3.win10启动openvpn报错： <br><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/50.png" alt=""><br>解决：<br>到openvpn安装后的bin下依次以管理员身份执行：delalltap.bat和addtap.bat <br><br>如果解决上面的问题，还是报错：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/51.png" alt=""><br>解决：<br>以管理员运行openvpn客户端。</p>
 
       
     </div>
