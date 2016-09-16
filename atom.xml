@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2016-08-15T02:09:45.172Z</updated>
+  <updated>2016-09-16T14:08:30.485Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,262 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>vpn简介及openvpn搭建</title>
+    <link href="http://yoursite.com/2016/09/06/vpn%E7%AE%80%E4%BB%8B%E5%8F%8Aopenvpn%E6%90%AD%E5%BB%BA/"/>
+    <id>http://yoursite.com/2016/09/06/vpn简介及openvpn搭建/</id>
+    <published>2016-09-06T03:33:59.000Z</published>
+    <updated>2016-09-16T14:08:30.485Z</updated>
+    
+    <content type="html">&lt;h1 id=&quot;VPN介绍&quot;&gt;&lt;a href=&quot;#VPN介绍&quot; class=&quot;headerlink&quot; title=&quot;VPN介绍&quot;&gt;&lt;/a&gt;VPN介绍&lt;/h1&gt;&lt;h2 id=&quot;VPN概述&quot;&gt;&lt;a href=&quot;#VPN概述&quot; class=&quot;headerlink&quot; title=&quot;VPN概述&quot;&gt;&lt;/a&gt;VPN概述&lt;/h2&gt;&lt;p&gt;VPN(全称Virtual Private Network)虚拟专用网络，是依靠ISP和其他的NSP，在公共网络中建立专用的数据通信网络的技术，可以为企业之间或者个人与企业之间提供安全的数据传输隧道服务。在VPN中任意两点之间的连接并没有传统专网所需的端到端的物理链路，而是利用公共网络资源动态组成的，可以理解为通过私有的隧道技术在公共数据网络上模拟出来的和专网有同样功能的点到点的专线技术。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;VPN的主要应用场景&quot;&gt;&lt;a href=&quot;#VPN的主要应用场景&quot; class=&quot;headerlink&quot; title=&quot;VPN的主要应用场景&quot;&gt;&lt;/a&gt;VPN的主要应用场景&lt;/h2&gt;&lt;p&gt;我们根据VPN的常见企业应用，将VPN分为以下4类应用：&lt;/p&gt;
+&lt;h3 id=&quot;出差在外访问公司内部资源&quot;&gt;&lt;a href=&quot;#出差在外访问公司内部资源&quot; class=&quot;headerlink&quot; title=&quot;出差在外访问公司内部资源&quot;&gt;&lt;/a&gt;出差在外访问公司内部资源&lt;/h3&gt;&lt;p&gt;企业内部员工出差、休假或特殊情况下在远离办公室的时候，又有需求访问公司的内部网络获取相关资源，就可以通过VPN拨号到公司内部。此时远程拨号的员工和办公室内的员工以及其他拨号的员工之间都相当于在一个局域网内。例如：访问内部的域控制器，文件服务器，OA系统，ERP，HTTP服务，内网飞秋聊天工具等局域网服务应用。&lt;br&gt;&lt;br&gt;运维人员需要个人电脑远程拨号到企业网站的IDC机房，远程维护IDC内网服务器。&lt;br&gt;&lt;br&gt;&lt;strong&gt;外出办公的人如何连接内网服务器呢？&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;没有VPN&lt;br&gt;先登录到外网服务器组中一台服务器，然后在这个外网服务器上SSH到内网服务器。&lt;/li&gt;
+&lt;li&gt;有VPN&lt;br&gt;把VPN搭在某一台外网服务器(外网服务器有公网ip)上，这样外出办公人员可以通过vpn拨号到这台机器上，然后在自己笔记本上输入内网服务器的IP:port访问内网服务器。同时有了vpn，可以把外网服务器的远程连接SSH全部屏蔽起来，黑客就不能通过SSH服务来攻击公司的外网服务器。而公司的人员通过vpn拨号拨到这个装了vpn的外网服务器上去，然后访问内网服务器。访问外网服务器通过访问内网ip地址去访问。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&quot;企业内部网络之间VPN服务&quot;&gt;&lt;a href=&quot;#企业内部网络之间VPN服务&quot; class=&quot;headerlink&quot; title=&quot;企业内部网络之间VPN服务&quot;&gt;&lt;/a&gt;企业内部网络之间VPN服务&lt;/h3&gt;&lt;p&gt;在公司的分支机构的局域网和公司内部LAN之间的VPN连接。通过公网Internet建立VPN将公司在各地的分支机构的LAN连接到公司总部的LAN。例如：各大超市之间业务结算等。&lt;br&gt;&lt;br&gt;这是由于地域的原因而产生的VPN需求，通过VPN让不同地域内的机器可以互相访问，就好像是一个局域网一样。例如：办公室互联协同办公，机房互联数据同步及业务访问。&lt;/p&gt;
+&lt;h3 id=&quot;互联网公司多IDC机房之间VPN服务&quot;&gt;&lt;a href=&quot;#互联网公司多IDC机房之间VPN服务&quot; class=&quot;headerlink&quot; title=&quot;互联网公司多IDC机房之间VPN服务&quot;&gt;&lt;/a&gt;互联网公司多IDC机房之间VPN服务&lt;/h3&gt;&lt;p&gt;这是运维架构人员需要考虑的问题，不同机房之间业务管理和业务访问，数据流动。&lt;/p&gt;
+&lt;h3 id=&quot;企业外部VPN服务&quot;&gt;&lt;a href=&quot;#企业外部VPN服务&quot; class=&quot;headerlink&quot; title=&quot;企业外部VPN服务&quot;&gt;&lt;/a&gt;企业外部VPN服务&lt;/h3&gt;&lt;p&gt;在供应商、合作伙伴的LAN和本公司的LAN之间建立的VPN服务。&lt;br&gt;&lt;br&gt;企业内部网络之间的VPN服务、企业内部网络之间VPN服务和企业外部VPN服务是一套系统，不同的场景。&lt;/p&gt;
+&lt;h3 id=&quot;翻墙&quot;&gt;&lt;a href=&quot;#翻墙&quot; class=&quot;headerlink&quot; title=&quot;翻墙&quot;&gt;&lt;/a&gt;翻墙&lt;/h3&gt;&lt;p&gt;翻墙的原理：比如有个VPS，有美国的ip地址。各位的笔记本或台式机通过vpn访问到美国的vps的机器，然后通过这个vitual private server出去访问美国的网站。在网站看来，你的源ip是美国的vps的地址，而你笔记本和vps之间的通信是加密的，走的是vpn协议。vps和后端的网站之间走的是http协议。&lt;/p&gt;
+&lt;h2 id=&quot;实现vpn功能的常见开源产品&quot;&gt;&lt;a href=&quot;#实现vpn功能的常见开源产品&quot; class=&quot;headerlink&quot; title=&quot;实现vpn功能的常见开源产品&quot;&gt;&lt;/a&gt;实现vpn功能的常见开源产品&lt;/h2&gt;&lt;h3 id=&quot;PPTP-VPN&quot;&gt;&lt;a href=&quot;#PPTP-VPN&quot; class=&quot;headerlink&quot; title=&quot;PPTP VPN&quot;&gt;&lt;/a&gt;PPTP VPN&lt;/h3&gt;&lt;p&gt;PPTP VPN的最大优点是，不需要在windows客户端单独安装vpn客户端软件，windows默认就支持PPTP VPN拨号连接功能。PPTP VPN属于点对点方式的应用，比较适合远程的企业用户拨号到企业进行办公等的应用，但是很多网络设备不支持PPTP，导致无法访问。典型的Linux平台上的开源软件是pptp。&lt;/p&gt;
+&lt;h3 id=&quot;SSL-VPN&quot;&gt;&lt;a href=&quot;#SSL-VPN&quot; class=&quot;headerlink&quot; title=&quot;SSL VPN&quot;&gt;&lt;/a&gt;SSL VPN&lt;/h3&gt;&lt;p&gt;PPTP主要为那些经常外出移动或家庭办公的用户考虑的，而OpenVPN不但可以使用于PPTP的应用场景，还适合针对企业异地两地总分公司之间的VPN不间断按需连接，例如：ERP，OA，及时通讯工具等在总分企业中的应用。但是需要在系统上单独安装客户端软件。典型的Linux平台的开源软件是openvpn。&lt;/p&gt;
+&lt;h3 id=&quot;IPSEC-VPN&quot;&gt;&lt;a href=&quot;#IPSEC-VPN&quot; class=&quot;headerlink&quot; title=&quot;IPSEC VPN&quot;&gt;&lt;/a&gt;IPSEC VPN&lt;/h3&gt;&lt;p&gt;IPSEC VPN也适合针对企业异地两地总分公司或多个IDC机房之间的VPN不间断连接，并且在部署使用上更加方便，典型的Linux平台上IPSEC VPN的开源产品是openswan。&lt;/p&gt;
+&lt;h1 id=&quot;Linux平台搭建OpenVPN&quot;&gt;&lt;a href=&quot;#Linux平台搭建OpenVPN&quot; class=&quot;headerlink&quot; title=&quot;Linux平台搭建OpenVPN&quot;&gt;&lt;/a&gt;Linux平台搭建OpenVPN&lt;/h1&gt;&lt;h2 id=&quot;环境规划&quot;&gt;&lt;a href=&quot;#环境规划&quot; class=&quot;headerlink&quot; title=&quot;环境规划&quot;&gt;&lt;/a&gt;环境规划&lt;/h2&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;安装软件&lt;/th&gt;
+&lt;th&gt;运行的进程&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;odsee&lt;/td&gt;
+&lt;td&gt;172.16.4.81&lt;/td&gt;
+&lt;td&gt;CentOS 6.3&lt;/td&gt;
+&lt;td&gt;openvpn-2.2.2.tar.gz&lt;/td&gt;
+&lt;td&gt;openvpn&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&quot;配置vpn-server时间同步&quot;&gt;&lt;a href=&quot;#配置vpn-server时间同步&quot; class=&quot;headerlink&quot; title=&quot;配置vpn server时间同步&quot;&gt;&lt;/a&gt;配置vpn server时间同步&lt;/h2&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee ~]# /usr/sbin/ntpdate pool.ntp.org&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;加入到定时任务:&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee ~]# echo &amp;apos;#time sync&amp;apos; &amp;gt;&amp;gt; /var/spool/cron/root&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee ~]#  echo &amp;apos;*/5 * * * * /usr/sbin/ntpdate pool.ntp.org &amp;gt;/dev/null 2&amp;gt;&amp;amp;1&amp;apos; &amp;gt;&amp;gt;/var/spool/cron/root&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;注意:&lt;/strong&gt;如果vpn服务器和拨号的计算机客户端时间不一致，可能会导致VPN连接失败。&lt;/p&gt;
+&lt;h2 id=&quot;安装openvpn&quot;&gt;&lt;a href=&quot;#安装openvpn&quot; class=&quot;headerlink&quot; title=&quot;安装openvpn&quot;&gt;&lt;/a&gt;安装openvpn&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;建立openvpn软件存放目录，并上传软件&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee ~]# cd /usr/local/&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee local]# mkdir openvpn&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee local]# cd openvpn/&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;注意:&lt;/strong&gt;openvpn网上用的最多的是lzo-2.0.2和openvpn-2.0.9，这两个也是最稳定的。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;安装lzo压缩模块&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn]# tar zxf lzo-2.06.tar.gz&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn]# cd lzo-2.06&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee lzo-2.06]# ./configure&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee lzo-2.06]# make&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee lzo-2.06]# make install&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;安装openvpn软件&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee lzo-2.06]# cd ..&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn]# tar zxf openvpn-2.2.2.tar.gz&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn]# cd openvpn-2.2.2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;查看依赖包有没有安装，openvpn需要ssl支持：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn-2.2.2]# rpm -qa|grep openssl&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn-2.2.2]# ./configure --with-lzo-headers=/usr/local/include --with-lzo-lib=/usr/local/lib&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn-2.2.2]# make&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn-2.2.2]# make install&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;配置openvpn server，建立CA证书&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn-2.2.2]# cd easy-rsa/2.0/&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# cp vars.bak vars20151204.bak&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# vim vars&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;修改完vars文件后，执行source vars使修改生效：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;清除所有证书keys：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# ./clean-all&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;创建新的ca证书：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/8.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# vim vars&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/9.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# source vars&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/10.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# ./clean-all&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# ./build-ca&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/11.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;查看生成的证书：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;生成服务器端证书和密钥key文件&lt;br&gt;[root@odsee 2.0]# ./build-key-server server&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/14.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;也可以输入密码。 &lt;br&gt;&lt;br&gt;查看创建的服务端证书：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/15.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;生成客户端证书和key文件&lt;br&gt;生成client证书和key文件。若建立多个客户端证书，则重复如下步骤即可。只需修改Common Name项的名称。 &lt;br&gt;&lt;br&gt;在openvpn中，这种配置方法是每一个登陆的VPN客户端需要一个证书，每个证书在同一时刻只能供一个客户端连接。下面建立1份客户端证书，key的名字叫test。在工作中一般名字为人的名字。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/16.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/17.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/18.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;.crt是证书，.key是密钥文件。这两个都是客户端需要的。 &lt;br&gt;&lt;br&gt;&lt;strong&gt;注意:&lt;/strong&gt;使用build-key给客户端生成证书和密钥，客户端拨号是不需要密码的。但是也可以加密码，使用build-key-pass脚本创建证书和密钥文件，这样你在客户端拨号的时候需要加密码，密码是拨号vpn的密码。 &lt;br&gt;&lt;br&gt;下面使用build-key-pass创建另一个客户端证书和密钥文件。&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee ~]# cd /usr/local/openvpn/openvpn-2.2.2/easy-rsa/2.0&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/19.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/20.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;生成vpn密钥协议交换文件&lt;br&gt;生成传输进行密钥交换时用到的交换密钥协议文件：&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# ./build-dh&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/21.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;查看生成的文件：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/22.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;详解服务器及客户端的证书各文件用途&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/23.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;为了防止恶意攻击(如DOS、UDP port flooding)，我们生成一个“HMAC firewall”：&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# openvpn --genkey --secret keys/ta.key&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/24.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;到此文件生成工作完成了。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;详解服务器端VPN重要命令&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;vars脚本：是用来创建环境变量，设置所需要的变量的脚本&lt;/li&gt;
+&lt;li&gt;clean-all脚本：清理生成ca证书及密钥文件&lt;/li&gt;
+&lt;li&gt;build-ca脚本：生成ca证书(交互)&lt;/li&gt;
+&lt;li&gt;build-key-server脚本：生成服务器端密钥(交互)&lt;/li&gt;
+&lt;li&gt;build-key脚本：生成客户端密钥(交互)&lt;/li&gt;
+&lt;li&gt;build-key-pass脚本：生成客户端带密码的密钥文件(交互)&lt;/li&gt;
+&lt;li&gt;build-dh脚本：脚本生成Diffie-Hellman文件(交互)&lt;/li&gt;
+&lt;li&gt;pkitool脚本：直接使用vars的环境变量设置，直接生成证书(非交互)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;详解openvpn服务端重要配置参数&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;拷贝keys及配置&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# mkdir /etc/openvpn/&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# cp -ap keys/ /etc/openvpn/&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# cd /usr/local/openvpn/openvpn-2.2.2/sample-config-files/&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee sample-config-files]# cp client.conf server.conf /etc/openvpn/&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/25.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;修改服务端配置文件&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# cd /etc/openvpn/&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn]# grep -vE &amp;quot;;|#|^$&amp;quot; server.conf &amp;gt;tmp.log&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn]# cat tmp.log &amp;gt;server.conf&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/26.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;常用的配置说明：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;配置参数&lt;/th&gt;
+&lt;th&gt;参数说明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;local 10.0.0.28(外网卡地址)&lt;/td&gt;
+&lt;td&gt;哪一个本地地址要被openvpn进行监听&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;port 52115&lt;/td&gt;
+&lt;td&gt;监听的端口，默认是1194，这里为了安全起见，修改为52115&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;proto udp&lt;/td&gt;
+&lt;td&gt;指定监听的协议，当并发访问多时，推荐tcp&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;dev tun&lt;/td&gt;
+&lt;td&gt;vpn server的模式采用路由模式，可选tap或tun&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ca ca.crt&lt;/td&gt;
+&lt;td&gt;ca证书，注意此文件和server.conf在一个目录下，否则要用绝对路径调用&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;cert server.crt&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;key server.key&lt;/td&gt;
+&lt;td&gt;this file should be kept secret&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;dh dh1024.pem&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server 10.8.0.0&lt;/td&gt;
+&lt;td&gt;这个是vpn server动态分配给vpn client的地址池，一般不需要更改。这个段不要和任何网络地址段冲突或者重复&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ifconfig-pool-persist ipp.txt&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;push “route 172.16.1.0 255.255.255.0”&lt;/td&gt;
+&lt;td&gt;这个是vpn server所在的内网网段，如果有多个可以写多个push，注意，此命令实际作用是在vpn client本地生成vpn sever所在的内网网段路由，确保能够和vpn server所在的内网网段通信&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;client-to-client&lt;/td&gt;
+&lt;td&gt;允许拨号的多个vpn client互相通信&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;duplicate-cn&lt;/td&gt;
+&lt;td&gt;允许多个客户端使用同一个帐号连接&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;keepalive 10 20&lt;/td&gt;
+&lt;td&gt;每10秒ping一次，若是120秒未收到包，即认定客户端断线&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;comp-lzo&lt;/td&gt;
+&lt;td&gt;开启压缩功能&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;persist-key&lt;/td&gt;
+&lt;td&gt;当vpn超时后，当重新启动vpn后，保持上一次使用的私钥，而不重新读取私钥&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;persist-tun&lt;/td&gt;
+&lt;td&gt;通过keepalive检测vpn超时后，当重新启动vpn后，保持tun或者tap设备自动连接状态&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;status openvpn-status.log&lt;/td&gt;
+&lt;td&gt;openvpn日志状态信息&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;log /var/log/openvpn.log&lt;/td&gt;
+&lt;td&gt;日志文件&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;verb 3&lt;/td&gt;
+&lt;td&gt;指定日志文件冗余&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&quot;配置调试vpn并运行vpn服务&quot;&gt;&lt;a href=&quot;#配置调试vpn并运行vpn服务&quot; class=&quot;headerlink&quot; title=&quot;配置调试vpn并运行vpn服务&quot;&gt;&lt;/a&gt;配置调试vpn并运行vpn服务&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;取消防火墙对vpnserver端口的限制以及允许服务转发。或者先关闭防火墙，调好VPN，在开启防火墙。&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee ~]# service iptables stop&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;开启内核转发功能&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee ~]# sed -i &amp;apos;s#net.ipv4.ip_forward = 0#net.ipv4.ip_forward = 1#&amp;apos; /etc/sysctl.conf&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/27.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee ~]# sysctl -p&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;注意:&lt;/strong&gt;iptables和内核的ip_forward都需要开启允许转发。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;关闭SELinux&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee ~]# setenforce 0&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee ~]# vim /etc/sysconfig/selinux&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/28.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;启动服务端的VPN服务&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn]# /usr/local/sbin/openvpn --config /etc/openvpn/server.conf &amp;amp;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn]# netstat -anp|grep vpn&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/29.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;查看日志：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/30.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;服务端查看虚拟网卡&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/31.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&quot;安装windows-VPN客户端，配置VPN连接&quot;&gt;&lt;a href=&quot;#安装windows-VPN客户端，配置VPN连接&quot; class=&quot;headerlink&quot; title=&quot;安装windows VPN客户端，配置VPN连接&quot;&gt;&lt;/a&gt;安装windows VPN客户端，配置VPN连接&lt;/h1&gt;&lt;h2 id=&quot;下载安装客户端&quot;&gt;&lt;a href=&quot;#下载安装客户端&quot; class=&quot;headerlink&quot; title=&quot;下载安装客户端&quot;&gt;&lt;/a&gt;下载安装客户端&lt;/h2&gt;&lt;p&gt;下载地址：&lt;a href=&quot;http://swupdate.openvpn.org/community/releases/openvpn-2.2.2-install.exe&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://swupdate.openvpn.org/community/releases/openvpn-2.2.2-install.exe&lt;/a&gt; &lt;br&gt;&lt;br&gt;安装过程中，有一步骤需要信任，见下图：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/32.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;配置客户端证书&quot;&gt;&lt;a href=&quot;#配置客户端证书&quot; class=&quot;headerlink&quot; title=&quot;配置客户端证书&quot;&gt;&lt;/a&gt;配置客户端证书&lt;/h2&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee keys]# cd /usr/local/openvpn/openvpn-2.2.2/easy-rsa/2.0/keys/&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;先从vpnserver上把那个登录不需要密码的证书和密钥传下来：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee keys]# sz ca.crt test.crt test.key&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee keys]# cd /usr/local/openvpn/openvpn-2.2.2/sample-config-files/&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee sample-config-files]# sz client.conf&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;把这些文件放到一个文件夹里：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/33.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/34.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;把这个文件夹放到OpenVPN安装目录的config目录下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/35.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;配置客户端的配置文件Client-conf&quot;&gt;&lt;a href=&quot;#配置客户端的配置文件Client-conf&quot; class=&quot;headerlink&quot; title=&quot;配置客户端的配置文件Client.conf&quot;&gt;&lt;/a&gt;配置客户端的配置文件Client.conf&lt;/h2&gt;&lt;p&gt;备份配置文件：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/36.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;可以在服务器上过滤配置文件，查看默认配置：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee openvpn]# egrep -v &amp;quot;^#|^;|^$&amp;quot; client.conf&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/37.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/38.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;新建一个文件test.ovpn文件，然后贴入下面的内容：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/39.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;client&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;dev tun&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;proto tcp&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;remote 172.16.4.81 52115&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;resolv-retry infinite&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;nobind&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;persist-key&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;persist-tun&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;ca ca.crt&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;cert test.crt&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;key test.key&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;ns-cert-type server&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;comp-lzo&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;verb 3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&quot;拨号连接调试&quot;&gt;&lt;a href=&quot;#拨号连接调试&quot; class=&quot;headerlink&quot; title=&quot;拨号连接调试&quot;&gt;&lt;/a&gt;拨号连接调试&lt;/h2&gt;&lt;p&gt;在windows上拨号远程连接openvpn服务，先双击如下图标：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/40.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;然后右下角右击图标，点击connect：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/41.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/42.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;但是发现上不了网，能连上，查看连接vpn前的路由和连接vpn后的路由：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/43.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;测试vpn客户端连接vpn server连通性的方法：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/44.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;原因是：没有设置客户端的默认网关通过vpn出去：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/45.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/46.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;最后改完的配置如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/47.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;为什么dns不用8.8.8.8？因为这台vpn server(172.16.4.81) ping不通8.8.8.8&lt;/p&gt;
+&lt;h1 id=&quot;常见问题&quot;&gt;&lt;a href=&quot;#常见问题&quot; class=&quot;headerlink&quot; title=&quot;常见问题&quot;&gt;&lt;/a&gt;常见问题&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;拨号后地址也获取到了，但是就是访问别人时地址，别人那边看到的访问记录还是你原来的ip地址？&lt;br&gt;解决：以管理员身份运行软件，在拨号上网。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;长时间不去生成证书，再次生成证书时如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/48.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;解决：&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# source vars&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;NOTE: If you run ./clean-all, I will be doing a rm -rf on /usr/local/openvpn/openvpn-2.2.2/easy-rsa/2.0/keys&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;[root@odsee 2.0]# ./build-key-pass ldh&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/49.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;把生成的3个证书copy到/etc/openvpn/keys目录下。然后给别人用时给.crt .key以及ca.crt3个文件。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;win10启动openvpn报错：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/50.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;解决：&lt;br&gt;到openvpn安装后的bin下依次以管理员身份执行：delalltap.bat和addtap.bat &lt;br&gt;&lt;br&gt;如果解决上面的问题，还是报错：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/51.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;解决：&lt;br&gt;以管理员运行openvpn客户端。&lt;/li&gt;
+&lt;/ol&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;VPN介绍&quot;&gt;&lt;a href=&quot;#VPN介绍&quot; class=&quot;headerlink&quot; title=&quot;VPN介绍&quot;&gt;&lt;/a&gt;VPN介绍&lt;/h1&gt;&lt;h2 id=&quot;VPN概述&quot;&gt;&lt;a href=&quot;#VPN概述&quot; class=&quot;headerlink&quot; title=&quot;VPN概述&quot;&gt;&lt;/a&gt;VPN概述&lt;/h2&gt;&lt;p&gt;VPN(全称Virtual Private Network)虚拟专用网络，是依靠ISP和其他的NSP，在公共网络中建立专用的数据通信网络的技术，可以为企业之间或者个人与企业之间提供安全的数据传输隧道服务。在VPN中任意两点之间的连接并没有传统专网所需的端到端的物理链路，而是利用公共网络资源动态组成的，可以理解为通过私有的隧道技术在公共数据网络上模拟出来的和专网有同样功能的点到点的专线技术。&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="vpn, openvpn" scheme="http://yoursite.com/tags/vpn-openvpn/"/>
+    
+  </entry>
   
   <entry>
     <title>安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)</title>

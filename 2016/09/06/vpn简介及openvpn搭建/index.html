@@ -1,0 +1,1012 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="vpn, openvpn," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="VPN介绍VPN概述VPN(全称Virtual Private Network)虚拟专用网络，是依靠ISP和其他的NSP，在公共网络中建立专用的数据通信网络的技术，可以为企业之间或者个人与企业之间提供安全的数据传输隧道服务。在VPN中任意两点之间的连接并没有传统专网所需的端到端的物理链路，而是利用公共网络资源动态组成的，可以理解为通过私有的隧道技术在公共数据网络上模拟出来的和专网有同样功能的点到点">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vpn简介及openvpn搭建">
+<meta property="og:url" content="http://yoursite.com/2016/09/06/vpn简介及openvpn搭建/index.html">
+<meta property="og:site_name" content="jkzhao's blog">
+<meta property="og:description" content="VPN介绍VPN概述VPN(全称Virtual Private Network)虚拟专用网络，是依靠ISP和其他的NSP，在公共网络中建立专用的数据通信网络的技术，可以为企业之间或者个人与企业之间提供安全的数据传输隧道服务。在VPN中任意两点之间的连接并没有传统专网所需的端到端的物理链路，而是利用公共网络资源动态组成的，可以理解为通过私有的隧道技术在公共数据网络上模拟出来的和专网有同样功能的点到点">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/6.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/7.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/8.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/9.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/10.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/12.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/13.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/14.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/15.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/16.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/17.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/18.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/19.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/20.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/21.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/22.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/23.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/24.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/25.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/26.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/27.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/28.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/29.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/30.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/31.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/32.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/33.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/34.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/35.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/36.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/37.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/38.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/39.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/40.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/41.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/42.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/43.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/44.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/45.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/46.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/47.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/48.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/49.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/50.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/51.png">
+<meta property="og:updated_time" content="2016-09-16T14:08:30.485Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="vpn简介及openvpn搭建">
+<meta name="twitter:description" content="VPN介绍VPN概述VPN(全称Virtual Private Network)虚拟专用网络，是依靠ISP和其他的NSP，在公共网络中建立专用的数据通信网络的技术，可以为企业之间或者个人与企业之间提供安全的数据传输隧道服务。在VPN中任意两点之间的连接并没有传统专网所需的端到端的物理链路，而是利用公共网络资源动态组成的，可以理解为通过私有的隧道技术在公共数据网络上模拟出来的和专网有同样功能的点到点">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> vpn简介及openvpn搭建 | jkzhao's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                vpn简介及openvpn搭建
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-06T11:33:59+08:00" content="2016-09-06">
+              2016-09-06
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/09/06/vpn简介及openvpn搭建/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/06/vpn简介及openvpn搭建/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="VPN介绍"><a href="#VPN介绍" class="headerlink" title="VPN介绍"></a>VPN介绍</h1><h2 id="VPN概述"><a href="#VPN概述" class="headerlink" title="VPN概述"></a>VPN概述</h2><p>VPN(全称Virtual Private Network)虚拟专用网络，是依靠ISP和其他的NSP，在公共网络中建立专用的数据通信网络的技术，可以为企业之间或者个人与企业之间提供安全的数据传输隧道服务。在VPN中任意两点之间的连接并没有传统专网所需的端到端的物理链路，而是利用公共网络资源动态组成的，可以理解为通过私有的隧道技术在公共数据网络上模拟出来的和专网有同样功能的点到点的专线技术。<br><a id="more"></a></p>
+<h2 id="VPN的主要应用场景"><a href="#VPN的主要应用场景" class="headerlink" title="VPN的主要应用场景"></a>VPN的主要应用场景</h2><p>我们根据VPN的常见企业应用，将VPN分为以下4类应用：</p>
+<h3 id="出差在外访问公司内部资源"><a href="#出差在外访问公司内部资源" class="headerlink" title="出差在外访问公司内部资源"></a>出差在外访问公司内部资源</h3><p>企业内部员工出差、休假或特殊情况下在远离办公室的时候，又有需求访问公司的内部网络获取相关资源，就可以通过VPN拨号到公司内部。此时远程拨号的员工和办公室内的员工以及其他拨号的员工之间都相当于在一个局域网内。例如：访问内部的域控制器，文件服务器，OA系统，ERP，HTTP服务，内网飞秋聊天工具等局域网服务应用。<br><br>运维人员需要个人电脑远程拨号到企业网站的IDC机房，远程维护IDC内网服务器。<br><br><strong>外出办公的人如何连接内网服务器呢？</strong></p>
+<ol>
+<li>没有VPN<br>先登录到外网服务器组中一台服务器，然后在这个外网服务器上SSH到内网服务器。</li>
+<li>有VPN<br>把VPN搭在某一台外网服务器(外网服务器有公网ip)上，这样外出办公人员可以通过vpn拨号到这台机器上，然后在自己笔记本上输入内网服务器的IP:port访问内网服务器。同时有了vpn，可以把外网服务器的远程连接SSH全部屏蔽起来，黑客就不能通过SSH服务来攻击公司的外网服务器。而公司的人员通过vpn拨号拨到这个装了vpn的外网服务器上去，然后访问内网服务器。访问外网服务器通过访问内网ip地址去访问。</li>
+</ol>
+<h3 id="企业内部网络之间VPN服务"><a href="#企业内部网络之间VPN服务" class="headerlink" title="企业内部网络之间VPN服务"></a>企业内部网络之间VPN服务</h3><p>在公司的分支机构的局域网和公司内部LAN之间的VPN连接。通过公网Internet建立VPN将公司在各地的分支机构的LAN连接到公司总部的LAN。例如：各大超市之间业务结算等。<br><br>这是由于地域的原因而产生的VPN需求，通过VPN让不同地域内的机器可以互相访问，就好像是一个局域网一样。例如：办公室互联协同办公，机房互联数据同步及业务访问。</p>
+<h3 id="互联网公司多IDC机房之间VPN服务"><a href="#互联网公司多IDC机房之间VPN服务" class="headerlink" title="互联网公司多IDC机房之间VPN服务"></a>互联网公司多IDC机房之间VPN服务</h3><p>这是运维架构人员需要考虑的问题，不同机房之间业务管理和业务访问，数据流动。</p>
+<h3 id="企业外部VPN服务"><a href="#企业外部VPN服务" class="headerlink" title="企业外部VPN服务"></a>企业外部VPN服务</h3><p>在供应商、合作伙伴的LAN和本公司的LAN之间建立的VPN服务。<br><br>企业内部网络之间的VPN服务、企业内部网络之间VPN服务和企业外部VPN服务是一套系统，不同的场景。</p>
+<h3 id="翻墙"><a href="#翻墙" class="headerlink" title="翻墙"></a>翻墙</h3><p>翻墙的原理：比如有个VPS，有美国的ip地址。各位的笔记本或台式机通过vpn访问到美国的vps的机器，然后通过这个vitual private server出去访问美国的网站。在网站看来，你的源ip是美国的vps的地址，而你笔记本和vps之间的通信是加密的，走的是vpn协议。vps和后端的网站之间走的是http协议。</p>
+<h2 id="实现vpn功能的常见开源产品"><a href="#实现vpn功能的常见开源产品" class="headerlink" title="实现vpn功能的常见开源产品"></a>实现vpn功能的常见开源产品</h2><h3 id="PPTP-VPN"><a href="#PPTP-VPN" class="headerlink" title="PPTP VPN"></a>PPTP VPN</h3><p>PPTP VPN的最大优点是，不需要在windows客户端单独安装vpn客户端软件，windows默认就支持PPTP VPN拨号连接功能。PPTP VPN属于点对点方式的应用，比较适合远程的企业用户拨号到企业进行办公等的应用，但是很多网络设备不支持PPTP，导致无法访问。典型的Linux平台上的开源软件是pptp。</p>
+<h3 id="SSL-VPN"><a href="#SSL-VPN" class="headerlink" title="SSL VPN"></a>SSL VPN</h3><p>PPTP主要为那些经常外出移动或家庭办公的用户考虑的，而OpenVPN不但可以使用于PPTP的应用场景，还适合针对企业异地两地总分公司之间的VPN不间断按需连接，例如：ERP，OA，及时通讯工具等在总分企业中的应用。但是需要在系统上单独安装客户端软件。典型的Linux平台的开源软件是openvpn。</p>
+<h3 id="IPSEC-VPN"><a href="#IPSEC-VPN" class="headerlink" title="IPSEC VPN"></a>IPSEC VPN</h3><p>IPSEC VPN也适合针对企业异地两地总分公司或多个IDC机房之间的VPN不间断连接，并且在部署使用上更加方便，典型的Linux平台上IPSEC VPN的开源产品是openswan。</p>
+<h1 id="Linux平台搭建OpenVPN"><a href="#Linux平台搭建OpenVPN" class="headerlink" title="Linux平台搭建OpenVPN"></a>Linux平台搭建OpenVPN</h1><h2 id="环境规划"><a href="#环境规划" class="headerlink" title="环境规划"></a>环境规划</h2><table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>IP地址</th>
+<th>操作系统版本</th>
+<th>安装软件</th>
+<th>运行的进程</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>odsee</td>
+<td>172.16.4.81</td>
+<td>CentOS 6.3</td>
+<td>openvpn-2.2.2.tar.gz</td>
+<td>openvpn</td>
+</tr>
+</tbody>
+</table>
+<h2 id="配置vpn-server时间同步"><a href="#配置vpn-server时间同步" class="headerlink" title="配置vpn server时间同步"></a>配置vpn server时间同步</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# /usr/sbin/ntpdate pool.ntp.org</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/1.png" alt=""><br>加入到定时任务:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# echo &apos;#time sync&apos; &gt;&gt; /var/spool/cron/root</span><br><span class="line">[root@odsee ~]#  echo &apos;*/5 * * * * /usr/sbin/ntpdate pool.ntp.org &gt;/dev/null 2&gt;&amp;1&apos; &gt;&gt;/var/spool/cron/root</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/2.png" alt=""><br><strong>注意:</strong>如果vpn服务器和拨号的计算机客户端时间不一致，可能会导致VPN连接失败。</p>
+<h2 id="安装openvpn"><a href="#安装openvpn" class="headerlink" title="安装openvpn"></a>安装openvpn</h2><ol>
+<li>建立openvpn软件存放目录，并上传软件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# cd /usr/local/</span><br><span class="line">[root@odsee local]# mkdir openvpn</span><br><span class="line">[root@odsee local]# cd openvpn/</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/3.png" alt=""><br><strong>注意:</strong>openvpn网上用的最多的是lzo-2.0.2和openvpn-2.0.9，这两个也是最稳定的。</p>
+<ol>
+<li><p>安装lzo压缩模块</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn]# tar zxf lzo-2.06.tar.gz</span><br><span class="line">[root@odsee openvpn]# cd lzo-2.06</span><br><span class="line">[root@odsee lzo-2.06]# ./configure</span><br><span class="line">[root@odsee lzo-2.06]# make</span><br><span class="line">[root@odsee lzo-2.06]# make install</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装openvpn软件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee lzo-2.06]# cd ..</span><br><span class="line">[root@odsee openvpn]# tar zxf openvpn-2.2.2.tar.gz</span><br><span class="line">[root@odsee openvpn]# cd openvpn-2.2.2</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>查看依赖包有没有安装，openvpn需要ssl支持：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn-2.2.2]# rpm -qa|grep openssl</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/4.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn-2.2.2]# ./configure --with-lzo-headers=/usr/local/include --with-lzo-lib=/usr/local/lib</span><br><span class="line">[root@odsee openvpn-2.2.2]# make</span><br><span class="line">[root@odsee openvpn-2.2.2]# make install</span><br></pre></td></tr></table></figure></p>
+<ol>
+<li>配置openvpn server，建立CA证书<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn-2.2.2]# cd easy-rsa/2.0/</span><br><span class="line">[root@odsee 2.0]# cp vars.bak vars20151204.bak</span><br><span class="line">[root@odsee 2.0]# vim vars</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/5.png" alt=""><br>修改完vars文件后，执行source vars使修改生效：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/6.png" alt=""><br>清除所有证书keys：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# ./clean-all</span><br></pre></td></tr></table></figure></p>
+<p>创建新的ca证书：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/7.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/8.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# vim vars</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/9.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# source vars</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/10.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# ./clean-all</span><br><span class="line">[root@odsee 2.0]# ./build-ca</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/11.png" alt=""><br>查看生成的证书：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/12.png" alt=""></p>
+<ol>
+<li><p>生成服务器端证书和密钥key文件<br>[root@odsee 2.0]# ./build-key-server server<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/13.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/14.png" alt=""><br>也可以输入密码。 <br><br>查看创建的服务端证书：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/15.png" alt=""></p>
+</li>
+<li><p>生成客户端证书和key文件<br>生成client证书和key文件。若建立多个客户端证书，则重复如下步骤即可。只需修改Common Name项的名称。 <br><br>在openvpn中，这种配置方法是每一个登陆的VPN客户端需要一个证书，每个证书在同一时刻只能供一个客户端连接。下面建立1份客户端证书，key的名字叫test。在工作中一般名字为人的名字。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/16.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/17.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/18.png" alt=""><br>.crt是证书，.key是密钥文件。这两个都是客户端需要的。 <br><br><strong>注意:</strong>使用build-key给客户端生成证书和密钥，客户端拨号是不需要密码的。但是也可以加密码，使用build-key-pass脚本创建证书和密钥文件，这样你在客户端拨号的时候需要加密码，密码是拨号vpn的密码。 <br><br>下面使用build-key-pass创建另一个客户端证书和密钥文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# cd /usr/local/openvpn/openvpn-2.2.2/easy-rsa/2.0</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/19.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/20.png" alt=""></p>
+<ol>
+<li>生成vpn密钥协议交换文件<br>生成传输进行密钥交换时用到的交换密钥协议文件：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# ./build-dh</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/21.png" alt=""><br>查看生成的文件：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/22.png" alt=""></p>
+<ol>
+<li>详解服务器及客户端的证书各文件用途<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/23.png" alt=""><br>为了防止恶意攻击(如DOS、UDP port flooding)，我们生成一个“HMAC firewall”：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# openvpn --genkey --secret keys/ta.key</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/24.png" alt=""><br>到此文件生成工作完成了。</p>
+<ol>
+<li>详解服务器端VPN重要命令</li>
+</ol>
+<ul>
+<li>vars脚本：是用来创建环境变量，设置所需要的变量的脚本</li>
+<li>clean-all脚本：清理生成ca证书及密钥文件</li>
+<li>build-ca脚本：生成ca证书(交互)</li>
+<li>build-key-server脚本：生成服务器端密钥(交互)</li>
+<li>build-key脚本：生成客户端密钥(交互)</li>
+<li>build-key-pass脚本：生成客户端带密码的密钥文件(交互)</li>
+<li>build-dh脚本：脚本生成Diffie-Hellman文件(交互)</li>
+<li>pkitool脚本：直接使用vars的环境变量设置，直接生成证书(非交互)</li>
+</ul>
+<ol>
+<li>详解openvpn服务端重要配置参数</li>
+</ol>
+<ul>
+<li>拷贝keys及配置<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# mkdir /etc/openvpn/</span><br><span class="line">[root@odsee 2.0]# cp -ap keys/ /etc/openvpn/</span><br><span class="line">[root@odsee 2.0]# cd /usr/local/openvpn/openvpn-2.2.2/sample-config-files/</span><br><span class="line">[root@odsee sample-config-files]# cp client.conf server.conf /etc/openvpn/</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/25.png" alt=""></p>
+<ul>
+<li>修改服务端配置文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# cd /etc/openvpn/</span><br><span class="line">[root@odsee openvpn]# grep -vE &quot;;|#|^$&quot; server.conf &gt;tmp.log</span><br><span class="line">[root@odsee openvpn]# cat tmp.log &gt;server.conf</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/26.png" alt=""><br>常用的配置说明：</p>
+<table>
+<thead>
+<tr>
+<th>配置参数</th>
+<th>参数说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>local 10.0.0.28(外网卡地址)</td>
+<td>哪一个本地地址要被openvpn进行监听</td>
+</tr>
+<tr>
+<td>port 52115</td>
+<td>监听的端口，默认是1194，这里为了安全起见，修改为52115</td>
+</tr>
+<tr>
+<td>proto udp</td>
+<td>指定监听的协议，当并发访问多时，推荐tcp</td>
+</tr>
+<tr>
+<td>dev tun</td>
+<td>vpn server的模式采用路由模式，可选tap或tun</td>
+</tr>
+<tr>
+<td>ca ca.crt</td>
+<td>ca证书，注意此文件和server.conf在一个目录下，否则要用绝对路径调用</td>
+</tr>
+<tr>
+<td>cert server.crt</td>
+<td></td>
+</tr>
+<tr>
+<td>key server.key</td>
+<td>this file should be kept secret</td>
+</tr>
+<tr>
+<td>dh dh1024.pem</td>
+<td></td>
+</tr>
+<tr>
+<td>server 10.8.0.0</td>
+<td>这个是vpn server动态分配给vpn client的地址池，一般不需要更改。这个段不要和任何网络地址段冲突或者重复</td>
+</tr>
+<tr>
+<td>ifconfig-pool-persist ipp.txt</td>
+<td></td>
+</tr>
+<tr>
+<td>push “route 172.16.1.0 255.255.255.0”</td>
+<td>这个是vpn server所在的内网网段，如果有多个可以写多个push，注意，此命令实际作用是在vpn client本地生成vpn sever所在的内网网段路由，确保能够和vpn server所在的内网网段通信</td>
+</tr>
+<tr>
+<td>client-to-client</td>
+<td>允许拨号的多个vpn client互相通信</td>
+</tr>
+<tr>
+<td>duplicate-cn</td>
+<td>允许多个客户端使用同一个帐号连接</td>
+</tr>
+<tr>
+<td>keepalive 10 20</td>
+<td>每10秒ping一次，若是120秒未收到包，即认定客户端断线</td>
+</tr>
+<tr>
+<td>comp-lzo</td>
+<td>开启压缩功能</td>
+</tr>
+<tr>
+<td>persist-key</td>
+<td>当vpn超时后，当重新启动vpn后，保持上一次使用的私钥，而不重新读取私钥</td>
+</tr>
+<tr>
+<td>persist-tun</td>
+<td>通过keepalive检测vpn超时后，当重新启动vpn后，保持tun或者tap设备自动连接状态</td>
+</tr>
+<tr>
+<td>status openvpn-status.log</td>
+<td>openvpn日志状态信息</td>
+</tr>
+<tr>
+<td>log /var/log/openvpn.log</td>
+<td>日志文件</td>
+</tr>
+<tr>
+<td>verb 3</td>
+<td>指定日志文件冗余</td>
+</tr>
+</tbody>
+</table>
+<h2 id="配置调试vpn并运行vpn服务"><a href="#配置调试vpn并运行vpn服务" class="headerlink" title="配置调试vpn并运行vpn服务"></a>配置调试vpn并运行vpn服务</h2><ol>
+<li><p>取消防火墙对vpnserver端口的限制以及允许服务转发。或者先关闭防火墙，调好VPN，在开启防火墙。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# service iptables stop</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>开启内核转发功能</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# sed -i &apos;s#net.ipv4.ip_forward = 0#net.ipv4.ip_forward = 1#&apos; /etc/sysctl.conf</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/27.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# sysctl -p</span><br></pre></td></tr></table></figure></p>
+<p><strong>注意:</strong>iptables和内核的ip_forward都需要开启允许转发。</p>
+<ol>
+<li>关闭SELinux<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee ~]# setenforce 0</span><br><span class="line">[root@odsee ~]# vim /etc/sysconfig/selinux</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/28.png" alt=""></p>
+<ol>
+<li>启动服务端的VPN服务<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn]# /usr/local/sbin/openvpn --config /etc/openvpn/server.conf &amp;</span><br><span class="line">[root@odsee openvpn]# netstat -anp|grep vpn</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/29.png" alt=""><br>查看日志：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/30.png" alt=""></p>
+<ol>
+<li>服务端查看虚拟网卡<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/31.png" alt=""></li>
+</ol>
+<h1 id="安装windows-VPN客户端，配置VPN连接"><a href="#安装windows-VPN客户端，配置VPN连接" class="headerlink" title="安装windows VPN客户端，配置VPN连接"></a>安装windows VPN客户端，配置VPN连接</h1><h2 id="下载安装客户端"><a href="#下载安装客户端" class="headerlink" title="下载安装客户端"></a>下载安装客户端</h2><p>下载地址：<a href="http://swupdate.openvpn.org/community/releases/openvpn-2.2.2-install.exe" target="_blank" rel="external">http://swupdate.openvpn.org/community/releases/openvpn-2.2.2-install.exe</a> <br><br>安装过程中，有一步骤需要信任，见下图：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/32.png" alt=""></p>
+<h2 id="配置客户端证书"><a href="#配置客户端证书" class="headerlink" title="配置客户端证书"></a>配置客户端证书</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee keys]# cd /usr/local/openvpn/openvpn-2.2.2/easy-rsa/2.0/keys/</span><br></pre></td></tr></table></figure>
+<p>先从vpnserver上把那个登录不需要密码的证书和密钥传下来：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee keys]# sz ca.crt test.crt test.key</span><br><span class="line">[root@odsee keys]# cd /usr/local/openvpn/openvpn-2.2.2/sample-config-files/</span><br><span class="line">[root@odsee sample-config-files]# sz client.conf</span><br></pre></td></tr></table></figure></p>
+<p>把这些文件放到一个文件夹里：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/33.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/34.png" alt=""><br>把这个文件夹放到OpenVPN安装目录的config目录下：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/35.png" alt=""></p>
+<h2 id="配置客户端的配置文件Client-conf"><a href="#配置客户端的配置文件Client-conf" class="headerlink" title="配置客户端的配置文件Client.conf"></a>配置客户端的配置文件Client.conf</h2><p>备份配置文件：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/36.png" alt=""><br>可以在服务器上过滤配置文件，查看默认配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee openvpn]# egrep -v &quot;^#|^;|^$&quot; client.conf</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/37.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/38.png" alt=""><br>新建一个文件test.ovpn文件，然后贴入下面的内容：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/39.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">client</span><br><span class="line">dev tun</span><br><span class="line">proto tcp</span><br><span class="line">remote 172.16.4.81 52115</span><br><span class="line">resolv-retry infinite</span><br><span class="line">nobind</span><br><span class="line">persist-key</span><br><span class="line">persist-tun</span><br><span class="line">ca ca.crt</span><br><span class="line">cert test.crt</span><br><span class="line">key test.key</span><br><span class="line">ns-cert-type server</span><br><span class="line">comp-lzo</span><br><span class="line">verb 3</span><br></pre></td></tr></table></figure></p>
+<h2 id="拨号连接调试"><a href="#拨号连接调试" class="headerlink" title="拨号连接调试"></a>拨号连接调试</h2><p>在windows上拨号远程连接openvpn服务，先双击如下图标：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/40.png" alt=""><br>然后右下角右击图标，点击connect：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/41.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/42.png" alt=""><br>但是发现上不了网，能连上，查看连接vpn前的路由和连接vpn后的路由：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/43.png" alt=""><br>测试vpn客户端连接vpn server连通性的方法：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/44.png" alt=""><br>原因是：没有设置客户端的默认网关通过vpn出去：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/45.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/46.png" alt=""><br>最后改完的配置如下：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/47.png" alt=""><br>为什么dns不用8.8.8.8？因为这台vpn server(172.16.4.81) ping不通8.8.8.8</p>
+<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><ol>
+<li><p>拨号后地址也获取到了，但是就是访问别人时地址，别人那边看到的访问记录还是你原来的ip地址？<br>解决：以管理员身份运行软件，在拨号上网。</p>
+</li>
+<li><p>长时间不去生成证书，再次生成证书时如下：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/48.png" alt=""><br>解决：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@odsee 2.0]# source vars</span><br><span class="line">NOTE: If you run ./clean-all, I will be doing a rm -rf on /usr/local/openvpn/openvpn-2.2.2/easy-rsa/2.0/keys</span><br><span class="line">[root@odsee 2.0]# ./build-key-pass ldh</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/49.png" alt=""><br>把生成的3个证书copy到/etc/openvpn/keys目录下。然后给别人用时给.crt .key以及ca.crt3个文件。</p>
+<ol>
+<li>win10启动openvpn报错：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/50.png" alt=""><br>解决：<br>到openvpn安装后的bin下依次以管理员身份执行：delalltap.bat和addtap.bat <br><br>如果解决上面的问题，还是报错：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/51.png" alt=""><br>解决：<br>以管理员运行openvpn客户端。</li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/vpn-openvpn/" rel="tag">#vpn, openvpn</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/07/安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)/" rel="next" title="安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)">
+                <i class="fa fa-chevron-left"></i> 安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/09/06/vpn简介及openvpn搭建/"
+           data-title="vpn简介及openvpn搭建" data-url="http://yoursite.com/2016/09/06/vpn简介及openvpn搭建/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/ju-feng-93" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-zhihu"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#VPN介绍"><span class="nav-number">1.</span> <span class="nav-text">VPN介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#VPN概述"><span class="nav-number">1.1.</span> <span class="nav-text">VPN概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VPN的主要应用场景"><span class="nav-number">1.2.</span> <span class="nav-text">VPN的主要应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#出差在外访问公司内部资源"><span class="nav-number">1.2.1.</span> <span class="nav-text">出差在外访问公司内部资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#企业内部网络之间VPN服务"><span class="nav-number">1.2.2.</span> <span class="nav-text">企业内部网络之间VPN服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#互联网公司多IDC机房之间VPN服务"><span class="nav-number">1.2.3.</span> <span class="nav-text">互联网公司多IDC机房之间VPN服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#企业外部VPN服务"><span class="nav-number">1.2.4.</span> <span class="nav-text">企业外部VPN服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#翻墙"><span class="nav-number">1.2.5.</span> <span class="nav-text">翻墙</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现vpn功能的常见开源产品"><span class="nav-number">1.3.</span> <span class="nav-text">实现vpn功能的常见开源产品</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PPTP-VPN"><span class="nav-number">1.3.1.</span> <span class="nav-text">PPTP VPN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSL-VPN"><span class="nav-number">1.3.2.</span> <span class="nav-text">SSL VPN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IPSEC-VPN"><span class="nav-number">1.3.3.</span> <span class="nav-text">IPSEC VPN</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux平台搭建OpenVPN"><span class="nav-number">2.</span> <span class="nav-text">Linux平台搭建OpenVPN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#环境规划"><span class="nav-number">2.1.</span> <span class="nav-text">环境规划</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置vpn-server时间同步"><span class="nav-number">2.2.</span> <span class="nav-text">配置vpn server时间同步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装openvpn"><span class="nav-number">2.3.</span> <span class="nav-text">安装openvpn</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置调试vpn并运行vpn服务"><span class="nav-number">2.4.</span> <span class="nav-text">配置调试vpn并运行vpn服务</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装windows-VPN客户端，配置VPN连接"><span class="nav-number">3.</span> <span class="nav-text">安装windows VPN客户端，配置VPN连接</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#下载安装客户端"><span class="nav-number">3.1.</span> <span class="nav-text">下载安装客户端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置客户端证书"><span class="nav-number">3.2.</span> <span class="nav-text">配置客户端证书</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置客户端的配置文件Client-conf"><span class="nav-number">3.3.</span> <span class="nav-text">配置客户端的配置文件Client.conf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拨号连接调试"><span class="nav-number">3.4.</span> <span class="nav-text">拨号连接调试</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常见问题"><span class="nav-number">4.</span> <span class="nav-text">常见问题</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jkzhao"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>
