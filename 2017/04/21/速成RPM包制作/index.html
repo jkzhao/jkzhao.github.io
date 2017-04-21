@@ -104,17 +104,17 @@
 
 
 
-<meta name="description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。支持的源类型包：  dir 将目录打包成所需要的类型，可以用于源码编译安装的软件包">
+<meta name="description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。">
 <meta name="keywords" content="rpm">
 <meta property="og:type" content="article">
 <meta property="og:title" content="速成RPM包制作">
 <meta property="og:url" content="http://yoursite.com/2017/04/21/速成RPM包制作/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
-<meta property="og:description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。支持的源类型包：  dir 将目录打包成所需要的类型，可以用于源码编译安装的软件包">
-<meta property="og:updated_time" content="2017-04-21T08:41:16.000Z">
+<meta property="og:description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。">
+<meta property="og:updated_time" content="2017-04-21T08:45:34.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="速成RPM包制作">
-<meta name="twitter:description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。支持的源类型包：  dir 将目录打包成所需要的类型，可以用于源码编译安装的软件包">
+<meta name="twitter:description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。">
 
 
 
@@ -359,7 +359,7 @@
       
 
       
-        <h1 id="FPM"><a href="#FPM" class="headerlink" title="FPM"></a>FPM</h1><p>由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。<br>通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。<br><br>FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。<br><br><strong>支持的源类型包：</strong></p>
+        <h1 id="FPM"><a href="#FPM" class="headerlink" title="FPM"></a>FPM</h1><p>由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。<br>通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。<br><br>FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。<br><br><a id="more"></a><br><strong>支持的源类型包：</strong></p>
 <ol>
 <li>dir 将目录打包成所需要的类型，可以用于源码编译安装的软件包</li>
 <li>rpm 对rpm进行转换</li>
