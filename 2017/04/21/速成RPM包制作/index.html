@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Linux," />
+  <meta name="keywords" content="rpm," />
 
 
 
@@ -104,17 +104,17 @@
 
 
 
-<meta name="description" content="从事了一年半的运维工作，更多的是做业务运维，或者说是应用运维。对于机房内的一些基础设施，比如交换机、路由器并不清楚怎么去配置。对于一个大公司来说，如果有成型的运维体系，运维按照工作内容来看，可分为基础运维、业务运维、监控运维和产品运维。而我的工作内容就是一些开源组件和商用中间件集群的部署和调优，并写一些脚本做一些简单的自动化部署。">
-<meta name="keywords" content="Linux">
+<meta name="description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。支持的源类型包：  dir 将目录打包成所需要的类型，可以用于源码编译安装的软件包">
+<meta name="keywords" content="rpm">
 <meta property="og:type" content="article">
-<meta property="og:title" content="个人这一年半以来的运维总结">
-<meta property="og:url" content="http://yoursite.com/2016/05/23/个人这一年半以来的运维总结/index.html">
+<meta property="og:title" content="速成RPM包制作">
+<meta property="og:url" content="http://yoursite.com/2017/04/21/速成RPM包制作/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
-<meta property="og:description" content="从事了一年半的运维工作，更多的是做业务运维，或者说是应用运维。对于机房内的一些基础设施，比如交换机、路由器并不清楚怎么去配置。对于一个大公司来说，如果有成型的运维体系，运维按照工作内容来看，可分为基础运维、业务运维、监控运维和产品运维。而我的工作内容就是一些开源组件和商用中间件集群的部署和调优，并写一些脚本做一些简单的自动化部署。">
-<meta property="og:updated_time" content="2016-06-08T09:40:34.000Z">
+<meta property="og:description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。支持的源类型包：  dir 将目录打包成所需要的类型，可以用于源码编译安装的软件包">
+<meta property="og:updated_time" content="2017-04-21T08:41:16.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="个人这一年半以来的运维总结">
-<meta name="twitter:description" content="从事了一年半的运维工作，更多的是做业务运维，或者说是应用运维。对于机房内的一些基础设施，比如交换机、路由器并不清楚怎么去配置。对于一个大公司来说，如果有成型的运维体系，运维按照工作内容来看，可分为基础运维、业务运维、监控运维和产品运维。而我的工作内容就是一些开源组件和商用中间件集群的部署和调优，并写一些脚本做一些简单的自动化部署。">
+<meta name="twitter:title" content="速成RPM包制作">
+<meta name="twitter:description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。支持的源类型包：  dir 将目录打包成所需要的类型，可以用于源码编译安装的软件包">
 
 
 
@@ -132,7 +132,7 @@
   };
 </script>
 
-  <title> 个人这一年半以来的运维总结 | jkzhao's blog </title>
+  <title> 速成RPM包制作 | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -312,7 +312,7 @@
             
             
               
-                个人这一年半以来的运维总结
+                速成RPM包制作
               
             
           </h1>
@@ -324,8 +324,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-05-23T13:29:35+08:00" content="2016-05-23">
-              2016-05-23
+            <time itemprop="dateCreated" datetime="2017-04-21T14:38:46+08:00" content="2017-04-21">
+              2017-04-21
             </time>
           </span>
 
@@ -335,8 +335,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/05/23/个人这一年半以来的运维总结/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/23/个人这一年半以来的运维总结/" itemprop="commentsCount"></span>
+                <a href="/2017/04/21/速成RPM包制作/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/21/速成RPM包制作/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -359,8 +359,58 @@
       
 
       
-        <hr>
-<p>从事了一年半的运维工作，更多的是做业务运维，或者说是应用运维。对于机房内的一些基础设施，比如交换机、路由器并不清楚怎么去配置。<br><br>对于一个大公司来说，如果有成型的运维体系，运维按照工作内容来看，可分为基础运维、业务运维、监控运维和产品运维。而我的工作内容就是一些开源组件和商用中间件集群的部署和调优，并写一些脚本做一些简单的自动化部署。<br><a id="more"></a><br>最近调到其他产品组开始搞大数据运维，同时也开始着手docker的调研。一个人去做这些事情有好处也有坏处，好处是培养自己解决问题的能力，因为处于研发部，研发人员对运维的工作懂得少之又少，所以遇到问题也只能自己想办法去学习相关的知识或者去google解决；而坏处就是去调研一个东西花的时间较长，而且很多东西只能有自己这一个思维去想，不少问题考虑的不够全面。解决问题花的时间也比较长，我记得最长的一次是花了4天。<br><br>这一年多以来，加了无数的班，基本没什么事情都是在公司学习。学习Linux基础，学习各种服务的原理和部署，学习各种自动化工具，无论说这些东西公司用到用不到。当然，公司产品组用到的一些，也提供了我场景，让我去应用。但是毕竟不是互联网公司，用到的东西不多，而且业务量不大，所以用的也不深。至于加班不加班这种事情，就看自己怎么想了，你觉得你是为公司加班的，而公司又不给加班费，那么你可能会觉得很不爽。如果你觉得你是为自己提升技术能力加班的，那么可能就不会有这方面的怨言了。当然，我们公司也是没有加班费的。<br><br>干了一年多，也学了不少东西。但是由于身边也没什么做运维工作的人，所以对自己现在所处的水平也是比较疑惑。于是陆续也查看了各大招聘网站上对于Linux运维工程师的要求，也投出了不少，面试了几家。其中包括杭州的几家互联网公司(基本都是6000上以上的)、南京的一些大小公司。杭州的互联网公司面试时相对比较专业，一般都有好几轮，一面会针对简历上的技术点进行询问，二面就是针对整体架构、设计上的一些询问，平时思考问题的方式等。<br><br>之前一直对自己的能力也不是很清楚，但是经过这几家的面试，发现即便是杭州的互联网公司，自己还是能够定岗到中级运维工程师，也算是对我这一年多的肯定吧。但是与一些运维资深人员交流下来发现两个问题，第一是对一些开源的东西理解的还不够深入；第二是不懂代码，真的很多事情做不了。就如自己一直想要去做运维开发这块，想要去做运维自动化平台，去解决公司环境部署、版本迭代这些重复劳动的工作。但是由于coding能力不足，人手短缺，这块也只是用jenkins+shell做了简单的持续集成和自动发布。还有就是不懂代码，对一些开源的项目理解不够深入，仅仅会使用是完全不够的。要想想它是怎么实现的，如何实现的，以及为什么要这么来实现。在学习的时候，不能浮于表面，要多思考。<br><br>纵观大多数大型公司的招聘Linux运维工程师的要求，大多都有一条熟悉shell/python/ruby中的一门或两门语言，遇到大数据这种职位，还会要求你精通java。我也打算从java入手，在学校里也是学过java的，只是没做过什么大项目。正好我这个组也就是在做大数据产品，接下来又要经过一段艰难的时光了。当然运维这块工作还是要由我来做，只是把工作的重心转移到开发上来。<br></p>
+        <h1 id="FPM"><a href="#FPM" class="headerlink" title="FPM"></a>FPM</h1><p>由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。<br>通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。<br><br>FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。<br><br><strong>支持的源类型包：</strong></p>
+<ol>
+<li>dir 将目录打包成所需要的类型，可以用于源码编译安装的软件包</li>
+<li>rpm 对rpm进行转换</li>
+<li>gem 对rubygem包进行转换</li>
+<li>python 将python模块打包成相应的类型</li>
+</ol>
+<p><strong>支持的目标类型包：</strong></p>
+<ol>
+<li>rpm 转换成rpm包</li>
+<li>deb 转换成deb包</li>
+<li>solaris 转换成solaris包</li>
+<li>puppet 转换成puppet模块</li>
+</ol>
+<h1 id="安装FPM"><a href="#安装FPM" class="headerlink" title="安装FPM"></a>安装FPM</h1><ol>
+<li><p>安装依赖包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum -y install ruby rubygems ruby-devel</div></pre></td></tr></table></figure>
+</li>
+<li><p>添加仓库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gem sources -a http://gems.ruby-china.org/</div></pre></td></tr></table></figure>
+</li>
+<li><p>移除原有的仓库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gem sources --remove https://rubygems.org/</div></pre></td></tr></table></figure>
+</li>
+<li><p>查看仓库是不是只有自己添加的那个</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gem sources -l</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">https://gems.ruby-china.org</div></pre></td></tr></table></figure>
+<ol>
+<li><p>安装fpm</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gem install fpm</div></pre></td></tr></table></figure>
+</li>
+<li><p>如何查看fpm帮助</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">fpm --help</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><strong>常用参数</strong><br>-s 指定源类型<br>-t 指定目标类型<br>-n 指定包的名字<br>-v 指定包的版本号<br>-C 指定打包的相对路径 change directory to here before searching for files<br>-d 指定依赖于哪些包<br>-f 第二次打包时目录下如果有同名安装包存在，则覆盖它<br>-p 输出的安装包的目录，不想放在当前目录下就需要指定<br>–post-install 软件包安装完成之后所要运行的脚本，同–after-install<br>–pre-install 软件包安装完成之前所要运行的脚本，同–before-install<br>–post-uninstall 软件包卸载之后所要运行的脚本，同–after-install<br>–pre-uninstall 软件包卸载之前所要运行的脚本，同–before-install</p>
+<h1 id="打包示例"><a href="#打包示例" class="headerlink" title="打包示例"></a>打包示例</h1><ol>
+<li>打包MySQL<br>事先安装好MySQL，MySQL安装过程这里不在详述。命令行终端输入以下命令，然后等待rpm包制作完成。<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">fpm -s dir -t rpm -n mysql -v 5.6.27 --description &apos;author: jkzhao&apos; -d &apos;libaio&apos; -d &apos;libaio-devel&apos; --pre-install /usr/local/mysql/mysql_pre_init.sh --post-install /usr/local/mysql/mysql_post_init.sh  /usr/local/mysql /usr/local/mysql-5.6.27-linux-glibc2.5-x86_64 /data</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><strong>注意</strong>：默认都是打好的包在当前目录下。<br><br><strong>命令说明：</strong><br>    -s dir：指定源文件是目录的形式<br>    -t rpm：指定打包的格式<br>    -n：指定打包后名称<br>    -v：版本号<br>        –description：描述信息<br>    -d：指定需要依赖的包。安装MySQL前需要在系统上安装libaio、libaio-devel。当你安装fpm打包成的rpm包时，它会先去检测系统上是否安装了这两个包，如果没有安装会给出提示，并终止rpm的安装。<br>    –pre-install：安装rpm包前需要执行的脚本<br>    –post-install：安装rpm包后需要执行的脚本<br>其中，mysql_pre_init.sh的内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">user=mysql</div><div class="line">group=mysql</div><div class="line"></div><div class="line"># create group if not exists.</div><div class="line">egrep &quot;^$group&quot; /etc/group &gt;&amp; /dev/null</div><div class="line">if [ $? -ne 0 ]</div><div class="line">then</div><div class="line">    groupadd -r -g 300 $group</div><div class="line">fi</div><div class="line"></div><div class="line"># create user if not exists.  </div><div class="line">egrep &quot;^$user&quot; /etc/passwd &gt;&amp; /dev/null</div><div class="line">if [ $? -ne 0 ]</div><div class="line">then</div><div class="line">    useradd -g $group -r -s /sbin/nologin -u 300 $user</div><div class="line">fi</div></pre></td></tr></table></figure></p>
+<p>mysql_post_init.sh的内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line"># cp my.cnf force.</div><div class="line">\cp /usr/local/mysql/my.cnf /etc/</div><div class="line"></div><div class="line"># start/stop/restart script.</div><div class="line">\cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld</div><div class="line">chkconfig --add mysqld</div><div class="line"></div><div class="line"># MySQL Client PATH.</div><div class="line">\cp /usr/local/mysql/mysql.sh /etc/profile.d/</div><div class="line"></div><div class="line">cd /usr/local/mysql</div><div class="line">chown -R root.mysql .</div><div class="line">chown -R mysql.mysql /data</div></pre></td></tr></table></figure></p>
+<p>打包完成后正常安装，如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rpm -ivh mysql-5.6.27-1.x86_64.rpm</div></pre></td></tr></table></figure></p>
+<ol>
+<li>打包openresty<br>事先安装好openresty。命令行终端输入以下命令，然后等待rpm包制作完成。<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">fpm -s dir -t rpm -n openresty -v 1.9.7.3 --description &apos;author: jkzhao&apos; -d &apos;openssl-devel&apos; -d &apos;readline-devel&apos; -d &apos;pcre-devel&apos; -d &apos;gcc&apos; --post-install /usr/local/openresty/openresty_init.sh  /usr/local/openresty</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>其中，openresty_init.sh的内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">mv /usr/local/openresty/nginx.service /etc/systemd/system/</div><div class="line">systemctl enable nginx.service</div></pre></td></tr></table></figure></p>
+<h1 id="如何卸载FPM打包好的rpm包"><a href="#如何卸载FPM打包好的rpm包" class="headerlink" title="如何卸载FPM打包好的rpm包"></a>如何卸载FPM打包好的rpm包</h1><p>如果重新安装rpm，必须先卸载rpm包，然后删除相应的目录及文件，否则再次安装时会报错。<br><strong>注意：</strong>卸载不要直接删除目录和文件，否则你再次安装这个包时会说已安装，冲突了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># rpm -e --nodeps  mysql-5.6.27-1.x86_64.rpm</div></pre></td></tr></table></figure></p>
+<p>然后再去删除各个目录和配置文件。</p>
 
       
     </div>
@@ -382,7 +432,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Linux/" rel="tag">#Linux</a>
+            <a href="/tags/rpm/" rel="tag">#rpm</a>
           
         </div>
       
@@ -391,13 +441,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/05/25/Nginx、Nignx-Plus减轻DDoS攻击-译/" rel="next" title="Nginx、Nignx Plus减轻DDoS攻击(译)">
-                <i class="fa fa-chevron-left"></i> Nginx、Nignx Plus减轻DDoS攻击(译)
-              </a>
-            
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/09/06/vpn简介及openvpn搭建/" rel="prev" title="vpn简介及openvpn搭建">
+                vpn简介及openvpn搭建 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -423,8 +473,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/05/23/个人这一年半以来的运维总结/"
-           data-title="个人这一年半以来的运维总结" data-url="http://yoursite.com/2016/05/23/个人这一年半以来的运维总结/">
+      <div class="ds-thread" data-thread-key="2017/04/21/速成RPM包制作/"
+           data-title="速成RPM包制作" data-url="http://yoursite.com/2017/04/21/速成RPM包制作/">
       </div>
     
   </div>
@@ -565,7 +615,7 @@
               
             
             
-              <p class="post-toc-empty">此文章未包含目录</p>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#FPM"><span class="nav-number">1.</span> <span class="nav-text">FPM</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装FPM"><span class="nav-number">2.</span> <span class="nav-text">安装FPM</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#打包示例"><span class="nav-number">3.</span> <span class="nav-text">打包示例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何卸载FPM打包好的rpm包"><span class="nav-number">4.</span> <span class="nav-text">如何卸载FPM打包好的rpm包</span></a></li></ol></div>
             
           </div>
         </section>
