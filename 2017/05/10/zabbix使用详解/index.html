@@ -118,10 +118,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/5.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/6.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/7.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/8.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/11.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/12.png">
-<meta property="og:updated_time" content="2017-05-10T11:07:20.000Z">
+<meta property="og:updated_time" content="2017-05-10T11:09:57.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zabbix使用详解">
 <meta name="twitter:description" content="实验环境   主机名 操作系统版本 IP地址 安装软件     console CentOS 7.0 114.55.29.246 Httpd、Nginx、MySQL、Zabbix   log1 CentOS 7.0 114.55.29.86 Httpd、Nginx、MySQL、Zabbix   log2 CentOS 7.0 114.55.29.241 Httpd、Nginx、MySQL、Zabb">
@@ -471,201 +468,115 @@ mysql&gt; grant all on zabbix.* to zabbix@localhost identified by &apos;wisedu&a
 mysql&gt; grant all on zabbix.* to zabbix@&apos;%.%.%.%&apos; identified by &apos;wisedu&apos;;
 mysql&gt; flush privileges;
 </code></pre><p>然后退出，使用zabbix用户登录mysql并导入数据：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root@console ~]# mysql -uzabbix -p</div><div class="line">mysql&gt; use zabbix;</div><div class="line">mysql&gt; source /usr/local/zabbix-3.0.1/database/mysql/schema.sql```如果你仅仅是初始化proxy的数据库，那么schema.sql够了。如果初始化server，那么接着导入下面两个sql：</div><div class="line"></div><div class="line">```mysql&gt; source /usr/local/zabbix-3.0.1/database/mysql/images.sqlmysql&gt; source /usr/local/zabbix-3.0.1/database/mysql/data.sql```如果是初始化agent，就不需要导入任何脚本。</div><div class="line"></div><div class="line">## 配置zabbix server</div><div class="line">因为上面我在编译加了--prefix=/usr/local/zabbix-3.0.1/参数，所以配置文件路径在：/usr/local/zabbix-3.0.1/etc。如果在编译时没有加这个参数，默认配置文件在/usr/local/etc/。</div><div class="line">```[root@console mysql]# cd /usr/local/zabbix-3.0.1/etc/</div></pre></td></tr></table></figure>
-<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/8.png" alt=""><br>备份原配置文件，然后去掉注释：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@console etc]# mv zabbix_server.conf zabbix_server.conf.bak[root@console etc]# cat zabbix_server.conf.bak | grep -v &quot;#&quot; | grep -v &quot;^$&quot; &gt; zabbix_server.conf</div></pre></td></tr></table></figure></p>
-<p>最终改后的配置文件内容如下：</p>
-<pre><code>[root@console etc]# cat zabbix_server.conf
-LogFile=/var/log/zabbix_server.log
-DBHost=localhost
+<pre><code>[root@console ~]# mysql -uzabbix -p
+mysql&gt; use zabbix;
+mysql&gt; source /usr/local/zabbix-3.0.1/database/mysql/schema.sql
+</code></pre><p>如果你仅仅是初始化proxy的数据库，那么schema.sql够了。如果初始化server，那么接着导入下面两个sql：</p>
+<pre><code>mysql&gt; source /usr/local/zabbix-3.0.1/database/mysql/images.sql
+mysql&gt; source /usr/local/zabbix-3.0.1/database/mysql/data.sql
+</code></pre><p>如果是初始化agent，就不需要导入任何脚本。</p>
+<h2 id="配置zabbix-server"><a href="#配置zabbix-server" class="headerlink" title="配置zabbix server"></a>配置zabbix server</h2><p>因为上面我在编译加了–prefix=/usr/local/zabbix-3.0.1/参数，所以配置文件路径在：/usr/local/zabbix-3.0.1/etc。如果在编译时没有加这个参数，默认配置文件在/usr/local/etc/。</p>
+<pre><code>[root@console mysql]# cd /usr/local/zabbix-3.0.1/etc/
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/8.png)</div><div class="line">备份原配置文件，然后去掉注释：</div></pre></td></tr></table></figure>
+
+[root@console etc]# mv zabbix_server.conf zabbix_server.conf.bak
+[root@console etc]# cat zabbix_server.conf.bak | grep -v &quot;#&quot; | grep -v &quot;^$&quot; &gt; zabbix_server.conf
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">最终改后的配置文件内容如下：</div><div class="line">```[root@console etc]# cat zabbix_server.confLogFile=/var/log/zabbix_server.logDBHost=localhostDBName=zabbixDBUser=zabbixDBPassword=wisedu# 注意mysql服务器上的mysql.sock文件路径，一般zabbix server和mysql在同一台就改为/tmp/mysql.sock，否则不修改DBSocket=/tmp/mysql.sockTimeout=4LogSlowQueries=3000</div></pre></td></tr></table></figure>
+
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/9.png)
+修改agent配置文件：
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@console etc]# mv zabbix_agentd.conf zabbix_agentd.conf.bak[root@console etc]# cat zabbix_agentd.conf.bak | grep -v &quot;#&quot; | grep -v &quot;^$&quot; &gt; zabbix_agentd.conf</div></pre></td></tr></table></figure>
+
+agent配置文件内容如下：
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@console etc]# cat zabbix_agentd.confLogFile=/var/log/zabbix_agentd.logServer=114.55.29.246# 主动向zabbix server发送监控内容ServerActive=114.55.29.246Hostname=consoleInclude=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf</div></pre></td></tr></table></figure>
+
+创建日志文件：
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@console etc]# touch /var/log/&#123;zabbix_server.log,zabbix_agentd.log&#125; [root@console etc]# chmod 777 /var/log/zabbix_*</div></pre></td></tr></table></figure>
+
+## 启动zabbix server
+        [root@console ~]# cd /usr/local/zabbix-3.0.1/sbin/
+        [root@console sbin]# ./zabbix_server
+查看10051端口，端口默认是10051。
+一大堆进程。
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/10.png)
+可以查看启动日志：
+        [root@log sbin]# tail -100f /var/log/zabbix_server.log
+常见启动错误：
+./zabbix_server: error while loading shared libraries: libmysqlclient.so.18: cannot open shared object file: No such file or directory
+解决：    
+        # ln -s /usr/local/mysql/lib/libmysqlclient.so.18  /usr/lib64/
+
+## 停止zabbix server
+        # killall -9 zabbix_server
+## 安装zabbix web界面(和server端装在一台机器)
+zabbix的服务端程序是用php写的，因此需要一个支持LAMP架构的服务器平台。Web服务器可以使用Httpd或者Nginx。
+鉴于zabbix最近爆出来的漏洞：zabbix的jsrpc的profileldx2参数存在insert方式的SQL注入漏洞，攻击者可以无需授权登陆即可登陆zabbix管理系统，也可通过script等功能轻易直接获取zabbix服务器的操作系统权限。建议升级到最新的zabbix-3.0.4版本，或者使用nginx，这样可以在server段加入如下配置处理这个漏洞：
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">if ($request_uri ~ ^(.+\.php)(.*)$) &#123;	    set $req $2;&#125;if ($req ~* &quot;union[+|(%20)]&quot;) &#123;	    return 503;&#125;if ($req ~* &quot;and[+|(%20)]&quot;) &#123;        return 503;&#125;if ($req ~* &quot;select[+|(%20)]&quot;) &#123;        return 503;&#125;if ($req ~* &quot;or[+|(%20)]&quot;) &#123;        return 503;&#125;if ($req ~* &quot;concat[+|(%20)]&quot;) &#123;        return 503;&#125;if ($req ~* &quot;cost[+|(%20)]&quot;) &#123;        return 503;&#125;</div><div class="line">```### 使用httpd#### 安装httpd我这里使用httpd2.4。</div><div class="line">```[root@console ~]# yum install -y httpd```#### 部署zabbix web将ZABBIX安装目录下 frontends/php 下面的php源代码文件拷贝到web服务器html文件目录下面。先建立一个子目录，将zabbix终端php文件拷贝到该子目录里面，执行下面的命令：</div><div class="line">```[root@console ~]# cd /var/www/html/[root@console html]# mkdir /var/www/html/zabbix[root@console html]# cp -ar /usr/local/zabbix-3.0.1/frontends/php/* ./zabbix/```启动httpd：</div><div class="line">```[root@console html]# systemctl start httpd.service[root@console ~]# systemctl enable httpd.service</div><div class="line">```访问：</div><div class="line">http://114.55.29.246/zabbix/ (1) You should see the first screen of the frontend installation wizard.![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/11.png)(2) 检查环境![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/12.png)查看到几处不符合要求，需修改该PHP文件配置文件参数:</div><div class="line">```# vim /etc/php.inipost_max_size = 16Mmax_execution_time = 300max_input_time = 300date.timezone = Asia/Shanghai```然后重启httpd和mysql，不重启mysql下面sql连接时还是会报错。```[root@console ~]# systemctl restart httpd.service [root@console ~]# service mysqld restart</div></pre></td></tr></table></figure>
+
+重新访问，全部依赖都通过：
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/13.png)
+(3) 输入之前在MYSQL后台设置的zabbix数据库信息:
 DBName=zabbix
 DBUser=zabbix
 DBPassword=wisedu
-# 注意mysql服务器上的mysql.sock文件路径，一般zabbix server和mysql在同一台就改为/tmp/mysql.sock，否则不修改
-DBSocket=/tmp/mysql.sock
-Timeout=4
-LogSlowQueries=3000
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/9.png)</div><div class="line">修改agent配置文件：</div></pre></td></tr></table></figure>
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/14.png)
+报错：
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/15.png)
+解决：
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@console ~]# mkdir /var/lib/mysql[root@console ~]# ln -s /tmp/mysql.sock /var/lib/mysql/mysql.sock</div></pre></td></tr></table></figure>
 
-[root@console etc]# mv zabbix_agentd.conf zabbix_agentd.conf.bak
-[root@console etc]# cat zabbix_agentd.conf.bak | grep -v &quot;#&quot; | grep -v &quot;^$&quot; &gt; zabbix_agentd.conf
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">agent配置文件内容如下：</div></pre></td></tr></table></figure>
-
-[root@console etc]# cat zabbix_agentd.conf
-LogFile=/var/log/zabbix_agentd.log
-Server=114.55.29.246
-# 主动向zabbix server发送监控内容
-ServerActive=114.55.29.246
-Hostname=console
-Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">创建日志文件：</div></pre></td></tr></table></figure>
-
-[root@console etc]# touch /var/log/{zabbix_server.log,zabbix_agentd.log} 
-[root@console etc]# chmod 777 /var/log/zabbix_*
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">## 启动zabbix server</div><div class="line">        [root@console ~]# cd /usr/local/zabbix-3.0.1/sbin/        [root@console sbin]# ./zabbix_server查看10051端口，端口默认是10051。一大堆进程。</div><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/10.png)</div><div class="line">可以查看启动日志：</div><div class="line">        [root@log sbin]# tail -100f /var/log/zabbix_server.log</div><div class="line">常见启动错误：./zabbix_server: error while loading shared libraries: libmysqlclient.so.18: cannot open shared object file: No such file or directory</div><div class="line">解决：	        # ln -s /usr/local/mysql/lib/libmysqlclient.so.18  /usr/lib64/</div><div class="line"></div><div class="line">## 停止zabbix server</div><div class="line">        # killall -9 zabbix_server</div><div class="line">## 安装zabbix web界面(和server端装在一台机器)zabbix的服务端程序是用php写的，因此需要一个支持LAMP架构的服务器平台。Web服务器可以使用Httpd或者Nginx。鉴于zabbix最近爆出来的漏洞：zabbix的jsrpc的profileldx2参数存在insert方式的SQL注入漏洞，攻击者可以无需授权登陆即可登陆zabbix管理系统，也可通过script等功能轻易直接获取zabbix服务器的操作系统权限。建议升级到最新的zabbix-3.0.4版本，或者使用nginx，这样可以在server段加入如下配置处理这个漏洞：</div></pre></td></tr></table></figure>
-
-if ($request_uri ~ ^(.+\.php)(.*)$) {
-        set $req $2;
+点击下一步，还是报错：
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/16.png)
+解决：
+</code></pre><p>mysql&gt; grant all on zabbix.* to ‘zabbix’@’console’ identified by ‘wisedu’;<br>mysql&gt; flush privileges;</p>
+<pre><code>如果以上方法试过后，还报下面的错误：
+</code></pre><p>Error connecting to database: Can’t connect to MySQL server on ‘’114.55.29.246’’</p>
+<pre><code>请检查SELinux是否关闭。
+</code></pre><p>[root@console ~]# /usr/sbin/sestatus -v</p>
+<pre><code>![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/17.png)
+关闭SELinux：
+</code></pre><p>[root@console ~]# setenforce 0<br>[root@console ~]# vim /etc/sysconfig/selinux<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/18.png)![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/19.png)(4) 输入zabbix服务器端的详细信息![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/20.png)</div><div class="line">(5) 检查一下设置情况![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/21.png)</div><div class="line">(6) 下载配置文件，并把它放置在/var/www/html/zabbix/conf/ 目录下</div><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/22.png)</div></pre></td></tr></table></figure></p>
+<p>Alternatively, you can install it manually:<br>Download the configuration file<br>Save it as “/var/www/html/zabbix/conf/zabbix.conf.php”<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/23.png)</div></pre></td></tr></table></figure></p>
+<p>[root@console conf]# cd /var/www/html/zabbix/conf/<br>[root@console conf]# chown zabbix.zabbix zabbix.conf.php<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">(7) 点击Finish</div><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/24.png)</div><div class="line">(8) Zabbix frontend is ready! The default user name is Admin, password zabbix.</div><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/25.png)</div><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/26.png)</div><div class="line">### 使用Nginx</div><div class="line">#### 安装openresty</div><div class="line">log2主机上安装openresty</div></pre></td></tr></table></figure></p>
+<h1 id="yum-install-readline-devel-pcre-devel-openssl-devel-gcc-y"><a href="#yum-install-readline-devel-pcre-devel-openssl-devel-gcc-y" class="headerlink" title="yum install readline-devel pcre-devel openssl-devel gcc -y"></a>yum install readline-devel pcre-devel openssl-devel gcc -y</h1><h1 id="cd-usr-local"><a href="#cd-usr-local" class="headerlink" title="cd /usr/local"></a>cd /usr/local</h1><h1 id="tar-zxf-openresty-1-9-7-3-tar-gz"><a href="#tar-zxf-openresty-1-9-7-3-tar-gz" class="headerlink" title="tar zxf openresty-1.9.7.3.tar.gz"></a>tar zxf openresty-1.9.7.3.tar.gz</h1><h1 id="cd-openresty-1-9-7-3"><a href="#cd-openresty-1-9-7-3" class="headerlink" title="cd openresty-1.9.7.3/"></a>cd openresty-1.9.7.3/</h1><h1 id="configure-–with-http-stub-status-module"><a href="#configure-–with-http-stub-status-module" class="headerlink" title="./configure –with-http_stub_status_module"></a>./configure –with-http_stub_status_module</h1><h1 id="gmake-amp-amp-gmake-install"><a href="#gmake-amp-amp-gmake-install" class="headerlink" title="gmake &amp;&amp; gmake install"></a>gmake &amp;&amp; gmake install</h1><pre><code>安装完成后，在/usr/local/下多了个openresty目录，nginx部署安装在/usr/local/openresty/nginx。
+将nginx加入系统服务：
+**Redhat7之前的版本：**
+(1)    上传nginx启动脚本到/etc/init.d/目录下
+(2)    授权脚本执行权限
+</code></pre><p>[root@log2 init.d]# chmod a+x nginx</p>
+<pre><code>(3)    加入系统服务
+</code></pre><p>[root@log2 init.d]# chkconfig –add nginx</p>
+<pre><code>(4)    nginx开启自启动
+</code></pre><p>[root@log2 init.d]# chkconfig nginx on</p>
+<pre><code>(5)    nginx启停重载
+</code></pre><p>service nginx start/stop/restart/reload</p>
+<pre><code>**Redhat7版本：**
+(1)    启动服务单元
+把写好的nginx.service放到/etc/systemd/system/目录下。
+(2)    设置开机启动
+</code></pre><p>[root@log2 ~]# systemctl enable nginx.service</p>
+<pre><code>(3)    启动/停止/重载nginx服务
+</code></pre><p>systemctl start/stop/reload nginx.service<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">#### 启动php</div><div class="line">Nginx是没办法以模块化方式或者CGI方式跟php结合的，php就可以工作在fastcgi模式下。即单独启动为服务。</div></pre></td></tr></table></figure></p>
+<h1 id="vim-etc-php-ini"><a href="#vim-etc-php-ini" class="headerlink" title="vim /etc/php.ini"></a>vim /etc/php.ini</h1><p>post_max_size = 16M<br>max_execution_time = 300<br>max_input_time = 300<br>date.timezone = Asia/Shanghai</p>
+<pre><code>启动：
+</code></pre><h1 id="systemctl-start-php-fpm-service"><a href="#systemctl-start-php-fpm-service" class="headerlink" title="systemctl start php-fpm.service"></a>systemctl start php-fpm.service</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">#### 部署zabbix web</div><div class="line">将zabbix安装目录下 frontends/php 下面的php源代码文件拷贝到web服务器html文件目录下面。</div><div class="line">```# mkdir /usr/local/openresty/nginx/html/zabbix# cp -ar /usr/local/zabbix-3.0.1/frontends/php/* /usr/local/openresty/nginx/html//zabbix/</div></pre></td></tr></table></figure>
+<p>修改nginx配置文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># cd /usr/local/openresty/nginx/conf/# cp nginx.conf nginx.conf.bak</div></pre></td></tr></table></figure></p>
+<p>配置文件内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">#user  nobody;worker_processes  1;error_log  logs/error.log info;#error_log  logs/error.log  notice;#error_log  logs/error.log  info;#pid        logs/nginx.pid;events &#123;    worker_connections  1024;&#125;http &#123;    include       mime.types;    default_type  application/octet-stream;    log_format  main  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;                      &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;                      &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;    #access_log  logs/access.log  main;    proxy_buffer_size  128k;    proxy_buffers   32 32k;     proxy_busy_buffers_size 128k;    sendfile        on;    #tcp_nopush     on;    #keepalive_timeout  0;    keepalive_timeout  65;    #gzip  on;    server &#123;        listen       80;        server_name  zabbix.wisedu.com;        #charset koi8-r;        access_log  logs/zabbix.access.log  main;		 index index.php index.html index.html;        root /usr/local/openresty/nginx/html;		if ($request_uri ~ ^(.+\.php)(.*)$) &#123;	    	set $req $2;		&#125;		if ($req ~* &quot;union[+|(%20)]&quot;) &#123;	    	return 503;		&#125;		if ($req ~* &quot;and[+|(%20)]&quot;) &#123;             return 503;       &#125;		if ($req ~* &quot;select[+|(%20)]&quot;) &#123;             return 503;       &#125;		if ($req ~* &quot;or[+|(%20)]&quot;) &#123;             return 503;       &#125;		if ($req ~* &quot;concat[+|(%20)]&quot;) &#123;             return 503;       &#125;		if ($req ~* &quot;cost[+|(%20)]&quot;) &#123;             return 503;       &#125;    	location / &#123;            try_files $uri $uri/ /index.php?$args;     	&#125;    	location ~ .*\.(php)?$ &#123;	    	fastcgi_buffer_size 128k;	    	fastcgi_buffers 4 256k;	    	fastcgi_busy_buffers_size 256k;          expires -1s;          try_files $uri =404;	    	fastcgi_split_path_info ^(.+\.php)(/.+)$;	    	include fastcgi_params;	    	fastcgi_param PATH_INFO $fastcgi_path_info;	    	fastcgi_index index.php;	    	fastcgi_param SCRIPT_FILENAME $document_root $fastcgi_script_name;	    	fastcgi_pass 127.0.0.1:9000;       &#125;      error_page   500 502 503 504  /50x.html;      location = /50x.html &#123;            root   html;      &#125;    &#125;&#125;</div></pre></td></tr></table></figure></p>
+<p>浏览器访问url，安装过程和上面httpd一样。</p>
+<h4 id="切割Nginx日志"><a href="#切割Nginx日志" class="headerlink" title="切割Nginx日志"></a>切割Nginx日志</h4><p>如果开启Nginx的debug日志，就需要考虑到切割日志：</p>
+<pre><code># cd /etc/logrotate.d/
+# vim nginx
+/usr/local/openresty/nginx/logs/*.log {
+        notifempty
+        weekly
+        rotate 4
+        nocompress
+        copytruncate
+        postrotate
+        service nginx reload
+        endscript
 }
-if ($req ~* &quot;union[+|(%20)]&quot;) {
-        return 503;
-}
-if ($req ~* &quot;and[+|(%20)]&quot;) { 
-       return 503;
-}
-if ($req ~* &quot;select[+|(%20)]&quot;) { 
-       return 503;
-}
-if ($req ~* &quot;or[+|(%20)]&quot;) { 
-       return 503;
-}
-if ($req ~* &quot;concat[+|(%20)]&quot;) { 
-       return 503;
-}
-if ($req ~* &quot;cost[+|(%20)]&quot;) { 
-       return 503;
-}
-</code></pre><h3 id="使用httpd"><a href="#使用httpd" class="headerlink" title="使用httpd"></a>使用httpd</h3><h4 id="安装httpd"><a href="#安装httpd" class="headerlink" title="安装httpd"></a>安装httpd</h4><p>我这里使用httpd2.4。</p>
-<pre><code>[root@console ~]# yum install -y httpd
-</code></pre><h4 id="部署zabbix-web"><a href="#部署zabbix-web" class="headerlink" title="部署zabbix web"></a>部署zabbix web</h4><p>将ZABBIX安装目录下 frontends/php 下面的php源代码文件拷贝到web服务器html文件目录下面。<br>先建立一个子目录，将zabbix终端php文件拷贝到该子目录里面，执行下面的命令：</p>
-<pre><code>[root@console ~]# cd /var/www/html/
-[root@console html]# mkdir /var/www/html/zabbix
-[root@console html]# cp -ar /usr/local/zabbix-3.0.1/frontends/php/* ./zabbix/
-</code></pre><p>启动httpd：</p>
-<pre><code>[root@console html]# systemctl start httpd.service
-[root@console ~]# systemctl enable httpd.service
-</code></pre><p>访问：<br><a href="http://114.55.29.246/zabbix/" target="_blank" rel="external">http://114.55.29.246/zabbix/</a><br> (1) You should see the first screen of the frontend installation wizard.<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/11.png" alt=""><br>(2) 检查环境<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/12.png" alt=""><br>查看到几处不符合要求，需修改该PHP文件配置文件参数:</p>
-<pre><code># vim /etc/php.ini
-post_max_size = 16M
-max_execution_time = 300
-max_input_time = 300
-date.timezone = Asia/Shanghai
-</code></pre><p>然后重启httpd和mysql，不重启mysql下面sql连接时还是会报错。</p>
-<pre><code>[root@console ~]# systemctl restart httpd.service 
-[root@console ~]# service mysqld restart
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">重新访问，全部依赖都通过：</div><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/13.png)</div><div class="line">(3) 输入之前在MYSQL后台设置的zabbix数据库信息:</div><div class="line">DBName=zabbixDBUser=zabbixDBPassword=wisedu</div><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/14.png)</div><div class="line">报错：</div><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/15.png)</div><div class="line">解决：</div></pre></td></tr></table></figure>
-
-[root@console ~]# mkdir /var/lib/mysql
-[root@console ~]# ln -s /tmp/mysql.sock /var/lib/mysql/mysql.sock
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">点击下一步，还是报错：![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/16.png)解决：</div><div class="line">```mysql&gt; grant all on zabbix.* to &apos;zabbix&apos;@&apos;console&apos; identified by &apos;wisedu&apos;;mysql&gt; flush privileges;```如果以上方法试过后，还报下面的错误：</div><div class="line">```Error connecting to database: Can&apos;t connect to MySQL server on &apos;&apos;114.55.29.246&apos;&apos;</div><div class="line">```请检查SELinux是否关闭。</div><div class="line">```[root@console ~]# /usr/sbin/sestatus -v```![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/17.png)关闭SELinux：</div><div class="line">```[root@console ~]# setenforce 0[root@console ~]# vim /etc/sysconfig/selinux</div></pre></td></tr></table></figure>
-
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/18.png)
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/19.png)
-(4) 输入zabbix服务器端的详细信息
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/20.png)
-(5) 检查一下设置情况
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/21.png)
-(6) 下载配置文件，并把它放置在/var/www/html/zabbix/conf/ 目录下
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/22.png)
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Alternatively, you can install it manually:Download the configuration fileSave it as &quot;/var/www/html/zabbix/conf/zabbix.conf.php&quot;</div></pre></td></tr></table></figure>
-
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/23.png)
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@console conf]# cd /var/www/html/zabbix/conf/[root@console conf]# chown zabbix.zabbix zabbix.conf.php</div></pre></td></tr></table></figure>
-
-(7) 点击Finish
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/24.png)
-(8) Zabbix frontend is ready! The default user name is Admin, password zabbix.
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/25.png)
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/26.png)
-### 使用Nginx
-#### 安装openresty
-log2主机上安装openresty
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"># yum install readline-devel pcre-devel openssl-devel gcc -y# cd /usr/local# tar zxf openresty-1.9.7.3.tar.gz# cd openresty-1.9.7.3/# ./configure --with-http_stub_status_module# gmake &amp;&amp; gmake install</div><div class="line">```安装完成后，在/usr/local/下多了个openresty目录，nginx部署安装在/usr/local/openresty/nginx。</div><div class="line">将nginx加入系统服务：</div><div class="line">**Redhat7之前的版本：**(1)	上传nginx启动脚本到/etc/init.d/目录下(2)	授权脚本执行权限```[root@log2 init.d]# chmod a+x nginx</div><div class="line">```(3)	加入系统服务</div><div class="line">```[root@log2 init.d]# chkconfig --add nginx</div><div class="line">```(4)	nginx开启自启动</div><div class="line">```[root@log2 init.d]# chkconfig nginx on</div><div class="line">```(5)	nginx启停重载</div><div class="line">```service nginx start/stop/restart/reload</div><div class="line">```**Redhat7版本：**(1)	启动服务单元把写好的nginx.service放到/etc/systemd/system/目录下。(2)	设置开机启动</div><div class="line">```[root@log2 ~]# systemctl enable nginx.service</div><div class="line">```(3)	启动/停止/重载nginx服务</div><div class="line">```systemctl start/stop/reload nginx.service</div></pre></td></tr></table></figure>
-
-#### 启动php
-Nginx是没办法以模块化方式或者CGI方式跟php结合的，php就可以工作在fastcgi模式下。即单独启动为服务。
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"># vim /etc/php.inipost_max_size = 16Mmax_execution_time = 300max_input_time = 300date.timezone = Asia/Shanghai</div><div class="line">```启动：</div><div class="line">```# systemctl start php-fpm.service</div></pre></td></tr></table></figure>
-
-#### 部署zabbix web
-将zabbix安装目录下 frontends/php 下面的php源代码文件拷贝到web服务器html文件目录下面。
-</code></pre><h1 id="mkdir-usr-local-openresty-nginx-html-zabbix"><a href="#mkdir-usr-local-openresty-nginx-html-zabbix" class="headerlink" title="mkdir /usr/local/openresty/nginx/html/zabbix"></a>mkdir /usr/local/openresty/nginx/html/zabbix</h1><h1 id="cp-ar-usr-local-zabbix-3-0-1-frontends-php-usr-local-openresty-nginx-html-zabbix"><a href="#cp-ar-usr-local-zabbix-3-0-1-frontends-php-usr-local-openresty-nginx-html-zabbix" class="headerlink" title="cp -ar /usr/local/zabbix-3.0.1/frontends/php/* /usr/local/openresty/nginx/html//zabbix/"></a>cp -ar /usr/local/zabbix-3.0.1/frontends/php/* /usr/local/openresty/nginx/html//zabbix/</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">修改nginx配置文件：</div></pre></td></tr></table></figure>
-<h1 id="cd-usr-local-openresty-nginx-conf"><a href="#cd-usr-local-openresty-nginx-conf" class="headerlink" title="cd /usr/local/openresty/nginx/conf/"></a>cd /usr/local/openresty/nginx/conf/</h1><h1 id="cp-nginx-conf-nginx-conf-bak"><a href="#cp-nginx-conf-nginx-conf-bak" class="headerlink" title="cp nginx.conf nginx.conf.bak"></a>cp nginx.conf nginx.conf.bak</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">配置文件内容：</div></pre></td></tr></table></figure>
-<p>#user  nobody;<br>worker_processes  1;</p>
-<p>error_log  logs/error.log info;</p>
-<p>#error_log  logs/error.log  notice;</p>
-<p>#error_log  logs/error.log  info;</p>
-<p>#pid        logs/nginx.pid;</p>
-<p>events {<br>    worker_connections  1024;<br>}</p>
-<p>http {<br>    include       mime.types;<br>    default_type  application/octet-stream;</p>
-<pre><code>log_format  main  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;
-                  &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;
-                  &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;
-
-#access_log  logs/access.log  main;
-
-proxy_buffer_size  128k;
-proxy_buffers   32 32k; 
-proxy_busy_buffers_size 128k;
-
-sendfile        on;
-#tcp_nopush     on;
-
-#keepalive_timeout  0;
-keepalive_timeout  65;
-
-#gzip  on;
-
-server {
-    listen       80;
-    server_name  zabbix.wisedu.com;
-
-    #charset koi8-r;
-
-    access_log  logs/zabbix.access.log  main;
-
-     index index.php index.html index.html;
-    root /usr/local/openresty/nginx/html;
-
-    if ($request_uri ~ ^(.+\.php)(.*)$) {
-        set $req $2;
-    }
-    if ($req ~* &quot;union[+|(%20)]&quot;) {
-        return 503;
-    }
-    if ($req ~* &quot;and[+|(%20)]&quot;) { 
-        return 503;
-   }
-    if ($req ~* &quot;select[+|(%20)]&quot;) { 
-        return 503;
-   }
-    if ($req ~* &quot;or[+|(%20)]&quot;) { 
-        return 503;
-   }
-    if ($req ~* &quot;concat[+|(%20)]&quot;) { 
-        return 503;
-   }
-    if ($req ~* &quot;cost[+|(%20)]&quot;) { 
-        return 503;
-   }
-
-    location / {
-        try_files $uri $uri/ /index.php?$args;
-     }
-
-    location ~ .*\.(php)?$ {
-        fastcgi_buffer_size 128k;
-        fastcgi_buffers 4 256k;
-        fastcgi_busy_buffers_size 256k;
-      expires -1s;
-      try_files $uri =404;
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        include fastcgi_params;
-        fastcgi_param PATH_INFO $fastcgi_path_info;
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME $document_root $fastcgi_script_name;
-        fastcgi_pass 127.0.0.1:9000;
-   }
-
-  error_page   500 502 503 504  /50x.html;
-  location = /50x.html {
-        root   html;
-  }
-}
-</code></pre><p>}</p>
-<pre><code>浏览器访问url，安装过程和上面httpd一样。
-#### 切割Nginx日志
-如果开启Nginx的debug日志，就需要考虑到切割日志：
-</code></pre><h1 id="cd-etc-logrotate-d"><a href="#cd-etc-logrotate-d" class="headerlink" title="cd /etc/logrotate.d/"></a>cd /etc/logrotate.d/</h1><h1 id="vim-nginx"><a href="#vim-nginx" class="headerlink" title="vim nginx"></a>vim nginx</h1><p>/usr/local/openresty/nginx/logs/*.log {<br>        notifempty<br>        weekly<br>        rotate 4<br>        nocompress<br>        copytruncate<br>        postrotate<br>        service nginx reload<br>        endscript<br>}<br>```</p>
-
+</code></pre>
       
     </div>
 
@@ -869,7 +780,7 @@ server {
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实验环境"><span class="nav-number">1.</span> <span class="nav-text">实验环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装准备"><span class="nav-number">2.</span> <span class="nav-text">安装准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装MySQL"><span class="nav-number">3.</span> <span class="nav-text">安装MySQL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装Zabbix3-0-1"><span class="nav-number">4.</span> <span class="nav-text">安装Zabbix3.0.1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装依赖包"><span class="nav-number">4.1.</span> <span class="nav-text">安装依赖包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装JDK"><span class="nav-number">4.2.</span> <span class="nav-text">安装JDK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装php环境"><span class="nav-number">4.3.</span> <span class="nav-text">安装php环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译安装zabbix-server"><span class="nav-number">4.4.</span> <span class="nav-text">编译安装zabbix server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化数据库"><span class="nav-number">4.5.</span> <span class="nav-text">初始化数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用httpd"><span class="nav-number">4.5.1.</span> <span class="nav-text">使用httpd</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装httpd"><span class="nav-number">4.5.1.1.</span> <span class="nav-text">安装httpd</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署zabbix-web"><span class="nav-number">4.5.1.2.</span> <span class="nav-text">部署zabbix web</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mkdir-usr-local-openresty-nginx-html-zabbix"><span class="nav-number">5.</span> <span class="nav-text">mkdir /usr/local/openresty/nginx/html/zabbix</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cp-ar-usr-local-zabbix-3-0-1-frontends-php-usr-local-openresty-nginx-html-zabbix"><span class="nav-number">6.</span> <span class="nav-text">cp -ar /usr/local/zabbix-3.0.1/frontends/php/* /usr/local/openresty/nginx/html//zabbix/</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cd-usr-local-openresty-nginx-conf"><span class="nav-number">7.</span> <span class="nav-text">cd /usr/local/openresty/nginx/conf/</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cp-nginx-conf-nginx-conf-bak"><span class="nav-number">8.</span> <span class="nav-text">cp nginx.conf nginx.conf.bak</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cd-etc-logrotate-d"><span class="nav-number">9.</span> <span class="nav-text">cd /etc/logrotate.d/</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vim-nginx"><span class="nav-number">10.</span> <span class="nav-text">vim nginx</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实验环境"><span class="nav-number">1.</span> <span class="nav-text">实验环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装准备"><span class="nav-number">2.</span> <span class="nav-text">安装准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装MySQL"><span class="nav-number">3.</span> <span class="nav-text">安装MySQL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装Zabbix3-0-1"><span class="nav-number">4.</span> <span class="nav-text">安装Zabbix3.0.1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装依赖包"><span class="nav-number">4.1.</span> <span class="nav-text">安装依赖包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装JDK"><span class="nav-number">4.2.</span> <span class="nav-text">安装JDK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装php环境"><span class="nav-number">4.3.</span> <span class="nav-text">安装php环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译安装zabbix-server"><span class="nav-number">4.4.</span> <span class="nav-text">编译安装zabbix server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化数据库"><span class="nav-number">4.5.</span> <span class="nav-text">初始化数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置zabbix-server"><span class="nav-number">4.6.</span> <span class="nav-text">配置zabbix server</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#yum-install-readline-devel-pcre-devel-openssl-devel-gcc-y"><span class="nav-number">5.</span> <span class="nav-text">yum install readline-devel pcre-devel openssl-devel gcc -y</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cd-usr-local"><span class="nav-number">6.</span> <span class="nav-text">cd /usr/local</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#tar-zxf-openresty-1-9-7-3-tar-gz"><span class="nav-number">7.</span> <span class="nav-text">tar zxf openresty-1.9.7.3.tar.gz</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cd-openresty-1-9-7-3"><span class="nav-number">8.</span> <span class="nav-text">cd openresty-1.9.7.3/</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#configure-–with-http-stub-status-module"><span class="nav-number">9.</span> <span class="nav-text">./configure –with-http_stub_status_module</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#gmake-amp-amp-gmake-install"><span class="nav-number">10.</span> <span class="nav-text">gmake && gmake install</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vim-etc-php-ini"><span class="nav-number">11.</span> <span class="nav-text">vim /etc/php.ini</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#systemctl-start-php-fpm-service"><span class="nav-number">12.</span> <span class="nav-text">systemctl start php-fpm.service</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#切割Nginx日志"><span class="nav-number">12.0.0.1.</span> <span class="nav-text">切割Nginx日志</span></a></li></ol></li></ol></li></ol></li></ol></div>
             
           </div>
         </section>
