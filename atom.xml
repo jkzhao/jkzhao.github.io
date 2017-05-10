@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-10T08:02:15.000Z</updated>
+  <updated>2017-05-10T08:04:21.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/05/10/zabbix%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/"/>
     <id>http://yoursite.com/2017/05/10/zabbix使用详解/</id>
     <published>2017-05-10T02:53:23.000Z</published>
-    <updated>2017-05-10T08:02:15.000Z</updated>
+    <updated>2017-05-10T08:04:21.000Z</updated>
     
     <content type="html">&lt;h1 id=&quot;实验环境&quot;&gt;&lt;a href=&quot;#实验环境&quot; class=&quot;headerlink&quot; title=&quot;实验环境&quot;&gt;&lt;/a&gt;实验环境&lt;/h1&gt;&lt;table&gt;
 &lt;thead&gt;
@@ -57,17 +57,16 @@
 &lt;h1 id=&quot;安装MySQL&quot;&gt;&lt;a href=&quot;#安装MySQL&quot; class=&quot;headerlink&quot; title=&quot;安装MySQL&quot;&gt;&lt;/a&gt;安装MySQL&lt;/h1&gt;&lt;p&gt;console主机安装mysql5.6。下载地址：&lt;a href=&quot;http://mirrors.sohu.com/mysql&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://mirrors.sohu.com/mysql&lt;/a&gt;&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;p&gt;安装依赖包&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# yum install libaio* -y&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console local]# yum install libaio* -y&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 &lt;/li&gt;
 &lt;li&gt;&lt;p&gt;解压安装&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# cd /usr/local&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# tar zxf mysql-5.6.27-linux-glibc2.5-x86_64.tar.gz # ln -sv mysql-5.6.27-linux-glibc2.5-x86_64 mysql&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console local]# tar zxf mysql-5.6.27-linux-glibc2.5-x86_64.tar.gz [root@console local]# ln -sv mysql-5.6.27-linux-glibc2.5-x86_64 mysql&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;p&gt;新建用户&lt;br&gt;运行mysql最好不要用root去运行，而以普通用户身份。添加用户mysql。&lt;br&gt;```bash&lt;/p&gt;
-&lt;h1 id=&quot;groupadd-r-g-300-mysql&quot;&gt;&lt;a href=&quot;#groupadd-r-g-300-mysql&quot; class=&quot;headerlink&quot; title=&quot;groupadd -r -g 300 mysql&quot;&gt;&lt;/a&gt;groupadd -r -g 300 mysql&lt;/h1&gt;&lt;h1 id=&quot;useradd-g-mysql-r-s-sbin-nologin-u-300-mysql&quot;&gt;&lt;a href=&quot;#useradd-g-mysql-r-s-sbin-nologin-u-300-mysql&quot; class=&quot;headerlink&quot; title=&quot;useradd -g mysql -r -s /sbin/nologin -u 300 mysql&quot;&gt;&lt;/a&gt;useradd -g mysql -r -s /sbin/nologin -u 300 mysql&lt;/h1&gt;&lt;h1 id=&quot;id-mysql&quot;&gt;&lt;a href=&quot;#id-mysql&quot; class=&quot;headerlink&quot; title=&quot;id mysql&quot;&gt;&lt;/a&gt;id mysql&lt;/h1&gt;&lt;p&gt;uid=300(mysql) gid=300(mysql) groups=300(mysql)&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;新建用户&lt;br&gt;运行mysql最好不要用root去运行，而以普通用户身份。添加用户mysql。&lt;br&gt;```&lt;br&gt;[root@console local]# groupadd -r -g 300 mysql&lt;br&gt;[root@console local]# useradd -g mysql -r -s /sbin/nologin -u 300 mysql&lt;br&gt;[root@console local]# id mysql&lt;br&gt;uid=300(mysql) gid=300(mysql) groups=300(mysql)&lt;/p&gt;
 &lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;4. 修改mysql文件权限为mysql.mysql&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;h1 id=&quot;cd-mysql&quot;&gt;&lt;a href=&quot;#cd-mysql&quot; class=&quot;headerlink&quot; title=&quot;cd mysql&quot;&gt;&lt;/a&gt;cd mysql&lt;/h1&gt;&lt;h1 id=&quot;chown-R-mysql-mysql&quot;&gt;&lt;a href=&quot;#chown-R-mysql-mysql&quot; class=&quot;headerlink&quot; title=&quot;chown -R mysql.mysql ./*&quot;&gt;&lt;/a&gt;chown -R mysql.mysql ./*&lt;/h1&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;5. 执行初始化操作，生成一个系统库叫mysql，它里面保存着有当前所有能够使用mysql服务器的用户帐号、所有数据库的名字、每个库中表的名字、表中字段的名字等等。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;脚本路径：/usr/local/mysql/scripts创建数据文件目录：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;[root@console local]# cd mysql&lt;br&gt;[root@console mysql]# chown -R mysql.mysql ./*&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;5. 执行初始化操作，生成一个系统库叫mysql，它里面保存着有当前所有能够使用mysql服务器的用户帐号、所有数据库的名字、每个库中表的名字、表中字段的名字等等。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;脚本路径：/usr/local/mysql/scripts创建数据文件目录：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
 &lt;p&gt;[root@console mysql]# mkdir -pv /data/{mydata,binlog}&lt;br&gt;[root@console mysql]# scripts/mysql_install_db –user=mysql –basedir=/usr/local/mysql –datadir=/data/mydata&lt;br&gt;[root@console mysql]# ls /data/mydata&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/1.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6. 修改mysql目录下的文件属主为root，属组为mysql&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
 &lt;p&gt;[root@console mysql]# chown -R root .&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;7. 修改data目录属主、属组为mysql&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
 &lt;p&gt;[root@console mysql]# chown -R mysql.mysql /data&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;8. 拷贝修改mysql的配置文件copy写好的my.cnf到/etc/目录下。9. 拷贝mysql的启动脚本，并加入系统服务&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
