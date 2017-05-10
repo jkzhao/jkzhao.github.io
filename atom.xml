@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-10T11:33:20.000Z</updated>
+  <updated>2017-05-10T11:47:50.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/05/10/zabbix%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/"/>
     <id>http://yoursite.com/2017/05/10/zabbix使用详解/</id>
     <published>2017-05-10T02:53:23.000Z</published>
-    <updated>2017-05-10T11:33:20.000Z</updated>
+    <updated>2017-05-10T11:47:50.000Z</updated>
     
     <content type="html">&lt;h1 id=&quot;实验环境&quot;&gt;&lt;a href=&quot;#实验环境&quot; class=&quot;headerlink&quot; title=&quot;实验环境&quot;&gt;&lt;/a&gt;实验环境&lt;/h1&gt;&lt;table&gt;
 &lt;thead&gt;
@@ -167,89 +167,171 @@ Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;常见启动错误：&lt;br&gt;./zabbix_server: error while loading shared libraries: libmysqlclient.so.18: cannot open shared object file: No such file or directory&lt;br&gt;解决：    &lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# ln -s /usr/local/mysql/lib/libmysqlclient.so.18  /usr/lib64/
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;停止zabbix-server&quot;&gt;&lt;a href=&quot;#停止zabbix-server&quot; class=&quot;headerlink&quot; title=&quot;停止zabbix server&quot;&gt;&lt;/a&gt;停止zabbix server&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# killall -9 zabbix_server
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装zabbix-web界面-和server端装在一台机器&quot;&gt;&lt;a href=&quot;#安装zabbix-web界面-和server端装在一台机器&quot; class=&quot;headerlink&quot; title=&quot;安装zabbix web界面(和server端装在一台机器)&quot;&gt;&lt;/a&gt;安装zabbix web界面(和server端装在一台机器)&lt;/h2&gt;&lt;p&gt;zabbix的服务端程序是用php写的，因此需要一个支持LAMP架构的服务器平台。Web服务器可以使用Httpd或者Nginx。&lt;br&gt;鉴于zabbix最近爆出来的漏洞：zabbix的jsrpc的profileldx2参数存在insert方式的SQL注入漏洞，攻击者可以无需授权登陆即可登陆zabbix管理系统，也可通过script等功能轻易直接获取zabbix服务器的操作系统权限。建议升级到最新的zabbix-3.0.4版本，或者使用nginx，这样可以在server段加入如下配置处理这个漏洞：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;32&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;33&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;34&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;35&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;36&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;37&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;38&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;39&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;40&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;41&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;42&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;43&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;44&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;45&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;46&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;47&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;48&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;49&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;50&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;51&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;52&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;53&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;54&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;55&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;56&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;57&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;58&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;59&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;60&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;61&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;62&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;63&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;64&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;65&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;66&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;67&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;68&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;69&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;70&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;71&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;72&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;73&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;74&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;75&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;76&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;if ($request_uri ~ ^(.+\.php)(.*)$) &amp;#123;	    set $req $2;&amp;#125;if ($req ~* &amp;quot;union[+|(%20)]&amp;quot;) &amp;#123;	    return 503;&amp;#125;if ($req ~* &amp;quot;and[+|(%20)]&amp;quot;) &amp;#123;        return 503;&amp;#125;if ($req ~* &amp;quot;select[+|(%20)]&amp;quot;) &amp;#123;        return 503;&amp;#125;if ($req ~* &amp;quot;or[+|(%20)]&amp;quot;) &amp;#123;        return 503;&amp;#125;if ($req ~* &amp;quot;concat[+|(%20)]&amp;quot;) &amp;#123;        return 503;&amp;#125;if ($req ~* &amp;quot;cost[+|(%20)]&amp;quot;) &amp;#123;        return 503;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```### 使用httpd#### 安装httpd我这里使用httpd2.4。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        [root@console ~]# yum install -y httpd#### 部署zabbix web将ZABBIX安装目录下 frontends/php 下面的php源代码文件拷贝到web服务器html文件目录下面。先建立一个子目录，将zabbix终端php文件拷贝到该子目录里面，执行下面的命令：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        [root@console ~]# cd /var/www/html/        [root@console html]# mkdir /var/www/html/zabbix        [root@console html]# cp -ar /usr/local/zabbix-3.0.1/frontends/php/* ./zabbix/启动httpd：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        [root@console html]# systemctl start httpd.service        [root@console ~]# systemctl enable httpd.service&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;访问：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;http://114.55.29.246/zabbix/ (1) You should see the first screen of the frontend installation wizard.![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/11.png)(2) 检查环境![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/12.png)查看到几处不符合要求，需修改该PHP文件配置文件参数:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        # vim /etc/php.ini        post_max_size = 16M        max_execution_time = 300        max_input_time = 300        date.timezone = Asia/Shanghai然后重启httpd和mysql，不重启mysql下面sql连接时还是会报错。        [root@console ~]# systemctl restart httpd.service         [root@console ~]# service mysqld restart&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;重新访问，全部依赖都通过：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/13.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;(3) 输入之前在MYSQL后台设置的zabbix数据库信息:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        DBName=zabbix        DBUser=zabbix        DBPassword=wisedu&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/14.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;报错：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/15.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;解决：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        [root@console ~]# mkdir /var/lib/mysql        [root@console ~]# ln -s /tmp/mysql.sock /var/lib/mysql/mysql.sock&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;点击下一步，还是报错：![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/16.png)解决：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        mysql&amp;gt; grant all on zabbix.* to &amp;apos;zabbix&amp;apos;@&amp;apos;console&amp;apos; identified by &amp;apos;wisedu&amp;apos;;        mysql&amp;gt; flush privileges;如果以上方法试过后，还报下面的错误：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        Error connecting to database: Can&amp;apos;t connect to MySQL server on &amp;apos;&amp;apos;114.55.29.246&amp;apos;&amp;apos;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;请检查SELinux是否关闭。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        [root@console ~]# /usr/sbin/sestatus -v![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/17.png)关闭SELinux：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        [root@console ~]# setenforce 0        [root@console ~]# vim /etc/sysconfig/selinux&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/18.png)![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/19.png)(4) 输入zabbix服务器端的详细信息![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/20.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;(5) 检查一下设置情况![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/21.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;(6) 下载配置文件，并把它放置在/var/www/html/zabbix/conf/ 目录下&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/22.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Alternatively, you can install it manually:Download the configuration fileSave it as &amp;quot;/var/www/html/zabbix/conf/zabbix.conf.php&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/23.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        [root@console conf]# cd /var/www/html/zabbix/conf/        [root@console conf]# chown zabbix.zabbix zabbix.conf.php&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;(7) 点击Finish&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/24.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;(8) Zabbix frontend is ready! The default user name is Admin, password zabbix.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/25.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/26.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;### 使用Nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#### 安装openresty&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;log2主机上安装openresty&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        # yum install readline-devel pcre-devel openssl-devel gcc -y        # cd /usr/local        # tar zxf openresty-1.9.7.3.tar.gz        # cd openresty-1.9.7.3/        # ./configure --with-http_stub_status_module        # gmake &amp;amp;&amp;amp; gmake install&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;安装完成后，在/usr/local/下多了个openresty目录，nginx部署安装在/usr/local/openresty/nginx。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;将nginx加入系统服务：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;**Redhat7之前的版本：**(1)	上传nginx启动脚本到/etc/init.d/目录下(2)	授权脚本执行权限        [root@log2 init.d]# chmod a+x nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;(3)	加入系统服务&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        [root@log2 init.d]# chkconfig --add nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;(4)	nginx开启自启动&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        [root@log2 init.d]# chkconfig nginx on&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;(5)	nginx启停重载&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        service nginx start/stop/restart/reload&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;**Redhat7版本：**(1)	启动服务单元把写好的nginx.service放到/etc/systemd/system/目录下。(2)	设置开机启动&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        [root@log2 ~]# systemctl enable nginx.service&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;(3)	启动/停止/重载nginx服务&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        systemctl start/stop/reload nginx.service&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#### 启动php&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Nginx是没办法以模块化方式或者CGI方式跟php结合的，php就可以工作在fastcgi模式下。即单独启动为服务。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        # vim /etc/php.ini        post_max_size = 16M        max_execution_time = 300        max_input_time = 300        date.timezone = Asia/Shanghai&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;启动：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        # systemctl start php-fpm.service&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#### 部署zabbix web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;将zabbix安装目录下 frontends/php 下面的php源代码文件拷贝到web服务器html文件目录下面。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        # mkdir /usr/local/openresty/nginx/html/zabbix        # cp -ar /usr/local/zabbix-3.0.1/frontends/php/* /usr/local/openresty/nginx/html//zabbix/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;修改nginx配置文件：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        # cd /usr/local/openresty/nginx/conf/        # cp nginx.conf nginx.conf.bak&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;配置文件内容：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;#user  nobody;&lt;br&gt;worker_processes  1;&lt;/p&gt;
-&lt;p&gt;error_log  logs/error.log info;&lt;/p&gt;
-&lt;p&gt;#error_log  logs/error.log  notice;&lt;/p&gt;
-&lt;p&gt;#error_log  logs/error.log  info;&lt;/p&gt;
-&lt;p&gt;#pid        logs/nginx.pid;&lt;/p&gt;
-&lt;p&gt;events {&lt;br&gt;    worker_connections  1024;&lt;br&gt;}&lt;/p&gt;
-&lt;p&gt;http {&lt;br&gt;    include       mime.types;&lt;br&gt;    default_type  application/octet-stream;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;log_format  main  &amp;apos;$remote_addr - $remote_user [$time_local] &amp;quot;$request&amp;quot; &amp;apos;
-                  &amp;apos;$status $body_bytes_sent &amp;quot;$http_referer&amp;quot; &amp;apos;
-                  &amp;apos;&amp;quot;$http_user_agent&amp;quot; &amp;quot;$http_x_forwarded_for&amp;quot;&amp;apos;;
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装zabbix-web界面-和server端装在一台机器&quot;&gt;&lt;a href=&quot;#安装zabbix-web界面-和server端装在一台机器&quot; class=&quot;headerlink&quot; title=&quot;安装zabbix web界面(和server端装在一台机器)&quot;&gt;&lt;/a&gt;安装zabbix web界面(和server端装在一台机器)&lt;/h2&gt;&lt;p&gt;zabbix的服务端程序是用php写的，因此需要一个支持LAMP架构的服务器平台。Web服务器可以使用Httpd或者Nginx。&lt;br&gt;鉴于zabbix最近爆出来的漏洞：zabbix的jsrpc的profileldx2参数存在insert方式的SQL注入漏洞，攻击者可以无需授权登陆即可登陆zabbix管理系统，也可通过script等功能轻易直接获取zabbix服务器的操作系统权限。建议升级到最新的zabbix-3.0.4版本，或者使用nginx，这样可以在server段加入如下配置处理这个漏洞：&lt;br&gt;        if ($request_uri ~ ^(.+.php)(.&lt;em&gt;)$) {&lt;br&gt;                 set $req $2;&lt;br&gt;        }&lt;br&gt;        if ($req ~&lt;/em&gt; “union[+|(%20)]”) {&lt;br&gt;                 return 503;&lt;br&gt;        }&lt;br&gt;        if ($req ~&lt;em&gt; “and[+|(%20)]”) {&lt;br&gt;                return 503;&lt;br&gt;        }&lt;br&gt;        if ($req ~&lt;/em&gt; “select[+|(%20)]”) {&lt;br&gt;                return 503;&lt;br&gt;        }&lt;br&gt;        if ($req ~&lt;em&gt; “or[+|(%20)]”) {&lt;br&gt;                return 503;&lt;br&gt;        }&lt;br&gt;        if ($req ~&lt;/em&gt; “concat[+|(%20)]”) {&lt;br&gt;                return 503;&lt;br&gt;        }&lt;br&gt;        if ($req ~* “cost[+|(%20)]”) {&lt;br&gt;                return 503;&lt;br&gt;        }&lt;/p&gt;
+&lt;h3 id=&quot;使用httpd&quot;&gt;&lt;a href=&quot;#使用httpd&quot; class=&quot;headerlink&quot; title=&quot;使用httpd&quot;&gt;&lt;/a&gt;使用httpd&lt;/h3&gt;&lt;h4 id=&quot;安装httpd&quot;&gt;&lt;a href=&quot;#安装httpd&quot; class=&quot;headerlink&quot; title=&quot;安装httpd&quot;&gt;&lt;/a&gt;安装httpd&lt;/h4&gt;&lt;p&gt;我这里使用httpd2.4。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# yum install -y httpd
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;部署zabbix-web&quot;&gt;&lt;a href=&quot;#部署zabbix-web&quot; class=&quot;headerlink&quot; title=&quot;部署zabbix web&quot;&gt;&lt;/a&gt;部署zabbix web&lt;/h4&gt;&lt;p&gt;将ZABBIX安装目录下 frontends/php 下面的php源代码文件拷贝到web服务器html文件目录下面。&lt;br&gt;先建立一个子目录，将zabbix终端php文件拷贝到该子目录里面，执行下面的命令：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# cd /var/www/html/
+[root@console html]# mkdir /var/www/html/zabbix
+[root@console html]# cp -ar /usr/local/zabbix-3.0.1/frontends/php/* ./zabbix/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动httpd：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console html]# systemctl start httpd.service
+[root@console ~]# systemctl enable httpd.service
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;访问：&lt;br&gt;&lt;a href=&quot;http://114.55.29.246/zabbix/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://114.55.29.246/zabbix/&lt;/a&gt;&lt;br&gt; (1) You should see the first screen of the frontend installation wizard.&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/11.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(2) 检查环境&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/12.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;查看到几处不符合要求，需修改该PHP文件配置文件参数:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# vim /etc/php.ini
+post_max_size = 16M
+max_execution_time = 300
+max_input_time = 300
+date.timezone = Asia/Shanghai
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后重启httpd和mysql，不重启mysql下面sql连接时还是会报错。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# systemctl restart httpd.service 
+[root@console ~]# service mysqld restart
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重新访问，全部依赖都通过：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(3) 输入之前在MYSQL后台设置的zabbix数据库信息:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;DBName=zabbix
+DBUser=zabbix
+DBPassword=wisedu
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/14.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;报错：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/15.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;解决：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# mkdir /var/lib/mysql
+[root@console ~]# ln -s /tmp/mysql.sock /var/lib/mysql/mysql.sock
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;点击下一步，还是报错：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/16.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;解决：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; grant all on zabbix.* to &amp;apos;zabbix&amp;apos;@&amp;apos;console&amp;apos; identified by &amp;apos;wisedu&amp;apos;;
+mysql&amp;gt; flush privileges;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果以上方法试过后，还报下面的错误：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Error connecting to database: Can&amp;apos;t connect to MySQL server on &amp;apos;&amp;apos;114.55.29.246&amp;apos;&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;请检查SELinux是否关闭。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# /usr/sbin/sestatus -v
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/17.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;关闭SELinux：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# setenforce 0
+[root@console ~]# vim /etc/sysconfig/selinux
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/18.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/19.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(4) 输入zabbix服务器端的详细信息&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/20.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(5) 检查一下设置情况&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/21.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(6) 下载配置文件，并把它放置在/var/www/html/zabbix/conf/ 目录下&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/22.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;Alternatively, you can install it manually:&lt;br&gt;Download the configuration file&lt;br&gt;Save it as “/var/www/html/zabbix/conf/zabbix.conf.php”&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/23.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console conf]# cd /var/www/html/zabbix/conf/
+[root@console conf]# chown zabbix.zabbix zabbix.conf.php
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(7) 点击Finish&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/24.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(8) Zabbix frontend is ready! The default user name is Admin, password zabbix.&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/25.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/26.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;使用Nginx&quot;&gt;&lt;a href=&quot;#使用Nginx&quot; class=&quot;headerlink&quot; title=&quot;使用Nginx&quot;&gt;&lt;/a&gt;使用Nginx&lt;/h3&gt;&lt;h4 id=&quot;安装openresty&quot;&gt;&lt;a href=&quot;#安装openresty&quot; class=&quot;headerlink&quot; title=&quot;安装openresty&quot;&gt;&lt;/a&gt;安装openresty&lt;/h4&gt;&lt;p&gt;log2主机上安装openresty&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# yum install readline-devel pcre-devel openssl-devel gcc -y
+# cd /usr/local
+# tar zxf openresty-1.9.7.3.tar.gz
+# cd openresty-1.9.7.3/
+# ./configure --with-http_stub_status_module
+# gmake &amp;amp;&amp;amp; gmake install
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;安装完成后，在/usr/local/下多了个openresty目录，nginx部署安装在/usr/local/openresty/nginx。&lt;br&gt;将nginx加入系统服务：&lt;br&gt;&lt;strong&gt;Redhat7之前的版本：&lt;/strong&gt;&lt;br&gt;(1)    上传nginx启动脚本到/etc/init.d/目录下&lt;br&gt;(2)    授权脚本执行权限&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 init.d]# chmod a+x nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(3)    加入系统服务&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 init.d]# chkconfig --add nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(4)    nginx开启自启动&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 init.d]# chkconfig nginx on
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(5)    nginx启停重载&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;service nginx start/stop/restart/reload
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;Redhat7版本：&lt;/strong&gt;&lt;br&gt;(1)    启动服务单元&lt;br&gt;把写好的nginx.service放到/etc/systemd/system/目录下。&lt;br&gt;(2)    设置开机启动&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 ~]# systemctl enable nginx.service
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(3)    启动/停止/重载nginx服务&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;systemctl start/stop/reload nginx.service
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;启动php&quot;&gt;&lt;a href=&quot;#启动php&quot; class=&quot;headerlink&quot; title=&quot;启动php&quot;&gt;&lt;/a&gt;启动php&lt;/h4&gt;&lt;p&gt;Nginx是没办法以模块化方式或者CGI方式跟php结合的，php就可以工作在fastcgi模式下。即单独启动为服务。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# vim /etc/php.ini
+post_max_size = 16M
+max_execution_time = 300
+max_input_time = 300
+date.timezone = Asia/Shanghai
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# systemctl start php-fpm.service
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;部署zabbix-web-1&quot;&gt;&lt;a href=&quot;#部署zabbix-web-1&quot; class=&quot;headerlink&quot; title=&quot;部署zabbix web&quot;&gt;&lt;/a&gt;部署zabbix web&lt;/h4&gt;&lt;p&gt;将zabbix安装目录下 frontends/php 下面的php源代码文件拷贝到web服务器html文件目录下面。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# mkdir /usr/local/openresty/nginx/html/zabbix
+# cp -ar /usr/local/zabbix-3.0.1/frontends/php/* /usr/local/openresty/nginx/html//zabbix/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;修改nginx配置文件：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /usr/local/openresty/nginx/conf/
+# cp nginx.conf nginx.conf.bak
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;配置文件内容：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#user  nobody;
+worker_processes  1;
 
-#access_log  logs/access.log  main;
+error_log  logs/error.log info;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
 
-proxy_buffer_size  128k;
-proxy_buffers   32 32k; 
-proxy_busy_buffers_size 128k;
+#pid        logs/nginx.pid;
 
-sendfile        on;
-#tcp_nopush     on;
-
-#keepalive_timeout  0;
-keepalive_timeout  65;
-
-#gzip  on;
-
-server {
-    listen       80;
-    server_name  zabbix.wisedu.com;
-
-    #charset koi8-r;
-
-    access_log  logs/zabbix.access.log  main;
-
-     index index.php index.html index.html;
-    root /usr/local/openresty/nginx/html;
-
-    if ($request_uri ~ ^(.+\.php)(.*)$) {
-        set $req $2;
-    }
-    if ($req ~* &amp;quot;union[+|(%20)]&amp;quot;) {
-        return 503;
-    }
-    if ($req ~* &amp;quot;and[+|(%20)]&amp;quot;) { 
-        return 503;
-   }
-    if ($req ~* &amp;quot;select[+|(%20)]&amp;quot;) { 
-        return 503;
-   }
-    if ($req ~* &amp;quot;or[+|(%20)]&amp;quot;) { 
-        return 503;
-   }
-    if ($req ~* &amp;quot;concat[+|(%20)]&amp;quot;) { 
-        return 503;
-   }
-    if ($req ~* &amp;quot;cost[+|(%20)]&amp;quot;) { 
-        return 503;
-   }
-
-    location / {
-        try_files $uri $uri/ /index.php?$args;
-     }
-
-    location ~ .*\.(php)?$ {
-        fastcgi_buffer_size 128k;
-        fastcgi_buffers 4 256k;
-        fastcgi_busy_buffers_size 256k;
-      expires -1s;
-      try_files $uri =404;
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        include fastcgi_params;
-        fastcgi_param PATH_INFO $fastcgi_path_info;
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME $document_root $fastcgi_script_name;
-        fastcgi_pass 127.0.0.1:9000;
-   }
-
-  error_page   500 502 503 504  /50x.html;
-  location = /50x.html {
-        root   html;
-  }
+events {
+        worker_connections  1024;
 }
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;}&lt;br&gt;```&lt;br&gt;浏览器访问url，安装过程和上面httpd一样。&lt;/p&gt;
+
+http {
+        include       mime.types;
+        default_type  application/octet-stream;
+
+        log_format  main  &amp;apos;$remote_addr - $remote_user [$time_local] &amp;quot;$request&amp;quot; &amp;apos; &amp;apos;$status $body_bytes_sent &amp;quot;$http_referer&amp;quot; &amp;apos; &amp;apos;&amp;quot;$http_user_agent&amp;quot; &amp;quot;$http_x_forwarded_for&amp;quot;&amp;apos;;
+
+        #access_log  logs/access.log  main;
+
+        proxy_buffer_size  128k;
+        proxy_buffers   32 32k; 
+        proxy_busy_buffers_size 128k;
+
+           sendfile        on;
+           #tcp_nopush     on;
+
+        #keepalive_timeout  0;
+        keepalive_timeout  65;
+
+        #gzip  on;
+
+           server {
+                listen       80;
+                    server_name  zabbix.wisedu.com;
+
+                     #charset koi8-r;
+
+                     access_log  logs/zabbix.access.log  main;
+
+                      index index.php index.html index.html;
+                     root /usr/local/openresty/nginx/html;
+
+                  if ($request_uri ~ ^(.+\.php)(.*)$) {
+                                set $req $2;
+                     }
+                     if ($req ~* &amp;quot;union[+|(%20)]&amp;quot;) {
+                                return 503;
+                     }
+                     if ($req ~* &amp;quot;and[+|(%20)]&amp;quot;) { 
+                                return 503;
+                    }
+                     if ($req ~* &amp;quot;select[+|(%20)]&amp;quot;) { 
+                                return 503;
+                    }
+                     if ($req ~* &amp;quot;or[+|(%20)]&amp;quot;) { 
+                                return 503;
+                    }
+                     if ($req ~* &amp;quot;concat[+|(%20)]&amp;quot;) { 
+                                return 503;
+                    }
+                     if ($req ~* &amp;quot;cost[+|(%20)]&amp;quot;) { 
+                                return 503;
+                    }
+
+                     location / {
+                                try_files $uri $uri/ /index.php?$args;
+                      }
+
+                     location ~ .*\.(php)?$ {
+                                fastcgi_buffer_size 128k;
+                                fastcgi_buffers 4 256k;
+                                fastcgi_busy_buffers_size 256k;
+                              expires -1s;
+                              try_files $uri =404;
+                                fastcgi_split_path_info ^(.+\.php)(/.+)$;
+                                include fastcgi_params;
+                                fastcgi_param PATH_INFO $fastcgi_path_info;
+                                fastcgi_index index.php;
+                                fastcgi_param SCRIPT_FILENAME $document_root $fastcgi_script_name;
+                                fastcgi_pass 127.0.0.1:9000;
+                    }
+
+                       error_page   500 502 503 504  /50x.html;
+                   location = /50x.html {
+                                 root   html;
+                       }
+                }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;浏览器访问url进行安装，安装过程和上面httpd一样。&lt;/p&gt;
 &lt;h4 id=&quot;切割Nginx日志&quot;&gt;&lt;a href=&quot;#切割Nginx日志&quot; class=&quot;headerlink&quot; title=&quot;切割Nginx日志&quot;&gt;&lt;/a&gt;切割Nginx日志&lt;/h4&gt;&lt;p&gt;如果开启Nginx的debug日志，就需要考虑到切割日志：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# cd /etc/logrotate.d/
 # vim nginx
