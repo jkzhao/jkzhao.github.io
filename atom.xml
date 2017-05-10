@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-10T11:56:24.000Z</updated>
+  <updated>2017-05-10T11:58:54.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/05/10/zabbix%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/"/>
     <id>http://yoursite.com/2017/05/10/zabbix使用详解/</id>
     <published>2017-05-10T02:53:23.000Z</published>
-    <updated>2017-05-10T11:56:24.000Z</updated>
+    <updated>2017-05-10T11:58:54.000Z</updated>
     
     <content type="html">&lt;h1 id=&quot;实验环境&quot;&gt;&lt;a href=&quot;#实验环境&quot; class=&quot;headerlink&quot; title=&quot;实验环境&quot;&gt;&lt;/a&gt;实验环境&lt;/h1&gt;&lt;table&gt;
 &lt;thead&gt;
@@ -189,8 +189,7 @@ if ($req ~* &amp;quot;concat[+|(%20)]&amp;quot;) {
 if ($req ~* &amp;quot;cost[+|(%20)]&amp;quot;) { 
        return 503;
 }
-&lt;/code&gt;&lt;/pre&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;if ($request_uri ~ ^(.+\.php)(.*)$) &amp;#123;	    set $req $2;&amp;#125;if ($req ~* &amp;quot;union[+|(%20)]&amp;quot;) &amp;#123;	    return 503;&amp;#125;if ($req ~* &amp;quot;and[+|(%20)]&amp;quot;) &amp;#123;             return 503;&amp;#125;if ($req ~* &amp;quot;select[+|(%20)]&amp;quot;) &amp;#123;             return 503;&amp;#125;if ($req ~* &amp;quot;or[+|(%20)]&amp;quot;) &amp;#123;             return 503;&amp;#125;if ($req ~* &amp;quot;concat[+|(%20)]&amp;quot;) &amp;#123;             return 503;&amp;#125;if ($req ~* &amp;quot;cost[+|(%20)]&amp;quot;) &amp;#123;             return 503;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;h3 id=&quot;使用httpd&quot;&gt;&lt;a href=&quot;#使用httpd&quot; class=&quot;headerlink&quot; title=&quot;使用httpd&quot;&gt;&lt;/a&gt;使用httpd&lt;/h3&gt;&lt;h4 id=&quot;安装httpd&quot;&gt;&lt;a href=&quot;#安装httpd&quot; class=&quot;headerlink&quot; title=&quot;安装httpd&quot;&gt;&lt;/a&gt;安装httpd&lt;/h4&gt;&lt;p&gt;我这里使用httpd2.4。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;使用httpd&quot;&gt;&lt;a href=&quot;#使用httpd&quot; class=&quot;headerlink&quot; title=&quot;使用httpd&quot;&gt;&lt;/a&gt;使用httpd&lt;/h3&gt;&lt;h4 id=&quot;安装httpd&quot;&gt;&lt;a href=&quot;#安装httpd&quot; class=&quot;headerlink&quot; title=&quot;安装httpd&quot;&gt;&lt;/a&gt;安装httpd&lt;/h4&gt;&lt;p&gt;我这里使用httpd2.4。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@console ~]# yum install -y httpd
 &lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;部署zabbix-web&quot;&gt;&lt;a href=&quot;#部署zabbix-web&quot; class=&quot;headerlink&quot; title=&quot;部署zabbix web&quot;&gt;&lt;/a&gt;部署zabbix web&lt;/h4&gt;&lt;p&gt;将ZABBIX安装目录下 frontends/php 下面的php源代码文件拷贝到web服务器html文件目录下面。&lt;br&gt;先建立一个子目录，将zabbix终端php文件拷贝到该子目录里面，执行下面的命令：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@console ~]# cd /var/www/html/
