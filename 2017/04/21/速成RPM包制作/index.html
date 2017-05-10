@@ -111,7 +111,7 @@
 <meta property="og:url" content="http://yoursite.com/2017/04/21/速成RPM包制作/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
 <meta property="og:description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。">
-<meta property="og:updated_time" content="2017-04-21T08:51:23.000Z">
+<meta property="og:updated_time" content="2017-04-21T09:43:10.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="速成RPM包制作">
 <meta name="twitter:description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。">
@@ -383,7 +383,7 @@
 <li><p>移除原有的仓库</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># gem sources --remove https://rubygems.org/</div></pre></td></tr></table></figure>
 </li>
-<li><p>查看仓库是不是只有自己添加的那个</p>
+<li><p>查看仓库是不是只有自己添加的那个仓库地址</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># gem sources -l </div><div class="line">https://gems.ruby-china.org</div></pre></td></tr></table></figure>
 </li>
 <li><p>安装fpm</p>
@@ -398,9 +398,9 @@
 <li>打包MySQL<br>事先安装好MySQL，MySQL安装过程这里不在详述。命令行终端输入以下命令，然后等待rpm包制作完成。<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># fpm -s dir -t rpm -n mysql -v 5.6.27 --description &apos;author: jkzhao&apos; -d &apos;libaio&apos; -d &apos;libaio-devel&apos; --pre-install /usr/local/mysql/mysql_pre_init.sh --post-install /usr/local/mysql/mysql_post_init.sh  /usr/local/mysql /usr/local/mysql-5.6.27-linux-glibc2.5-x86_64 /data</div></pre></td></tr></table></figure>
 </li>
 </ol>
-<p><strong>注意</strong>：默认都是打好的包在当前目录下。<br><strong>命令说明：</strong><br>    -s dir：指定源文件是目录的形式<br>    -t rpm：指定打包的格式<br>    -n：指定打包后名称<br>    -v：版本号<br>   –description：描述信息<br>    -d：指定需要依赖的包。安装MySQL前需要在系统上安装libaio、libaio-devel。当你安装fpm打包成的rpm包时，它会先去检测系统上是否安装了这两个包，如果没有安装会给出提示，并终止rpm的安装。<br>    –pre-install：安装rpm包前需要执行的脚本<br>    –post-install：安装rpm包后需要执行的脚本 <br><br>其中，mysql_pre_init.sh的内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">user=mysql</div><div class="line">group=mysql</div><div class="line"></div><div class="line"># create group if not exists.</div><div class="line">egrep &quot;^$group&quot; /etc/group &gt;&amp; /dev/null</div><div class="line">if [ $? -ne 0 ]</div><div class="line">then</div><div class="line">    groupadd -r -g 300 $group</div><div class="line">fi</div><div class="line"></div><div class="line"># create user if not exists.  </div><div class="line">egrep &quot;^$user&quot; /etc/passwd &gt;&amp; /dev/null</div><div class="line">if [ $? -ne 0 ]</div><div class="line">then</div><div class="line">    useradd -g $group -r -s /sbin/nologin -u 300 $user</div><div class="line">fi</div></pre></td></tr></table></figure></p>
+<p><strong>注意</strong>：默认打好的包是在当前目录下。<br><strong>命令说明：</strong><br>    -s dir：指定源文件是目录的形式<br>    -t rpm：指定打包的格式<br>    -n：指定打包后名称<br>    -v：版本号<br>   –description：描述信息<br>    -d：指定需要依赖的包。安装MySQL前需要在系统上安装libaio、libaio-devel。当你安装fpm打包成的rpm包时，它会先去检测系统上是否安装了这两个包，如果没有安装会给出提示，并终止rpm的安装。<br>    –pre-install：安装rpm包前需要执行的脚本<br>    –post-install：安装rpm包后需要执行的脚本 <br><br>其中，mysql_pre_init.sh的内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">user=mysql</div><div class="line">group=mysql</div><div class="line"></div><div class="line"># create group if not exists.</div><div class="line">egrep &quot;^$group&quot; /etc/group &gt;&amp; /dev/null</div><div class="line">if [ $? -ne 0 ]</div><div class="line">then</div><div class="line">    groupadd -r -g 300 $group</div><div class="line">fi</div><div class="line"></div><div class="line"># create user if not exists.  </div><div class="line">egrep &quot;^$user&quot; /etc/passwd &gt;&amp; /dev/null</div><div class="line">if [ $? -ne 0 ]</div><div class="line">then</div><div class="line">    useradd -g $group -r -s /sbin/nologin -u 300 $user</div><div class="line">fi</div></pre></td></tr></table></figure></p>
 <p>mysql_post_init.sh的内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line"># cp my.cnf force.</div><div class="line">\cp /usr/local/mysql/my.cnf /etc/</div><div class="line"></div><div class="line"># start/stop/restart script.</div><div class="line">\cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld</div><div class="line">chkconfig --add mysqld</div><div class="line"></div><div class="line"># MySQL Client PATH.</div><div class="line">\cp /usr/local/mysql/mysql.sh /etc/profile.d/</div><div class="line"></div><div class="line">cd /usr/local/mysql</div><div class="line">chown -R root.mysql .</div><div class="line">chown -R mysql.mysql /data</div></pre></td></tr></table></figure></p>
-<p>打包完成后正常安装，如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rpm -ivh mysql-5.6.27-1.x86_64.rpm</div></pre></td></tr></table></figure></p>
+<p>打包完成后正常安装，如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># rpm -ivh mysql-5.6.27-1.x86_64.rpm</div></pre></td></tr></table></figure></p>
 <ol>
 <li>打包openresty<br>事先安装好openresty。命令行终端输入以下命令，然后等待rpm包制作完成。<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># fpm -s dir -t rpm -n openresty -v 1.9.7.3 --description &apos;author: jkzhao&apos; -d &apos;openssl-devel&apos; -d &apos;readline-devel&apos; -d &apos;pcre-devel&apos; -d &apos;gcc&apos; --post-install /usr/local/openresty/openresty_init.sh  /usr/local/openresty</div></pre></td></tr></table></figure>
 </li>
@@ -437,6 +437,10 @@
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/10/zabbix使用详解/" rel="next" title="zabbix使用详解">
+                <i class="fa fa-chevron-left"></i> zabbix使用详解
+              </a>
             
           </div>
 
@@ -516,7 +520,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-count">8</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -533,7 +537,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">7</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
