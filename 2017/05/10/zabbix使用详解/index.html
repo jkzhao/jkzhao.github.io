@@ -117,7 +117,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/10.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/11.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/12.png">
-<meta property="og:updated_time" content="2017-05-10T08:12:56.000Z">
+<meta property="og:updated_time" content="2017-05-10T08:15:31.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zabbix使用详解">
 <meta name="twitter:description" content="实验环境   主机名 操作系统版本 IP地址 安装软件     console CentOS 7.0 114.55.29.246 Httpd、Nginx、MySQL、Zabbix   log1 CentOS 7.0 114.55.29.86 Httpd、Nginx、MySQL、Zabbix   log2 CentOS 7.0 114.55.29.241 Httpd、Nginx、MySQL、Zabb">
@@ -398,26 +398,35 @@
 </table>
 <a id="more"></a>
 <h1 id="安装准备"><a href="#安装准备" class="headerlink" title="安装准备"></a>安装准备</h1><p>为了安全考虑，zabbix只使用普通用户运行，如果你的系统没有名叫zabbix的用户，你需要创建一个用户，如下：<br>[root@console local]# groupadd zabbix<br>[root@console local]# useradd -g zabbix zabbix<br>[root@console local]# id zabbix<br>uid=1000(zabbix) gid=1000(zabbix) groups=1000(zabbix)</p>
-<h1 id="安装MySQL"><a href="#安装MySQL" class="headerlink" title="安装MySQL"></a>安装MySQL</h1><p>console主机安装mysql5.6。下载地址：<a href="http://mirrors.sohu.com/mysql" target="_blank" rel="external">http://mirrors.sohu.com/mysql</a><br>(1)安装依赖包<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@console local]# yum install libaio* -y</div></pre></td></tr></table></figure></p>
-<p>(2)解压安装<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@console local]# tar zxf mysql-5.6.27-linux-glibc2.5-x86_64.tar.gz [root@console local]# ln -sv mysql-5.6.27-linux-glibc2.5-x86_64 mysql</div></pre></td></tr></table></figure></p>
-<p>(3)新建用户<br>运行mysql最好不要用root去运行，而以普通用户身份。添加用户mysql。</p>
+<h1 id="安装MySQL"><a href="#安装MySQL" class="headerlink" title="安装MySQL"></a>安装MySQL</h1><p>console主机安装mysql5.6。下载地址：<a href="http://mirrors.sohu.com/mysql" target="_blank" rel="external">http://mirrors.sohu.com/mysql</a></p>
+<ol>
+<li>安装依赖包</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@console local]# yum install libaio* -y</div></pre></td></tr></table></figure>
+<ol>
+<li>解压安装</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@console local]# tar zxf mysql-5.6.27-linux-glibc2.5-x86_64.tar.gz [root@console local]# ln -sv mysql-5.6.27-linux-glibc2.5-x86_64 mysql</div></pre></td></tr></table></figure>
+<ol>
+<li>新建用户<br>运行mysql最好不要用root去运行，而以普通用户身份。添加用户mysql。</li>
+</ol>
 <pre><code>[root@console local]# groupadd -r -g 300 mysql
 [root@console local]# useradd -g mysql -r -s /sbin/nologin -u 300 mysql
 [root@console local]# id mysql
 uid=300(mysql) gid=300(mysql) groups=300(mysql)
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(4)修改mysql文件权限为mysql.mysql</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">4. 修改mysql文件权限为mysql.mysql</div></pre></td></tr></table></figure>
 
 [root@console local]# cd mysql
 [root@console mysql]# chown -R mysql.mysql ./*
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">5. 执行初始化操作，生成一个系统库叫mysql，它里面保存着有当前所有能够使用mysql服务器的用户帐号、所有数据库的名字、每个库中表的名字、表中字段的名字等等。</div><div class="line">脚本路径：/usr/local/mysql/scripts创建数据文件目录：</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">5. 执行初始化操作，生成一个系统库叫mysql，它里面保存着有当前所有能够使用mysql服务器的用户帐号、所有数据库的名字、每个库中表的名字、表中字段的名字等等。</div><div class="line">脚本路径：/usr/local/mysql/scripts创建数据文件目录：</div></pre></td></tr></table></figure>
 
 [root@console mysql]# mkdir -pv /data/{mydata,binlog}
 [root@console mysql]# scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/data/mydata
 [root@console mysql]# ls /data/mydata
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/1.png)</div><div class="line">6. 修改mysql目录下的文件属主为root，属组为mysql</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/1.png)</div><div class="line"></div><div class="line">6. 修改mysql目录下的文件属主为root，属组为mysql</div></pre></td></tr></table></figure>
 
 [root@console mysql]# chown -R root .
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">7. 修改data目录属主、属组为mysql</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">7. 修改data目录属主、属组为mysql</div></pre></td></tr></table></figure>
 
 [root@console mysql]# chown -R mysql.mysql /data
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">8. 拷贝修改mysql的配置文件copy写好的my.cnf到/etc/目录下。9. 拷贝mysql的启动脚本，并加入系统服务</div></pre></td></tr></table></figure>
