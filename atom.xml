@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-10T07:36:21.000Z</updated>
+  <updated>2017-05-10T07:42:15.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/05/10/zabbix%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/"/>
     <id>http://yoursite.com/2017/05/10/zabbix使用详解/</id>
     <published>2017-05-10T02:53:23.000Z</published>
-    <updated>2017-05-10T07:36:21.000Z</updated>
+    <updated>2017-05-10T07:42:15.000Z</updated>
     
     <content type="html">&lt;h1 id=&quot;实验环境&quot;&gt;&lt;a href=&quot;#实验环境&quot; class=&quot;headerlink&quot; title=&quot;实验环境&quot;&gt;&lt;/a&gt;实验环境&lt;/h1&gt;&lt;table&gt;
 &lt;thead&gt;
@@ -53,224 +53,178 @@
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-&lt;h1 id=&quot;安装准备&quot;&gt;&lt;a href=&quot;#安装准备&quot; class=&quot;headerlink&quot; title=&quot;安装准备&quot;&gt;&lt;/a&gt;安装准备&lt;/h1&gt;&lt;p&gt;为了安全考虑，zabbix只使用普通用户运行，如果你的系统没有名叫zabbix的用户，你需要创建一个用户，如下：&lt;br&gt;[root@console local]# groupadd zabbix&lt;br&gt;[root@console local]# useradd -g zabbix zabbix&lt;br&gt;[root@console local]# id zabbix&lt;br&gt;uid=1000(zabbix) gid=1000(zabbix) groups=1000(zabbix)&lt;/p&gt;
-&lt;h1 id=&quot;安装MySQL&quot;&gt;&lt;a href=&quot;#安装MySQL&quot; class=&quot;headerlink&quot; title=&quot;安装MySQL&quot;&gt;&lt;/a&gt;安装MySQL&lt;/h1&gt;&lt;p&gt;console主机安装mysql5.6。下载地址：&lt;a href=&quot;http://mirrors.sohu.com/mysql&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://mirrors.sohu.com/mysql&lt;/a&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;安装依赖包&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console local]# yum install libaio* -y&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;解压安装&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console local]# tar zxf mysql-5.6.27-linux-glibc2.5-x86_64.tar.gz [root@console local]# ln -sv mysql-5.6.27-linux-glibc2.5-x86_64 mysql&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;新建用户&lt;br&gt;运行mysql最好不要用root去运行，而以普通用户身份。添加用户mysql。&lt;br&gt;```&lt;br&gt;[root@console local]# groupadd -r -g 300 mysql&lt;br&gt;[root@console local]# useradd -g mysql -r -s /sbin/nologin -u 300 mysql&lt;br&gt;[root@console local]# id mysql&lt;br&gt;uid=300(mysql) gid=300(mysql) groups=300(mysql)&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;4. 修改mysql文件权限为mysql.mysql&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;[root@console local]# cd mysql&lt;br&gt;[root@console mysql]# chown -R mysql.mysql ./*&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;5. 执行初始化操作，生成一个系统库叫mysql，它里面保存着有当前所有能够使用mysql服务器的用户帐号、所有数据库的名字、每个库中表的名字、表中字段的名字等等。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;脚本路径：/usr/local/mysql/scripts创建数据文件目录：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;[root@console mysql]# mkdir -pv /data/{mydata,binlog}&lt;br&gt;[root@console mysql]# scripts/mysql_install_db –user=mysql –basedir=/usr/local/mysql –datadir=/data/mydata&lt;br&gt;[root@console mysql]# ls /data/mydata&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/1.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6. 修改mysql目录下的文件属主为root，属组为mysql&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;[root@console mysql]# chown -R root .&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;7. 修改data目录属主、属组为mysql&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;[root@console mysql]# chown -R mysql.mysql /data&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;8. 拷贝修改mysql的配置文件copy写好的my.cnf到/etc/目录下。9. 拷贝mysql的启动脚本，并加入系统服务&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;[root@console mysql]# cp support-files/mysql.server /etc/init.d/mysqld&lt;br&gt;[root@console mysql]# chkconfig –add mysqld&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;10. 启动mysql
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console mysql]# service mysqld start&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```11. 配置环境变量，配置完重新打开一个shell&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;h1 id=&quot;安装准备&quot;&gt;&lt;a href=&quot;#安装准备&quot; class=&quot;headerlink&quot; title=&quot;安装准备&quot;&gt;&lt;/a&gt;安装准备&lt;/h1&gt;&lt;p&gt;为了安全考虑，zabbix只使用普通用户运行，如果你的系统没有名叫zabbix的用户，你需要创建一个用户，如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console local]# groupadd zabbix
+[root@console local]# useradd -g zabbix zabbix
+[root@console local]# id zabbix
+uid=1000(zabbix) gid=1000(zabbix) groups=1000(zabbix)
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# 安装MySQL&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;console主机安装mysql5.6。下载地址：http://mirrors.sohu.com/mysql1. 安装依赖包&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 
-[root@console mysql]# vim /etc/profile.d/mysql.sh
-export PATH=/usr/local/mysql/bin:$PATH
+[root@console local]# yum install libaio* -y
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;2. 解压安装&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+[root@console local]# tar zxf mysql-5.6.27-linux-glibc2.5-x86_64.tar.gz 
+[root@console local]# ln -sv mysql-5.6.27-linux-glibc2.5-x86_64 mysql
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;3. 新建用户&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;运行mysql最好不要用root去运行，而以普通用户身份。添加用户mysql。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```[root@console local]# groupadd -r -g 300 mysql[root@console local]# useradd -g mysql -r -s /sbin/nologin -u 300 mysql[root@console local]# id mysqluid=300(mysql) gid=300(mysql) groups=300(mysql)&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+4. 修改mysql文件权限为mysql.mysql
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console local]# cd mysql[root@console mysql]# chown -R mysql.mysql ./*&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+5. 执行初始化操作，生成一个系统库叫mysql，它里面保存着有当前所有能够使用mysql服务器的用户帐号、所有数据库的名字、每个库中表的名字、表中字段的名字等等。
+脚本路径：/usr/local/mysql/scripts
+创建数据文件目录：
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console mysql]# mkdir -pv /data/&amp;#123;mydata,binlog&amp;#125;[root@console mysql]# scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/data/mydata[root@console mysql]# ls /data/mydata&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/1.png)
+6. 修改mysql目录下的文件属主为root，属组为mysql
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console mysql]# chown -R root .&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+7. 修改data目录属主、属组为mysql
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console mysql]# chown -R mysql.mysql /data&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+8. 拷贝修改mysql的配置文件
+copy写好的my.cnf到/etc/目录下。
+9. 拷贝mysql的启动脚本，并加入系统服务
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console mysql]# cp support-files/mysql.server /etc/init.d/mysqld [root@console mysql]# chkconfig --add mysqld&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```10. 启动mysql&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+[root@console mysql]# service mysqld start
 &lt;/code&gt;&lt;/pre&gt;&lt;ol&gt;
-&lt;li&gt;修改root密码，因为一装完root密码是空的&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console ~]# mysql -uroot mysql ```![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/2.png)&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;li&gt;配置环境变量，配置完重新打开一个shell&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console mysql]# vim /etc/profile.d/mysql.shexport PATH=/usr/local/mysql/bin:$PATH&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```12. 修改root密码，因为一装完root密码是空的&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;mysql&amp;gt; UPDATE user SET Password=PASSWORD(‘wisedu123’) where USER=’root’;&lt;br&gt;mysql&amp;gt; FLUSH PRIVILEGES;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/3.png)此时再以root登录就需要密码了。![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/4.png)13. 删除两个匿名帐号&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;mysql&amp;gt; use mysql&lt;br&gt;mysql&amp;gt; SELECT host,user,password FROM user;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/5.png)
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;mysql&amp;gt; DROP USER &amp;apos;&amp;apos;@localhost;mysql&amp;gt; DROP USER &amp;apos;&amp;apos;@console;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/6.png)# 安装Zabbix3.0.1官方说3.0以上版本是在redhat7以上运行的，我之前在redhat6.6尝试编译安装也是可以的。## 安装依赖包&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;[root@console ~]# mysql -uroot mysql &lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/2.png)
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;mysql&amp;gt; UPDATE user SET Password=PASSWORD(&amp;apos;wisedu123&amp;apos;) where USER=&amp;apos;root&amp;apos;;mysql&amp;gt; FLUSH PRIVILEGES;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 
-[root@console ~]# yum install net-snmp-devel libxml2-devel libcurl-devel  libssh2-devel unixODBC-devel -y
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;## 安装JDK&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;如果zabbix需要监控JMX应用的程序，在编译zabbix的时候就需要--enable-java，同时也需要安装配置好JDK。&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/3.png)
+此时再以root登录就需要密码了。
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/4.png)
+13. 删除两个匿名帐号
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;mysql&amp;gt; use mysqlmysql&amp;gt; SELECT host,user,password FROM user;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/5.png)&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 
-# mkdir /usr/java
-# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
-# vim /etc/profile
-# source /etc/profile
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;## 安装php环境&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;zabbix的服务端程序是用php写的，因此需要一个支持LAMP架构的服务器平台。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;**CentOS 6：**CenOS 6的yum源中自带的php解释器版本过低，是 5.3版本，需要&amp;gt;=5.4版本才可以。这里使用 Webtatic EL6的YUM源来安装php5.4,我们首先安装Webtatic EL6 YUM源：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```# rpm -Uvh http://repo.webtatic.com/yum/el6/latest.rpm # yum install php54w php54w-mysql php54w-mbstring php54w-bcmath php54w-gd php54w-xml -y```**CentOS 7：**&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```# yum install php php-fpm php-mysql php-mbstring php-bcmath php-gd php-xml -y&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+mysql&amp;gt; DROP USER &amp;apos;&amp;apos;@localhost;
+mysql&amp;gt; DROP USER &amp;apos;&amp;apos;@console;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/6.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h1 id=&quot;安装Zabbix3-0-1&quot;&gt;&lt;a href=&quot;#安装Zabbix3-0-1&quot; class=&quot;headerlink&quot; title=&quot;安装Zabbix3.0.1&quot;&gt;&lt;/a&gt;安装Zabbix3.0.1&lt;/h1&gt;&lt;p&gt;官方说3.0以上版本是在redhat7以上运行的，我之前在redhat6.6尝试编译安装也是可以的。&lt;/p&gt;
+&lt;h2 id=&quot;安装依赖包&quot;&gt;&lt;a href=&quot;#安装依赖包&quot; class=&quot;headerlink&quot; title=&quot;安装依赖包&quot;&gt;&lt;/a&gt;安装依赖包&lt;/h2&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console ~]# yum install net-snmp-devel libxml2-devel libcurl-devel  libssh2-devel unixODBC-devel -y&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;h2 id=&quot;安装JDK&quot;&gt;&lt;a href=&quot;#安装JDK&quot; class=&quot;headerlink&quot; title=&quot;安装JDK&quot;&gt;&lt;/a&gt;安装JDK&lt;/h2&gt;&lt;p&gt;如果zabbix需要监控JMX应用的程序，在编译zabbix的时候就需要–enable-java，同时也需要安装配置好JDK。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# mkdir /usr/java# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/# vim /etc/profile# source /etc/profile&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&quot;安装php环境&quot;&gt;&lt;a href=&quot;#安装php环境&quot; class=&quot;headerlink&quot; title=&quot;安装php环境&quot;&gt;&lt;/a&gt;安装php环境&lt;/h2&gt;&lt;p&gt;zabbix的服务端程序是用php写的，因此需要一个支持LAMP架构的服务器平台。&lt;br&gt;&lt;strong&gt;CentOS 6：&lt;/strong&gt;&lt;br&gt;CenOS 6的yum源中自带的php解释器版本过低，是 5.3版本，需要&amp;gt;=5.4版本才可以。这里使用 Webtatic EL6的YUM源来安装php5.4,我们首先安装Webtatic EL6 YUM源：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# rpm -Uvh http://repo.webtatic.com/yum/el6/latest.rpm 
+# yum install php54w php54w-mysql php54w-mbstring php54w-bcmath php54w-gd php54w-xml -y
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;CentOS 7：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# yum install php php-fpm php-mysql php-mbstring php-bcmath php-gd php-xml -y
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;## 编译安装zabbix server&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;如果仅安装server，并支持将数据放入mysql数据中，可使用类似如下配置命令：./configure --enable-server --with-mysql --with-net-snmp --with-libcurl如果仅安装proxy，并支持将数据放入mysql数据中，可使用类似如下配置命令：./configure --prefix=/usr --enable-proxy --with-net-snmp --with-mysql --with-ssh2如果仅安装agent，可使用类似如下配置命令：./configure --enable-agent&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;在console主机上同时安装server和agent，并支持将数据放入mysql数据中：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 
-## 编译安装zabbix server
-如果仅安装server，并支持将数据放入mysql数据中，可使用类似如下配置命令：
-./configure --enable-server --with-mysql --with-net-snmp --with-libcurl
-如果仅安装proxy，并支持将数据放入mysql数据中，可使用类似如下配置命令：
-./configure --prefix=/usr --enable-proxy --with-net-snmp --with-mysql --with-ssh2
-如果仅安装agent，可使用类似如下配置命令：
-./configure --enable-agent
-在console主机上同时安装server和agent，并支持将数据放入mysql数据中：
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console local]# cd /usr/local/[root@console local]# wget http://sourceforge.net/projects/zabbix/files/ZABBIX%20Latest%20Stable/3.0.1/zabbix-3.0.1.tar.gz[root@console local]# tar zxf zabbix-3.0.1.tar.gz [root@console local]# cd zabbix-3.0.1/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@console zabbix-3.0.1]# ./configure --prefix=/usr/local/zabbix-3.0.1/ --enable-server --enable-agent --with-mysql --with-net-snmp --with-libcurl --with-libxml2 --enable-ipv6 --with-ssh2 --enable-java --with-unixodbc&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+[root@console local]# cd /usr/local/
+[root@console local]# wget http://sourceforge.net/projects/zabbix/files/ZABBIX%20Latest%20Stable/3.0.1/zabbix-3.0.1.tar.gz
+[root@console local]# tar zxf zabbix-3.0.1.tar.gz 
+[root@console local]# cd zabbix-3.0.1/
+[root@console zabbix-3.0.1]# ./configure --prefix=/usr/local/zabbix-3.0.1/ --enable-server --enable-agent --with-mysql --with-net-snmp --with-libcurl --with-libxml2 --enable-ipv6 --with-ssh2 --enable-java --with-unixodbc
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/7.png)&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/7.png)
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console zabbix-3.0.1]# make &amp;amp;&amp;amp; make install&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+[root@console zabbix-3.0.1]# make &amp;amp;&amp;amp; make install
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;## 初始化数据库&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;For Zabbix server and proxy daemons, as well as Zabbix frontend, a database is required. It is not needed to run Zabbix agent.数据库初始化脚本在/usr/local/zabbix-3.0.1/database/mysql，分别是data.sql、images.sql和schema.sql。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;**注意:**导入顺序不能变。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;现在MySQL中创建zabbix数据库：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 
-## 初始化数据库
-For Zabbix server and proxy daemons, as well as Zabbix frontend, a database is required. It is not needed to run Zabbix agent.
-数据库初始化脚本在/usr/local/zabbix-3.0.1/database/mysql，分别是data.sql、images.sql和schema.sql。
-**注意:**导入顺序不能变。
-现在MySQL中创建zabbix数据库：
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console ~]# mysql -uroot -pmysql&amp;gt; create database zabbix default charset utf8;mysql&amp;gt; grant all on zabbix.* to zabbix@localhost identified by &amp;apos;wisedu&amp;apos;;mysql&amp;gt; grant all on zabbix.* to zabbix@&amp;apos;%.%.%.%&amp;apos; identified by &amp;apos;wisedu&amp;apos;;mysql&amp;gt; flush privileges;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+[root@console ~]# mysql -uroot -p
+mysql&amp;gt; create database zabbix default charset utf8;
+mysql&amp;gt; grant all on zabbix.* to zabbix@localhost identified by &amp;apos;wisedu&amp;apos;;
+mysql&amp;gt; grant all on zabbix.* to zabbix@&amp;apos;%.%.%.%&amp;apos; identified by &amp;apos;wisedu&amp;apos;;
+mysql&amp;gt; flush privileges;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;然后退出，使用zabbix用户登录mysql并导入数据：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 
-然后退出，使用zabbix用户登录mysql并导入数据：
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console ~]# mysql -uzabbix -p&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;mysql&amp;gt; use zabbix;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;mysql&amp;gt; source /usr/local/zabbix-3.0.1/database/mysql/schema.sql```如果你仅仅是初始化proxy的数据库，那么schema.sql够了。如果初始化server，那么接着导入下面两个sql：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```mysql&amp;gt; source /usr/local/zabbix-3.0.1/database/mysql/images.sqlmysql&amp;gt; source /usr/local/zabbix-3.0.1/database/mysql/data.sql&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```如果是初始化agent，就不需要导入任何脚本。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;## 配置zabbix server&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;因为上面我在编译加了--prefix=/usr/local/zabbix-3.0.1/参数，所以配置文件路径在：/usr/local/zabbix-3.0.1/etc。如果在编译时没有加这个参数，默认配置文件在/usr/local/etc/。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```[root@console mysql]# cd /usr/local/zabbix-3.0.1/etc/&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+[root@console ~]# mysql -uzabbix -p
+mysql&amp;gt; use zabbix;
+mysql&amp;gt; source /usr/local/zabbix-3.0.1/database/mysql/schema.sql
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果你仅仅是初始化proxy的数据库，那么schema.sql够了。如果初始化server，那么接着导入下面两个sql：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; source /usr/local/zabbix-3.0.1/database/mysql/images.sql
+mysql&amp;gt; source /usr/local/zabbix-3.0.1/database/mysql/data.sql
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果是初始化agent，就不需要导入任何脚本。&lt;/p&gt;
+&lt;h2 id=&quot;配置zabbix-server&quot;&gt;&lt;a href=&quot;#配置zabbix-server&quot; class=&quot;headerlink&quot; title=&quot;配置zabbix server&quot;&gt;&lt;/a&gt;配置zabbix server&lt;/h2&gt;&lt;p&gt;因为上面我在编译加了–prefix=/usr/local/zabbix-3.0.1/参数，所以配置文件路径在：/usr/local/zabbix-3.0.1/etc。如果在编译时没有加这个参数，默认配置文件在/usr/local/etc/。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console mysql]# cd /usr/local/zabbix-3.0.1/etc/
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/8.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;备份原配置文件，然后去掉注释：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/8.png)
-备份原配置文件，然后去掉注释：
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console etc]# mv zabbix_server.conf zabbix_server.conf.bak[root@console etc]# cat zabbix_server.conf.bak | grep -v &amp;quot;#&amp;quot; | grep -v &amp;quot;^$&amp;quot; &amp;gt; zabbix_server.conf&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+[root@console etc]# mv zabbix_server.conf zabbix_server.conf.bak
+[root@console etc]# cat zabbix_server.conf.bak | grep -v &amp;quot;#&amp;quot; | grep -v &amp;quot;^$&amp;quot; &amp;gt; zabbix_server.conf
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;最终改后的配置文件内容如下：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```[root@console etc]# vim zabbix_server.confLogFile=/var/log/zabbix_server.logDBHost=localhostDBName=zabbixDBUser=zabbixDBPassword=wisedu# 注意mysql服务器上的mysql.sock文件路径，一般zabbix server和mysql在同一台就改为/tmp/mysql.sock，否则不修改DBSocket=/tmp/mysql.sockTimeout=4LogSlowQueries=3000&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 
-最终改后的配置文件内容如下：
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;[root@console etc]# vim zabbix_server.conf&lt;br&gt;LogFile=/var/log/zabbix_server.log&lt;br&gt;DBHost=localhost&lt;br&gt;DBName=zabbix&lt;br&gt;DBUser=zabbix&lt;br&gt;DBPassword=wisedu&lt;/p&gt;
-&lt;h1 id=&quot;注意mysql服务器上的mysql-sock文件路径，一般zabbix-server和mysql在同一台就改为-tmp-mysql-sock，否则不修改&quot;&gt;&lt;a href=&quot;#注意mysql服务器上的mysql-sock文件路径，一般zabbix-server和mysql在同一台就改为-tmp-mysql-sock，否则不修改&quot; class=&quot;headerlink&quot; title=&quot;注意mysql服务器上的mysql.sock文件路径，一般zabbix server和mysql在同一台就改为/tmp/mysql.sock，否则不修改&quot;&gt;&lt;/a&gt;注意mysql服务器上的mysql.sock文件路径，一般zabbix server和mysql在同一台就改为/tmp/mysql.sock，否则不修改&lt;/h1&gt;&lt;p&gt;DBSocket=/tmp/mysql.sock&lt;br&gt;Timeout=4&lt;br&gt;LogSlowQueries=3000&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/9.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;修改agent配置文件：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;[root@console etc]# mv zabbix_agentd.conf zabbix_agentd.conf.bak&lt;br&gt;[root@console etc]# cat zabbix_agentd.conf.bak | grep -v “#” | grep -v “^$” &amp;gt; zabbix_agentd.conf&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;agent配置文件内容如下：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;[root@console etc]# vim zabbix_agentd.conf&lt;br&gt;LogFile=/var/log/zabbix_agentd.log&lt;br&gt;Server=114.55.29.246&lt;/p&gt;
-&lt;h1 id=&quot;主动向zabbix-server发送监控内容&quot;&gt;&lt;a href=&quot;#主动向zabbix-server发送监控内容&quot; class=&quot;headerlink&quot; title=&quot;主动向zabbix server发送监控内容&quot;&gt;&lt;/a&gt;主动向zabbix server发送监控内容&lt;/h1&gt;&lt;p&gt;ServerActive=114.55.29.246&lt;br&gt;Hostname=console&lt;br&gt;Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;创建日志文件：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;[root@console etc]# touch /var/log/{zabbix_server.log,zabbix&lt;em&gt;agentd.log}&lt;br&gt;[root@console etc]# chmod 777 /var/log/zabbix&lt;/em&gt;*&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;## 启动zabbix server&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;[root@console ~]# cd /usr/local/zabbix-3.0.1/sbin/&lt;br&gt;[root@console sbin]# ./zabbix_server&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;查看10051端口，端口默认是10051。
-一大堆进程。
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/10.png)
-可以查看启动日志：
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@log sbin]# tail -100f /var/log/zabbix_server.log&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/9.png)
+修改agent配置文件：
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console etc]# mv zabbix_agentd.conf zabbix_agentd.conf.bak[root@console etc]# cat zabbix_agentd.conf.bak | grep -v &amp;quot;#&amp;quot; | grep -v &amp;quot;^$&amp;quot; &amp;gt; zabbix_agentd.conf&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 
-常见启动错误：
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# ./zabbix_server./zabbix_server: error while loading shared libraries: libmysqlclient.so.18: cannot open shared object file: No such file or directory&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+agent配置文件内容如下：
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console etc]# vim zabbix_agentd.confLogFile=/var/log/zabbix_agentd.logServer=114.55.29.246# 主动向zabbix server发送监控内容ServerActive=114.55.29.246Hostname=consoleInclude=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 
+创建日志文件：
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console etc]# touch /var/log/&amp;#123;zabbix_server.log,zabbix_agentd.log&amp;#125; [root@console etc]# chmod 777 /var/log/zabbix_*&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+## 启动zabbix server
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console ~]# cd /usr/local/zabbix-3.0.1/sbin/[root@console sbin]# ./zabbix_server&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```查看10051端口，端口默认是10051。一大堆进程。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/10.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;可以查看启动日志：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+[root@log sbin]# tail -100f /var/log/zabbix_server.log
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;常见启动错误：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+# ./zabbix_server
+./zabbix_server: error while loading shared libraries: libmysqlclient.so.18: cannot open shared object file: No such file or directory
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;解决：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```# ln -s /usr/local/mysql/lib/libmysqlclient.so.18  /usr/lib64/&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+## 停止zabbix server
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# killall -9 zabbix_server&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+## 安装zabbix web界面(和server端装在一台机器)
+zabbix的服务端程序是用php写的，因此需要一个支持LAMP架构的服务器平台。Web服务器可以使用Httpd或者Nginx。
+鉴于zabbix最近爆出来的漏洞：zabbix的jsrpc的profileldx2参数存在insert方式的SQL注入漏洞，攻击者可以无需授权登陆即可登陆zabbix管理系统，也可通过script等功能轻易直接获取zabbix服务器的操作系统权限。建议升级到最新的zabbix-3.0.4版本，或者使用nginx，这样可以在server段加入如下配置处理这个漏洞：
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;if ($request_uri ~ ^(.+\.php)(.*)$) &amp;#123;	    set $req $2;&amp;#125;if ($req ~* &amp;quot;union[+|(%20)]&amp;quot;) &amp;#123;	    return 503;&amp;#125;if ($req ~* &amp;quot;and[+|(%20)]&amp;quot;) &amp;#123;        return 503;&amp;#125;if ($req ~* &amp;quot;select[+|(%20)]&amp;quot;) &amp;#123;        return 503;&amp;#125;if ($req ~* &amp;quot;or[+|(%20)]&amp;quot;) &amp;#123;        return 503;&amp;#125;if ($req ~* &amp;quot;concat[+|(%20)]&amp;quot;) &amp;#123;        return 503;&amp;#125;if ($req ~* &amp;quot;cost[+|(%20)]&amp;quot;) &amp;#123;        return 503;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```### 使用httpd#### 安装httpd我这里使用httpd2.4。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```[root@console ~]# yum install -y httpd```#### 部署zabbix web将ZABBIX安装目录下 frontends/php 下面的php源代码文件拷贝到web服务器html文件目录下面。先建立一个子目录，将zabbix终端php文件拷贝到该子目录里面，执行下面的命令：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```[root@console ~]# cd /var/www/html/[root@console html]# mkdir /var/www/html/zabbix[root@console html]# cp -ar /usr/local/zabbix-3.0.1/frontends/php/* ./zabbix/```启动httpd：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```[root@console html]# systemctl start httpd.service[root@console ~]# systemctl enable httpd.service&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```访问：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;http://114.55.29.246/zabbix/ (1) You should see the first screen of the frontend installation wizard.![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/11.png)(2) 检查环境![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/12.png)查看到几处不符合要求，需修改该PHP文件配置文件参数:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```# vim /etc/php.inipost_max_size = 16Mmax_execution_time = 300max_input_time = 300date.timezone = Asia/Shanghai```然后重启httpd和mysql，不重启mysql下面sql连接时还是会报错。```[root@console ~]# systemctl restart httpd.service [root@console ~]# service mysqld restart&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+重新访问，全部依赖都通过：
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/13.png)
+(3) 输入之前在MYSQL后台设置的zabbix数据库信息:
+DBName=zabbix
+DBUser=zabbix
+DBPassword=wisedu
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/14.png)
+报错：
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/15.png)
 解决：
-&lt;/code&gt;&lt;/pre&gt;&lt;h1 id=&quot;ln-s-usr-local-mysql-lib-libmysqlclient-so-18-usr-lib64&quot;&gt;&lt;a href=&quot;#ln-s-usr-local-mysql-lib-libmysqlclient-so-18-usr-lib64&quot; class=&quot;headerlink&quot; title=&quot;ln -s /usr/local/mysql/lib/libmysqlclient.so.18  /usr/lib64/&quot;&gt;&lt;/a&gt;ln -s /usr/local/mysql/lib/libmysqlclient.so.18  /usr/lib64/&lt;/h1&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;## 停止zabbix server&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;h1 id=&quot;killall-9-zabbix-server&quot;&gt;&lt;a href=&quot;#killall-9-zabbix-server&quot; class=&quot;headerlink&quot; title=&quot;killall -9 zabbix_server&quot;&gt;&lt;/a&gt;killall -9 zabbix_server&lt;/h1&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;## 安装zabbix web界面(和server端装在一台机器)zabbix的服务端程序是用php写的，因此需要一个支持LAMP架构的服务器平台。Web服务器可以使用Httpd或者Nginx。鉴于zabbix最近爆出来的漏洞：zabbix的jsrpc的profileldx2参数存在insert方式的SQL注入漏洞，攻击者可以无需授权登陆即可登陆zabbix管理系统，也可通过script等功能轻易直接获取zabbix服务器的操作系统权限。建议升级到最新的zabbix-3.0.4版本，或者使用nginx，这样可以在server段加入如下配置处理这个漏洞：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;if ($request_uri ~ ^(.+.php)(.&lt;em&gt;)$) {&lt;br&gt;        set $req $2;&lt;br&gt;}&lt;br&gt;if ($req ~&lt;/em&gt; “union[+|(%20)]”) {&lt;br&gt;        return 503;&lt;br&gt;}&lt;br&gt;if ($req ~&lt;em&gt; “and[+|(%20)]”) {&lt;br&gt;       return 503;&lt;br&gt;}&lt;br&gt;if ($req ~&lt;/em&gt; “select[+|(%20)]”) {&lt;br&gt;       return 503;&lt;br&gt;}&lt;br&gt;if ($req ~&lt;em&gt; “or[+|(%20)]”) {&lt;br&gt;       return 503;&lt;br&gt;}&lt;br&gt;if ($req ~&lt;/em&gt; “concat[+|(%20)]”) {&lt;br&gt;       return 503;&lt;br&gt;}&lt;br&gt;if ($req ~* “cost[+|(%20)]”) {&lt;br&gt;       return 503;&lt;br&gt;}&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;### 使用httpd
-#### 安装httpd
-我这里使用httpd2.4。
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;[root@console ~]# yum install -y httpd&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;#### 部署zabbix web
-将ZABBIX安装目录下 frontends/php 下面的php源代码文件拷贝到web服务器html文件目录下面。
-先建立一个子目录，将zabbix终端php文件拷贝到该子目录里面，执行下面的命令：
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;[root@console ~]# cd /var/www/html/&lt;br&gt;[root@console html]# mkdir /var/www/html/zabbix&lt;br&gt;[root@console html]# cp -ar /usr/local/zabbix-3.0.1/frontends/php/* ./zabbix/&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;启动httpd：
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;[root@console html]# systemctl start httpd.service&lt;br&gt;[root@console ~]# systemctl enable httpd.service&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;访问：
-http://114.55.29.246/zabbix/
- (1) You should see the first screen of the frontend installation wizard.
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/11.png)
-(2) 检查环境
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/12.png)
-查看到几处不符合要求，需修改该PHP文件配置文件参数:
-&lt;/code&gt;&lt;/pre&gt;&lt;h1 id=&quot;vim-etc-php-ini&quot;&gt;&lt;a href=&quot;#vim-etc-php-ini&quot; class=&quot;headerlink&quot; title=&quot;vim /etc/php.ini&quot;&gt;&lt;/a&gt;vim /etc/php.ini&lt;/h1&gt;&lt;p&gt;post_max_size = 16M&lt;br&gt;max_execution_time = 300&lt;br&gt;max_input_time = 300&lt;br&gt;date.timezone = Asia/Shanghai&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;然后重启httpd和mysql，不重启mysql下面sql连接时还是会报错。
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;[root@console ~]# systemctl restart httpd.service&lt;br&gt;[root@console ~]# service mysqld restart&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;重新访问，全部依赖都通过：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/13.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;(3) 输入之前在MYSQL后台设置的zabbix数据库信息:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;DBName=zabbixDBUser=zabbixDBPassword=wisedu&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/14.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;报错：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/15.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;解决：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;[root@console ~]# mkdir /var/lib/mysql&lt;br&gt;[root@console ~]# ln -s /tmp/mysql.sock /var/lib/mysql/mysql.sock&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;点击下一步，还是报错：![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/16.png)解决：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```mysql&amp;gt; grant all on zabbix.* to &amp;apos;zabbix&amp;apos;@&amp;apos;console&amp;apos; identified by &amp;apos;wisedu&amp;apos;;mysql&amp;gt; flush privileges;```如果以上方法试过后，还报下面的错误：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```Error connecting to database: Can&amp;apos;t connect to MySQL server on &amp;apos;&amp;apos;114.55.29.246&amp;apos;&amp;apos;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```请检查SELinux是否关闭。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```[root@console ~]# /usr/sbin/sestatus -v```![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/17.png)关闭SELinux：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```[root@console ~]# setenforce 0[root@console ~]# vim /etc/sysconfig/selinux&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/18.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/19.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(4) 输入zabbix服务器端的详细信息&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/20.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(5) 检查一下设置情况&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/21.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(6) 下载配置文件，并把它放置在/var/www/html/zabbix/conf/ 目录下&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/22.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;Alternatively, you can install it manually:Download the configuration fileSave it as &amp;quot;/var/www/html/zabbix/conf/zabbix.conf.php&amp;quot;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/23.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console conf]# cd /var/www/html/zabbix/conf/[root@console conf]# chown zabbix.zabbix zabbix.conf.php&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;(7) 点击Finish&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/24.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(8) Zabbix frontend is ready! The default user name is Admin, password zabbix.&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/25.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/26.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;使用Nginx&quot;&gt;&lt;a href=&quot;#使用Nginx&quot; class=&quot;headerlink&quot; title=&quot;使用Nginx&quot;&gt;&lt;/a&gt;使用Nginx&lt;/h3&gt;&lt;h4 id=&quot;安装openresty&quot;&gt;&lt;a href=&quot;#安装openresty&quot; class=&quot;headerlink&quot; title=&quot;安装openresty&quot;&gt;&lt;/a&gt;安装openresty&lt;/h4&gt;&lt;p&gt;log2主机上安装openresty&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# yum install readline-devel pcre-devel openssl-devel gcc -y# cd /usr/local# tar zxf openresty-1.9.7.3.tar.gz# cd openresty-1.9.7.3/# ./configure --with-http_stub_status_module# gmake &amp;amp;&amp;amp; gmake install&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```安装完成后，在/usr/local/下多了个openresty目录，nginx部署安装在/usr/local/openresty/nginx。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;将nginx加入系统服务：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;**Redhat7之前的版本：**(1)	上传nginx启动脚本到/etc/init.d/目录下(2)	授权脚本执行权限```[root@log2 init.d]# chmod a+x nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```(3)	加入系统服务&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```[root@log2 init.d]# chkconfig --add nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```(4)	nginx开启自启动&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```[root@log2 init.d]# chkconfig nginx on&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```(5)	nginx启停重载&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```service nginx start/stop/restart/reload&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```**Redhat7版本：**(1)	启动服务单元把写好的nginx.service放到/etc/systemd/system/目录下。(2)	设置开机启动&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```[root@log2 ~]# systemctl enable nginx.service&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```(3)	启动/停止/重载nginx服务&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```systemctl start/stop/reload nginx.service&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;h4 id=&quot;启动php&quot;&gt;&lt;a href=&quot;#启动php&quot; class=&quot;headerlink&quot; title=&quot;启动php&quot;&gt;&lt;/a&gt;启动php&lt;/h4&gt;&lt;p&gt;Nginx是没办法以模块化方式或者CGI方式跟php结合的，php就可以工作在fastcgi模式下。即单独启动为服务。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# vim /etc/php.inipost_max_size = 16Mmax_execution_time = 300max_input_time = 300date.timezone = Asia/Shanghai&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```启动：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```# systemctl start php-fpm.service&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;h4 id=&quot;部署zabbix-web&quot;&gt;&lt;a href=&quot;#部署zabbix-web&quot; class=&quot;headerlink&quot; title=&quot;部署zabbix web&quot;&gt;&lt;/a&gt;部署zabbix web&lt;/h4&gt;&lt;p&gt;将zabbix安装目录下 frontends/php 下面的php源代码文件拷贝到web服务器html文件目录下面。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# mkdir /usr/local/openresty/nginx/html/zabbix
-# cp -ar /usr/local/zabbix-3.0.1/frontends/php/* /usr/local/openresty/nginx/html//zabbix/
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;修改nginx配置文件：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@console ~]# mkdir /var/lib/mysql[root@console ~]# ln -s /tmp/mysql.sock /var/lib/mysql/mysql.sock&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 
-# cd /usr/local/openresty/nginx/conf/
-# cp nginx.conf nginx.conf.bak
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;配置文件内容：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-#user  nobody;
-worker_processes  1;
-
-error_log  logs/error.log info;
-#error_log  logs/error.log  notice;
-#error_log  logs/error.log  info;
-
-#pid        logs/nginx.pid;
-
-events {
-    worker_connections  1024;
-}
-
-http {
-    include       mime.types;
-    default_type  application/octet-stream;
-
-    log_format  main  &amp;apos;$remote_addr - $remote_user [$time_local] &amp;quot;$request&amp;quot; &amp;apos;
-                      &amp;apos;$status $body_bytes_sent &amp;quot;$http_referer&amp;quot; &amp;apos;
-                      &amp;apos;&amp;quot;$http_user_agent&amp;quot; &amp;quot;$http_x_forwarded_for&amp;quot;&amp;apos;;
-
-    #access_log  logs/access.log  main;
-
-    proxy_buffer_size  128k;
-    proxy_buffers   32 32k; 
-    proxy_busy_buffers_size 128k;
-
-    sendfile        on;
-    #tcp_nopush     on;
-
-    #keepalive_timeout  0;
-    keepalive_timeout  65;
-
-    #gzip  on;
-
-    server {
-        listen       80;
-        server_name  zabbix.wisedu.com;
-
-        #charset koi8-r;
-
-        access_log  logs/zabbix.access.log  main;
-
-         index index.php index.html index.html;
-        root /usr/local/openresty/nginx/html;
-
-        if ($request_uri ~ ^(.+\.php)(.*)$) {
-            set $req $2;
-        }
-        if ($req ~* &amp;quot;union[+|(%20)]&amp;quot;) {
-            return 503;
-        }
-        if ($req ~* &amp;quot;and[+|(%20)]&amp;quot;) { 
-            return 503;
-       }
-        if ($req ~* &amp;quot;select[+|(%20)]&amp;quot;) { 
-            return 503;
-       }
-        if ($req ~* &amp;quot;or[+|(%20)]&amp;quot;) { 
-            return 503;
-       }
-        if ($req ~* &amp;quot;concat[+|(%20)]&amp;quot;) { 
-            return 503;
-       }
-        if ($req ~* &amp;quot;cost[+|(%20)]&amp;quot;) { 
-            return 503;
-       }
-
-        location / {
-            try_files $uri $uri/ /index.php?$args;
-         }
-
-        location ~ .*\.(php)?$ {
-            fastcgi_buffer_size 128k;
-            fastcgi_buffers 4 256k;
-            fastcgi_busy_buffers_size 256k;
-          expires -1s;
-          try_files $uri =404;
-            fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            include fastcgi_params;
-            fastcgi_param PATH_INFO $fastcgi_path_info;
-            fastcgi_index index.php;
-            fastcgi_param SCRIPT_FILENAME $document_root $fastcgi_script_name;
-            fastcgi_pass 127.0.0.1:9000;
-       }
-
-      error_page   500 502 503 504  /50x.html;
-      location = /50x.html {
-            root   html;
-      }
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;浏览器访问url，安装过程和上面httpd一样。&lt;/p&gt;
+点击下一步，还是报错：
+![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/16.png)
+解决：
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;mysql&amp;gt; grant all on zabbix.* to ‘zabbix’@’console’ identified by ‘wisedu’;&lt;br&gt;mysql&amp;gt; flush privileges;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;如果以上方法试过后，还报下面的错误：
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Error connecting to database: Can’t connect to MySQL server on ‘’114.55.29.246’’&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;请检查SELinux是否关闭。
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;[root@console ~]# /usr/sbin/sestatus -v&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/17.png)
+关闭SELinux：
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;[root@console ~]# setenforce 0&lt;br&gt;[root@console ~]# vim /etc/sysconfig/selinux&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/18.png)![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/19.png)(4) 输入zabbix服务器端的详细信息![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/20.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;(5) 检查一下设置情况![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/21.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;(6) 下载配置文件，并把它放置在/var/www/html/zabbix/conf/ 目录下&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/22.png)&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;Alternatively, you can install it manually:&lt;br&gt;Download the configuration file&lt;br&gt;Save it as “/var/www/html/zabbix/conf/zabbix.conf.php”&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/23.png)&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;[root@console conf]# cd /var/www/html/zabbix/conf/&lt;br&gt;[root@console conf]# chown zabbix.zabbix zabbix.conf.php&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;(7) 点击Finish&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/24.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;(8) Zabbix frontend is ready! The default user name is Admin, password zabbix.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/25.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/26.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;### 使用Nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#### 安装openresty&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;log2主机上安装openresty&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h1 id=&quot;yum-install-readline-devel-pcre-devel-openssl-devel-gcc-y&quot;&gt;&lt;a href=&quot;#yum-install-readline-devel-pcre-devel-openssl-devel-gcc-y&quot; class=&quot;headerlink&quot; title=&quot;yum install readline-devel pcre-devel openssl-devel gcc -y&quot;&gt;&lt;/a&gt;yum install readline-devel pcre-devel openssl-devel gcc -y&lt;/h1&gt;&lt;h1 id=&quot;cd-usr-local&quot;&gt;&lt;a href=&quot;#cd-usr-local&quot; class=&quot;headerlink&quot; title=&quot;cd /usr/local&quot;&gt;&lt;/a&gt;cd /usr/local&lt;/h1&gt;&lt;h1 id=&quot;tar-zxf-openresty-1-9-7-3-tar-gz&quot;&gt;&lt;a href=&quot;#tar-zxf-openresty-1-9-7-3-tar-gz&quot; class=&quot;headerlink&quot; title=&quot;tar zxf openresty-1.9.7.3.tar.gz&quot;&gt;&lt;/a&gt;tar zxf openresty-1.9.7.3.tar.gz&lt;/h1&gt;&lt;h1 id=&quot;cd-openresty-1-9-7-3&quot;&gt;&lt;a href=&quot;#cd-openresty-1-9-7-3&quot; class=&quot;headerlink&quot; title=&quot;cd openresty-1.9.7.3/&quot;&gt;&lt;/a&gt;cd openresty-1.9.7.3/&lt;/h1&gt;&lt;h1 id=&quot;configure-–with-http-stub-status-module&quot;&gt;&lt;a href=&quot;#configure-–with-http-stub-status-module&quot; class=&quot;headerlink&quot; title=&quot;./configure –with-http_stub_status_module&quot;&gt;&lt;/a&gt;./configure –with-http_stub_status_module&lt;/h1&gt;&lt;h1 id=&quot;gmake-amp-amp-gmake-install&quot;&gt;&lt;a href=&quot;#gmake-amp-amp-gmake-install&quot; class=&quot;headerlink&quot; title=&quot;gmake &amp;amp;&amp;amp; gmake install&quot;&gt;&lt;/a&gt;gmake &amp;amp;&amp;amp; gmake install&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;安装完成后，在/usr/local/下多了个openresty目录，nginx部署安装在/usr/local/openresty/nginx。
+将nginx加入系统服务：
+**Redhat7之前的版本：**
+(1)    上传nginx启动脚本到/etc/init.d/目录下
+(2)    授权脚本执行权限
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;[root@log2 init.d]# chmod a+x nginx&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;(3)    加入系统服务
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;[root@log2 init.d]# chkconfig –add nginx&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;(4)    nginx开启自启动
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;[root@log2 init.d]# chkconfig nginx on&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;(5)    nginx启停重载
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;service nginx start/stop/restart/reload&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;**Redhat7版本：**
+(1)    启动服务单元
+把写好的nginx.service放到/etc/systemd/system/目录下。
+(2)    设置开机启动
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;[root@log2 ~]# systemctl enable nginx.service&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;(3)    启动/停止/重载nginx服务
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;systemctl start/stop/reload nginx.service&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;#### 启动php&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Nginx是没办法以模块化方式或者CGI方式跟php结合的，php就可以工作在fastcgi模式下。即单独启动为服务。&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h1 id=&quot;vim-etc-php-ini&quot;&gt;&lt;a href=&quot;#vim-etc-php-ini&quot; class=&quot;headerlink&quot; title=&quot;vim /etc/php.ini&quot;&gt;&lt;/a&gt;vim /etc/php.ini&lt;/h1&gt;&lt;p&gt;post_max_size = 16M&lt;br&gt;max_execution_time = 300&lt;br&gt;max_input_time = 300&lt;br&gt;date.timezone = Asia/Shanghai&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;启动：
+&lt;/code&gt;&lt;/pre&gt;&lt;h1 id=&quot;systemctl-start-php-fpm-service&quot;&gt;&lt;a href=&quot;#systemctl-start-php-fpm-service&quot; class=&quot;headerlink&quot; title=&quot;systemctl start php-fpm.service&quot;&gt;&lt;/a&gt;systemctl start php-fpm.service&lt;/h1&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;#### 部署zabbix web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;将zabbix安装目录下 frontends/php 下面的php源代码文件拷贝到web服务器html文件目录下面。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```# mkdir /usr/local/openresty/nginx/html/zabbix# cp -ar /usr/local/zabbix-3.0.1/frontends/php/* /usr/local/openresty/nginx/html//zabbix/&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;修改nginx配置文件：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# cd /usr/local/openresty/nginx/conf/# cp nginx.conf nginx.conf.bak&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;配置文件内容：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;#user  nobody;worker_processes  1;error_log  logs/error.log info;#error_log  logs/error.log  notice;#error_log  logs/error.log  info;#pid        logs/nginx.pid;events &amp;#123;    worker_connections  1024;&amp;#125;http &amp;#123;    include       mime.types;    default_type  application/octet-stream;    log_format  main  &amp;apos;$remote_addr - $remote_user [$time_local] &amp;quot;$request&amp;quot; &amp;apos;                      &amp;apos;$status $body_bytes_sent &amp;quot;$http_referer&amp;quot; &amp;apos;                      &amp;apos;&amp;quot;$http_user_agent&amp;quot; &amp;quot;$http_x_forwarded_for&amp;quot;&amp;apos;;    #access_log  logs/access.log  main;    proxy_buffer_size  128k;    proxy_buffers   32 32k;     proxy_busy_buffers_size 128k;    sendfile        on;    #tcp_nopush     on;    #keepalive_timeout  0;    keepalive_timeout  65;    #gzip  on;    server &amp;#123;        listen       80;        server_name  zabbix.wisedu.com;        #charset koi8-r;        access_log  logs/zabbix.access.log  main;		 index index.php index.html index.html;        root /usr/local/openresty/nginx/html;		if ($request_uri ~ ^(.+\.php)(.*)$) &amp;#123;	    	set $req $2;		&amp;#125;		if ($req ~* &amp;quot;union[+|(%20)]&amp;quot;) &amp;#123;	    	return 503;		&amp;#125;		if ($req ~* &amp;quot;and[+|(%20)]&amp;quot;) &amp;#123;             return 503;       &amp;#125;		if ($req ~* &amp;quot;select[+|(%20)]&amp;quot;) &amp;#123;             return 503;       &amp;#125;		if ($req ~* &amp;quot;or[+|(%20)]&amp;quot;) &amp;#123;             return 503;       &amp;#125;		if ($req ~* &amp;quot;concat[+|(%20)]&amp;quot;) &amp;#123;             return 503;       &amp;#125;		if ($req ~* &amp;quot;cost[+|(%20)]&amp;quot;) &amp;#123;             return 503;       &amp;#125;    	location / &amp;#123;            try_files $uri $uri/ /index.php?$args;     	&amp;#125;    	location ~ .*\.(php)?$ &amp;#123;	    	fastcgi_buffer_size 128k;	    	fastcgi_buffers 4 256k;	    	fastcgi_busy_buffers_size 256k;          expires -1s;          try_files $uri =404;	    	fastcgi_split_path_info ^(.+\.php)(/.+)$;	    	include fastcgi_params;	    	fastcgi_param PATH_INFO $fastcgi_path_info;	    	fastcgi_index index.php;	    	fastcgi_param SCRIPT_FILENAME $document_root $fastcgi_script_name;	    	fastcgi_pass 127.0.0.1:9000;       &amp;#125;      error_page   500 502 503 504  /50x.html;      location = /50x.html &amp;#123;            root   html;      &amp;#125;    &amp;#125;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;浏览器访问url，安装过程和上面httpd一样。&lt;/p&gt;
 &lt;h4 id=&quot;切割Nginx日志&quot;&gt;&lt;a href=&quot;#切割Nginx日志&quot; class=&quot;headerlink&quot; title=&quot;切割Nginx日志&quot;&gt;&lt;/a&gt;切割Nginx日志&lt;/h4&gt;&lt;p&gt;如果开启Nginx的debug日志，就需要考虑到切割日志：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# cd /etc/logrotate.d/
 # vim nginx
