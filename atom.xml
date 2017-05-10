@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-10T11:58:54.000Z</updated>
+  <updated>2017-05-10T15:24:25.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>zabbix使用详解</title>
-    <link href="http://yoursite.com/2017/05/10/zabbix%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/"/>
-    <id>http://yoursite.com/2017/05/10/zabbix使用详解/</id>
+    <title>zabbix安装配置</title>
+    <link href="http://yoursite.com/2017/05/10/zabbix%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/"/>
+    <id>http://yoursite.com/2017/05/10/zabbix安装配置/</id>
     <published>2017-05-10T02:53:23.000Z</published>
-    <updated>2017-05-10T11:58:54.000Z</updated>
+    <updated>2017-05-10T15:24:25.000Z</updated>
     
     <content type="html">&lt;h1 id=&quot;实验环境&quot;&gt;&lt;a href=&quot;#实验环境&quot; class=&quot;headerlink&quot; title=&quot;实验环境&quot;&gt;&lt;/a&gt;实验环境&lt;/h1&gt;&lt;table&gt;
 &lt;thead&gt;
@@ -366,6 +366,49 @@ http {
         service nginx reload
         endscript
 }
+&lt;/code&gt;&lt;/pre&gt;&lt;h1 id=&quot;其他主机安装agent&quot;&gt;&lt;a href=&quot;#其他主机安装agent&quot; class=&quot;headerlink&quot; title=&quot;其他主机安装agent&quot;&gt;&lt;/a&gt;其他主机安装agent&lt;/h1&gt;&lt;p&gt;log1和log2主机安装agent。&lt;/p&gt;
+&lt;h2 id=&quot;添加用户&quot;&gt;&lt;a href=&quot;#添加用户&quot; class=&quot;headerlink&quot; title=&quot;添加用户&quot;&gt;&lt;/a&gt;添加用户&lt;/h2&gt;&lt;p&gt;Zabbix agent也不能用root用户运行，要以zabbix用户身份运行。否则：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# ./zabbix_agentd
+zabbix_agentd [15530]: user zabbix does not exist
+zabbix_agentd [15530]: cannot run as root!
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;添加用户：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# groupadd zabbix
+# useradd -g zabbix zabbix
+# id zabbix
+uid=1000(zabbix) gid=1000(zabbix) groups=1000(zabbix)
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装agent&quot;&gt;&lt;a href=&quot;#安装agent&quot; class=&quot;headerlink&quot; title=&quot;安装agent&quot;&gt;&lt;/a&gt;安装agent&lt;/h2&gt;&lt;p&gt;从console主机上将zabbix源代码包copy过来：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console local]# scp -p zabbix-3.0.1.tar.gz root@114.55.29.86:/usr/local/
+[root@console local]# scp -p zabbix-3.0.1.tar.gz root@114.55.29.241:/usr/local/
+
+# yum install -y gcc
+# cd /usr/local/
+# tar zxf zabbix-3.0.1.tar.gz
+# cd zabbix-3.0.1/
+# ./configure --prefix=/usr/local/zabbix-3.0.1/ --enable-agent
+# make &amp;amp;&amp;amp; make install
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;配置agent&quot;&gt;&lt;a href=&quot;#配置agent&quot; class=&quot;headerlink&quot; title=&quot;配置agent&quot;&gt;&lt;/a&gt;配置agent&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# cd /usr/local/zabbix-3.0.1/etc/
+# mv zabbix_agentd.conf zabbix_agentd.conf.bak
+# cat zabbix_agentd.conf.bak | grep -v &amp;quot;#&amp;quot; | grep -v &amp;quot;^$&amp;quot; &amp;gt; zabbix_agentd.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;修改后的agent配置文件内容如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cat zabbix_agentd.conf
+LogFile=/var/log/zabbix_agentd.log
+Server=114.55.29.246
+# 主动向zabbix server发送监控内容
+ServerActive=114.55.29.246
+# 本机的主机名或IP地址
+Hostname=log1
+Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;创建日志文件：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# touch /var/log/zabbix_agentd.log
+# chmod 777 /var/log/zabbix_agentd.log
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;启动agent&quot;&gt;&lt;a href=&quot;#启动agent&quot; class=&quot;headerlink&quot; title=&quot;启动agent&quot;&gt;&lt;/a&gt;启动agent&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# cd /usr/local/zabbix-3.0.1/sbin/
+# ./zabbix_agentd
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看端口是否监听，默认agent端口是10050：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# lsof -i :10050
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/27.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;可以查看日志：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# tail -100f /var/log/zabbix_agentd.log
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;停止agent&quot;&gt;&lt;a href=&quot;#停止agent&quot; class=&quot;headerlink&quot; title=&quot;停止agent&quot;&gt;&lt;/a&gt;停止agent&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# killall -9 zabbix_agentd
 &lt;/code&gt;&lt;/pre&gt;</content>
     
     <summary type="html">

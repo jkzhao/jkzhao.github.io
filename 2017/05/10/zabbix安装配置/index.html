@@ -107,8 +107,8 @@
 <meta name="description" content="实验环境   主机名 操作系统版本 IP地址 安装软件     console CentOS 7.0 114.55.29.246 Httpd、Nginx、MySQL、Zabbix   log1 CentOS 7.0 114.55.29.86 Httpd、Nginx、MySQL、Zabbix   log2 CentOS 7.0 114.55.29.241 Httpd、Nginx、MySQL、Zabb">
 <meta name="keywords" content="监控 zabbix">
 <meta property="og:type" content="article">
-<meta property="og:title" content="zabbix使用详解">
-<meta property="og:url" content="http://yoursite.com/2017/05/10/zabbix使用详解/index.html">
+<meta property="og:title" content="zabbix安装配置">
+<meta property="og:url" content="http://yoursite.com/2017/05/10/zabbix安装配置/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
 <meta property="og:description" content="实验环境   主机名 操作系统版本 IP地址 安装软件     console CentOS 7.0 114.55.29.246 Httpd、Nginx、MySQL、Zabbix   log1 CentOS 7.0 114.55.29.86 Httpd、Nginx、MySQL、Zabbix   log2 CentOS 7.0 114.55.29.241 Httpd、Nginx、MySQL、Zabb">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/1.png">
@@ -137,9 +137,10 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/24.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/25.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/26.png">
-<meta property="og:updated_time" content="2017-05-10T11:58:54.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/27.png">
+<meta property="og:updated_time" content="2017-05-10T15:24:25.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zabbix使用详解">
+<meta name="twitter:title" content="zabbix安装配置">
 <meta name="twitter:description" content="实验环境   主机名 操作系统版本 IP地址 安装软件     console CentOS 7.0 114.55.29.246 Httpd、Nginx、MySQL、Zabbix   log1 CentOS 7.0 114.55.29.86 Httpd、Nginx、MySQL、Zabbix   log2 CentOS 7.0 114.55.29.241 Httpd、Nginx、MySQL、Zabb">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/1.png">
 
@@ -159,7 +160,7 @@
   };
 </script>
 
-  <title> zabbix使用详解 | jkzhao's blog </title>
+  <title> zabbix安装配置 | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -339,7 +340,7 @@
             
             
               
-                zabbix使用详解
+                zabbix安装配置
               
             
           </h1>
@@ -362,8 +363,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2017/05/10/zabbix使用详解/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/10/zabbix使用详解/" itemprop="commentsCount"></span>
+                <a href="/2017/05/10/zabbix安装配置/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/10/zabbix安装配置/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -730,6 +731,49 @@ http {
         service nginx reload
         endscript
 }
+</code></pre><h1 id="其他主机安装agent"><a href="#其他主机安装agent" class="headerlink" title="其他主机安装agent"></a>其他主机安装agent</h1><p>log1和log2主机安装agent。</p>
+<h2 id="添加用户"><a href="#添加用户" class="headerlink" title="添加用户"></a>添加用户</h2><p>Zabbix agent也不能用root用户运行，要以zabbix用户身份运行。否则：</p>
+<pre><code># ./zabbix_agentd
+zabbix_agentd [15530]: user zabbix does not exist
+zabbix_agentd [15530]: cannot run as root!
+</code></pre><p>添加用户：</p>
+<pre><code># groupadd zabbix
+# useradd -g zabbix zabbix
+# id zabbix
+uid=1000(zabbix) gid=1000(zabbix) groups=1000(zabbix)
+</code></pre><h2 id="安装agent"><a href="#安装agent" class="headerlink" title="安装agent"></a>安装agent</h2><p>从console主机上将zabbix源代码包copy过来：</p>
+<pre><code>[root@console local]# scp -p zabbix-3.0.1.tar.gz root@114.55.29.86:/usr/local/
+[root@console local]# scp -p zabbix-3.0.1.tar.gz root@114.55.29.241:/usr/local/
+
+# yum install -y gcc
+# cd /usr/local/
+# tar zxf zabbix-3.0.1.tar.gz
+# cd zabbix-3.0.1/
+# ./configure --prefix=/usr/local/zabbix-3.0.1/ --enable-agent
+# make &amp;&amp; make install
+</code></pre><h2 id="配置agent"><a href="#配置agent" class="headerlink" title="配置agent"></a>配置agent</h2><pre><code># cd /usr/local/zabbix-3.0.1/etc/
+# mv zabbix_agentd.conf zabbix_agentd.conf.bak
+# cat zabbix_agentd.conf.bak | grep -v &quot;#&quot; | grep -v &quot;^$&quot; &gt; zabbix_agentd.conf
+</code></pre><p>修改后的agent配置文件内容如下：</p>
+<pre><code># cat zabbix_agentd.conf
+LogFile=/var/log/zabbix_agentd.log
+Server=114.55.29.246
+# 主动向zabbix server发送监控内容
+ServerActive=114.55.29.246
+# 本机的主机名或IP地址
+Hostname=log1
+Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf
+</code></pre><p>创建日志文件：</p>
+<pre><code># touch /var/log/zabbix_agentd.log
+# chmod 777 /var/log/zabbix_agentd.log
+</code></pre><h2 id="启动agent"><a href="#启动agent" class="headerlink" title="启动agent"></a>启动agent</h2><pre><code># cd /usr/local/zabbix-3.0.1/sbin/
+# ./zabbix_agentd
+</code></pre><p>查看端口是否监听，默认agent端口是10050：</p>
+<pre><code># lsof -i :10050
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/27.png" alt=""></p>
+<p>可以查看日志：</p>
+<pre><code># tail -100f /var/log/zabbix_agentd.log
+</code></pre><h2 id="停止agent"><a href="#停止agent" class="headerlink" title="停止agent"></a>停止agent</h2><pre><code># killall -9 zabbix_agentd
 </code></pre>
       
     </div>
@@ -792,8 +836,8 @@ http {
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/05/10/zabbix使用详解/"
-           data-title="zabbix使用详解" data-url="http://yoursite.com/2017/05/10/zabbix使用详解/">
+      <div class="ds-thread" data-thread-key="2017/05/10/zabbix安装配置/"
+           data-title="zabbix安装配置" data-url="http://yoursite.com/2017/05/10/zabbix安装配置/">
       </div>
     
   </div>
@@ -934,7 +978,7 @@ http {
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实验环境"><span class="nav-number">1.</span> <span class="nav-text">实验环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装准备"><span class="nav-number">2.</span> <span class="nav-text">安装准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装MySQL"><span class="nav-number">3.</span> <span class="nav-text">安装MySQL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装Zabbix3-0-1"><span class="nav-number">4.</span> <span class="nav-text">安装Zabbix3.0.1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装依赖包"><span class="nav-number">4.1.</span> <span class="nav-text">安装依赖包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装JDK"><span class="nav-number">4.2.</span> <span class="nav-text">安装JDK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装php环境"><span class="nav-number">4.3.</span> <span class="nav-text">安装php环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译安装zabbix-server"><span class="nav-number">4.4.</span> <span class="nav-text">编译安装zabbix server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化数据库"><span class="nav-number">4.5.</span> <span class="nav-text">初始化数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置zabbix-server"><span class="nav-number">4.6.</span> <span class="nav-text">配置zabbix server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动zabbix-server"><span class="nav-number">4.7.</span> <span class="nav-text">启动zabbix server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#停止zabbix-server"><span class="nav-number">4.8.</span> <span class="nav-text">停止zabbix server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装zabbix-web界面-和server端装在一台机器"><span class="nav-number">4.9.</span> <span class="nav-text">安装zabbix web界面(和server端装在一台机器)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用httpd"><span class="nav-number">4.9.1.</span> <span class="nav-text">使用httpd</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装httpd"><span class="nav-number">4.9.1.1.</span> <span class="nav-text">安装httpd</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署zabbix-web"><span class="nav-number">4.9.1.2.</span> <span class="nav-text">部署zabbix web</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Nginx"><span class="nav-number">4.9.2.</span> <span class="nav-text">使用Nginx</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装openresty"><span class="nav-number">4.9.2.1.</span> <span class="nav-text">安装openresty</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动php"><span class="nav-number">4.9.2.2.</span> <span class="nav-text">启动php</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署zabbix-web-1"><span class="nav-number">4.9.2.3.</span> <span class="nav-text">部署zabbix web</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#切割Nginx日志"><span class="nav-number">4.9.2.4.</span> <span class="nav-text">切割Nginx日志</span></a></li></ol></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实验环境"><span class="nav-number">1.</span> <span class="nav-text">实验环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装准备"><span class="nav-number">2.</span> <span class="nav-text">安装准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装MySQL"><span class="nav-number">3.</span> <span class="nav-text">安装MySQL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装Zabbix3-0-1"><span class="nav-number">4.</span> <span class="nav-text">安装Zabbix3.0.1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装依赖包"><span class="nav-number">4.1.</span> <span class="nav-text">安装依赖包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装JDK"><span class="nav-number">4.2.</span> <span class="nav-text">安装JDK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装php环境"><span class="nav-number">4.3.</span> <span class="nav-text">安装php环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译安装zabbix-server"><span class="nav-number">4.4.</span> <span class="nav-text">编译安装zabbix server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化数据库"><span class="nav-number">4.5.</span> <span class="nav-text">初始化数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置zabbix-server"><span class="nav-number">4.6.</span> <span class="nav-text">配置zabbix server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动zabbix-server"><span class="nav-number">4.7.</span> <span class="nav-text">启动zabbix server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#停止zabbix-server"><span class="nav-number">4.8.</span> <span class="nav-text">停止zabbix server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装zabbix-web界面-和server端装在一台机器"><span class="nav-number">4.9.</span> <span class="nav-text">安装zabbix web界面(和server端装在一台机器)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用httpd"><span class="nav-number">4.9.1.</span> <span class="nav-text">使用httpd</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装httpd"><span class="nav-number">4.9.1.1.</span> <span class="nav-text">安装httpd</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署zabbix-web"><span class="nav-number">4.9.1.2.</span> <span class="nav-text">部署zabbix web</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Nginx"><span class="nav-number">4.9.2.</span> <span class="nav-text">使用Nginx</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装openresty"><span class="nav-number">4.9.2.1.</span> <span class="nav-text">安装openresty</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动php"><span class="nav-number">4.9.2.2.</span> <span class="nav-text">启动php</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署zabbix-web-1"><span class="nav-number">4.9.2.3.</span> <span class="nav-text">部署zabbix web</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#切割Nginx日志"><span class="nav-number">4.9.2.4.</span> <span class="nav-text">切割Nginx日志</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他主机安装agent"><span class="nav-number">5.</span> <span class="nav-text">其他主机安装agent</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#添加用户"><span class="nav-number">5.1.</span> <span class="nav-text">添加用户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装agent"><span class="nav-number">5.2.</span> <span class="nav-text">安装agent</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置agent"><span class="nav-number">5.3.</span> <span class="nav-text">配置agent</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动agent"><span class="nav-number">5.4.</span> <span class="nav-text">启动agent</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#停止agent"><span class="nav-number">5.5.</span> <span class="nav-text">停止agent</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
