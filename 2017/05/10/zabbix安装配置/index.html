@@ -138,7 +138,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/25.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/26.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/27.png">
-<meta property="og:updated_time" content="2017-05-10T15:24:25.000Z">
+<meta property="og:updated_time" content="2017-05-10T15:27:22.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zabbix安装配置">
 <meta name="twitter:description" content="实验环境   主机名 操作系统版本 IP地址 安装软件     console CentOS 7.0 114.55.29.246 Httpd、Nginx、MySQL、Zabbix   log1 CentOS 7.0 114.55.29.86 Httpd、Nginx、MySQL、Zabbix   log2 CentOS 7.0 114.55.29.241 Httpd、Nginx、MySQL、Zabb">
@@ -774,7 +774,8 @@ Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf
 <p>可以查看日志：</p>
 <pre><code># tail -100f /var/log/zabbix_agentd.log
 </code></pre><h2 id="停止agent"><a href="#停止agent" class="headerlink" title="停止agent"></a>停止agent</h2><pre><code># killall -9 zabbix_agentd
-</code></pre>
+</code></pre><p>具体的监控配置实例见下一篇文章。</p>
+
       
     </div>
 
