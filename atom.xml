@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-10T11:05:34.000Z</updated>
+  <updated>2017-05-10T11:07:20.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/05/10/zabbix%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/"/>
     <id>http://yoursite.com/2017/05/10/zabbix使用详解/</id>
     <published>2017-05-10T02:53:23.000Z</published>
-    <updated>2017-05-10T11:05:34.000Z</updated>
+    <updated>2017-05-10T11:07:20.000Z</updated>
     
     <content type="html">&lt;h1 id=&quot;实验环境&quot;&gt;&lt;a href=&quot;#实验环境&quot; class=&quot;headerlink&quot; title=&quot;实验环境&quot;&gt;&lt;/a&gt;实验环境&lt;/h1&gt;&lt;table&gt;
 &lt;thead&gt;
@@ -53,8 +53,12 @@
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-&lt;h1 id=&quot;安装准备&quot;&gt;&lt;a href=&quot;#安装准备&quot; class=&quot;headerlink&quot; title=&quot;安装准备&quot;&gt;&lt;/a&gt;安装准备&lt;/h1&gt;&lt;p&gt;为了安全考虑，zabbix只使用普通用户运行，如果你的系统没有名叫zabbix的用户，你需要创建一个用户，如下：&lt;br&gt;        [root@console local]# groupadd zabbix&lt;br&gt;        [root@console local]# useradd -g zabbix zabbix&lt;br&gt;        [root@console local]# id zabbix&lt;br&gt;        uid=1000(zabbix) gid=1000(zabbix) groups=1000(zabbix)&lt;/p&gt;
-&lt;h1 id=&quot;安装MySQL&quot;&gt;&lt;a href=&quot;#安装MySQL&quot; class=&quot;headerlink&quot; title=&quot;安装MySQL&quot;&gt;&lt;/a&gt;安装MySQL&lt;/h1&gt;&lt;p&gt;console主机安装mysql5.6。下载地址：&lt;a href=&quot;http://mirrors.sohu.com/mysql&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://mirrors.sohu.com/mysql&lt;/a&gt;&lt;/p&gt;
+&lt;h1 id=&quot;安装准备&quot;&gt;&lt;a href=&quot;#安装准备&quot; class=&quot;headerlink&quot; title=&quot;安装准备&quot;&gt;&lt;/a&gt;安装准备&lt;/h1&gt;&lt;p&gt;为了安全考虑，zabbix只使用普通用户运行，如果你的系统没有名叫zabbix的用户，你需要创建一个用户，如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console local]# groupadd zabbix
+[root@console local]# useradd -g zabbix zabbix
+[root@console local]# id zabbix
+uid=1000(zabbix) gid=1000(zabbix) groups=1000(zabbix)
+&lt;/code&gt;&lt;/pre&gt;&lt;h1 id=&quot;安装MySQL&quot;&gt;&lt;a href=&quot;#安装MySQL&quot; class=&quot;headerlink&quot; title=&quot;安装MySQL&quot;&gt;&lt;/a&gt;安装MySQL&lt;/h1&gt;&lt;p&gt;console主机安装mysql5.6。下载地址：&lt;a href=&quot;http://mirrors.sohu.com/mysql&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://mirrors.sohu.com/mysql&lt;/a&gt;&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;安装依赖包&lt;pre&gt;&lt;code&gt;[root@console local]# yum install libaio* -y
 &lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
