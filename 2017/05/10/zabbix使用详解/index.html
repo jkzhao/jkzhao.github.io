@@ -117,7 +117,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/10.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/11.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/12.png">
-<meta property="og:updated_time" content="2017-05-10T08:08:10.000Z">
+<meta property="og:updated_time" content="2017-05-10T08:09:57.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zabbix使用详解">
 <meta name="twitter:description" content="实验环境   主机名 操作系统版本 IP地址 安装软件     console CentOS 7.0 114.55.29.246 Httpd、Nginx、MySQL、Zabbix   log1 CentOS 7.0 114.55.29.86 Httpd、Nginx、MySQL、Zabbix   log2 CentOS 7.0 114.55.29.241 Httpd、Nginx、MySQL、Zabb">
@@ -413,13 +413,11 @@
 [root@console local]# useradd -g mysql -r -s /sbin/nologin -u 300 mysql
 [root@console local]# id mysql
 uid=300(mysql) gid=300(mysql) groups=300(mysql)
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">4. 修改mysql文件权限为mysql.mysql</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">4. 修改mysql文件权限为mysql.mysql</div></pre></td></tr></table></figure>
 
 [root@console local]# cd mysql
 [root@console mysql]# chown -R mysql.mysql ./*
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">5. 执行初始化操作，生成一个系统库叫mysql，它里面保存着有当前所有能够使用mysql服务器的用户帐号、所有数据库的名字、每个库中表的名字、表中字段的名字等等。</div><div class="line">脚本路径：/usr/local/mysql/scripts创建数据文件目录：</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">5. 执行初始化操作，生成一个系统库叫mysql，它里面保存着有当前所有能够使用mysql服务器的用户帐号、所有数据库的名字、每个库中表的名字、表中字段的名字等等。</div><div class="line">脚本路径：/usr/local/mysql/scripts创建数据文件目录：</div></pre></td></tr></table></figure>
 
 [root@console mysql]# mkdir -pv /data/{mydata,binlog}
 [root@console mysql]# scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/data/mydata
