@@ -120,7 +120,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/24.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/25.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/26.png">
-<meta property="og:updated_time" content="2017-05-10T07:32:46.000Z">
+<meta property="og:updated_time" content="2017-05-10T07:35:30.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zabbix使用详解">
 <meta name="twitter:description" content="实验环境   主机名 操作系统版本 IP地址 安装软件     console CentOS 7.0 114.55.29.246 Httpd、Nginx、MySQL、Zabbix   log1 CentOS 7.0 114.55.29.86 Httpd、Nginx、MySQL、Zabbix   log2 CentOS 7.0 114.55.29.241 Httpd、Nginx、MySQL、Zabb">
@@ -399,7 +399,8 @@
 </tr>
 </tbody>
 </table>
-<h1 id="安装准备"><a href="#安装准备" class="headerlink" title="安装准备"></a>安装准备</h1><p>为了安全考虑，zabbix只使用普通用户运行，如果你的系统没有名叫zabbix的用户，你需要创建一个用户，如下：<br>[root@console local]# groupadd zabbix<br>[root@console local]# useradd -g zabbix zabbix<br>[root@console local]# id zabbix<br>uid=1000(zabbix) gid=1000(zabbix) groups=1000(zabbix)<br><a id="more"></a></p>
+<a id="more"></a>
+<h1 id="安装准备"><a href="#安装准备" class="headerlink" title="安装准备"></a>安装准备</h1><p>为了安全考虑，zabbix只使用普通用户运行，如果你的系统没有名叫zabbix的用户，你需要创建一个用户，如下：<br>[root@console local]# groupadd zabbix<br>[root@console local]# useradd -g zabbix zabbix<br>[root@console local]# id zabbix<br>uid=1000(zabbix) gid=1000(zabbix) groups=1000(zabbix)</p>
 <h1 id="安装MySQL"><a href="#安装MySQL" class="headerlink" title="安装MySQL"></a>安装MySQL</h1><p>console主机安装mysql5.6。下载地址：<a href="http://mirrors.sohu.com/mysql" target="_blank" rel="external">http://mirrors.sohu.com/mysql</a></p>
 <ol>
 <li><p>安装依赖包</p>
