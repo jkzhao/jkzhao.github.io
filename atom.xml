@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-10T15:28:21.000Z</updated>
+  <updated>2017-05-11T00:56:11.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/05/10/zabbix%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/"/>
     <id>http://yoursite.com/2017/05/10/zabbix安装配置/</id>
     <published>2017-05-10T02:53:23.000Z</published>
-    <updated>2017-05-10T15:28:21.000Z</updated>
+    <updated>2017-05-11T00:56:11.000Z</updated>
     
     <content type="html">&lt;h1 id=&quot;实验环境&quot;&gt;&lt;a href=&quot;#实验环境&quot; class=&quot;headerlink&quot; title=&quot;实验环境&quot;&gt;&lt;/a&gt;实验环境&lt;/h1&gt;&lt;table&gt;
 &lt;thead&gt;
@@ -42,13 +42,13 @@
 &lt;td&gt;log1&lt;/td&gt;
 &lt;td&gt;CentOS 7.0&lt;/td&gt;
 &lt;td&gt;114.55.29.86&lt;/td&gt;
-&lt;td&gt;Httpd、Nginx、MySQL、Zabbix&lt;/td&gt;
+&lt;td&gt;Zabbix agent&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;log2&lt;/td&gt;
 &lt;td&gt;CentOS 7.0&lt;/td&gt;
 &lt;td&gt;114.55.29.241&lt;/td&gt;
-&lt;td&gt;Httpd、Nginx、MySQL、Zabbix&lt;/td&gt;
+&lt;td&gt;Zabbix agent&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -434,13 +434,13 @@ Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf
 &lt;td&gt;log1&lt;/td&gt;
 &lt;td&gt;CentOS 7.0&lt;/td&gt;
 &lt;td&gt;114.55.29.86&lt;/td&gt;
-&lt;td&gt;Httpd、Nginx、MySQL、Zabbix&lt;/td&gt;
+&lt;td&gt;Zabbix agent&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;log2&lt;/td&gt;
 &lt;td&gt;CentOS 7.0&lt;/td&gt;
 &lt;td&gt;114.55.29.241&lt;/td&gt;
-&lt;td&gt;Httpd、Nginx、MySQL、Zabbix&lt;/td&gt;
+&lt;td&gt;Zabbix agent&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
