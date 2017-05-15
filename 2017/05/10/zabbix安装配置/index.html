@@ -138,7 +138,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/25.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/26.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/27.png">
-<meta property="og:updated_time" content="2017-05-11T00:56:11.000Z">
+<meta property="og:updated_time" content="2017-05-11T01:37:08.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zabbix安装配置">
 <meta name="twitter:description" content="实验环境   主机名 操作系统版本 IP地址 安装软件     console CentOS 7.0 114.55.29.246 Httpd、Nginx、MySQL、Zabbix   log1 CentOS 7.0 114.55.29.86 Zabbix agent   log2 CentOS 7.0 114.55.29.241 Zabbix agent">
@@ -497,7 +497,7 @@ mysql&gt; source /usr/local/zabbix-3.0.1/database/mysql/data.sql
 </code></pre><p>如果是初始化agent，就不需要导入任何脚本。</p>
 <h2 id="配置zabbix-server"><a href="#配置zabbix-server" class="headerlink" title="配置zabbix server"></a>配置zabbix server</h2><p>因为上面我在编译加了–prefix=/usr/local/zabbix-3.0.1/参数，所以配置文件路径在：/usr/local/zabbix-3.0.1/etc。如果在编译时没有加这个参数，默认配置文件在/usr/local/etc/。</p>
 <pre><code>[root@console mysql]# cd /usr/local/zabbix-3.0.1/etc/
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/8.png" alt=""><br>备份原配置文件，然后去掉注释：</p>
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/8.png" alt=""><br>修改server配置文件，备份原配置文件，然后去掉注释：</p>
 <pre><code>[root@console etc]# mv zabbix_server.conf zabbix_server.conf.bak
 [root@console etc]# cat zabbix_server.conf.bak | grep -v &quot;#&quot; | grep -v &quot;^$&quot; &gt; zabbix_server.conf
 </code></pre><p>最终改后的配置文件内容如下：</p>
@@ -805,6 +805,10 @@ Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2017/05/14/zabbix监控实例/" rel="next" title="zabbix监控实例">
+                <i class="fa fa-chevron-left"></i> zabbix监控实例
+              </a>
+            
           </div>
 
           <div class="post-nav-prev post-nav-item">
@@ -883,7 +887,7 @@ Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">8</span>
+              <span class="site-state-item-count">9</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
