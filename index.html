@@ -360,62 +360,13 @@
 
       
         
-          
-            <h1 id="zabbix-web添加主机"><a href="#zabbix-web添加主机" class="headerlink" title="zabbix web添加主机"></a>zabbix web添加主机</h1><ol>
-<li>进入zabbix web界面，点击配置—&gt;主机—&gt;创建主机。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/28.png" alt=""></li>
-<li>填入下图中的信息，点击添加。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/29.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/30.png" alt=""></li>
-</ol>
-<h1 id="定义Items"><a href="#定义Items" class="headerlink" title="定义Items"></a>定义Items</h1><p>要真正实现数据采集，需要定义监控项(Items)。多个Items可以归为一个组，称为Applications。定义好Items之后，还应该为Items定义Triggers(触发器)。我这里演示下创建监控网卡进入和出去的流量。</p>
-<h2 id="创建item监控网卡出去流量"><a href="#创建item监控网卡出去流量" class="headerlink" title="创建item监控网卡出去流量"></a>创建item监控网卡出去流量</h2><p>登录zabbix web管控台，点击配置—&gt;主机—&gt;监控项。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/31.png" alt=""><br>点击右上角的“创建监控项”。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/32.png" alt=""><br>在如下的界面填入以下内容：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/34.png" alt=""><br>其中，在key那一栏，点击select按钮，选择key值。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/35.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/36.png" alt=""><br>回到hosts，你会发现已经有application和item了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/37.png" alt=""><br>每创建一个Item，会自动帮你创建图形的。点击监控—&gt;最新的数据，输入要查的主机，点击select，就可以看到为刚才我们创建的item所创建的图形。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/38.png" alt=""><br>点击图形。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/39.png" alt=""><br><strong>注意:数据量从右往左走的。</strong></p>
-<h2 id="创建item监控进入网卡流量"><a href="#创建item监控进入网卡流量" class="headerlink" title="创建item监控进入网卡流量"></a>创建item监控进入网卡流量</h2><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/40.png" alt=""><br><strong>注意:</strong>有时候，不是一创建完item，graph那边就有数据了，你可以主要通过浏览器去访问监听在这个网卡的某个端口上的服务，然后graph就会有数据了。</p>
-<h1 id="创建graph"><a href="#创建graph" class="headerlink" title="创建graph"></a>创建graph</h1><p>为什么要创建graph？拿上节中的网卡进出流量来举例，进和出此时都不在一张图上，这就需要Graphs自定义图像。将多个指标放在一起。</p>
-<p>点击配置—&gt;主机，点击Graphs。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/41.png" alt=""><br>点击右上角的创建图形。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/42.png" alt=""><br>输入Name，点击图中倒数第二个add。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/43.png" alt=""><br>选择监控项。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/44.png" alt=""><br>最后点击添加。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/45.png" alt=""><br>点击监控—&gt;图形，在右上角输入主机组，主机和图形。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/46.png" alt=""></p>
-<h1 id="创建模板"><a href="#创建模板" class="headerlink" title="创建模板"></a>创建模板</h1><p>如果我们在加一个主机进来，假如说我们每一次都想监控某几个同样的指标，每台主机都要这么去定义的话，就太痛苦了。这就要使用到模板。</p>
-<h2 id="创建模板-1"><a href="#创建模板-1" class="headerlink" title="创建模板"></a>创建模板</h2><p>点击配置—&gt;模板，点击创建模板。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/47.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/48.png" alt=""></p>
-<h2 id="创建-Item"><a href="#创建-Item" class="headerlink" title="创建    Item"></a>创建    Item</h2><p>创建完模板后，其上是没有任何Item和trigger等。所以我们需要创建这一系列监控项。但是由于这里我是要监控Elasticsearch状态，而zabbix是没有内置的key来监控elasticsearch的，所以需要自定义监控项来监控。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/49.png" alt=""></p>
-<ol>
-<li><p>在elasticsearch主机定义zabbix agent的UserParameter</p>
-<pre><code>[root@log1 ~]# cd /usr/local/zabbix-3.0.1/etc/
-[root@log1 etc]# vim zabbix_agentd.conf
-</code></pre></li>
-</ol>
-<p>输入内容：</p>
-<pre><code>UserParameter=Elasticsearch.status[*],/usr/bin/curl -s &apos;http://$1:$2/_cluster/health?pretty=true&apos; | awk -F&apos;&quot;&apos; &apos;/status/{print $$4}&apos;
-</code></pre><ol>
-<li><p>重启zabbix agent</p>
-<pre><code>[root@log1 ~] # killall -9 zabbix_agentd
-[root@log1 ~]# /usr/local/zabbix-3.0.1/sbin/zabbix_agentd
-</code></pre></li>
-<li><p>在zabbix server端使用zabbix_get模拟获取数据</p>
-<pre><code>[root@console ~]# /usr/local/zabbix-3.0.1/bin/zabbix_get -s 114.55.29.86 -k &quot;Elasticsearch.status[114.55.29.86,9200]&quot;
-green
-</code></pre></li>
-<li><p>创建模板的Item<br>(1)找到刚才新建的模板，点击Item。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/50.png" alt=""><br>(2)点击右上角的Create Item<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/51.png" alt=""><br>(3)输入如下的信息<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/52.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/53.png" alt=""></p>
-</li>
-</ol>
-<h2 id="为模板上的Item创建触发器"><a href="#为模板上的Item创建触发器" class="headerlink" title="为模板上的Item创建触发器"></a>为模板上的Item创建触发器</h2><ol>
-<li><p>点击触发器。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/54.png" alt=""></p>
-</li>
-<li><p>点击右上角的创建触发器<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/55.png" alt=""></p>
-</li>
-<li><p>定义触发器名字，然后点击Add。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/56.png" alt=""></p>
-</li>
-<li><p>点击Select，选择对哪个Item做Trigger。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/57.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/58.png" alt=""></p>
-</li>
-</ol>
-<h2 id="将模板应用到主机上"><a href="#将模板应用到主机上" class="headerlink" title="将模板应用到主机上"></a>将模板应用到主机上</h2><ol>
-<li><p>点击配置—&gt;主机，点击log1主机。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/59.png" alt=""></p>
-</li>
-<li><p>点击模板，点击选择。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/60.png" alt=""></p>
-</li>
-<li><p>选择我们需要的模板，点击选择。然后在点击Add。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/61.png" alt=""></p>
-</li>
-<li><p>这是Add后显示页面，再点击Update。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/62.png" alt=""><br>这样你就可以看到这边log1主机有应用的模板的。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/63.png" alt=""></p>
-</li>
-</ol>
-<h2 id="查看监控数据"><a href="#查看监控数据" class="headerlink" title="查看监控数据"></a>查看监控数据</h2><p>点击监控—&gt;最新数据，找到Elasticsearch status这个监控项，点击后面的History。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/64.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/65.png" alt=""></p>
-
-          
+          <h1 id="zabbix-web添加主机"><a href="#zabbix-web添加主机" class="headerlink" title="zabbix web添加主机"></a>zabbix web添加主机</h1><ol>
+<li><p>进入zabbix web界面，点击配置—&gt;主机—&gt;创建主机。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/28.png" alt=""></p>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/05/14/zabbix监控实例/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
