@@ -149,7 +149,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/63.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/64.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/65.png">
-<meta property="og:updated_time" content="2017-05-15T02:55:04.000Z">
+<meta property="og:updated_time" content="2017-05-15T03:24:53.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zabbix监控实例">
 <meta name="twitter:description" content="zabbix web添加主机 进入zabbix web界面，点击配置—&amp;gt;主机—&amp;gt;创建主机。">
@@ -412,7 +412,7 @@
 <p>点击配置—&gt;主机，点击Graphs。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/41.png" alt=""><br>点击右上角的创建图形。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/42.png" alt=""><br>输入Name，点击图中倒数第二个add。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/43.png" alt=""><br>选择监控项。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/44.png" alt=""><br>最后点击添加。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/45.png" alt=""><br>点击监控—&gt;图形，在右上角输入主机组，主机和图形。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/46.png" alt=""></p>
 <h1 id="创建模板"><a href="#创建模板" class="headerlink" title="创建模板"></a>创建模板</h1><p>如果我们在加一个主机进来，假如说我们每一次都想监控某几个同样的指标，每台主机都要这么去定义的话，就太痛苦了。这就要使用到模板。</p>
 <h2 id="创建模板-1"><a href="#创建模板-1" class="headerlink" title="创建模板"></a>创建模板</h2><p>点击配置—&gt;模板，点击创建模板。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/47.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/48.png" alt=""></p>
-<h2 id="创建-Item"><a href="#创建-Item" class="headerlink" title="创建    Item"></a>创建    Item</h2><p>创建完模板后，其上是没有任何Item和trigger等。所以我们需要创建这一系列监控项。但是由于这里我是要监控Elasticsearch状态，而zabbix是没有内置的key来监控elasticsearch的，所以需要自定义监控项来监控。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/49.png" alt=""></p>
+<h2 id="创建Item"><a href="#创建Item" class="headerlink" title="创建Item"></a>创建Item</h2><p>创建完模板后，其上是没有任何Item和trigger等。所以我们需要创建这一系列监控项。但是由于这里我是要监控Elasticsearch状态，而zabbix是没有内置的key来监控elasticsearch的，所以需要自定义监控项来监控。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/49.png" alt=""></p>
 <ol>
 <li><p>在elasticsearch主机定义zabbix agent的UserParameter</p>
 <pre><code>[root@log1 ~]# cd /usr/local/zabbix-3.0.1/etc/
@@ -483,6 +483,10 @@ green
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/16/zabbix监控Nginx/" rel="next" title="zabbix监控Nginx">
+                <i class="fa fa-chevron-left"></i> zabbix监控Nginx
+              </a>
             
           </div>
 
@@ -562,7 +566,7 @@ green
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -658,7 +662,7 @@ green
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#zabbix-web添加主机"><span class="nav-number">1.</span> <span class="nav-text">zabbix web添加主机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#定义Items"><span class="nav-number">2.</span> <span class="nav-text">定义Items</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建item监控网卡出去流量"><span class="nav-number">2.1.</span> <span class="nav-text">创建item监控网卡出去流量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建item监控进入网卡流量"><span class="nav-number">2.2.</span> <span class="nav-text">创建item监控进入网卡流量</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建graph"><span class="nav-number">3.</span> <span class="nav-text">创建graph</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建模板"><span class="nav-number">4.</span> <span class="nav-text">创建模板</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建模板-1"><span class="nav-number">4.1.</span> <span class="nav-text">创建模板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建-Item"><span class="nav-number">4.2.</span> <span class="nav-text">创建    Item</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为模板上的Item创建触发器"><span class="nav-number">4.3.</span> <span class="nav-text">为模板上的Item创建触发器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#将模板应用到主机上"><span class="nav-number">4.4.</span> <span class="nav-text">将模板应用到主机上</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看监控数据"><span class="nav-number">4.5.</span> <span class="nav-text">查看监控数据</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#zabbix-web添加主机"><span class="nav-number">1.</span> <span class="nav-text">zabbix web添加主机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#定义Items"><span class="nav-number">2.</span> <span class="nav-text">定义Items</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建item监控网卡出去流量"><span class="nav-number">2.1.</span> <span class="nav-text">创建item监控网卡出去流量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建item监控进入网卡流量"><span class="nav-number">2.2.</span> <span class="nav-text">创建item监控进入网卡流量</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建graph"><span class="nav-number">3.</span> <span class="nav-text">创建graph</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建模板"><span class="nav-number">4.</span> <span class="nav-text">创建模板</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建模板-1"><span class="nav-number">4.1.</span> <span class="nav-text">创建模板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Item"><span class="nav-number">4.2.</span> <span class="nav-text">创建Item</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为模板上的Item创建触发器"><span class="nav-number">4.3.</span> <span class="nav-text">为模板上的Item创建触发器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#将模板应用到主机上"><span class="nav-number">4.4.</span> <span class="nav-text">将模板应用到主机上</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看监控数据"><span class="nav-number">4.5.</span> <span class="nav-text">查看监控数据</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
