@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-16T03:28:39.000Z</updated>
+  <updated>2017-05-24T01:11:31.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,66 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>zabbix监控websphere和weblogic</title>
+    <link href="http://yoursite.com/2017/05/23/zabbix%E7%9B%91%E6%8E%A7websphere%E5%92%8Cweblogic/"/>
+    <id>http://yoursite.com/2017/05/23/zabbix监控websphere和weblogic/</id>
+    <published>2017-05-23T13:25:25.000Z</published>
+    <updated>2017-05-24T01:11:31.000Z</updated>
+    
+    <content type="html">&lt;h1 id=&quot;zabbix-java-gateway&quot;&gt;&lt;a href=&quot;#zabbix-java-gateway&quot; class=&quot;headerlink&quot; title=&quot;zabbix java gateway&quot;&gt;&lt;/a&gt;zabbix java gateway&lt;/h1&gt;&lt;p&gt;zabbix通过JMX监控应用服务器。JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架。JMX可以跨越一系列异构操作系统平台、系统体系结构和网络传输协议，灵活的开发无缝集成的系统、网络和服务管理应用。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;Zabbix已经集成JMX，可以用Zabbix通过JMX监控JVM，TOMCAT，Weblogic，Jboss等。要使用Zabbix监控Weblogic，我们先要了解Zabbix的JMX监控架构，Weblogic的JMX信息，最后才能去实现怎么去配置监控和报警。&lt;br&gt;Zabbix是使用了一个叫做Java Gateway的应用去监控JMX的。Java Gateway集成在zabbix官方开发发布的。所以需要在编译安装zabbix server时，需要添加一个选项–enable-java。这样安装zabbix后在/usr/local/zabbix-3.0.1/sbin目录下会有个zabbix_java目录，这个目录里面就是zabbix Java gateway的文件。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/80.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h1 id=&quot;配置和运行java-gateway&quot;&gt;&lt;a href=&quot;#配置和运行java-gateway&quot; class=&quot;headerlink&quot; title=&quot;配置和运行java gateway&quot;&gt;&lt;/a&gt;配置和运行java gateway&lt;/h1&gt;&lt;p&gt;默认情况下，Java gateway监听10052端口. 如果你计划使用不同的端口来运行Java gateway，你需要通过setting.sh脚本指定下需要的端口。&lt;br&gt;启动：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;./startup.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;关闭：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;./shutdown.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;h1 id=&quot;配置zabbix-server使用java-gateway&quot;&gt;&lt;a href=&quot;#配置zabbix-server使用java-gateway&quot; class=&quot;headerlink&quot; title=&quot;配置zabbix server使用java gateway&quot;&gt;&lt;/a&gt;配置zabbix server使用java gateway&lt;/h1&gt;&lt;p&gt;当前Java gateway已经运行，接下来你需要告诉Zabbix server如何找到Zabbix Java gateway. 因此你需要在 server配置文件 中指定JavaGateway及JavaGateway端口. 如果JMX应用采用Zabbix代理进行监控的话，你需要在 代理配置文件 中指定对应的连接参数。&lt;br&gt;默认情况下，server并不会派生出任何进程去进行JMX监控。如果你想使用完成JMX监控，你需要指定预派生出来的Java pollers进程数，你也可过同类的方式指定常见的pollers和trappers。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# vim zabbix_server.conf
+JavaGateway=172.16.7.151
+JavaGatewayPort=10052
+StartJavaPollers=5
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/81.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;在完成配置后，要重启server(或代理)：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# killall -9 zabbix_server
+# ./zabbix_server
+&lt;/code&gt;&lt;/pre&gt;&lt;h1 id=&quot;调整java-gateway的日志级别&quot;&gt;&lt;a href=&quot;#调整java-gateway的日志级别&quot; class=&quot;headerlink&quot; title=&quot;调整java gateway的日志级别&quot;&gt;&lt;/a&gt;调整java gateway的日志级别&lt;/h1&gt;&lt;p&gt;万一Java gateway出现了若干问题，在前段可以看到的监控项报错信息并不充分，你也可以通过查看Java gateway日志文件获得更多信息。&lt;br&gt;默认情况下，Java gateway将记录日志到/tmp/zabbix_java.log文件中，log级别为”info”。有时你觉得”info”级别得到的信息并不够，你需要修改级别为”debug”。你可以通过修改lib/logback.xml将&lt;root&gt;标签更改为”debug”以获取日志级别的增加。&lt;/root&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;root level=&amp;quot;debug&amp;quot;&amp;gt;
+   &amp;lt;appender-ref ref=&amp;quot;FILE&amp;quot; /&amp;gt;
+&amp;lt;/root&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;需要注意的是，并不像Zabbix server或proxy那样，修改完logback.xml并不需要重启Zabbix Java gateway. 修改后的配置将会自动被加载。当你完成了debugging,你可以将log级别替换为”info”。&lt;/p&gt;
+&lt;h1 id=&quot;监控weblogic&quot;&gt;&lt;a href=&quot;#监控weblogic&quot; class=&quot;headerlink&quot; title=&quot;监控weblogic&quot;&gt;&lt;/a&gt;监控weblogic&lt;/h1&gt;&lt;h2 id=&quot;weblogic配置&quot;&gt;&lt;a href=&quot;#weblogic配置&quot; class=&quot;headerlink&quot; title=&quot;weblogic配置&quot;&gt;&lt;/a&gt;weblogic配置&lt;/h2&gt;&lt;p&gt;1.如果是监控weblogic 的admin server：&lt;br&gt;编辑WL_DOMAIN_HOME/bin/setDomainEnv.sh，在文件结尾加入下面几行：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ cd /opt/Oracle/Middleware/user_projects/domains/ids_domain/bin
+$ vim setDomainEnv.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;添加一句：&lt;br&gt;JAVA_OPTIONS=”$JAVA_OPTIONS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9997 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false”&lt;br&gt;然后在去启动weblogic。&lt;/p&gt;
+&lt;p&gt;2.如果是监控受管服务器：&lt;br&gt;进入weblogic控制台-&amp;gt;环境-&amp;gt;服务器-&amp;gt;”你新增的服务器”-&amp;gt;配置-&amp;gt;服务器启动。在“参数”的输入框内输入：&lt;br&gt;-Dcom.sun.management.jmxremote.port=JMX_PORT -Djava.rmi.server.hostname=JMX_HOST -Dcom.sun.management.jmxremote.authenticate=false  -Dcom.sun.management.jmxremote.ssl=false -Djavax.management.builder.initial=weblogic.management.jmx.mbeanserver.WLSMBeanServerBuilder&lt;/p&gt;
+&lt;p&gt;然后控制台启动受管服务器。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/82.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;zabbix-server添加监控weblogic主机&quot;&gt;&lt;a href=&quot;#zabbix-server添加监控weblogic主机&quot; class=&quot;headerlink&quot; title=&quot;zabbix server添加监控weblogic主机&quot;&gt;&lt;/a&gt;zabbix server添加监控weblogic主机&lt;/h2&gt;&lt;p&gt;点击配置—&amp;gt;主机—&amp;gt;创建主机。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/83.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;输入主机信息，主要注意JMX的端口，点击添加。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/84.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;选择JMX模板。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/85.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h1 id=&quot;监控websphere&quot;&gt;&lt;a href=&quot;#监控websphere&quot; class=&quot;headerlink&quot; title=&quot;监控websphere&quot;&gt;&lt;/a&gt;监控websphere&lt;/h1&gt;&lt;h2 id=&quot;websphere配置&quot;&gt;&lt;a href=&quot;#websphere配置&quot; class=&quot;headerlink&quot; title=&quot;websphere配置&quot;&gt;&lt;/a&gt;websphere配置&lt;/h2&gt;&lt;p&gt;访问websphere控制台，点击 Server Types → WebSphere application servers → WAS_SERVER_NAME → Java and Process Management → Process definition → Java Virtual Machine.&lt;/p&gt;
+&lt;p&gt;在“Generic JVM arguments”增加下面环境变量：&lt;br&gt;-Djavax.management.builder.initial=&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/86.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击 Server Types → WebSphere application servers → WAS_SERVER_NAME → Java and Process Management → Process definition → Java Virtual Machine → Custom properties.&lt;br&gt;增加下面几个环境变量：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Name: java.rmi.server.hostname
+Value: JMX_HOST
+Name: com.sun.management.jmxremote
+Value: true
+Name: com.sun.management.jmxremote.port
+Value: JMX_PORT
+Name: com.sun.management.jmxremote.ssl
+Value: false
+Name: com.sun.management.jmxremote.authenticate
+Value: false
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/87.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;重启server。&lt;/p&gt;
+&lt;h2 id=&quot;zabbix-server添加监控websphere主机&quot;&gt;&lt;a href=&quot;#zabbix-server添加监控websphere主机&quot; class=&quot;headerlink&quot; title=&quot;zabbix server添加监控websphere主机&quot;&gt;&lt;/a&gt;zabbix server添加监控websphere主机&lt;/h2&gt;&lt;p&gt;点击配置—&amp;gt;主机—&amp;gt;创建主机。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/88.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;输入主机信息，主要注意JMX的端口，点击添加。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/89.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;zabbix-java-gateway&quot;&gt;&lt;a href=&quot;#zabbix-java-gateway&quot; class=&quot;headerlink&quot; title=&quot;zabbix java gateway&quot;&gt;&lt;/a&gt;zabbix java gateway&lt;/h1&gt;&lt;p&gt;zabbix通过JMX监控应用服务器。JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架。JMX可以跨越一系列异构操作系统平台、系统体系结构和网络传输协议，灵活的开发无缝集成的系统、网络和服务管理应用。&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="监控 zabbix" scheme="http://yoursite.com/tags/%E7%9B%91%E6%8E%A7-zabbix/"/>
+    
+  </entry>
   
   <entry>
     <title>zabbix监控Nginx</title>

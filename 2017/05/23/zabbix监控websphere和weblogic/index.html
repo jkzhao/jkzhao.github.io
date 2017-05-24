@@ -104,32 +104,28 @@
 
 
 
-<meta name="description" content="https://nginx.org/en/docs/http/ngx_http_stub_status_module.html在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。">
+<meta name="description" content="zabbix java gatewayzabbix通过JMX监控应用服务器。JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架。JMX可以跨越一系列异构操作系统平台、系统体系结构和网络传输协议，灵活的开发无缝集成的系统、网络和服务管理应用。">
 <meta name="keywords" content="监控 zabbix">
 <meta property="og:type" content="article">
-<meta property="og:title" content="zabbix监控Nginx">
-<meta property="og:url" content="http://yoursite.com/2017/05/16/zabbix监控Nginx/index.html">
+<meta property="og:title" content="zabbix监控websphere和weblogic">
+<meta property="og:url" content="http://yoursite.com/2017/05/23/zabbix监控websphere和weblogic/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
-<meta property="og:description" content="https://nginx.org/en/docs/http/ngx_http_stub_status_module.html在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/66.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/67.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/68.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/69.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/70.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/71.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/72.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/73.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/74.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/75.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/76.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/77.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/78.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/79.png">
-<meta property="og:updated_time" content="2017-05-16T03:28:39.000Z">
+<meta property="og:description" content="zabbix java gatewayzabbix通过JMX监控应用服务器。JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架。JMX可以跨越一系列异构操作系统平台、系统体系结构和网络传输协议，灵活的开发无缝集成的系统、网络和服务管理应用。">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/80.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/81.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/82.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/83.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/84.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/85.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/86.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/87.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/88.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/89.png">
+<meta property="og:updated_time" content="2017-05-24T01:11:31.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zabbix监控Nginx">
-<meta name="twitter:description" content="https://nginx.org/en/docs/http/ngx_http_stub_status_module.html在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/66.png">
+<meta name="twitter:title" content="zabbix监控websphere和weblogic">
+<meta name="twitter:description" content="zabbix java gatewayzabbix通过JMX监控应用服务器。JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架。JMX可以跨越一系列异构操作系统平台、系统体系结构和网络传输协议，灵活的开发无缝集成的系统、网络和服务管理应用。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/80.png">
 
 
 
@@ -147,7 +143,7 @@
   };
 </script>
 
-  <title> zabbix监控Nginx | jkzhao's blog </title>
+  <title> zabbix监控websphere和weblogic | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -327,7 +323,7 @@
             
             
               
-                zabbix监控Nginx
+                zabbix监控websphere和weblogic
               
             
           </h1>
@@ -339,8 +335,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-05-16T11:04:58+08:00" content="2017-05-16">
-              2017-05-16
+            <time itemprop="dateCreated" datetime="2017-05-23T21:25:25+08:00" content="2017-05-23">
+              2017-05-23
             </time>
           </span>
 
@@ -350,8 +346,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2017/05/16/zabbix监控Nginx/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/16/zabbix监控Nginx/" itemprop="commentsCount"></span>
+                <a href="/2017/05/23/zabbix监控websphere和weblogic/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/23/zabbix监控websphere和weblogic/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -374,49 +370,46 @@
       
 
       
-        <p><a href="https://nginx.org/en/docs/http/ngx_http_stub_status_module.html" target="_blank" rel="external">https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</a><br>在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。<br>Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。<br><a id="more"></a></p>
-<h1 id="启用nginx-status配置"><a href="#启用nginx-status配置" class="headerlink" title="启用nginx status配置"></a>启用nginx status配置</h1><p>在http段加入如下配置：</p>
-<pre><code>server {
-        listen  80;
-        server_name localhost;
-        location /status {
-            stub_status;
-            access_log off;
-            allow 114.55.29.246;
-            deny all;
-        }
-}
-</code></pre><p>重载Nginx。</p>
-<h1 id="zabbix-agent端配置"><a href="#zabbix-agent端配置" class="headerlink" title="zabbix agent端配置"></a>zabbix agent端配置</h1><pre><code># cd /usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/
-# vim nginx_userparams.conf
-</code></pre><p>把下面的内容贴进去：</p>
-<pre><code>UserParameter=Nginx.active[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | awk &apos;/^Active/ {print $NF}&apos;
-UserParameter=Nginx.reading[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | grep &apos;Reading&apos; | cut -d&quot; &quot; -f2
-UserParameter=Nginx.writing[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | grep &apos;Writing&apos; | cut -d&quot; &quot; -f4
-UserParameter=Nginx.waiting[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | grep &apos;Waiting&apos; | cut -d&quot; &quot; -f6
-UserParameter=Nginx.accepted[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | awk &apos;/^[ \t]+[0-9]+[ \t]+[0-9]+[ \t]+[0-9]+/ {print $$1}&apos;
-UserParameter=Nginx.handled[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | awk &apos;/^[ \t]+[0-9]+[ \t]+[0-9]+[ \t]+[0-9]+/ {print $$2}&apos;
-UserParameter=Nginx.requests[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | awk &apos;/^[ \t]+[0-9]+[ \t]+[0-9]+[ \t]+[0-9]+/ {print $$3}&apos;
-</code></pre><p>重启zabbix agent：</p>
-<pre><code># killall -9 zabbix_agentd
-# /usr/local/zabbix-3.0.1/sbin/zabbix_agentd
-</code></pre><p>测试，在zabbix server上使用zabbix_get获取数据：</p>
-<pre><code># cd /usr/local/zabbix-3.0.1/bin/
-# ./zabbix_get -s 114.55.29.241 -k &quot;Nginx.active[114.55.29.241,80]&quot;
-</code></pre><h1 id="zabbix-web-gui配置监控项"><a href="#zabbix-web-gui配置监控项" class="headerlink" title="zabbix web gui配置监控项"></a>zabbix web gui配置监控项</h1><h2 id="创建Nginx-Template"><a href="#创建Nginx-Template" class="headerlink" title="创建Nginx Template"></a>创建Nginx Template</h2><p>点击Configuration—&gt;Templates，点击右上角的Create template。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/66.png" alt=""><br>填写模板的信息，点击Add。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/67.png" alt=""></p>
-<h2 id="创建Application"><a href="#创建Application" class="headerlink" title="创建Application"></a>创建Application</h2><p><strong>生产环境下只需要把我写好的模板文件import进去就可以了，不需要像下面那样再去创建模板，下面只是介绍下创建模板的过程。</strong></p>
-<p>点击Configuration—&gt;Templates，找到刚才创建的Nginx template，点击所在行的Applications列。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/68.png" alt=""><br>点击右上角的Create application。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/69.png" alt=""><br>输入application的名字Nginx running status，点击Add。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/70.png" alt=""></p>
-<h2 id="创建Items"><a href="#创建Items" class="headerlink" title="创建Items"></a>创建Items</h2><p>点击Configuration—&gt;Templates，找到刚才创建的Nginx template，点击所在行的Items列。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/71.png" alt=""><br>点击右上角的Create item。分别创建5个监控项，如下图：</p>
-<ol>
-<li>当前 Nginx 正处理的活动连接数（包括等待着的连接数）<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/72.png" alt=""></li>
-<li>Nginx一共处理了的连接数<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/73.png" alt=""></li>
-<li>Nginx一共处理了的连接数(包括失败了的，因为某些限制会导致连接被拒绝，比如the worker_connections limit)<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/74.png" alt=""></li>
-<li>Nginx一共处理了的请求的个数(连接和请求是两码事，一个长连接可能会处理多个请求)<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/75.png" alt=""></li>
-<li>Nginx正在读取到客户端的Header信息数<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/76.png" alt=""></li>
-<li>Nginx正在向客户端发送响应的个数<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/77.png" alt=""></li>
-<li>开启keep-alive 的情况下，这个值等于active – (reading + writing)，意思就是 Nginx 已经处理完正在等候下一次请求指令的驻留连接<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/78.png" alt=""></li>
-<li>Nginx服务可用性<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/79.png" alt=""></li>
-</ol>
+        <h1 id="zabbix-java-gateway"><a href="#zabbix-java-gateway" class="headerlink" title="zabbix java gateway"></a>zabbix java gateway</h1><p>zabbix通过JMX监控应用服务器。JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架。JMX可以跨越一系列异构操作系统平台、系统体系结构和网络传输协议，灵活的开发无缝集成的系统、网络和服务管理应用。<br><a id="more"></a><br>Zabbix已经集成JMX，可以用Zabbix通过JMX监控JVM，TOMCAT，Weblogic，Jboss等。要使用Zabbix监控Weblogic，我们先要了解Zabbix的JMX监控架构，Weblogic的JMX信息，最后才能去实现怎么去配置监控和报警。<br>Zabbix是使用了一个叫做Java Gateway的应用去监控JMX的。Java Gateway集成在zabbix官方开发发布的。所以需要在编译安装zabbix server时，需要添加一个选项–enable-java。这样安装zabbix后在/usr/local/zabbix-3.0.1/sbin目录下会有个zabbix_java目录，这个目录里面就是zabbix Java gateway的文件。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/80.png" alt=""></p>
+<h1 id="配置和运行java-gateway"><a href="#配置和运行java-gateway" class="headerlink" title="配置和运行java gateway"></a>配置和运行java gateway</h1><p>默认情况下，Java gateway监听10052端口. 如果你计划使用不同的端口来运行Java gateway，你需要通过setting.sh脚本指定下需要的端口。<br>启动：</p>
+<pre><code>./startup.sh
+</code></pre><p>关闭：</p>
+<pre><code>./shutdown.sh
+</code></pre><h1 id="配置zabbix-server使用java-gateway"><a href="#配置zabbix-server使用java-gateway" class="headerlink" title="配置zabbix server使用java gateway"></a>配置zabbix server使用java gateway</h1><p>当前Java gateway已经运行，接下来你需要告诉Zabbix server如何找到Zabbix Java gateway. 因此你需要在 server配置文件 中指定JavaGateway及JavaGateway端口. 如果JMX应用采用Zabbix代理进行监控的话，你需要在 代理配置文件 中指定对应的连接参数。<br>默认情况下，server并不会派生出任何进程去进行JMX监控。如果你想使用完成JMX监控，你需要指定预派生出来的Java pollers进程数，你也可过同类的方式指定常见的pollers和trappers。</p>
+<pre><code># vim zabbix_server.conf
+JavaGateway=172.16.7.151
+JavaGatewayPort=10052
+StartJavaPollers=5
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/81.png" alt=""></p>
+<p>在完成配置后，要重启server(或代理)：</p>
+<pre><code># killall -9 zabbix_server
+# ./zabbix_server
+</code></pre><h1 id="调整java-gateway的日志级别"><a href="#调整java-gateway的日志级别" class="headerlink" title="调整java gateway的日志级别"></a>调整java gateway的日志级别</h1><p>万一Java gateway出现了若干问题，在前段可以看到的监控项报错信息并不充分，你也可以通过查看Java gateway日志文件获得更多信息。<br>默认情况下，Java gateway将记录日志到/tmp/zabbix_java.log文件中，log级别为”info”。有时你觉得”info”级别得到的信息并不够，你需要修改级别为”debug”。你可以通过修改lib/logback.xml将<root>标签更改为”debug”以获取日志级别的增加。</root></p>
+<pre><code>&lt;root level=&quot;debug&quot;&gt;
+   &lt;appender-ref ref=&quot;FILE&quot; /&gt;
+&lt;/root&gt;
+</code></pre><p>需要注意的是，并不像Zabbix server或proxy那样，修改完logback.xml并不需要重启Zabbix Java gateway. 修改后的配置将会自动被加载。当你完成了debugging,你可以将log级别替换为”info”。</p>
+<h1 id="监控weblogic"><a href="#监控weblogic" class="headerlink" title="监控weblogic"></a>监控weblogic</h1><h2 id="weblogic配置"><a href="#weblogic配置" class="headerlink" title="weblogic配置"></a>weblogic配置</h2><p>1.如果是监控weblogic 的admin server：<br>编辑WL_DOMAIN_HOME/bin/setDomainEnv.sh，在文件结尾加入下面几行：</p>
+<pre><code>$ cd /opt/Oracle/Middleware/user_projects/domains/ids_domain/bin
+$ vim setDomainEnv.sh
+</code></pre><p>添加一句：<br>JAVA_OPTIONS=”$JAVA_OPTIONS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9997 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false”<br>然后在去启动weblogic。</p>
+<p>2.如果是监控受管服务器：<br>进入weblogic控制台-&gt;环境-&gt;服务器-&gt;”你新增的服务器”-&gt;配置-&gt;服务器启动。在“参数”的输入框内输入：<br>-Dcom.sun.management.jmxremote.port=JMX_PORT -Djava.rmi.server.hostname=JMX_HOST -Dcom.sun.management.jmxremote.authenticate=false  -Dcom.sun.management.jmxremote.ssl=false -Djavax.management.builder.initial=weblogic.management.jmx.mbeanserver.WLSMBeanServerBuilder</p>
+<p>然后控制台启动受管服务器。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/82.png" alt=""></p>
+<h2 id="zabbix-server添加监控weblogic主机"><a href="#zabbix-server添加监控weblogic主机" class="headerlink" title="zabbix server添加监控weblogic主机"></a>zabbix server添加监控weblogic主机</h2><p>点击配置—&gt;主机—&gt;创建主机。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/83.png" alt=""><br>输入主机信息，主要注意JMX的端口，点击添加。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/84.png" alt=""><br>选择JMX模板。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/85.png" alt=""></p>
+<h1 id="监控websphere"><a href="#监控websphere" class="headerlink" title="监控websphere"></a>监控websphere</h1><h2 id="websphere配置"><a href="#websphere配置" class="headerlink" title="websphere配置"></a>websphere配置</h2><p>访问websphere控制台，点击 Server Types → WebSphere application servers → WAS_SERVER_NAME → Java and Process Management → Process definition → Java Virtual Machine.</p>
+<p>在“Generic JVM arguments”增加下面环境变量：<br>-Djavax.management.builder.initial=<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/86.png" alt=""><br>点击 Server Types → WebSphere application servers → WAS_SERVER_NAME → Java and Process Management → Process definition → Java Virtual Machine → Custom properties.<br>增加下面几个环境变量：</p>
+<pre><code>Name: java.rmi.server.hostname
+Value: JMX_HOST
+Name: com.sun.management.jmxremote
+Value: true
+Name: com.sun.management.jmxremote.port
+Value: JMX_PORT
+Name: com.sun.management.jmxremote.ssl
+Value: false
+Name: com.sun.management.jmxremote.authenticate
+Value: false
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/87.png" alt=""><br>重启server。</p>
+<h2 id="zabbix-server添加监控websphere主机"><a href="#zabbix-server添加监控websphere主机" class="headerlink" title="zabbix server添加监控websphere主机"></a>zabbix server添加监控websphere主机</h2><p>点击配置—&gt;主机—&gt;创建主机。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/88.png" alt=""><br>输入主机信息，主要注意JMX的端口，点击添加。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/89.png" alt=""></p>
 
       
     </div>
@@ -447,16 +440,12 @@ UserParameter=Nginx.requests[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/05/23/zabbix监控websphere和weblogic/" rel="next" title="zabbix监控websphere和weblogic">
-                <i class="fa fa-chevron-left"></i> zabbix监控websphere和weblogic
-              </a>
-            
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/05/14/zabbix监控实例/" rel="prev" title="zabbix监控实例">
-                zabbix监控实例 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/05/16/zabbix监控Nginx/" rel="prev" title="zabbix监控Nginx">
+                zabbix监控Nginx <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -483,8 +472,8 @@ UserParameter=Nginx.requests[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/05/16/zabbix监控Nginx/"
-           data-title="zabbix监控Nginx" data-url="http://yoursite.com/2017/05/16/zabbix监控Nginx/">
+      <div class="ds-thread" data-thread-key="2017/05/23/zabbix监控websphere和weblogic/"
+           data-title="zabbix监控websphere和weblogic" data-url="http://yoursite.com/2017/05/23/zabbix监控websphere和weblogic/">
       </div>
     
   </div>
@@ -625,7 +614,7 @@ UserParameter=Nginx.requests[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#启用nginx-status配置"><span class="nav-number">1.</span> <span class="nav-text">启用nginx status配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#zabbix-agent端配置"><span class="nav-number">2.</span> <span class="nav-text">zabbix agent端配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#zabbix-web-gui配置监控项"><span class="nav-number">3.</span> <span class="nav-text">zabbix web gui配置监控项</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Nginx-Template"><span class="nav-number">3.1.</span> <span class="nav-text">创建Nginx Template</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Application"><span class="nav-number">3.2.</span> <span class="nav-text">创建Application</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Items"><span class="nav-number">3.3.</span> <span class="nav-text">创建Items</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#zabbix-java-gateway"><span class="nav-number">1.</span> <span class="nav-text">zabbix java gateway</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置和运行java-gateway"><span class="nav-number">2.</span> <span class="nav-text">配置和运行java gateway</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置zabbix-server使用java-gateway"><span class="nav-number">3.</span> <span class="nav-text">配置zabbix server使用java gateway</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#调整java-gateway的日志级别"><span class="nav-number">4.</span> <span class="nav-text">调整java gateway的日志级别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#监控weblogic"><span class="nav-number">5.</span> <span class="nav-text">监控weblogic</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#weblogic配置"><span class="nav-number">5.1.</span> <span class="nav-text">weblogic配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#zabbix-server添加监控weblogic主机"><span class="nav-number">5.2.</span> <span class="nav-text">zabbix server添加监控weblogic主机</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#监控websphere"><span class="nav-number">6.</span> <span class="nav-text">监控websphere</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#websphere配置"><span class="nav-number">6.1.</span> <span class="nav-text">websphere配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#zabbix-server添加监控websphere主机"><span class="nav-number">6.2.</span> <span class="nav-text">zabbix server添加监控websphere主机</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
