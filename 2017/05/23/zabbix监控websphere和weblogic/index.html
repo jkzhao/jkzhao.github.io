@@ -121,7 +121,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/87.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/88.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/89.png">
-<meta property="og:updated_time" content="2017-05-24T01:17:40.000Z">
+<meta property="og:updated_time" content="2017-05-24T01:21:08.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zabbix监控websphere和weblogic">
 <meta name="twitter:description" content="zabbix java gatewayzabbix通过JMX监控应用服务器。JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架。JMX可以跨越一系列异构操作系统平台、系统体系结构和网络传输协议，灵活的开发无缝集成的系统、网络和服务管理应用。">
@@ -371,9 +371,11 @@
 
       
         <h1 id="zabbix-java-gateway"><a href="#zabbix-java-gateway" class="headerlink" title="zabbix java gateway"></a>zabbix java gateway</h1><p>zabbix通过JMX监控应用服务器。JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架。JMX可以跨越一系列异构操作系统平台、系统体系结构和网络传输协议，灵活的开发无缝集成的系统、网络和服务管理应用。<br><a id="more"></a><br>Zabbix已经集成JMX，可以用Zabbix通过JMX监控JVM，TOMCAT，Weblogic，Jboss等。要使用Zabbix监控Weblogic，我们先要了解Zabbix的JMX监控架构，Weblogic的JMX信息，最后才能去实现怎么去配置监控和报警。<br>Zabbix是使用了一个叫做Java Gateway的应用去监控JMX的。Java Gateway集成在zabbix官方开发发布的。所以需要在编译安装zabbix server时，需要添加一个选项–enable-java。这样安装zabbix后在/usr/local/zabbix-3.0.1/sbin目录下会有个zabbix_java目录，这个目录里面就是zabbix Java gateway的文件。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/80.png" alt=""></p>
-<h1 id="配置和运行java-gateway"><a href="#配置和运行java-gateway" class="headerlink" title="配置和运行java gateway"></a>配置和运行java gateway</h1><p>默认情况下，Java gateway监听10052端口. 如果你计划使用不同的端口来运行Java gateway，你需要通过setting.sh脚本指定下需要的端口。<br>启动：<br>        ./startup.sh</p>
-<p>关闭：<br>        ./shutdown.sh</p>
-<h1 id="配置zabbix-server使用java-gateway"><a href="#配置zabbix-server使用java-gateway" class="headerlink" title="配置zabbix server使用java gateway"></a>配置zabbix server使用java gateway</h1><p>当前Java gateway已经运行，接下来你需要告诉Zabbix server如何找到Zabbix Java gateway. 因此你需要在 server配置文件 中指定JavaGateway及JavaGateway端口. 如果JMX应用采用Zabbix代理进行监控的话，你需要在 代理配置文件 中指定对应的连接参数。<br>默认情况下，server并不会派生出任何进程去进行JMX监控。如果你想使用完成JMX监控，你需要指定预派生出来的Java pollers进程数，你也可过同类的方式指定常见的pollers和trappers。</p>
+<h1 id="配置和运行java-gateway"><a href="#配置和运行java-gateway" class="headerlink" title="配置和运行java gateway"></a>配置和运行java gateway</h1><p>默认情况下，Java gateway监听10052端口. 如果你计划使用不同的端口来运行Java gateway，你需要通过setting.sh脚本指定下需要的端口。<br>启动：</p>
+<pre><code>./startup.sh
+</code></pre><p>关闭：</p>
+<pre><code>./shutdown.sh
+</code></pre><h1 id="配置zabbix-server使用java-gateway"><a href="#配置zabbix-server使用java-gateway" class="headerlink" title="配置zabbix server使用java gateway"></a>配置zabbix server使用java gateway</h1><p>当前Java gateway已经运行，接下来你需要告诉Zabbix server如何找到Zabbix Java gateway. 因此你需要在 server配置文件 中指定JavaGateway及JavaGateway端口. 如果JMX应用采用Zabbix代理进行监控的话，你需要在 代理配置文件 中指定对应的连接参数。<br>默认情况下，server并不会派生出任何进程去进行JMX监控。如果你想使用完成JMX监控，你需要指定预派生出来的Java pollers进程数，你也可过同类的方式指定常见的pollers和trappers。</p>
 <pre><code># vim zabbix_server.conf
 JavaGateway=172.16.7.151
 JavaGatewayPort=10052
@@ -393,11 +395,14 @@ $ vim setDomainEnv.sh
 </code></pre><p>添加一句：</p>
 <pre><code>JAVA_OPTIONS=&quot;$JAVA_OPTIONS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9997 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false&quot;
 </code></pre><p>然后在去启动weblogic。</p>
-<p>2.如果是监控受管服务器：<br>进入weblogic控制台-&gt;环境-&gt;服务器-&gt;”你新增的服务器”-&gt;配置-&gt;服务器启动。在“参数”的输入框内输入：<br>        -Dcom.sun.management.jmxremote.port=JMX_PORT -Djava.rmi.server.hostname=JMX_HOST -Dcom.sun.management.jmxremote.authenticate=false  -Dcom.sun.management.jmxremote.ssl=false -Djavax.management.builder.initial=weblogic.management.jmx.mbeanserver.WLSMBeanServerBuilder</p>
-<p>然后控制台启动受管服务器。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/82.png" alt=""></p>
+<p>2.如果是监控受管服务器：<br>进入weblogic控制台-&gt;环境-&gt;服务器-&gt;”你新增的服务器”-&gt;配置-&gt;服务器启动。在“参数”的输入框内输入：</p>
+<pre><code>-Dcom.sun.management.jmxremote.port=JMX_PORT -Djava.rmi.server.hostname=JMX_HOST -Dcom.sun.management.jmxremote.authenticate=false  -Dcom.sun.management.jmxremote.ssl=false -Djavax.management.builder.initial=weblogic.management.jmx.mbeanserver.WLSMBeanServerBuilder
+</code></pre><p>然后控制台启动受管服务器。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/82.png" alt=""></p>
 <h2 id="zabbix-server添加监控weblogic主机"><a href="#zabbix-server添加监控weblogic主机" class="headerlink" title="zabbix server添加监控weblogic主机"></a>zabbix server添加监控weblogic主机</h2><p>点击配置—&gt;主机—&gt;创建主机。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/83.png" alt=""><br>输入主机信息，主要注意JMX的端口，点击添加。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/84.png" alt=""><br>选择JMX模板。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/85.png" alt=""></p>
 <h1 id="监控websphere"><a href="#监控websphere" class="headerlink" title="监控websphere"></a>监控websphere</h1><h2 id="websphere配置"><a href="#websphere配置" class="headerlink" title="websphere配置"></a>websphere配置</h2><p>访问websphere控制台，点击 Server Types → WebSphere application servers → WAS_SERVER_NAME → Java and Process Management → Process definition → Java Virtual Machine.</p>
-<p>在“Generic JVM arguments”增加下面环境变量：<br>-Djavax.management.builder.initial=<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/86.png" alt=""><br>点击 Server Types → WebSphere application servers → WAS_SERVER_NAME → Java and Process Management → Process definition → Java Virtual Machine → Custom properties.<br>增加下面几个环境变量：</p>
+<p>在“Generic JVM arguments”增加下面环境变量：</p>
+<pre><code>-Djavax.management.builder.initial=
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/86.png" alt=""><br>点击 Server Types → WebSphere application servers → WAS_SERVER_NAME → Java and Process Management → Process definition → Java Virtual Machine → Custom properties.<br>增加下面几个环境变量：</p>
 <pre><code>Name: java.rmi.server.hostname
 Value: JMX_HOST
 Name: com.sun.management.jmxremote
