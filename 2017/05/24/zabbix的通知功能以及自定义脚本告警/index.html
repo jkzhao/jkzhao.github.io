@@ -131,9 +131,12 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/107.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/108.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/109.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/110.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/111.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/112.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/113.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/114.png">
-<meta property="og:updated_time" content="2017-05-25T02:08:10.000Z">
+<meta property="og:updated_time" content="2017-05-25T03:54:57.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zabbix的通知功能以及自定义脚本告警">
 <meta name="twitter:description" content="zabbix的通知功能在配置好监控项和触发器之后，一旦正常工作中的某触发器状态发生改变，一般意味着有异常情况发生，此时通常需要采取一定的动作(action)，如告警或者执行远程命令。实现zabbix的通知功能，一般需要两个步骤：定义所需的“媒介”和配置一个”动作”。媒介类型有：E-mail，SMS，Jabber和自定义的通知脚本。我这里就使用E-mail了。">
@@ -396,8 +399,44 @@
 <p><strong>3.python报警脚本</strong></p>
 <pre><code># cd /usr/local/zabbix-3.0.1/share/zabbix/alertscripts/
 # vim zabbix_sendmail.py
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/python# coding:utf-8 import smtplibfrom email.mime.text import MIMETextimport sys# 邮箱服务器地址mail_host = &apos;smtp.exmail.qq.com&apos;# 邮箱用户名mail_user = &apos;01115009@wisedu.com&apos;# 邮箱密码mail_pass = &apos;123123123&apos;mail_postfix = &apos;wisedu.com&apos;def send_mail(to_list,subject,content):    me = mail_user+&quot;&lt;&quot;+mail_user+&quot;@&quot;+mail_postfix+&quot;&gt;&quot;    msg = MIMEText(content)    msg[&apos;Subject&apos;] = subject    msg[&apos;From&apos;] = me    msg[&apos;to&apos;] = to_list    try:        s = smtplib.SMTP()        s.connect(mail_host)        s.login(mail_user,mail_pass)        s.sendmail(me,to_list,msg.as_string())        s.close()        return True    except Exception,e:        print str(e)        return Falseif __name__ == &quot;__main__&quot;:    send_mail(sys.argv[1], sys.argv[2], sys.argv[3])</div></pre></td></tr></table></figure>
-<pre><code># chmod +x zabbix_sendmail.py
+</code></pre><p>脚本内容如下：</p>
+<pre><code>#!/usr/bin/python
+# coding:utf-8 
+
+import smtplib
+from email.mime.text import MIMEText
+import sys
+
+# 邮箱服务器地址
+mail_host = &apos;smtp.exmail.qq.com&apos;
+# 邮箱用户名
+mail_user = &apos;01115009@wisedu.com&apos;
+# 邮箱密码
+mail_pass = &apos;123123123&apos;
+mail_postfix = &apos;wisedu.com&apos;
+
+ def send_mail(to_list,subject,content):
+     me = mail_user+&quot;&lt;&quot;+mail_user+&quot;@&quot;+mail_postfix+&quot;&gt;&quot;
+     msg = MIMEText(content)
+     msg[&apos;Subject&apos;] = subject
+     msg[&apos;From&apos;] = me
+     msg[&apos;to&apos;] = to_list
+
+try:
+    s = smtplib.SMTP()
+    s.connect(mail_host)
+    s.login(mail_user,mail_pass)
+    s.sendmail(me,to_list,msg.as_string())
+    s.close()
+    return True
+except Exception,e:
+    print str(e)
+    return False
+
+if __name__ == &quot;__main__&quot;:
+    send_mail(sys.argv[1], sys.argv[2], sys.argv[3])
+
+# chmod +x zabbix_sendmail.py
 # chown -R zabbix.zabbix zabbix_sendmail.py
 </code></pre><p><strong>4.修改zabbix_server配置</strong></p>
 <pre><code># vim /usr/local/zabbix-3.0.1/etc/zabbix_server.conf
@@ -410,11 +449,78 @@ AlertScriptsPath=/usr/local/zabbix-3.0.1/share/zabbix/alertscripts
 <h3 id="shell脚本发邮件"><a href="#shell脚本发邮件" class="headerlink" title="shell脚本发邮件"></a>shell脚本发邮件</h3><p><strong>1.先安装sendEmail</strong></p>
 <pre><code>[root@care local]# tar zxf sendEmail-v1.56.tar.gz
 [root@care local]# cp sendEmail-v1.56/sendEmail /usr/local/bin
-</code></pre><p>将写好的脚本上传到/usr/local/zabbix-3.0.1/share/zabbix/alertscripts。这里为了业务需求，需要定制化发送邮件的内容，脚本内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">###Description:This script is used to alarm.</div><div class="line">###Written by: jkzhao - jkzhao@wisedu.com  </div><div class="line">###History: 2016-08-10 Second release.</div><div class="line">###Modification: Please modify the variables host, user and passwd.</div><div class="line"></div><div class="line"># 获取默认的邮件接收者，邮件主题，邮件正文</div><div class="line">to=$1</div><div class="line">subject=$2</div><div class="line">bodyOrgin=$3</div><div class="line"></div><div class="line"># 获取eventid</div><div class="line">#eventid=grep &quot;event ID&quot; $bodyOrgin |awk &apos;&#123;print $4&#125;&apos;</div><div class="line">eventid=$(echo $bodyOrgin | grep &quot;event ID&quot; |awk &apos;&#123;print $NF&#125;&apos;)</div><div class="line">echo &quot;eventid:$eventid&quot; &gt; /tmp/test.txt</div><div class="line"></div><div class="line"># shell调用存储过程，获取主键viewid，传入参数：eventid，输出：viewid</div><div class="line">host=172.16.9.112</div><div class="line">user=root</div><div class="line">passwd=zabbix</div><div class="line">database=zabbix</div><div class="line"></div><div class="line">viewid=$(mysql -u$&#123;user&#125; -p$&#123;passwd&#125; -h$&#123;host&#125; -D$&#123;database&#125; -e &quot;call generateAlertView($eventid,@result)&quot; 2&gt;/dev/null | awk &apos;NR&gt;1&apos;)</div><div class="line">echo &quot;viewid:$viewid&quot; &gt;&gt; /tmp/test.txt</div><div class="line">group=$(mysql -u$&#123;user&#125; -p$&#123;passwd&#125; -h$&#123;host&#125; -D$&#123;database&#125; -e &quot;select alerts_view_group.group from alerts_view_group where viewid = $viewid&quot; 2&gt;/dev/null | awk &apos;NR&gt;1&apos;)</div><div class="line">echo &quot;group:$group&quot; &gt;&gt; /tmp/test.txt</div><div class="line">body=$bodyOrgin&quot;; 影响业务: &quot;$group</div><div class="line"></div><div class="line"></div><div class="line"># 因为需要格式化发送邮件的内容，将拼接好的body信息写入文件中再做处理</div><div class="line">echo $body | awk -F&apos;;&apos; &apos;&#123;for(i=1;i&lt;=NF;i++)&#123;print $i&#125;&#125;&apos; &gt; /tmp/messages.txt</div><div class="line"># 将文件中出现的^M删除掉</div><div class="line">sed -i &apos;s/\x0D//g&apos; /tmp/messages.txt</div><div class="line"># 删除以空格开头的行前面的空格</div><div class="line">sed -i &apos;s/^\s*//g&apos; /tmp/messages.txt</div><div class="line"></div><div class="line"># 由于zabbix无论是故障还是恢复都是要发邮件的，但是对于故障和恢复的邮件内容需要定制为不同的内容，因此需要先获取到是故障还是恢复</div><div class="line">state=$(echo $subject | awk -F: &apos;&#123;print $2&#125;&apos;)</div><div class="line"></div><div class="line"># 按照安心守护要求修改邮件正文内容</div><div class="line">if [ $state == &quot;PROBLEM&quot; ]; then</div><div class="line">    sed -i &apos;s/Trigger:/异常对象:/&apos; /tmp/messages.txt</div><div class="line">    sed -i &apos;/Trigger severity:/&#123;h;d&#125;;/Item values:/&#123;G&#125;&apos; /tmp/messages.txt</div><div class="line">    sed -i &apos;s/Trigger severity:/异常等级:/&apos; /tmp/messages.txt </div><div class="line">    sed -i &apos;s/Item values:/异常原因:/&apos; /tmp/messages.txt</div><div class="line">    sed -i &apos;/Original event/d&apos; /tmp/messages.txt</div><div class="line">    sed -i &apos;/Trigger status:/d&apos; /tmp/messages.txt</div><div class="line">    sed -i &apos;$a发生时间: &apos; /tmp/messages.txt</div><div class="line">    sed -i &quot;s/发生时间: /发生时间: $(date &quot;+%Y-%m-%d %H:%M:%S&quot;)/&quot; /tmp/messages.txt</div><div class="line">    # 把发生故障时的alertView插入alerts_view表</div><div class="line">    alertValue=$(grep &quot;异常原因&quot; /tmp/messages.txt | awk -F: &apos;BEGIN&#123;ORS=&quot;&quot;&#125;;&#123;for(i=3;i&lt;=NF;++i) &#123;print $i&#125;&#125;&apos;)</div><div class="line">    echo &quot;alertValue:$alertValue&quot; &gt;&gt; /tmp/test.txt</div><div class="line">    mysql -u$&#123;user&#125; -p$&#123;passwd&#125; -h$&#123;host&#125; -D$&#123;database&#125; -e &quot;UPDATE alerts_view set alertValue=&apos;$&#123;alertValue&#125;&apos; WHERE viewid = &apos;$&#123;viewid&#125;&apos;&quot; 2&gt;/dev/null</div><div class="line">    sed -i &apos;s/Warning/风险/&apos; /tmp/messages.txt</div><div class="line">    sed -i &apos;s/Disaster/宕机/&apos; /tmp/messages.txt</div><div class="line">else</div><div class="line">    sed -i &apos;s/Trigger:/恢复对象:/&apos; /tmp/messages.txt</div><div class="line">    sed -i &apos;s/Item values:/恢复内容:/&apos; /tmp/messages.txt</div><div class="line">    sed -i &apos;s/影响业务/恢复业务/&apos; /tmp/messages.txt</div><div class="line">    sed -i &apos;/Original event/d&apos; /tmp/messages.txt</div><div class="line">    sed -i &apos;/Trigger status:/d&apos; /tmp/messages.txt</div><div class="line">    sed -i &apos;/Trigger severity:/d&apos; /tmp/messages.txt</div><div class="line">    sed -i &apos;$a发生时间: &apos; /tmp/messages.txt</div><div class="line">    sed -i &quot;s/发生时间: /发生时间: $(date &quot;+%Y-%m-%d %H:%M:%S&quot;)/&quot; /tmp/messages.txt</div><div class="line">fi</div><div class="line">    </div><div class="line"></div><div class="line">/usr/local/bin/sendEmail -f monitor@wisedu.com -t &quot;$to&quot; -s smtp.exmail.qq.com -u &quot;$subject&quot; -o message-content-type=text -o message-charset=utf-8 -o message-file=/tmp/messages.txt -xu monitor@wisedu.com -xp 123456 2&gt;&gt;/tmp/22.log</div><div class="line">```**2.添加Media types**![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/110.png)</div><div class="line"></div><div class="line">**3.给指定的用户添加Media**</div><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/111.png)</div><div class="line"></div><div class="line">**4.配置Actions，为了业务需求定制Default message**</div><div class="line">![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/112.png)</div></pre></td></tr></table></figure></p>
-<p>Trigger: {TRIGGER.NAME};<br>Trigger status: {TRIGGER.STATUS};<br>Trigger severity: {TRIGGER.SEVERITY};</p>
-<p>Item values:</p>
-<p> {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1};</p>
-<p>Original event ID: {EVENT.ID}<br>```</p>
+</code></pre><p>将写好的脚本上传到/usr/local/zabbix-3.0.1/share/zabbix/alertscripts。这里为了业务需求，需要定制化发送邮件的内容，脚本内容如下：</p>
+<pre><code>#!/bin/bash
+###Description:This script is used to alarm.
+###Written by: jkzhao - jkzhao@wisedu.com  
+###History: 2016-08-10 Second release.
+###Modification: Please modify the variables host, user and passwd.
+
+# 获取默认的邮件接收者，邮件主题，邮件正文
+to=$1
+subject=$2
+bodyOrgin=$3
+
+# 获取eventid
+#eventid=grep &quot;event ID&quot; $bodyOrgin |awk &apos;{print $4}&apos;
+eventid=$(echo $bodyOrgin | grep &quot;event ID&quot; |awk &apos;{print $NF}&apos;)
+echo &quot;eventid:$eventid&quot; &gt; /tmp/test.txt
+
+# shell调用存储过程，获取主键viewid，传入参数：eventid，输出：viewid
+host=172.16.9.112
+user=root
+passwd=zabbix
+database=zabbix
+
+viewid=$(mysql -u${user} -p${passwd} -h${host} -D${database} -e &quot;call generateAlertView($eventid,@result)&quot; 2&gt;/dev/null | awk &apos;NR&gt;1&apos;)
+echo &quot;viewid:$viewid&quot; &gt;&gt; /tmp/test.txt
+group=$(mysql -u${user} -p${passwd} -h${host} -D${database} -e &quot;select alerts_view_group.group from alerts_view_group where viewid = $viewid&quot; 2&gt;/dev/null | awk &apos;NR&gt;1&apos;)
+echo &quot;group:$group&quot; &gt;&gt; /tmp/test.txt
+body=$bodyOrgin&quot;; 影响业务: &quot;$group
+
+
+# 因为需要格式化发送邮件的内容，将拼接好的body信息写入文件中再做处理
+echo $body | awk -F&apos;;&apos; &apos;{for(i=1;i&lt;=NF;i++){print $i}}&apos; &gt; /tmp/messages.txt
+# 将文件中出现的^M删除掉
+sed -i &apos;s/\x0D//g&apos; /tmp/messages.txt
+# 删除以空格开头的行前面的空格
+sed -i &apos;s/^\s*//g&apos; /tmp/messages.txt
+
+# 由于zabbix无论是故障还是恢复都是要发邮件的，但是对于故障和恢复的邮件内容需要定制为不同的内容，因此需要先获取到是故障还是恢复
+state=$(echo $subject | awk -F: &apos;{print $2}&apos;)
+
+# 按照安心守护要求修改邮件正文内容
+if [ $state == &quot;PROBLEM&quot; ]; then
+    sed -i &apos;s/Trigger:/异常对象:/&apos; /tmp/messages.txt
+    sed -i &apos;/Trigger severity:/{h;d};/Item values:/{G}&apos; /tmp/messages.txt
+    sed -i &apos;s/Trigger severity:/异常等级:/&apos; /tmp/messages.txt 
+    sed -i &apos;s/Item values:/异常原因:/&apos; /tmp/messages.txt
+    sed -i &apos;/Original event/d&apos; /tmp/messages.txt
+    sed -i &apos;/Trigger status:/d&apos; /tmp/messages.txt
+    sed -i &apos;$a发生时间: &apos; /tmp/messages.txt
+    sed -i &quot;s/发生时间: /发生时间: $(date &quot;+%Y-%m-%d %H:%M:%S&quot;)/&quot; /tmp/messages.txt
+    # 把发生故障时的alertView插入alerts_view表
+    alertValue=$(grep &quot;异常原因&quot; /tmp/messages.txt | awk -F: &apos;BEGIN{ORS=&quot;&quot;};{for(i=3;i&lt;=NF;++i) {print $i}}&apos;)
+    echo &quot;alertValue:$alertValue&quot; &gt;&gt; /tmp/test.txt
+    mysql -u${user} -p${passwd} -h${host} -D${database} -e &quot;UPDATE alerts_view set alertValue=&apos;${alertValue}&apos; WHERE viewid = &apos;${viewid}&apos;&quot; 2&gt;/dev/null
+    sed -i &apos;s/Warning/风险/&apos; /tmp/messages.txt
+    sed -i &apos;s/Disaster/宕机/&apos; /tmp/messages.txt
+else
+    sed -i &apos;s/Trigger:/恢复对象:/&apos; /tmp/messages.txt
+    sed -i &apos;s/Item values:/恢复内容:/&apos; /tmp/messages.txt
+    sed -i &apos;s/影响业务/恢复业务/&apos; /tmp/messages.txt
+    sed -i &apos;/Original event/d&apos; /tmp/messages.txt
+    sed -i &apos;/Trigger status:/d&apos; /tmp/messages.txt
+    sed -i &apos;/Trigger severity:/d&apos; /tmp/messages.txt
+    sed -i &apos;$a发生时间: &apos; /tmp/messages.txt
+    sed -i &quot;s/发生时间: /发生时间: $(date &quot;+%Y-%m-%d %H:%M:%S&quot;)/&quot; /tmp/messages.txt
+fi
+
+
+/usr/local/bin/sendEmail -f monitor@wisedu.com -t &quot;$to&quot; -s smtp.exmail.qq.com -u &quot;$subject&quot; -o message-content-type=text -o message-charset=utf-8 -o message-file=/tmp/messages.txt -xu monitor@wisedu.com -xp 123456 2&gt;&gt;/tmp/22.log
+</code></pre><p><strong>2.添加Media types</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/110.png" alt=""></p>
+<p><strong>3.给指定的用户添加Media</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/111.png" alt=""></p>
+<p><strong>4.配置Actions，为了业务需求定制Default message</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/112.png" alt=""></p>
 <p><strong>5.邮件展示</strong><br>故障邮件展示：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/113.png" alt=""><br>故障恢复邮件展示：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/114.png" alt=""></p>
 
       
