@@ -112,7 +112,7 @@
 <meta property="og:site_name" content="jkzhao's blog">
 <meta property="og:description" content="Zookeeper介绍 是一个针对大型分布式系统的可靠协调系统； 提供的功能包括：配置维护、名字服务、分布式同步、组服务等； 目标就是封装好复杂易出错的关键职务，将简单易用的接口和性能高效、功能稳定的系统提供给用户； Zookeeper已经成为Hadoop生态系统中的基础组件。">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Zookeeper/1.png">
-<meta property="og:updated_time" content="2017-05-26T03:23:25.000Z">
+<meta property="og:updated_time" content="2017-05-26T03:26:37.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Zookeeper介绍及安装部署">
 <meta name="twitter:description" content="Zookeeper介绍 是一个针对大型分布式系统的可靠协调系统； 提供的功能包括：配置维护、名字服务、分布式同步、组服务等； 目标就是封装好复杂易出错的关键职务，将简单易用的接口和性能高效、功能稳定的系统提供给用户； Zookeeper已经成为Hadoop生态系统中的基础组件。">
@@ -473,15 +473,14 @@ export PATH=$JAVA_HOME/bin:$PATH
 export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 [root@log1 local]# source /etc/profile
 </code></pre><h2 id="安装zookeeper集群"><a href="#安装zookeeper集群" class="headerlink" title="安装zookeeper集群"></a>安装zookeeper集群</h2><p><strong>注意：3台机器都需要安装zk。对于Zookeeper集群的话，官方推荐的最小节点数为3个。</strong></p>
-<h3 id="安装配置zk"><a href="#安装配置zk" class="headerlink" title="安装配置zk"></a>安装配置zk</h3><ol>
-<li><p>配置zk节点的hosts文件：配置3台机器的ip地址和主机名的对应关系。以下以console主机为例，其hosts文件添加下面3行：</p>
-<p>  114.55.29.246 console<br>  114.55.29.86 log1<br>  114.55.29.241 log2</p>
-</li>
-<li><p>解压安装配置第一台zk</p>
-<p>  [root@console local]# tar zxf zookeeper-3.4.6.tar.gz<br>  [root@console local]# cd zookeeper-3.4.6</p>
-</li>
-</ol>
-<p>创建快照日志存放目录：</p>
+<h3 id="安装配置zk"><a href="#安装配置zk" class="headerlink" title="安装配置zk"></a>安装配置zk</h3><p>1.配置zk节点的hosts文件：配置3台机器的ip地址和主机名的对应关系。以下以console主机为例，其hosts文件添加下面3行：</p>
+<pre><code>114.55.29.246 console
+114.55.29.86 log1
+114.55.29.241 log2
+</code></pre><p>2.解压安装配置第一台zk</p>
+<pre><code>[root@console local]# tar zxf zookeeper-3.4.6.tar.gz
+[root@console local]# cd zookeeper-3.4.6
+</code></pre><p>创建快照日志存放目录：</p>
 <pre><code>[root@console zookeeper-3.4.6]# mkdir -p dataDir 
 </code></pre><p>创建事务日志存放目录：</p>
 <pre><code>[root@console zookeeper-3.4.6]# mkdir dataLogDir
@@ -499,13 +498,10 @@ server.2=log1:2888:3888
 server.3=log2:2888:3888
 </code></pre><p>在我们配置的dataDir指定的目录下面，创建一个myid文件，里面内容为一个数字，用来标识当前主机，conf/zoo.cfg文件中配置的server.X中X为什么数字，则myid文件中就输入这个数字：<br>console主机：</p>
 <pre><code>[root@console ~]# echo &quot;1&quot; &gt; /usr/local/zookeeper-3.4.6/dataDir/myid
-</code></pre><ol>
-<li><p>远程复制第一台的zk到另外两台上，并修改myid文件为2和3</p>
+</code></pre><p>3.远程复制第一台的zk到另外两台上，并修改myid文件为2和3</p>
 <pre><code>[root@console local]# scp -rp zookeeper-3.4.6 root@114.55.29.86:/usr/local/
 [root@console local]# scp -rp zookeeper-3.4.6 root@114.55.29.241:/usr/local/
-</code></pre></li>
-</ol>
-<h3 id="启动和关闭zk"><a href="#启动和关闭zk" class="headerlink" title="启动和关闭zk"></a>启动和关闭zk</h3><p>在ZooKeeper集群的每个结点上，执行启动ZooKeeper服务的脚本，如下所示：</p>
+</code></pre><h3 id="启动和关闭zk"><a href="#启动和关闭zk" class="headerlink" title="启动和关闭zk"></a>启动和关闭zk</h3><p>在ZooKeeper集群的每个结点上，执行启动ZooKeeper服务的脚本，如下所示：</p>
 <pre><code>[root@console bin]# ./zkServer.sh start 
 [root@log1 bin]# ./zkServer.sh start
 [root@log2 bin]# ./zkServer.sh start
