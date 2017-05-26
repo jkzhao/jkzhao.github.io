@@ -136,7 +136,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/112.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/113.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/114.png">
-<meta property="og:updated_time" content="2017-05-25T03:54:57.000Z">
+<meta property="og:updated_time" content="2017-05-25T05:30:47.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zabbix的通知功能以及自定义脚本告警">
 <meta name="twitter:description" content="zabbix的通知功能在配置好监控项和触发器之后，一旦正常工作中的某触发器状态发生改变，一般意味着有异常情况发生，此时通常需要采取一定的动作(action)，如告警或者执行远程命令。实现zabbix的通知功能，一般需要两个步骤：定义所需的“媒介”和配置一个”动作”。媒介类型有：E-mail，SMS，Jabber和自定义的通知脚本。我这里就使用E-mail了。">
@@ -435,8 +435,8 @@ except Exception,e:
 
 if __name__ == &quot;__main__&quot;:
     send_mail(sys.argv[1], sys.argv[2], sys.argv[3])
-
-# chmod +x zabbix_sendmail.py
+</code></pre><p> 修改脚本权限：</p>
+<pre><code># chmod +x zabbix_sendmail.py
 # chown -R zabbix.zabbix zabbix_sendmail.py
 </code></pre><p><strong>4.修改zabbix_server配置</strong></p>
 <pre><code># vim /usr/local/zabbix-3.0.1/etc/zabbix_server.conf
@@ -552,6 +552,10 @@ fi
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2017/05/26/Zookeeper介绍及安装部署/" rel="next" title="Zookeeper介绍及安装部署">
+                <i class="fa fa-chevron-left"></i> Zookeeper介绍及安装部署
+              </a>
+            
           </div>
 
           <div class="post-nav-prev post-nav-item">
@@ -630,7 +634,7 @@ fi
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-count">13</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -647,7 +651,7 @@ fi
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

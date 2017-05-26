@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-25T03:54:57.000Z</updated>
+  <updated>2017-05-26T03:10:32.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,279 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Zookeeper介绍及安装部署</title>
+    <link href="http://yoursite.com/2017/05/26/Zookeeper%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
+    <id>http://yoursite.com/2017/05/26/Zookeeper介绍及安装部署/</id>
+    <published>2017-05-26T01:20:04.000Z</published>
+    <updated>2017-05-26T03:10:32.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Zookeeper介绍&quot;&gt;&lt;a href=&quot;#Zookeeper介绍&quot; class=&quot;headerlink&quot; title=&quot;Zookeeper介绍&quot;&gt;&lt;/a&gt;Zookeeper介绍&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;是一个针对大型分布式系统的可靠协调系统；&lt;/li&gt;
+&lt;li&gt;提供的功能包括：配置维护、名字服务、分布式同步、组服务等；&lt;/li&gt;
+&lt;li&gt;目标就是封装好复杂易出错的关键职务，将简单易用的接口和性能高效、功能稳定的系统提供给用户；&lt;/li&gt;
+&lt;li&gt;Zookeeper已经成为Hadoop生态系统中的基础组件。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
+&lt;h2 id=&quot;Zookeeper特点&quot;&gt;&lt;a href=&quot;#Zookeeper特点&quot; class=&quot;headerlink&quot; title=&quot;Zookeeper特点&quot;&gt;&lt;/a&gt;Zookeeper特点&lt;/h2&gt;&lt;/li&gt;
+&lt;li&gt;最终一致性：为客户端展示同一视图，这是Zookeeper最重要的性能；&lt;/li&gt;
+&lt;li&gt;可靠性：如果消息被一台服务器接受，那么它将被所有的服务器接受；&lt;/li&gt;
+&lt;li&gt;原子性：更新只能成功或失败，没有中间状态；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;Zookeeper应用场景&quot;&gt;&lt;a href=&quot;#Zookeeper应用场景&quot; class=&quot;headerlink&quot; title=&quot;Zookeeper应用场景&quot;&gt;&lt;/a&gt;Zookeeper应用场景&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;一、统一命名服务&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;分布式环境下，经常需要对应用/服务进行统一命名，便于识别不同的服务&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;类似于域名与ip之间对应关系，域名容易记住；&lt;/li&gt;
+&lt;li&gt;通过名称来获取资源或服务的地址，提供者信息。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;按照层次结构组织服务/应用名称&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;可将服务名称以及地址信息写在Zookeeper上，客户端通过Zookeeper获取可用服务列表。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;二、配置管理&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;分布式环境下，配置文件管理和同步是一个常见问题&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;一个集群中，所有节点的配置信息是一致的，比如Hadoop；&lt;/li&gt;
+&lt;li&gt;对配置文件修改后，希望能够快速同步到各个节点上。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;配置管理可交由Zookeeper实现&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;可将配置信息写入Zookeeper的一个znode上；&lt;/li&gt;
+&lt;li&gt;各个节点监听这个znode&lt;/li&gt;
+&lt;li&gt;一旦znode中的数据被修改，Zookeeper将会通知各个节点。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;三、集群管理&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;分布式环境下，实时掌握每个节点的状态是必要的&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;可根据节点实时状态做出一些调整。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;可交由Zookeeper实现&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;可将节点信息写入Zookeeper的一个znode上；&lt;/li&gt;
+&lt;li&gt;监听这个znode可获得它的实时状态变化。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;典型应用&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;HBase中Master状态的监控与选举。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;四、分布式通知/协调&lt;/strong&gt;&lt;br&gt;原理其实就是发布/订阅。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;分布式环境下经常存在一个服务需要知道它所管理的子服务的状态&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;NameNode需要知道各DataNode的状态&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;心跳检测机制可通过Zookeeper实现&lt;/li&gt;
+&lt;li&gt;信息推送可由Zookeeper实现(发布/订阅模式)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;五、分布式锁&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Zookeeper是强一致性的&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;多个客户端同时在Zookeeper上创建相同znode，只有一个创建成功。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;实现锁的独占性&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;多个客户端同时在Zookeeper上创建相同znode，创建成功的那个客户端得到锁，其他客户端等待。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;控制锁的时序&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;各个客户端在某个znode下创建临时znode(类型为CreateMode.EPHEMERAL_SEQUENTIAL)，这样，该znode可掌握全局访问时序。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;用到了Zookeeper的一些系统&quot;&gt;&lt;a href=&quot;#用到了Zookeeper的一些系统&quot; class=&quot;headerlink&quot; title=&quot;用到了Zookeeper的一些系统&quot;&gt;&lt;/a&gt;用到了Zookeeper的一些系统&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;HDFS&lt;/li&gt;
+&lt;li&gt;YARN&lt;/li&gt;
+&lt;li&gt;Storm&lt;/li&gt;
+&lt;li&gt;HBase&lt;/li&gt;
+&lt;li&gt;Flume&lt;/li&gt;
+&lt;li&gt;Dubbo&lt;/li&gt;
+&lt;li&gt;metaq&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;Zookeeper安装部署&quot;&gt;&lt;a href=&quot;#Zookeeper安装部署&quot; class=&quot;headerlink&quot; title=&quot;Zookeeper安装部署&quot;&gt;&lt;/a&gt;Zookeeper安装部署&lt;/h2&gt;&lt;p&gt;下面开始介绍Zookeeper的安装部署。安装部署分三种模式：单机模式、伪分布式模式和分布式模式。&lt;br&gt;单机模式和为分布式比较简单，多用于本地测试调试，下面介绍分布式模式安装部署。&lt;/p&gt;
+&lt;h2 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h2&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;安装软件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;console&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;114.55.29.246&lt;/td&gt;
+&lt;td&gt;JDK1.7、zookeeper-3.4.6&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;log1&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;114.55.29.86&lt;/td&gt;
+&lt;td&gt;JDK1.7、zookeeper-3.4.6&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;log2&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;114.55.29.241&lt;/td&gt;
+&lt;td&gt;JDK1.7、zookeeper-3.4.6&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&quot;安装jdk1-7&quot;&gt;&lt;a href=&quot;#安装jdk1-7&quot; class=&quot;headerlink&quot; title=&quot;安装jdk1.7&quot;&gt;&lt;/a&gt;安装jdk1.7&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;3台机器都需要安装jdk1.7&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# mkdir /usr/java
+[root@log1 local]# tar zxf jdk-7u80-linux-x64.gz -C /usr/java/
+[root@log1 local]# vim /etc/profile
+export JAVA_HOME=/usr/java/jdk1.7.0_80
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+[root@log1 local]# source /etc/profile
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装zookeeper集群&quot;&gt;&lt;a href=&quot;#安装zookeeper集群&quot; class=&quot;headerlink&quot; title=&quot;安装zookeeper集群&quot;&gt;&lt;/a&gt;安装zookeeper集群&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;注意：3台机器都需要安装zk。对于Zookeeper集群的话，官方推荐的最小节点数为3个。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&quot;安装配置zk&quot;&gt;&lt;a href=&quot;#安装配置zk&quot; class=&quot;headerlink&quot; title=&quot;安装配置zk&quot;&gt;&lt;/a&gt;安装配置zk&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;配置zk节点的hosts文件：配置3台机器的ip地址和主机名的对应关系。以下以console主机为例，其hosts文件添加下面3行：&lt;/p&gt;
+&lt;p&gt;  114.55.29.246 console&lt;br&gt;  114.55.29.86 log1&lt;br&gt;  114.55.29.241 log2&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;解压安装配置第一台zk&lt;/p&gt;
+&lt;p&gt;  [root@console local]# tar zxf zookeeper-3.4.6.tar.gz&lt;br&gt;  [root@console local]# cd zookeeper-3.4.6&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;创建快照日志存放目录：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console zookeeper-3.4.6]# mkdir -p dataDir 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;创建事务日志存放目录：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console zookeeper-3.4.6]# mkdir dataLogDir
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】:如果不配置dataLogDir，那么事务日志也会写在dataDir目录中。这样会严重影响zk的性能。因为在zk吞吐量很高的时候，产生的事务日志和快照日志太多。&lt;br&gt;修改配置文件，添加如下内容：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console zookeeper-3.4.6]# cd conf 
+[root@console conf]# mv zoo_sample.cfg zoo.cfg 
+[root@console conf]# vim zoo.cfg
+# 存放数据文件
+dataDir=/usr/local/zookeeper-3.4.6/dataDir
+# 存放日志文件
+dataLogDir=/usr/local/zookeeper-3.4.6/dataLogDir
+# zookeeper cluster，2888为选举端口，3888为心跳端口
+server.1=console:2888:3888
+server.2=log1:2888:3888
+server.3=log2:2888:3888
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在我们配置的dataDir指定的目录下面，创建一个myid文件，里面内容为一个数字，用来标识当前主机，conf/zoo.cfg文件中配置的server.X中X为什么数字，则myid文件中就输入这个数字：&lt;br&gt;console主机：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# echo &amp;quot;1&amp;quot; &amp;gt; /usr/local/zookeeper-3.4.6/dataDir/myid
+&lt;/code&gt;&lt;/pre&gt;&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;远程复制第一台的zk到另外两台上，并修改myid文件为2和3&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console local]# scp -rp zookeeper-3.4.6 root@114.55.29.86:/usr/local/
+[root@console local]# scp -rp zookeeper-3.4.6 root@114.55.29.241:/usr/local/
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&quot;启动和关闭zk&quot;&gt;&lt;a href=&quot;#启动和关闭zk&quot; class=&quot;headerlink&quot; title=&quot;启动和关闭zk&quot;&gt;&lt;/a&gt;启动和关闭zk&lt;/h3&gt;&lt;p&gt;在ZooKeeper集群的每个结点上，执行启动ZooKeeper服务的脚本，如下所示：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console bin]# ./zkServer.sh start 
+[root@log1 bin]# ./zkServer.sh start
+[root@log2 bin]# ./zkServer.sh start
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;日志可查询：/usr/local/zookeeper-3.4.6/bin/zookeeper.out&lt;br&gt;可以通过命令jps查看Zookeeper进程：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Zookeeper/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;停止zk命令：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# /usr/local/zookeeper-3.4.6/bin/zkServer.sh stop
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;测试zk集群&quot;&gt;&lt;a href=&quot;#测试zk集群&quot; class=&quot;headerlink&quot; title=&quot;测试zk集群&quot;&gt;&lt;/a&gt;测试zk集群&lt;/h3&gt;&lt;p&gt;可以通过ZooKeeper的脚本来查看启动状态，包括集群中各个结点的角色（或是Leader，或是Follower）&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console bin]# ./zkServer.sh status
+JMX enabled by default
+Using config: /usr/local/zookeeper-3.4.6/bin/../conf/zoo.cfg
+Mode: follower
+[root@log1 bin]# ./zkServer.sh status
+JMX enabled by default
+Using config: /usr/local/zookeeper-3.4.6/bin/../conf/zoo.cfg
+Mode: leader
+[root@log2 bin]# ./zkServer.sh status
+JMX enabled by default
+Using config: /usr/local/zookeeper-3.4.6/bin/../conf/zoo.cfg
+Mode: follower
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;通过上面状态查询结果可见，log1是集群的Leader，其余的两个结点是Follower。&lt;br&gt;另外，可以通过客户端脚本，连接到ZooKeeper集群上。对于客户端来说，ZooKeeper是一个整体，连接到ZooKeeper集群实际上感觉在独享整个集群的服务，所以，你可以在任何一个结点上建立到服务集群的连接。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 bin]# ./zkCli.sh -server log1:2181
+Connecting to log1:2181
+2016-03-08 14:21:31,502 [myid:] - INFO  [main:Environment@100] - Client environment:zookeeper.version=3.4.6-1569965, built on 02/20/2014 09:09 GMT
+2016-03-08 14:21:31,505 [myid:] - INFO  [main:Environment@100] - Client environment:host.name=log2
+2016-03-08 14:21:31,505 [myid:] - INFO  [main:Environment@100] - Client environment:java.version=1.7.0_80
+2016-03-08 14:21:31,507 [myid:] - INFO  [main:Environment@100] - Client environment:java.vendor=Oracle Corporation
+2016-03-08 14:21:31,507 [myid:] - INFO  [main:Environment@100] - Client environment:java.home=/usr/java/jdk1.7.0_80/jre
+2016-03-08 14:21:31,507 [myid:] - INFO  [main:Environment@100] - Client environment:java.class.path=/usr/local/zookeeper-3.4.6/bin/../build/classes:/usr/local/zookeeper-3.4.6/bin/../build/lib/*.jar:/usr/local/zookeeper-3.4.6/bin/../lib/slf4j-log4j12-1.6.1.jar:/usr/local/zookeeper-3.4.6/bin/../lib/slf4j-api-1.6.1.jar:/usr/local/zookeeper-3.4.6/bin/../lib/netty-3.7.0.Final.jar:/usr/local/zookeeper-3.4.6/bin/../lib/log4j-1.2.16.jar:/usr/local/zookeeper-3.4.6/bin/../lib/jline-0.9.94.jar:/usr/local/zookeeper-3.4.6/bin/../zookeeper-3.4.6.jar:/usr/local/zookeeper-3.4.6/bin/../src/java/lib/*.jar:/usr/local/zookeeper-3.4.6/bin/../conf:.:/usr/java/jdk1.7.0_80/lib/dt.jar:/usr/java/jdk1.7.0_80/lib/tools.jar
+2016-03-08 14:21:31,507 [myid:] - INFO  [main:Environment@100] - Client environment:java.library.path=/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
+2016-03-08 14:21:31,508 [myid:] - INFO  [main:Environment@100] - Client environment:java.io.tmpdir=/tmp
+2016-03-08 14:21:31,508 [myid:] - INFO  [main:Environment@100] - Client environment:java.compiler=&amp;lt;NA&amp;gt;
+2016-03-08 14:21:31,508 [myid:] - INFO  [main:Environment@100] - Client environment:os.name=Linux
+2016-03-08 14:21:31,508 [myid:] - INFO  [main:Environment@100] - Client environment:os.arch=amd64
+2016-03-08 14:21:31,508 [myid:] - INFO  [main:Environment@100] - Client environment:os.version=3.10.0-123.9.3.el7.x86_64
+2016-03-08 14:21:31,508 [myid:] - INFO  [main:Environment@100] - Client environment:user.name=root
+2016-03-08 14:21:31,508 [myid:] - INFO  [main:Environment@100] - Client environment:user.home=/root
+2016-03-08 14:21:31,508 [myid:] - INFO  [main:Environment@100] - Client environment:user.dir=/usr/local/zookeeper-3.4.6/bin
+2016-03-08 14:21:31,510 [myid:] - INFO  [main:ZooKeeper@438] - Initiating client connection, connectString=log1:2181 sessionTimeout=30000 watcher=org.apache.zookeeper.ZooKeeperMain$MyWatcher@ee01430
+Welcome to ZooKeeper!
+2016-03-08 14:21:31,534 [myid:] - INFO  [main-SendThread(log1:2181):ClientCnxn$SendThread@975] - Opening socket connection to server log1/114.55.29.86:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-03-08 14:21:31,539 [myid:] - INFO  [main-SendThread(log1:2181):ClientCnxn$SendThread@852] - Socket connection established to log1/114.55.29.86:2181, initiating session
+JLine support is enabled
+[zk: log1:2181(CONNECTING) 0] 2016-03-08 14:21:31,572 [myid:] - INFO  [main-SendThread(log1:2181):ClientCnxn$SendThread@1235] - Session establishment complete on server log1/114.55.29.86:2181, sessionid = 0x25354db0d430000, negotiated timeout = 30000
+
+WATCHER::
+
+WatchedEvent state:SyncConnected type:None path:null
+
+[zk: log1:2181(CONNECTED) 0]
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;脚本定期清理zk快照和日志文件&quot;&gt;&lt;a href=&quot;#脚本定期清理zk快照和日志文件&quot; class=&quot;headerlink&quot; title=&quot;脚本定期清理zk快照和日志文件&quot;&gt;&lt;/a&gt;脚本定期清理zk快照和日志文件&lt;/h3&gt;&lt;p&gt;正常运行过程中，ZK会不断地把快照数据和事务日志输出到dataDir和dataLogDir这两个目录，并且如果没有人为操作的话，ZK自己是不会清理这些文件的。&lt;br&gt;我这里采用脚本切割。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 ~]# cd /usr/local/zookeeper-3.4.6/
+[root@log1 zookeeper-3.4.6]# vim clean_zklog.sh
+#!/bin/bash
+###Description:This script is used to clear zookeeper snapshot file and transaction logs.
+###Written by: jkzhao - jkzhao@wisedu.com  
+###History: 2016-04-08 First release.
+
+# Snapshot file dir.
+dataDir=/usr/local/zookeeper-3.4.6/dataDir/version-2
+
+# Transaction logs dir.
+dataLogDir=/usr/local/zookeeper-3.4.6/dataLogDir/version-2
+
+# Reserved 5 files.
+COUNT=5
+
+ls -t $dataDir/snapshot.* | tail -n +$[$COUNT+1] | xargs rm -f
+ls -t $dataLogDir/log.* | tail -n +$[$COUNT+1] | xargs rm -f
+
+[root@log1 zookeeper-3.4.6]# chmod +x clean_zklog.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;每个Zookeeper集群节点配置周期性任务，每个星期日的0点0分执行：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console zookeeper-3.4.6]# crontab -e
+0 0 * * 0 /usr/local/zookeeper-3.4.6/clean_zklog.sh
+&lt;/code&gt;&lt;/pre&gt;</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Zookeeper介绍&quot;&gt;&lt;a href=&quot;#Zookeeper介绍&quot; class=&quot;headerlink&quot; title=&quot;Zookeeper介绍&quot;&gt;&lt;/a&gt;Zookeeper介绍&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;是一个针对大型分布式系统的可靠协调系统；&lt;/li&gt;
+&lt;li&gt;提供的功能包括：配置维护、名字服务、分布式同步、组服务等；&lt;/li&gt;
+&lt;li&gt;目标就是封装好复杂易出错的关键职务，将简单易用的接口和性能高效、功能稳定的系统提供给用户；&lt;/li&gt;
+&lt;li&gt;Zookeeper已经成为Hadoop生态系统中的基础组件。
+    
+    </summary>
+    
+    
+      <category term="大数据 Zookeeper" scheme="http://yoursite.com/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE-Zookeeper/"/>
+    
+  </entry>
+  
+  <entry>
     <title>zabbix的通知功能以及自定义脚本告警</title>
     <link href="http://yoursite.com/2017/05/24/zabbix%E7%9A%84%E9%80%9A%E7%9F%A5%E5%8A%9F%E8%83%BD%E4%BB%A5%E5%8F%8A%E8%87%AA%E5%AE%9A%E4%B9%89%E8%84%9A%E6%9C%AC%E5%91%8A%E8%AD%A6/"/>
     <id>http://yoursite.com/2017/05/24/zabbix的通知功能以及自定义脚本告警/</id>
     <published>2017-05-24T01:35:41.000Z</published>
-    <updated>2017-05-25T03:54:57.000Z</updated>
+    <updated>2017-05-25T05:30:47.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;zabbix的通知功能&quot;&gt;&lt;a href=&quot;#zabbix的通知功能&quot; class=&quot;headerlink&quot; title=&quot;zabbix的通知功能&quot;&gt;&lt;/a&gt;zabbix的通知功能&lt;/h2&gt;&lt;p&gt;在配置好监控项和触发器之后，一旦正常工作中的某触发器状态发生改变，一般意味着有异常情况发生，此时通常需要采取一定的动作(action)，如告警或者执行远程命令。&lt;br&gt;实现zabbix的通知功能，一般需要两个步骤：定义所需的“媒介”和配置一个”动作”。&lt;br&gt;媒介类型有：E-mail，SMS，Jabber和自定义的通知脚本。我这里就使用E-mail了。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;定义媒介&quot;&gt;&lt;a href=&quot;#定义媒介&quot; class=&quot;headerlink&quot; title=&quot;定义媒介&quot;&gt;&lt;/a&gt;定义媒介&lt;/h2&gt;&lt;p&gt;登录zabbix web管理控制台，点击Administration—&amp;gt; Media types，可以看到有3个定义好了的媒介，不用这3个，点击右上角的”Create media type”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/90.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;填写信息：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/91.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
@@ -72,8 +340,8 @@ except Exception,e:
 
 if __name__ == &amp;quot;__main__&amp;quot;:
     send_mail(sys.argv[1], sys.argv[2], sys.argv[3])
-
-# chmod +x zabbix_sendmail.py
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt; 修改脚本权限：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# chmod +x zabbix_sendmail.py
 # chown -R zabbix.zabbix zabbix_sendmail.py
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;4.修改zabbix_server配置&lt;/strong&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# vim /usr/local/zabbix-3.0.1/etc/zabbix_server.conf
