@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-26T03:14:50.000Z</updated>
+  <updated>2017-05-26T03:23:25.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/05/26/Zookeeper%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2017/05/26/Zookeeper介绍及安装部署/</id>
     <published>2017-05-26T01:20:04.000Z</published>
-    <updated>2017-05-26T03:14:50.000Z</updated>
+    <updated>2017-05-26T03:23:25.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Zookeeper介绍&quot;&gt;&lt;a href=&quot;#Zookeeper介绍&quot; class=&quot;headerlink&quot; title=&quot;Zookeeper介绍&quot;&gt;&lt;/a&gt;Zookeeper介绍&lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;是一个针对大型分布式系统的可靠协调系统；&lt;/li&gt;
@@ -34,85 +34,54 @@
 &lt;li&gt;可靠性：如果消息被一台服务器接受，那么它将被所有的服务器接受；&lt;/li&gt;
 &lt;li&gt;原子性：更新只能成功或失败，没有中间状态；&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&quot;Zookeeper应用场景&quot;&gt;&lt;a href=&quot;#Zookeeper应用场景&quot; class=&quot;headerlink&quot; title=&quot;Zookeeper应用场景&quot;&gt;&lt;/a&gt;Zookeeper应用场景&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;一、统一命名服务&lt;/strong&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;分布式环境下，经常需要对应用/服务进行统一命名，便于识别不同的服务&lt;/li&gt;
-&lt;/ol&gt;
+&lt;h2 id=&quot;Zookeeper应用场景&quot;&gt;&lt;a href=&quot;#Zookeeper应用场景&quot; class=&quot;headerlink&quot; title=&quot;Zookeeper应用场景&quot;&gt;&lt;/a&gt;Zookeeper应用场景&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;一、统一命名服务&lt;/strong&gt;&lt;br&gt;1.分布式环境下，经常需要对应用/服务进行统一命名，便于识别不同的服务&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;类似于域名与ip之间对应关系，域名容易记住；&lt;/li&gt;
 &lt;li&gt;通过名称来获取资源或服务的地址，提供者信息。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;ol&gt;
-&lt;li&gt;按照层次结构组织服务/应用名称&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;2.按照层次结构组织服务/应用名称&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;可将服务名称以及地址信息写在Zookeeper上，客户端通过Zookeeper获取可用服务列表。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;二、配置管理&lt;/strong&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;分布式环境下，配置文件管理和同步是一个常见问题&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;二、配置管理&lt;/strong&gt;&lt;br&gt;1.分布式环境下，配置文件管理和同步是一个常见问题&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;一个集群中，所有节点的配置信息是一致的，比如Hadoop；&lt;/li&gt;
 &lt;li&gt;对配置文件修改后，希望能够快速同步到各个节点上。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;ol&gt;
-&lt;li&gt;配置管理可交由Zookeeper实现&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;2.配置管理可交由Zookeeper实现&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;可将配置信息写入Zookeeper的一个znode上；&lt;/li&gt;
 &lt;li&gt;各个节点监听这个znode&lt;/li&gt;
 &lt;li&gt;一旦znode中的数据被修改，Zookeeper将会通知各个节点。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;三、集群管理&lt;/strong&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;分布式环境下，实时掌握每个节点的状态是必要的&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;三、集群管理&lt;/strong&gt;&lt;br&gt;1.分布式环境下，实时掌握每个节点的状态是必要的&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;可根据节点实时状态做出一些调整。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;ol&gt;
-&lt;li&gt;可交由Zookeeper实现&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;2.可交由Zookeeper实现&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;可将节点信息写入Zookeeper的一个znode上；&lt;/li&gt;
 &lt;li&gt;监听这个znode可获得它的实时状态变化。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;ol&gt;
-&lt;li&gt;典型应用&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;3.典型应用&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;HBase中Master状态的监控与选举。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;四、分布式通知/协调&lt;/strong&gt;&lt;br&gt;原理其实就是发布/订阅。&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;分布式环境下经常存在一个服务需要知道它所管理的子服务的状态&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;四、分布式通知/协调&lt;/strong&gt;&lt;br&gt;原理其实就是发布/订阅。&lt;br&gt;1.分布式环境下经常存在一个服务需要知道它所管理的子服务的状态&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;NameNode需要知道各DataNode的状态&lt;/li&gt;
 &lt;/ul&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;心跳检测机制可通过Zookeeper实现&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;信息推送可由Zookeeper实现(发布/订阅模式)&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;strong&gt;五、分布式锁&lt;/strong&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Zookeeper是强一致性的&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;2.心跳检测机制可通过Zookeeper实现&lt;/p&gt;
+&lt;p&gt;3.信息推送可由Zookeeper实现(发布/订阅模式)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;五、分布式锁&lt;/strong&gt;&lt;br&gt;1.Zookeeper是强一致性的&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;多个客户端同时在Zookeeper上创建相同znode，只有一个创建成功。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;ol&gt;
-&lt;li&gt;实现锁的独占性&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;2.实现锁的独占性&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;多个客户端同时在Zookeeper上创建相同znode，创建成功的那个客户端得到锁，其他客户端等待。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;ol&gt;
-&lt;li&gt;控制锁的时序&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;3.控制锁的时序&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;各个客户端在某个znode下创建临时znode(类型为CreateMode.EPHEMERAL_SEQUENTIAL)，这样，该znode可掌握全局访问时序。&lt;/li&gt;
 &lt;/ul&gt;

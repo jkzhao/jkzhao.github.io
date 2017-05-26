@@ -112,7 +112,7 @@
 <meta property="og:site_name" content="jkzhao's blog">
 <meta property="og:description" content="Zookeeper介绍 是一个针对大型分布式系统的可靠协调系统； 提供的功能包括：配置维护、名字服务、分布式同步、组服务等； 目标就是封装好复杂易出错的关键职务，将简单易用的接口和性能高效、功能稳定的系统提供给用户； Zookeeper已经成为Hadoop生态系统中的基础组件。">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Zookeeper/1.png">
-<meta property="og:updated_time" content="2017-05-26T03:14:50.000Z">
+<meta property="og:updated_time" content="2017-05-26T03:23:25.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Zookeeper介绍及安装部署">
 <meta name="twitter:description" content="Zookeeper介绍 是一个针对大型分布式系统的可靠协调系统； 提供的功能包括：配置维护、名字服务、分布式同步、组服务等； 目标就是封装好复杂易出错的关键职务，将简单易用的接口和性能高效、功能稳定的系统提供给用户； Zookeeper已经成为Hadoop生态系统中的基础组件。">
@@ -373,85 +373,54 @@
 <li>可靠性：如果消息被一台服务器接受，那么它将被所有的服务器接受；</li>
 <li>原子性：更新只能成功或失败，没有中间状态；</li>
 </ul>
-<h2 id="Zookeeper应用场景"><a href="#Zookeeper应用场景" class="headerlink" title="Zookeeper应用场景"></a>Zookeeper应用场景</h2><p><strong>一、统一命名服务</strong></p>
-<ol>
-<li>分布式环境下，经常需要对应用/服务进行统一命名，便于识别不同的服务</li>
-</ol>
+<h2 id="Zookeeper应用场景"><a href="#Zookeeper应用场景" class="headerlink" title="Zookeeper应用场景"></a>Zookeeper应用场景</h2><p><strong>一、统一命名服务</strong><br>1.分布式环境下，经常需要对应用/服务进行统一命名，便于识别不同的服务</p>
 <ul>
 <li>类似于域名与ip之间对应关系，域名容易记住；</li>
 <li>通过名称来获取资源或服务的地址，提供者信息。</li>
 </ul>
-<ol>
-<li>按照层次结构组织服务/应用名称</li>
-</ol>
+<p>2.按照层次结构组织服务/应用名称</p>
 <ul>
 <li>可将服务名称以及地址信息写在Zookeeper上，客户端通过Zookeeper获取可用服务列表。</li>
 </ul>
-<p><strong>二、配置管理</strong></p>
-<ol>
-<li>分布式环境下，配置文件管理和同步是一个常见问题</li>
-</ol>
+<p><strong>二、配置管理</strong><br>1.分布式环境下，配置文件管理和同步是一个常见问题</p>
 <ul>
 <li>一个集群中，所有节点的配置信息是一致的，比如Hadoop；</li>
 <li>对配置文件修改后，希望能够快速同步到各个节点上。</li>
 </ul>
-<ol>
-<li>配置管理可交由Zookeeper实现</li>
-</ol>
+<p>2.配置管理可交由Zookeeper实现</p>
 <ul>
 <li>可将配置信息写入Zookeeper的一个znode上；</li>
 <li>各个节点监听这个znode</li>
 <li>一旦znode中的数据被修改，Zookeeper将会通知各个节点。</li>
 </ul>
-<p><strong>三、集群管理</strong></p>
-<ol>
-<li>分布式环境下，实时掌握每个节点的状态是必要的</li>
-</ol>
+<p><strong>三、集群管理</strong><br>1.分布式环境下，实时掌握每个节点的状态是必要的</p>
 <ul>
 <li>可根据节点实时状态做出一些调整。</li>
 </ul>
-<ol>
-<li>可交由Zookeeper实现</li>
-</ol>
+<p>2.可交由Zookeeper实现</p>
 <ul>
 <li>可将节点信息写入Zookeeper的一个znode上；</li>
 <li>监听这个znode可获得它的实时状态变化。</li>
 </ul>
-<ol>
-<li>典型应用</li>
-</ol>
+<p>3.典型应用</p>
 <ul>
 <li>HBase中Master状态的监控与选举。</li>
 </ul>
-<p><strong>四、分布式通知/协调</strong><br>原理其实就是发布/订阅。</p>
-<ol>
-<li>分布式环境下经常存在一个服务需要知道它所管理的子服务的状态</li>
-</ol>
+<p><strong>四、分布式通知/协调</strong><br>原理其实就是发布/订阅。<br>1.分布式环境下经常存在一个服务需要知道它所管理的子服务的状态</p>
 <ul>
 <li>NameNode需要知道各DataNode的状态</li>
 </ul>
-<ol>
-<li><p>心跳检测机制可通过Zookeeper实现</p>
-</li>
-<li><p>信息推送可由Zookeeper实现(发布/订阅模式)</p>
-</li>
-</ol>
-<p><strong>五、分布式锁</strong></p>
-<ol>
-<li>Zookeeper是强一致性的</li>
-</ol>
+<p>2.心跳检测机制可通过Zookeeper实现</p>
+<p>3.信息推送可由Zookeeper实现(发布/订阅模式)</p>
+<p><strong>五、分布式锁</strong><br>1.Zookeeper是强一致性的</p>
 <ul>
 <li>多个客户端同时在Zookeeper上创建相同znode，只有一个创建成功。</li>
 </ul>
-<ol>
-<li>实现锁的独占性</li>
-</ol>
+<p>2.实现锁的独占性</p>
 <ul>
 <li>多个客户端同时在Zookeeper上创建相同znode，创建成功的那个客户端得到锁，其他客户端等待。</li>
 </ul>
-<ol>
-<li>控制锁的时序</li>
-</ol>
+<p>3.控制锁的时序</p>
 <ul>
 <li>各个客户端在某个znode下创建临时znode(类型为CreateMode.EPHEMERAL_SEQUENTIAL)，这样，该znode可掌握全局访问时序。</li>
 </ul>
