@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-31T01:27:37.000Z</updated>
+  <updated>2017-05-31T01:34:08.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/05/28/Kafka%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2017/05/28/Kafka介绍及安装部署/</id>
     <published>2017-05-28T11:46:22.000Z</published>
-    <updated>2017-05-31T01:27:37.000Z</updated>
+    <updated>2017-05-31T01:34:08.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;消息中间件&quot;&gt;&lt;a href=&quot;#消息中间件&quot; class=&quot;headerlink&quot; title=&quot;消息中间件&quot;&gt;&lt;/a&gt;消息中间件&lt;/h2&gt;&lt;p&gt;消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;消息中间件特点&quot;&gt;&lt;a href=&quot;#消息中间件特点&quot; class=&quot;headerlink&quot; title=&quot;消息中间件特点&quot;&gt;&lt;/a&gt;消息中间件特点&lt;/h2&gt;&lt;p&gt;1.采用异步处理模式&lt;br&gt;消息发送者可以发送一个消息而无须等待响应。消息发送者将消息发送到一条虚拟的通道（主题或者队列）上，消息接收者则订阅或者监听该通道。一条消息可能最终转发给一个或多个消息接收者，这些接收者都无需对消息发送者做出同步回应。整个过程是异步的。&lt;/p&gt;
@@ -32,13 +32,13 @@
 &lt;li&gt;发送者和接收者不必要了解对方、只需要确认消息&lt;/li&gt;
 &lt;li&gt;发送者和接收者不必同时在线&lt;br&gt;比如在线交易系统为了保证数据的最终一致，在支付系统处理完成后会把支付结果放到信息中间件里通知订单系统修改订单支付状态。两个系统通过消息中间件解耦。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&quot;消息中间件的传递模型&quot;&gt;&lt;a href=&quot;#消息中间件的传递模型&quot; class=&quot;headerlink&quot; title=&quot;消息中间件的传递模型&quot;&gt;&lt;/a&gt;消息中间件的传递模型&lt;/h2&gt;&lt;p&gt;1.点对点模型(PTP)&lt;br&gt;点对点模型用于消息生产者和消息消费者之间点对点的通信。消息生产者将消息发送到由某个名字标识的特定消费者。这个名字实际上对应于消费服务中的一个队列(Queue)，在消息传递给消费者之前它被存储在这个队列中。队列消息可以放在内存中也可以是持久的，以保证在消息服务出现故障时仍然能够传递消息。&lt;br&gt;点对点模型特性：&lt;/p&gt;
+&lt;h2 id=&quot;消息中间件的传递模型&quot;&gt;&lt;a href=&quot;#消息中间件的传递模型&quot; class=&quot;headerlink&quot; title=&quot;消息中间件的传递模型&quot;&gt;&lt;/a&gt;消息中间件的传递模型&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.点对点模型(PTP)&lt;/strong&gt;&lt;br&gt;点对点模型用于消息生产者和消息消费者之间点对点的通信。消息生产者将消息发送到由某个名字标识的特定消费者。这个名字实际上对应于消费服务中的一个队列(Queue)，在消息传递给消费者之前它被存储在这个队列中。队列消息可以放在内存中也可以是持久的，以保证在消息服务出现故障时仍然能够传递消息。&lt;br&gt;点对点模型特性：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;每个消息只有一个消费者&lt;/li&gt;
 &lt;li&gt;发送者和接受者没有时间依赖&lt;/li&gt;
 &lt;li&gt;接受者确认消息接受和处理成功&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/1.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;2.发布—订阅模型(Pub/Sub)&lt;br&gt;发布者/订阅者模型支持向一个特定的消息主题生产消息。0或多个订阅者可能对接收来自特定消息主题的消息感兴趣。在这种模型下，发布者和订阅者彼此不知道对方。这种模式好比是匿名公告板。这种模式被概括为：多个消费者可以获得消息。在发布者和订阅者之间存在时间依赖性。发布者需要建立一个订阅(subscription)，以便能够让消费者订阅。订阅者必须保持持续的活动状态以接收消息，除非订阅者建立了持久的订阅。在这种情况下，在订阅者未连接时发布的消息将在订阅者重新连接时重新发布。&lt;br&gt;其实消息中间件，像MySQL其实也可以作为消息中间件，只要你把消息中间件原理搞清楚，你会发现目前所有的存储，包括NoSQL，只要支持顺序性东西的，就可以作为一个消息中间件。就看你怎么去利用它了。就像redis里面那个队列list，就可以作为一个消息队列。&lt;br&gt;发布—订阅模型特性：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2.发布—订阅模型(Pub/Sub)&lt;/strong&gt;&lt;br&gt;发布者/订阅者模型支持向一个特定的消息主题生产消息。0或多个订阅者可能对接收来自特定消息主题的消息感兴趣。在这种模型下，发布者和订阅者彼此不知道对方。这种模式好比是匿名公告板。这种模式被概括为：多个消费者可以获得消息。在发布者和订阅者之间存在时间依赖性。发布者需要建立一个订阅(subscription)，以便能够让消费者订阅。订阅者必须保持持续的活动状态以接收消息，除非订阅者建立了持久的订阅。在这种情况下，在订阅者未连接时发布的消息将在订阅者重新连接时重新发布。&lt;br&gt;其实消息中间件，像MySQL其实也可以作为消息中间件，只要你把消息中间件原理搞清楚，你会发现目前所有的存储，包括NoSQL，只要支持顺序性东西的，就可以作为一个消息中间件。就看你怎么去利用它了。就像redis里面那个队列list，就可以作为一个消息队列。&lt;br&gt;发布—订阅模型特性：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;每个消息可以有多个订阅者&lt;/li&gt;
 &lt;li&gt;客户端只有订阅后才能接收到消息&lt;/li&gt;
@@ -75,10 +75,23 @@
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h3 id=&quot;安装JDK1-7&quot;&gt;&lt;a href=&quot;#安装JDK1-7&quot; class=&quot;headerlink&quot; title=&quot;安装JDK1.7&quot;&gt;&lt;/a&gt;安装JDK1.7&lt;/h3&gt;&lt;p&gt;3台机器都需要安装JDK1.7。&lt;br&gt;        [root@log1 local]# mkdir /usr/java&lt;br&gt;        [root@log1 local]# tar zxf jdk-7u80-linux-x64.gz -C /usr/java/&lt;br&gt;        [root@log1 local]# vim /etc/profile&lt;br&gt;        export JAVA_HOME=/usr/java/jdk1.7.0_80&lt;br&gt;        export PATH=$JAVA_HOME/bin:$PATH&lt;br&gt;        export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar&lt;br&gt;        [root@log1 local]# source /etc/profile&lt;/p&gt;
-&lt;h3 id=&quot;安装集群&quot;&gt;&lt;a href=&quot;#安装集群&quot; class=&quot;headerlink&quot; title=&quot;安装集群&quot;&gt;&lt;/a&gt;安装集群&lt;/h3&gt;&lt;p&gt;需要先安装好Zookeeper集群，见之前的文章《Zookeeper介绍及安装部署》。&lt;br&gt;1.创建消息持久化目录&lt;br&gt;[root@log1 ~]# mkdir /kafkaLogs&lt;/p&gt;
-&lt;p&gt;2.下载解压kafka，版本是kafka_2.11-0.9.0.1&lt;br&gt;[root@log1 local]# wget &lt;a href=&quot;http://mirrors.cnnic.cn/apache/kafka/0.9.0.1/kafka_2.11-0.9.0.1.tgz&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://mirrors.cnnic.cn/apache/kafka/0.9.0.1/kafka_2.11-0.9.0.1.tgz&lt;/a&gt;&lt;br&gt;[root@log1 local]# tar zxf kafka_2.11-0.9.0.1.tgz&lt;/p&gt;
-&lt;p&gt;3.修改配置&lt;br&gt;[root@log1 local]# cd kafka_2.11-0.9.0.1/config/&lt;br&gt;[root@log1 config]# vim server.properties&lt;br&gt;(1)修改broker.id&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(2)修改kafka监听地址&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;注意: advertised.host.name参数用来配置返回的host.name值，把这个参数配置为IP地址。这样客户端在使用java.net.InetAddress.getCanonicalHostName()获取时拿到的就是ip地址而不是主机名。&lt;/strong&gt;&lt;br&gt;(3)修改消息持久化目录&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(4)修改zk地址&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(5)添加启用删除topic配置&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(6)关闭自动创建topic&lt;br&gt;是否允许自动创建topic。如果设为true，那么produce，consume或者fetch metadata一个不存在的topic时，就会自动创建一个默认replication factor和partition number的topic。默认是true。&lt;/p&gt;
+&lt;h3 id=&quot;安装JDK1-7&quot;&gt;&lt;a href=&quot;#安装JDK1-7&quot; class=&quot;headerlink&quot; title=&quot;安装JDK1.7&quot;&gt;&lt;/a&gt;安装JDK1.7&lt;/h3&gt;&lt;p&gt;3台机器都需要安装JDK1.7。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# mkdir /usr/java
+[root@log1 local]# tar zxf jdk-7u80-linux-x64.gz -C /usr/java/
+[root@log1 local]# vim /etc/profile
+export JAVA_HOME=/usr/java/jdk1.7.0_80
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+[root@log1 local]# source /etc/profile
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装集群&quot;&gt;&lt;a href=&quot;#安装集群&quot; class=&quot;headerlink&quot; title=&quot;安装集群&quot;&gt;&lt;/a&gt;安装集群&lt;/h3&gt;&lt;p&gt;需要先安装好Zookeeper集群，见之前的文章《Zookeeper介绍及安装部署》。&lt;br&gt;1.创建消息持久化目录&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 ~]# mkdir /kafkaLogs
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.下载解压kafka，版本是kafka_2.11-0.9.0.1&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# wget http://mirrors.cnnic.cn/apache/kafka/0.9.0.1/kafka_2.11-0.9.0.1.tgz
+[root@log1 local]# tar zxf kafka_2.11-0.9.0.1.tgz
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.修改配置&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# cd kafka_2.11-0.9.0.1/config/
+[root@log1 config]# vim server.properties
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(1)修改broker.id&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(2)修改kafka监听地址&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;注意: advertised.host.name参数用来配置返回的host.name值，把这个参数配置为IP地址。这样客户端在使用java.net.InetAddress.getCanonicalHostName()获取时拿到的就是ip地址而不是主机名。&lt;/strong&gt;&lt;br&gt;(3)修改消息持久化目录&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(4)修改zk地址&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(5)添加启用删除topic配置&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(6)关闭自动创建topic&lt;br&gt;是否允许自动创建topic。如果设为true，那么produce，consume或者fetch metadata一个不存在的topic时，就会自动创建一个默认replication factor和partition number的topic。默认是true。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;auto.create.topics.enable=false
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/8.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;4.把log1的配置好的kafka拷贝到log2和log3上&lt;/p&gt;
