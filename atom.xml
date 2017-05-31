@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-26T03:26:37.000Z</updated>
+  <updated>2017-05-29T09:14:11.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,165 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Kafka介绍及安装部署</title>
+    <link href="http://yoursite.com/2017/05/28/Kafka%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
+    <id>http://yoursite.com/2017/05/28/Kafka介绍及安装部署/</id>
+    <published>2017-05-28T11:46:22.000Z</published>
+    <updated>2017-05-29T09:14:11.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;消息中间件&quot;&gt;&lt;a href=&quot;#消息中间件&quot; class=&quot;headerlink&quot; title=&quot;消息中间件&quot;&gt;&lt;/a&gt;消息中间件&lt;/h2&gt;&lt;p&gt;消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;消息中间件特点&quot;&gt;&lt;a href=&quot;#消息中间件特点&quot; class=&quot;headerlink&quot; title=&quot;消息中间件特点&quot;&gt;&lt;/a&gt;消息中间件特点&lt;/h2&gt;&lt;p&gt;1.采用异步处理模式&lt;br&gt;消息发送者可以发送一个消息而无须等待响应。消息发送者将消息发送到一条虚拟的通道（主题或者队列）上，消息接收者则订阅或者监听该通道。一条消息可能最终转发给一个或多个消息接收者，这些接收者都无需对消息发送者做出同步回应。整个过程是异步的。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;比如用户信息注册。注册完成后过段时间发送邮件或者短信。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;2.应用程序和应用程序调用关系为松耦合关系&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;发送者和接收者不必要了解对方、只需要确认消息&lt;/li&gt;
+&lt;li&gt;发送者和接收者不必同时在线&lt;br&gt;比如在线交易系统为了保证数据的最终一致，在支付系统处理完成后会把支付结果放到信息中间件里通知订单系统修改订单支付状态。两个系统通过消息中间件解耦。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;消息中间件的传递模型&quot;&gt;&lt;a href=&quot;#消息中间件的传递模型&quot; class=&quot;headerlink&quot; title=&quot;消息中间件的传递模型&quot;&gt;&lt;/a&gt;消息中间件的传递模型&lt;/h2&gt;&lt;p&gt;1.点对点模型(PTP)&lt;br&gt;点对点模型用于消息生产者和消息消费者之间点对点的通信。消息生产者将消息发送到由某个名字标识的特定消费者。这个名字实际上对应于消费服务中的一个队列(Queue)，在消息传递给消费者之前它被存储在这个队列中。队列消息可以放在内存中也可以是持久的，以保证在消息服务出现故障时仍然能够传递消息。&lt;br&gt;点对点模型特性：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;每个消息只有一个消费者&lt;/li&gt;
+&lt;li&gt;发送者和接受者没有时间依赖&lt;/li&gt;
+&lt;li&gt;接受者确认消息接受和处理成功&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;2.发布—订阅模型(Pub/Sub)&lt;br&gt;发布者/订阅者模型支持向一个特定的消息主题生产消息。0或多个订阅者可能对接收来自特定消息主题的消息感兴趣。在这种模型下，发布者和订阅者彼此不知道对方。这种模式好比是匿名公告板。这种模式被概括为：多个消费者可以获得消息。在发布者和订阅者之间存在时间依赖性。发布者需要建立一个订阅(subscription)，以便能够让消费者订阅。订阅者必须保持持续的活动状态以接收消息，除非订阅者建立了持久的订阅。在这种情况下，在订阅者未连接时发布的消息将在订阅者重新连接时重新发布。&lt;br&gt;其实消息中间件，像MySQL其实也可以作为消息中间件，只要你把消息中间件原理搞清楚，你会发现目前所有的存储，包括NoSQL，只要支持顺序性东西的，就可以作为一个消息中间件。就看你怎么去利用它了。就像redis里面那个队列list，就可以作为一个消息队列。&lt;br&gt;发布—订阅模型特性：&lt;/li&gt;
+&lt;li&gt;每个消息可以有多个订阅者&lt;/li&gt;
+&lt;li&gt;客户端只有订阅后才能接收到消息&lt;/li&gt;
+&lt;li&gt;持久订阅和非持久订阅&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(1)发布者和订阅者有时间依赖&lt;br&gt;接收者和发布者只有建立订阅关系才能收到消息。&lt;br&gt;(2)持久订阅&lt;br&gt;订阅关系建立后，消息就不会消失，不管订阅者是否在线。&lt;br&gt;(3)非持久订阅&lt;br&gt;订阅者为了接收消息，必须一直在线&lt;br&gt;当只有一个订阅者时约等于点对点模式。&lt;br&gt;&lt;strong&gt;大部分情况下会使用持久订阅。常用的消息队列有Kafka、RabbitMQ、ActiveMQ、metaq等&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;Kafka介绍&quot;&gt;&lt;a href=&quot;#Kafka介绍&quot; class=&quot;headerlink&quot; title=&quot;Kafka介绍&quot;&gt;&lt;/a&gt;Kafka介绍&lt;/h2&gt;&lt;p&gt;Kafka是一种分布式消息系统，由LinkedIn使用Scala编写，用作LinkedIn的活动流(Activity Stream)和运营数据处理管道(Pipeline)的基础，具有高水平扩展和高吞吐量。&lt;br&gt;目前越来越多的开源分布式处理系统如Apache flume、Apache Storm、Spark、Elasticsearch都支持与Kafka集成。&lt;/p&gt;
+&lt;h2 id=&quot;安装部署Kafka集群&quot;&gt;&lt;a href=&quot;#安装部署Kafka集群&quot; class=&quot;headerlink&quot; title=&quot;安装部署Kafka集群&quot;&gt;&lt;/a&gt;安装部署Kafka集群&lt;/h2&gt;&lt;h3 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;安装软件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;log1&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;114.55.29.86&lt;/td&gt;
+&lt;td&gt;JDK1.7、kafka_2.11&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;log2&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;114.55.29.241&lt;/td&gt;
+&lt;td&gt;JDK1.7、kafka_2.11&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;log3&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;114.55.253.15&lt;/td&gt;
+&lt;td&gt;JDK1.7、kafka_2.11&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&quot;安装JDK1-7&quot;&gt;&lt;a href=&quot;#安装JDK1-7&quot; class=&quot;headerlink&quot; title=&quot;安装JDK1.7&quot;&gt;&lt;/a&gt;安装JDK1.7&lt;/h3&gt;&lt;p&gt;3台机器都需要安装JDK1.7。&lt;br&gt;        [root@log1 local]# mkdir /usr/java&lt;br&gt;        [root@log1 local]# tar zxf jdk-7u80-linux-x64.gz -C /usr/java/&lt;br&gt;        [root@log1 local]# vim /etc/profile&lt;br&gt;        export JAVA_HOME=/usr/java/jdk1.7.0_80&lt;br&gt;        export PATH=$JAVA_HOME/bin:$PATH&lt;br&gt;        export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar&lt;br&gt;        [root@log1 local]# source /etc/profile&lt;/p&gt;
+&lt;h3 id=&quot;安装集群&quot;&gt;&lt;a href=&quot;#安装集群&quot; class=&quot;headerlink&quot; title=&quot;安装集群&quot;&gt;&lt;/a&gt;安装集群&lt;/h3&gt;&lt;p&gt;需要先安装好Zookeeper集群，见之前的文章《Zookeeper介绍及安装部署》。&lt;br&gt;1.创建消息持久化目录&lt;br&gt;[root@log1 ~]# mkdir /kafkaLogs&lt;/p&gt;
+&lt;p&gt;2.下载解压kafka，版本是kafka_2.11-0.9.0.1&lt;br&gt;[root@log1 local]# wget &lt;a href=&quot;http://mirrors.cnnic.cn/apache/kafka/0.9.0.1/kafka_2.11-0.9.0.1.tgz&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://mirrors.cnnic.cn/apache/kafka/0.9.0.1/kafka_2.11-0.9.0.1.tgz&lt;/a&gt;&lt;br&gt;[root@log1 local]# tar zxf kafka_2.11-0.9.0.1.tgz&lt;/p&gt;
+&lt;p&gt;3.修改配置&lt;br&gt;[root@log1 local]# cd kafka_2.11-0.9.0.1/config/&lt;br&gt;[root@log1 config]# vim server.properties&lt;br&gt;(1)修改broker.id&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(2)修改kafka监听地址&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;注意: advertised.host.name参数用来配置返回的host.name值，把这个参数配置为IP地址。这样客户端在使用java.net.InetAddress.getCanonicalHostName()获取时拿到的就是ip地址而不是主机名。&lt;/strong&gt;&lt;br&gt;(3)修改消息持久化目录&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(4)修改zk地址&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(5)添加启用删除topic配置&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(6)关闭自动创建topic&lt;br&gt;是否允许自动创建topic。如果设为true，那么produce，consume或者fetch metadata一个不存在的topic时，就会自动创建一个默认replication factor和partition number的topic。默认是true。&lt;br&gt;auto.create.topics.enable=false&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/8.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;4.把log1的配置好的kafka拷贝到log2和log3上&lt;br&gt;[root@log1 local]# scp -rp kafka_2.11-0.9.0.1 root@114.55.29.241:/usr/local/&lt;br&gt;[root@log1 local]# scp -rp kafka_2.11-0.9.0.1 root@114.55.253.15:/usr/local/&lt;/p&gt;
+&lt;p&gt;5.log2和log3主机上创建消息持久化目录&lt;br&gt;[root@log2 ~]# mkdir /kafkaLogs&lt;br&gt;[root@log3 ~]# mkdir /kafkaLogs&lt;/p&gt;
+&lt;p&gt;6.修改log2配置文件中的broker.id为1，log3主机的为2&lt;br&gt;[root@log2 config]# vim server.properties&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/9.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;启动集群&quot;&gt;&lt;a href=&quot;#启动集群&quot; class=&quot;headerlink&quot; title=&quot;启动集群&quot;&gt;&lt;/a&gt;启动集群&lt;/h3&gt;&lt;p&gt;log1主机启动kafka：&lt;br&gt;        [root@log1 ~]# cd /usr/local/kafka_2.11-0.9.0.1/&lt;br&gt;        [root@log1 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;amp;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/10.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;log2主机启动kafka：&lt;br&gt;        [root@log2 ~]# cd /usr/local/kafka_2.11-0.9.0.1/&lt;br&gt;        [root@log2 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;amp;&lt;/p&gt;
+&lt;p&gt;log3主机启动kafka：&lt;br&gt;        [root@log3 ~]# cd /usr/local/kafka_2.11-0.9.0.1/&lt;br&gt;        [root@log3 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;amp;&lt;/p&gt;
+&lt;h3 id=&quot;脚本定期清理logs下的日志文件&quot;&gt;&lt;a href=&quot;#脚本定期清理logs下的日志文件&quot; class=&quot;headerlink&quot; title=&quot;脚本定期清理logs下的日志文件&quot;&gt;&lt;/a&gt;脚本定期清理logs下的日志文件&lt;/h3&gt;&lt;p&gt;默认kafka是按天切割日志的，而且不删除：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/11.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这里写一个简单的脚本来清理这些日志，主要是清理server.log和controller.log。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 ~]# cd /usr/local/kafka_2.11-0.9.0.1/
+[root@log1 kafka_2.11-0.9.0.1]# vim clean_kafkalog.sh
+#!/bin/bash
+###Description:This script is used to clear kafka logs, not message file.
+###Written by: jkzhao - jkzhao@wisedu.com  
+###History: 2016-04-18 First release.
+
+# log file dir.
+logDir=/usr/local/kafka_2.11-0.9.0.1/logs
+
+# Reserved 7 files.
+COUNT=7
+
+ls -t $logDir/server.log* | tail -n +$[$COUNT+1] | xargs rm -f
+ls -t $logDir/controller.log* | tail -n +$[$COUNT+1] | xargs rm -f
+ls -t $logDir/state-change.log* | tail -n +$[$COUNT+1] | xargs rm -f
+ls -t $logDir/log-cleaner.log* | tail -n +$[$COUNT+1] | xargs rm –f
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;赋予脚本执行权限：&lt;br&gt;        [root@log1 kafka_2.11-0.9.0.1]# chmod +x clean_kafkalog.sh&lt;br&gt;周期性任务策略：每周日的0点0分去执行这个脚本。&lt;br&gt;        [root@log1 logs]# crontab -e&lt;br&gt;0 0 &lt;em&gt; &lt;/em&gt; 0 /usr/local/kafka_2.11-0.9.0.1/clean_kafkalog.sh&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/12.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;把清理日志的脚本拷贝到第二台和第三台主机：&lt;br&gt;        [root@log1 kafka_2.11-0.9.0.1]# scp -p clean_kafkalog.sh root@114.55.29.241:/usr/local/kafka_2.11-0.9.0.1&lt;br&gt;        [root@log1 kafka_2.11-0.9.0.1]# scp -p clean_kafkalog.sh root@114.55.253.15:/usr/local/kafka_2.11-0.9.0.1&lt;br&gt;同样的配置周期性任务策略。&lt;/p&gt;
+&lt;h3 id=&quot;停止kafka命令&quot;&gt;&lt;a href=&quot;#停止kafka命令&quot; class=&quot;headerlink&quot; title=&quot;停止kafka命令&quot;&gt;&lt;/a&gt;停止kafka命令&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@log1 ~]# /usr/local/kafka_2.11-0.9.0.1/bin/kafka-server-stop.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;测试集群&quot;&gt;&lt;a href=&quot;#测试集群&quot; class=&quot;headerlink&quot; title=&quot;测试集群&quot;&gt;&lt;/a&gt;测试集群&lt;/h3&gt;&lt;p&gt;1.log1主机上创建一个名为test的topic&lt;br&gt;        [root@log1 kafka_2.11-0.9.0.1]# bin/kafka-topics.sh –create –zookeeper localhost:2181 –replication-factor 1 –partitions 1 –topic test&lt;/p&gt;
+&lt;p&gt;2.log2和log3主机上利用命令行工具创建一个consumer程序&lt;br&gt;        [root@log2 kafka_2.11-0.9.0.1]# bin/kafka-console-consumer.sh –zookeeper localhost:2181 –topic test –from-beginning&lt;br&gt;        [root@log2 kafka_2.11-0.9.0.1]# bin/kafka-console-consumer.sh –zookeeper localhost:2181 –topic test –from-beginning&lt;/p&gt;
+&lt;p&gt;3.log1主机上利用命令行工具创建一个producer程序&lt;br&gt;        [root@log1 kafka_2.11-0.9.0.1]# bin/kafka-console-producer.sh –broker-list localhost:9092 –topic test&lt;/p&gt;
+&lt;p&gt;log1主机上终端输入message，然后到log2和log3主机的终端查看&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/14.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;创建生产环境topic&quot;&gt;&lt;a href=&quot;#创建生产环境topic&quot; class=&quot;headerlink&quot; title=&quot;创建生产环境topic&quot;&gt;&lt;/a&gt;创建生产环境topic&lt;/h3&gt;&lt;p&gt;如果kafka集群是3台，我们创建一个名为business的Topic，如下：&lt;br&gt;        bin/kafka-topics.sh –create –zookeeper localhost:2181 –replication-factor 2 –partitions 3 –topic business&lt;br&gt;&lt;strong&gt;注意:为Topic创建分区时，–partitions(分区数)最好是broker数量的整数倍，这样才能使一个Topic的分区均匀的分布在整个Kafka集群中。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&quot;Kafka常用命令&quot;&gt;&lt;a href=&quot;#Kafka常用命令&quot; class=&quot;headerlink&quot; title=&quot;Kafka常用命令&quot;&gt;&lt;/a&gt;Kafka常用命令&lt;/h3&gt;&lt;p&gt;1.启动kafka&lt;br&gt;        nohup bin/kafka-server-start.sh config/server.properties &amp;gt; /dev/null 2&amp;gt;&amp;amp;1 &amp;amp;&lt;/p&gt;
+&lt;p&gt;2.查看topic&lt;br&gt;        bin/kafka-topics.sh –list –zookeeper localhost:2181&lt;/p&gt;
+&lt;p&gt;3.控制台消费&lt;br&gt;        bin/kafka-console-consumer.sh –zookeeper localhost:2181 –topic middleware –from-beginning&lt;/p&gt;
+&lt;p&gt;4.删除topic&lt;br&gt;(1)删除kafka存储目录（server.properties文件log.dirs配置，默认为”/tmp/kafka-logs”）相关topic目录&lt;br&gt;(2)如果配置了delete.topic.enable=true直接通过命令删除，如果命令删除不掉，直接通过zookeeper-client 删除掉”/brokers/topics/“目录下相关topic节点。&lt;br&gt;【注意】: 1.如果你要删除一个topic并且重建，那么必须重新启动kafka，否则新建的topic在zookeeper的/brokers/topics/test-topic/目录下没有partitions这个目录，也就是没有分区信息。&lt;/p&gt;
+&lt;h2 id=&quot;安装Yahoo-kafka-manager&quot;&gt;&lt;a href=&quot;#安装Yahoo-kafka-manager&quot; class=&quot;headerlink&quot; title=&quot;安装Yahoo kafka manager&quot;&gt;&lt;/a&gt;安装Yahoo kafka manager&lt;/h2&gt;&lt;h3 id=&quot;Yahoo-kafka-manager介绍&quot;&gt;&lt;a href=&quot;#Yahoo-kafka-manager介绍&quot; class=&quot;headerlink&quot; title=&quot;Yahoo kafka manager介绍&quot;&gt;&lt;/a&gt;Yahoo kafka manager介绍&lt;/h3&gt;&lt;p&gt;项目地址：&lt;a href=&quot;https://github.com/yahoo/kafka-manager&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/yahoo/kafka-manager&lt;/a&gt;&lt;br&gt;Requirements：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Kafka 0.8.1.1 or 0.8.2.*&lt;/li&gt;
+&lt;li&gt;sbt 0.13.x&lt;/li&gt;
+&lt;li&gt;Java 8+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Kafka Manager是一个管控台，这款工具主要支持以下几个功能：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;管理多个不同的集群；&lt;/li&gt;
+&lt;li&gt;很容易地检查集群的状态(topics, brokers, 副本的分布, 分区的分布)；&lt;/li&gt;
+&lt;li&gt;选择副本；&lt;/li&gt;
+&lt;li&gt;产生分区分配(Generate partition assignments)基于集群的当前状态；&lt;/li&gt;
+&lt;li&gt;重新分配分区。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;环境信息-1&quot;&gt;&lt;a href=&quot;#环境信息-1&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;安装软件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;console&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;114.55.29.246&lt;/td&gt;
+&lt;td&gt;JDK1.8、kafka-manager-1.3.0.6.zip&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Kafka Manager可以装在任何一台机器上，我这里部署在一台单独的机器上。&lt;/p&gt;
+&lt;h3 id=&quot;安装jdk1-8&quot;&gt;&lt;a href=&quot;#安装jdk1-8&quot; class=&quot;headerlink&quot; title=&quot;安装jdk1.8&quot;&gt;&lt;/a&gt;安装jdk1.8&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@console local]# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;配置PATH环境变量:&lt;br&gt;        [root@console ~]# vim /etc/profile&lt;br&gt;        export JAVA_HOME=/usr/java/jdk1.8.0_73&lt;br&gt;        export PATH=$JAVA_HOME/bin:$PATH&lt;br&gt;        export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar&lt;/p&gt;
+&lt;h3 id=&quot;安装sbt0-13-9&quot;&gt;&lt;a href=&quot;#安装sbt0-13-9&quot; class=&quot;headerlink&quot; title=&quot;安装sbt0.13.9&quot;&gt;&lt;/a&gt;安装sbt0.13.9&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@console ~]# curl https://bintray.com/sbt/rpm/rpm | sudo tee /etc/yum.repos.d/bintray-sbt-rpm.repo
+[root@console ~]# yum install -y sbt
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;构建kafka-manager包&quot;&gt;&lt;a href=&quot;#构建kafka-manager包&quot; class=&quot;headerlink&quot; title=&quot;构建kafka manager包&quot;&gt;&lt;/a&gt;构建kafka manager包&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@console ~]# git clone https://github.com/yahoo/kafka-manager.git
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/15.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;        [root@console ~]# unzip -oq kafka-manager-upgrade-to-90.zip&lt;br&gt;        [root@console ~]# mv kafka-manager-upgrade-to-90 kafka-manager&lt;br&gt;        [root@console ~]# cd kafka-manager&lt;br&gt;        [root@console kafka-manager]# sbt clean dist&lt;br&gt;        The command below will create a zip file which can be used to deploy the application. 使用sbt编译打包的时候时间可能会比较长。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/16.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这个需要翻墙才能完成。配置代理：&lt;br&gt;        [root@console ~]# vim /usr/share/sbt-launcher-packaging/conf/sbtconfig.txt&lt;br&gt;        -Dhttp.proxyHost=proxy&lt;br&gt;        -Dhttp.proxyPort=8080&lt;br&gt;再次运行这个命令，依然需要等待较长的时间，有可能还会失败。如果失败就多次尝试打包：&lt;br&gt;        [root@console kafka-manager]# sbt clean dist&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/17.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/18.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;打包完成后会创建一个zip压缩包，而这个压缩包可以用来部署该应用。生成的包会在kafka-manager/target/universal 下面。生成的包只需要java环境就可以运行了，在以后部署到其他机器上不需要安装sbt进行打包构建了。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/19.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;安装kafka-manager&quot;&gt;&lt;a href=&quot;#安装kafka-manager&quot; class=&quot;headerlink&quot; title=&quot;安装kafka manager&quot;&gt;&lt;/a&gt;安装kafka manager&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@console kafka-manager]# cp target/universal/kafka-manager-1.3.0.6.zip ~/
+[root@console kafka-manager]# cd
+[root@console ~]# unzip -oq kafka-manager-1.3.0.6.zip
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置kafka-manager&quot;&gt;&lt;a href=&quot;#配置kafka-manager&quot; class=&quot;headerlink&quot; title=&quot;配置kafka-manager&quot;&gt;&lt;/a&gt;配置kafka-manager&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@console ~]# cd kafka-manager-1.3.0.6/
+[root@console kafka-manager-1.3.0.6]# vim conf/application.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;设置zkhosts：&lt;br&gt;        kafka-manager.zkhosts=”114.55.29.246:2181,114.55.29.86:2181,114.55.29.241:2181”&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/20.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;启动kafka-manager&quot;&gt;&lt;a href=&quot;#启动kafka-manager&quot; class=&quot;headerlink&quot; title=&quot;启动kafka-manager&quot;&gt;&lt;/a&gt;启动kafka-manager&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@console kafka-manager-1.3.0.6]# bin/kafka-manager
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/21.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;默认监听的端口是9000。你也可以在启动时指定配置文件和监听端口：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# bin/kafka-manager -Dconfig.file=/path/to/application.conf -Dhttp.port=8080
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动并置于后台运行：&lt;br&gt;        [kmanager@console kafka-manager-1.3.0.6]$ nohup bin/kafka-manager &amp;gt; /dev/null 2&amp;gt;&amp;amp;1 &amp;amp;&lt;/p&gt;
+&lt;h2 id=&quot;kafka-manager添加cluster&quot;&gt;&lt;a href=&quot;#kafka-manager添加cluster&quot; class=&quot;headerlink&quot; title=&quot;kafka-manager添加cluster&quot;&gt;&lt;/a&gt;kafka-manager添加cluster&lt;/h2&gt;&lt;p&gt;浏览器输入地址访问：&lt;a href=&quot;http://114.55.29.246:9000/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://114.55.29.246:9000/&lt;/a&gt;&lt;br&gt;&lt;strong&gt;注意:安装完成后需要手动添加Cluster。添加Cluster是指添加一个已有的Kafka集群进入监控列表，而非通过Kafka Manager部署一个新的Kafka Cluster，这一点与Cloudera Manager不同。&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/22.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/23.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;消息中间件&quot;&gt;&lt;a href=&quot;#消息中间件&quot; class=&quot;headerlink&quot; title=&quot;消息中间件&quot;&gt;&lt;/a&gt;消息中间件&lt;/h2&gt;&lt;p&gt;消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="Kafka 大数据" scheme="http://yoursite.com/tags/Kafka-%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
+    
+  </entry>
   
   <entry>
     <title>Zookeeper介绍及安装部署</title>
@@ -414,7 +573,7 @@ fi
     <link href="http://yoursite.com/2017/05/23/zabbix%E7%9B%91%E6%8E%A7websphere%E5%92%8Cweblogic/"/>
     <id>http://yoursite.com/2017/05/23/zabbix监控websphere和weblogic/</id>
     <published>2017-05-23T13:25:25.000Z</published>
-    <updated>2017-05-24T01:23:56.000Z</updated>
+    <updated>2017-05-30T02:52:02.000Z</updated>
     
     <content type="html">&lt;h1 id=&quot;zabbix-java-gateway&quot;&gt;&lt;a href=&quot;#zabbix-java-gateway&quot; class=&quot;headerlink&quot; title=&quot;zabbix java gateway&quot;&gt;&lt;/a&gt;zabbix java gateway&lt;/h1&gt;&lt;p&gt;zabbix通过JMX监控应用服务器。JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架。JMX可以跨越一系列异构操作系统平台、系统体系结构和网络传输协议，灵活的开发无缝集成的系统、网络和服务管理应用。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;Zabbix已经集成JMX，可以用Zabbix通过JMX监控JVM，TOMCAT，Weblogic，Jboss等。要使用Zabbix监控Weblogic，我们先要了解Zabbix的JMX监控架构，Weblogic的JMX信息，最后才能去实现怎么去配置监控和报警。&lt;br&gt;Zabbix是使用了一个叫做Java Gateway的应用去监控JMX的。Java Gateway集成在zabbix官方开发发布的。所以需要在编译安装zabbix server时，需要添加一个选项–enable-java。这样安装zabbix后在/usr/local/zabbix-3.0.1/sbin目录下会有个zabbix_java目录，这个目录里面就是zabbix Java gateway的文件。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/80.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h1 id=&quot;配置和运行java-gateway&quot;&gt;&lt;a href=&quot;#配置和运行java-gateway&quot; class=&quot;headerlink&quot; title=&quot;配置和运行java gateway&quot;&gt;&lt;/a&gt;配置和运行java gateway&lt;/h1&gt;&lt;p&gt;默认情况下，Java gateway监听10052端口. 如果你计划使用不同的端口来运行Java gateway，你需要通过setting.sh脚本指定下需要的端口。&lt;br&gt;启动：&lt;/p&gt;
@@ -479,7 +638,7 @@ Value: false
     <link href="http://yoursite.com/2017/05/16/zabbix%E7%9B%91%E6%8E%A7Nginx/"/>
     <id>http://yoursite.com/2017/05/16/zabbix监控Nginx/</id>
     <published>2017-05-16T03:04:58.000Z</published>
-    <updated>2017-05-16T03:28:39.000Z</updated>
+    <updated>2017-05-29T10:32:50.000Z</updated>
     
     <content type="html">&lt;p&gt;&lt;a href=&quot;https://nginx.org/en/docs/http/ngx_http_stub_status_module.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://nginx.org/en/docs/http/ngx_http_stub_status_module.html&lt;/a&gt;&lt;br&gt;在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。&lt;br&gt;Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h1 id=&quot;启用nginx-status配置&quot;&gt;&lt;a href=&quot;#启用nginx-status配置&quot; class=&quot;headerlink&quot; title=&quot;启用nginx status配置&quot;&gt;&lt;/a&gt;启用nginx status配置&lt;/h1&gt;&lt;p&gt;在http段加入如下配置：&lt;/p&gt;
@@ -513,7 +672,7 @@ UserParameter=Nginx.requests[*], /usr/bin/curl -s &amp;quot;http://$1:$2/status&
 &lt;/code&gt;&lt;/pre&gt;&lt;h1 id=&quot;zabbix-web-gui配置监控项&quot;&gt;&lt;a href=&quot;#zabbix-web-gui配置监控项&quot; class=&quot;headerlink&quot; title=&quot;zabbix web gui配置监控项&quot;&gt;&lt;/a&gt;zabbix web gui配置监控项&lt;/h1&gt;&lt;h2 id=&quot;创建Nginx-Template&quot;&gt;&lt;a href=&quot;#创建Nginx-Template&quot; class=&quot;headerlink&quot; title=&quot;创建Nginx Template&quot;&gt;&lt;/a&gt;创建Nginx Template&lt;/h2&gt;&lt;p&gt;点击Configuration—&amp;gt;Templates，点击右上角的Create template。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/66.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;填写模板的信息，点击Add。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/67.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h2 id=&quot;创建Application&quot;&gt;&lt;a href=&quot;#创建Application&quot; class=&quot;headerlink&quot; title=&quot;创建Application&quot;&gt;&lt;/a&gt;创建Application&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;生产环境下只需要把我写好的模板文件import进去就可以了，不需要像下面那样再去创建模板，下面只是介绍下创建模板的过程。&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;点击Configuration—&amp;gt;Templates，找到刚才创建的Nginx template，点击所在行的Applications列。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/68.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击右上角的Create application。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/69.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;输入application的名字Nginx running status，点击Add。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/70.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;创建Items&quot;&gt;&lt;a href=&quot;#创建Items&quot; class=&quot;headerlink&quot; title=&quot;创建Items&quot;&gt;&lt;/a&gt;创建Items&lt;/h2&gt;&lt;p&gt;点击Configuration—&amp;gt;Templates，找到刚才创建的Nginx template，点击所在行的Items列。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/71.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击右上角的Create item。分别创建5个监控项，如下图：&lt;/p&gt;
+&lt;h2 id=&quot;创建Items&quot;&gt;&lt;a href=&quot;#创建Items&quot; class=&quot;headerlink&quot; title=&quot;创建Items&quot;&gt;&lt;/a&gt;创建Items&lt;/h2&gt;&lt;p&gt;点击Configuration—&amp;gt;Templates，找到刚才创建的Nginx template，点击所在行的Items列。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/71.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击右上角的Create item。分别创建8个监控项，如下图：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;当前 Nginx 正处理的活动连接数（包括等待着的连接数）&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/72.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
 &lt;li&gt;Nginx一共处理了的连接数&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/73.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;

@@ -1,0 +1,891 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kafka 大数据," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="消息中间件消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。">
+<meta name="keywords" content="Kafka 大数据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kafka介绍及安装部署">
+<meta property="og:url" content="http://yoursite.com/2017/05/28/Kafka介绍及安装部署/index.html">
+<meta property="og:site_name" content="jkzhao's blog">
+<meta property="og:description" content="消息中间件消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/6.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/7.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/8.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/9.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/10.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/12.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/13.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/14.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/15.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/16.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/17.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/18.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/19.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/20.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/21.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/22.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/23.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png">
+<meta property="og:updated_time" content="2017-05-29T09:14:11.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kafka介绍及安装部署">
+<meta name="twitter:description" content="消息中间件消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Kafka介绍及安装部署 | jkzhao's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Kafka介绍及安装部署
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-05-28T19:46:22+08:00" content="2017-05-28">
+              2017-05-28
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/05/28/Kafka介绍及安装部署/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/28/Kafka介绍及安装部署/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="消息中间件"><a href="#消息中间件" class="headerlink" title="消息中间件"></a>消息中间件</h2><p>消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。<br><a id="more"></a></p>
+<h2 id="消息中间件特点"><a href="#消息中间件特点" class="headerlink" title="消息中间件特点"></a>消息中间件特点</h2><p>1.采用异步处理模式<br>消息发送者可以发送一个消息而无须等待响应。消息发送者将消息发送到一条虚拟的通道（主题或者队列）上，消息接收者则订阅或者监听该通道。一条消息可能最终转发给一个或多个消息接收者，这些接收者都无需对消息发送者做出同步回应。整个过程是异步的。</p>
+<ul>
+<li>比如用户信息注册。注册完成后过段时间发送邮件或者短信。</li>
+</ul>
+<p>2.应用程序和应用程序调用关系为松耦合关系</p>
+<ul>
+<li>发送者和接收者不必要了解对方、只需要确认消息</li>
+<li>发送者和接收者不必同时在线<br>比如在线交易系统为了保证数据的最终一致，在支付系统处理完成后会把支付结果放到信息中间件里通知订单系统修改订单支付状态。两个系统通过消息中间件解耦。</li>
+</ul>
+<h2 id="消息中间件的传递模型"><a href="#消息中间件的传递模型" class="headerlink" title="消息中间件的传递模型"></a>消息中间件的传递模型</h2><p>1.点对点模型(PTP)<br>点对点模型用于消息生产者和消息消费者之间点对点的通信。消息生产者将消息发送到由某个名字标识的特定消费者。这个名字实际上对应于消费服务中的一个队列(Queue)，在消息传递给消费者之前它被存储在这个队列中。队列消息可以放在内存中也可以是持久的，以保证在消息服务出现故障时仍然能够传递消息。<br>点对点模型特性：</p>
+<ul>
+<li>每个消息只有一个消费者</li>
+<li>发送者和接受者没有时间依赖</li>
+<li>接受者确认消息接受和处理成功<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/1.png" alt=""><br>2.发布—订阅模型(Pub/Sub)<br>发布者/订阅者模型支持向一个特定的消息主题生产消息。0或多个订阅者可能对接收来自特定消息主题的消息感兴趣。在这种模型下，发布者和订阅者彼此不知道对方。这种模式好比是匿名公告板。这种模式被概括为：多个消费者可以获得消息。在发布者和订阅者之间存在时间依赖性。发布者需要建立一个订阅(subscription)，以便能够让消费者订阅。订阅者必须保持持续的活动状态以接收消息，除非订阅者建立了持久的订阅。在这种情况下，在订阅者未连接时发布的消息将在订阅者重新连接时重新发布。<br>其实消息中间件，像MySQL其实也可以作为消息中间件，只要你把消息中间件原理搞清楚，你会发现目前所有的存储，包括NoSQL，只要支持顺序性东西的，就可以作为一个消息中间件。就看你怎么去利用它了。就像redis里面那个队列list，就可以作为一个消息队列。<br>发布—订阅模型特性：</li>
+<li>每个消息可以有多个订阅者</li>
+<li>客户端只有订阅后才能接收到消息</li>
+<li>持久订阅和非持久订阅<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/2.png" alt=""><br>(1)发布者和订阅者有时间依赖<br>接收者和发布者只有建立订阅关系才能收到消息。<br>(2)持久订阅<br>订阅关系建立后，消息就不会消失，不管订阅者是否在线。<br>(3)非持久订阅<br>订阅者为了接收消息，必须一直在线<br>当只有一个订阅者时约等于点对点模式。<br><strong>大部分情况下会使用持久订阅。常用的消息队列有Kafka、RabbitMQ、ActiveMQ、metaq等</strong></li>
+</ul>
+<h2 id="Kafka介绍"><a href="#Kafka介绍" class="headerlink" title="Kafka介绍"></a>Kafka介绍</h2><p>Kafka是一种分布式消息系统，由LinkedIn使用Scala编写，用作LinkedIn的活动流(Activity Stream)和运营数据处理管道(Pipeline)的基础，具有高水平扩展和高吞吐量。<br>目前越来越多的开源分布式处理系统如Apache flume、Apache Storm、Spark、Elasticsearch都支持与Kafka集成。</p>
+<h2 id="安装部署Kafka集群"><a href="#安装部署Kafka集群" class="headerlink" title="安装部署Kafka集群"></a>安装部署Kafka集群</h2><h3 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h3><table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>操作系统版本</th>
+<th>IP地址</th>
+<th>安装软件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>log1</td>
+<td>CentOS 7.0</td>
+<td>114.55.29.86</td>
+<td>JDK1.7、kafka_2.11</td>
+</tr>
+<tr>
+<td>log2</td>
+<td>CentOS 7.0</td>
+<td>114.55.29.241</td>
+<td>JDK1.7、kafka_2.11</td>
+</tr>
+<tr>
+<td>log3</td>
+<td>CentOS 7.0</td>
+<td>114.55.253.15</td>
+<td>JDK1.7、kafka_2.11</td>
+</tr>
+</tbody>
+</table>
+<h3 id="安装JDK1-7"><a href="#安装JDK1-7" class="headerlink" title="安装JDK1.7"></a>安装JDK1.7</h3><p>3台机器都需要安装JDK1.7。<br>        [root@log1 local]# mkdir /usr/java<br>        [root@log1 local]# tar zxf jdk-7u80-linux-x64.gz -C /usr/java/<br>        [root@log1 local]# vim /etc/profile<br>        export JAVA_HOME=/usr/java/jdk1.7.0_80<br>        export PATH=$JAVA_HOME/bin:$PATH<br>        export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar<br>        [root@log1 local]# source /etc/profile</p>
+<h3 id="安装集群"><a href="#安装集群" class="headerlink" title="安装集群"></a>安装集群</h3><p>需要先安装好Zookeeper集群，见之前的文章《Zookeeper介绍及安装部署》。<br>1.创建消息持久化目录<br>[root@log1 ~]# mkdir /kafkaLogs</p>
+<p>2.下载解压kafka，版本是kafka_2.11-0.9.0.1<br>[root@log1 local]# wget <a href="http://mirrors.cnnic.cn/apache/kafka/0.9.0.1/kafka_2.11-0.9.0.1.tgz" target="_blank" rel="external">http://mirrors.cnnic.cn/apache/kafka/0.9.0.1/kafka_2.11-0.9.0.1.tgz</a><br>[root@log1 local]# tar zxf kafka_2.11-0.9.0.1.tgz</p>
+<p>3.修改配置<br>[root@log1 local]# cd kafka_2.11-0.9.0.1/config/<br>[root@log1 config]# vim server.properties<br>(1)修改broker.id<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/3.png" alt=""><br>(2)修改kafka监听地址<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/4.png" alt=""><br><strong>注意: advertised.host.name参数用来配置返回的host.name值，把这个参数配置为IP地址。这样客户端在使用java.net.InetAddress.getCanonicalHostName()获取时拿到的就是ip地址而不是主机名。</strong><br>(3)修改消息持久化目录<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/5.png" alt=""><br>(4)修改zk地址<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/6.png" alt=""><br>(5)添加启用删除topic配置<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/7.png" alt=""><br>(6)关闭自动创建topic<br>是否允许自动创建topic。如果设为true，那么produce，consume或者fetch metadata一个不存在的topic时，就会自动创建一个默认replication factor和partition number的topic。默认是true。<br>auto.create.topics.enable=false<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/8.png" alt=""></p>
+<p>4.把log1的配置好的kafka拷贝到log2和log3上<br>[root@log1 local]# scp -rp kafka_2.11-0.9.0.1 root@114.55.29.241:/usr/local/<br>[root@log1 local]# scp -rp kafka_2.11-0.9.0.1 root@114.55.253.15:/usr/local/</p>
+<p>5.log2和log3主机上创建消息持久化目录<br>[root@log2 ~]# mkdir /kafkaLogs<br>[root@log3 ~]# mkdir /kafkaLogs</p>
+<p>6.修改log2配置文件中的broker.id为1，log3主机的为2<br>[root@log2 config]# vim server.properties<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/9.png" alt=""></p>
+<h3 id="启动集群"><a href="#启动集群" class="headerlink" title="启动集群"></a>启动集群</h3><p>log1主机启动kafka：<br>        [root@log1 ~]# cd /usr/local/kafka_2.11-0.9.0.1/<br>        [root@log1 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/10.png" alt=""></p>
+<p>log2主机启动kafka：<br>        [root@log2 ~]# cd /usr/local/kafka_2.11-0.9.0.1/<br>        [root@log2 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;</p>
+<p>log3主机启动kafka：<br>        [root@log3 ~]# cd /usr/local/kafka_2.11-0.9.0.1/<br>        [root@log3 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;</p>
+<h3 id="脚本定期清理logs下的日志文件"><a href="#脚本定期清理logs下的日志文件" class="headerlink" title="脚本定期清理logs下的日志文件"></a>脚本定期清理logs下的日志文件</h3><p>默认kafka是按天切割日志的，而且不删除：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/11.png" alt=""><br>这里写一个简单的脚本来清理这些日志，主要是清理server.log和controller.log。</p>
+<pre><code>[root@log1 ~]# cd /usr/local/kafka_2.11-0.9.0.1/
+[root@log1 kafka_2.11-0.9.0.1]# vim clean_kafkalog.sh
+#!/bin/bash
+###Description:This script is used to clear kafka logs, not message file.
+###Written by: jkzhao - jkzhao@wisedu.com  
+###History: 2016-04-18 First release.
+
+# log file dir.
+logDir=/usr/local/kafka_2.11-0.9.0.1/logs
+
+# Reserved 7 files.
+COUNT=7
+
+ls -t $logDir/server.log* | tail -n +$[$COUNT+1] | xargs rm -f
+ls -t $logDir/controller.log* | tail -n +$[$COUNT+1] | xargs rm -f
+ls -t $logDir/state-change.log* | tail -n +$[$COUNT+1] | xargs rm -f
+ls -t $logDir/log-cleaner.log* | tail -n +$[$COUNT+1] | xargs rm –f
+</code></pre><p>赋予脚本执行权限：<br>        [root@log1 kafka_2.11-0.9.0.1]# chmod +x clean_kafkalog.sh<br>周期性任务策略：每周日的0点0分去执行这个脚本。<br>        [root@log1 logs]# crontab -e<br>0 0 <em> </em> 0 /usr/local/kafka_2.11-0.9.0.1/clean_kafkalog.sh<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/12.png" alt=""><br>把清理日志的脚本拷贝到第二台和第三台主机：<br>        [root@log1 kafka_2.11-0.9.0.1]# scp -p clean_kafkalog.sh root@114.55.29.241:/usr/local/kafka_2.11-0.9.0.1<br>        [root@log1 kafka_2.11-0.9.0.1]# scp -p clean_kafkalog.sh root@114.55.253.15:/usr/local/kafka_2.11-0.9.0.1<br>同样的配置周期性任务策略。</p>
+<h3 id="停止kafka命令"><a href="#停止kafka命令" class="headerlink" title="停止kafka命令"></a>停止kafka命令</h3><pre><code>[root@log1 ~]# /usr/local/kafka_2.11-0.9.0.1/bin/kafka-server-stop.sh
+</code></pre><h3 id="测试集群"><a href="#测试集群" class="headerlink" title="测试集群"></a>测试集群</h3><p>1.log1主机上创建一个名为test的topic<br>        [root@log1 kafka_2.11-0.9.0.1]# bin/kafka-topics.sh –create –zookeeper localhost:2181 –replication-factor 1 –partitions 1 –topic test</p>
+<p>2.log2和log3主机上利用命令行工具创建一个consumer程序<br>        [root@log2 kafka_2.11-0.9.0.1]# bin/kafka-console-consumer.sh –zookeeper localhost:2181 –topic test –from-beginning<br>        [root@log2 kafka_2.11-0.9.0.1]# bin/kafka-console-consumer.sh –zookeeper localhost:2181 –topic test –from-beginning</p>
+<p>3.log1主机上利用命令行工具创建一个producer程序<br>        [root@log1 kafka_2.11-0.9.0.1]# bin/kafka-console-producer.sh –broker-list localhost:9092 –topic test</p>
+<p>log1主机上终端输入message，然后到log2和log3主机的终端查看<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/13.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/14.png" alt=""></p>
+<h3 id="创建生产环境topic"><a href="#创建生产环境topic" class="headerlink" title="创建生产环境topic"></a>创建生产环境topic</h3><p>如果kafka集群是3台，我们创建一个名为business的Topic，如下：<br>        bin/kafka-topics.sh –create –zookeeper localhost:2181 –replication-factor 2 –partitions 3 –topic business<br><strong>注意:为Topic创建分区时，–partitions(分区数)最好是broker数量的整数倍，这样才能使一个Topic的分区均匀的分布在整个Kafka集群中。</strong></p>
+<h3 id="Kafka常用命令"><a href="#Kafka常用命令" class="headerlink" title="Kafka常用命令"></a>Kafka常用命令</h3><p>1.启动kafka<br>        nohup bin/kafka-server-start.sh config/server.properties &gt; /dev/null 2&gt;&amp;1 &amp;</p>
+<p>2.查看topic<br>        bin/kafka-topics.sh –list –zookeeper localhost:2181</p>
+<p>3.控制台消费<br>        bin/kafka-console-consumer.sh –zookeeper localhost:2181 –topic middleware –from-beginning</p>
+<p>4.删除topic<br>(1)删除kafka存储目录（server.properties文件log.dirs配置，默认为”/tmp/kafka-logs”）相关topic目录<br>(2)如果配置了delete.topic.enable=true直接通过命令删除，如果命令删除不掉，直接通过zookeeper-client 删除掉”/brokers/topics/“目录下相关topic节点。<br>【注意】: 1.如果你要删除一个topic并且重建，那么必须重新启动kafka，否则新建的topic在zookeeper的/brokers/topics/test-topic/目录下没有partitions这个目录，也就是没有分区信息。</p>
+<h2 id="安装Yahoo-kafka-manager"><a href="#安装Yahoo-kafka-manager" class="headerlink" title="安装Yahoo kafka manager"></a>安装Yahoo kafka manager</h2><h3 id="Yahoo-kafka-manager介绍"><a href="#Yahoo-kafka-manager介绍" class="headerlink" title="Yahoo kafka manager介绍"></a>Yahoo kafka manager介绍</h3><p>项目地址：<a href="https://github.com/yahoo/kafka-manager" target="_blank" rel="external">https://github.com/yahoo/kafka-manager</a><br>Requirements：</p>
+<ul>
+<li>Kafka 0.8.1.1 or 0.8.2.*</li>
+<li>sbt 0.13.x</li>
+<li>Java 8+</li>
+</ul>
+<p>Kafka Manager是一个管控台，这款工具主要支持以下几个功能：</p>
+<ul>
+<li>管理多个不同的集群；</li>
+<li>很容易地检查集群的状态(topics, brokers, 副本的分布, 分区的分布)；</li>
+<li>选择副本；</li>
+<li>产生分区分配(Generate partition assignments)基于集群的当前状态；</li>
+<li>重新分配分区。</li>
+</ul>
+<h3 id="环境信息-1"><a href="#环境信息-1" class="headerlink" title="环境信息"></a>环境信息</h3><table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>操作系统版本</th>
+<th>IP地址</th>
+<th>安装软件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>console</td>
+<td>CentOS 7.0</td>
+<td>114.55.29.246</td>
+<td>JDK1.8、kafka-manager-1.3.0.6.zip</td>
+</tr>
+</tbody>
+</table>
+<p>Kafka Manager可以装在任何一台机器上，我这里部署在一台单独的机器上。</p>
+<h3 id="安装jdk1-8"><a href="#安装jdk1-8" class="headerlink" title="安装jdk1.8"></a>安装jdk1.8</h3><pre><code>[root@console local]# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
+</code></pre><p>配置PATH环境变量:<br>        [root@console ~]# vim /etc/profile<br>        export JAVA_HOME=/usr/java/jdk1.8.0_73<br>        export PATH=$JAVA_HOME/bin:$PATH<br>        export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar</p>
+<h3 id="安装sbt0-13-9"><a href="#安装sbt0-13-9" class="headerlink" title="安装sbt0.13.9"></a>安装sbt0.13.9</h3><pre><code>[root@console ~]# curl https://bintray.com/sbt/rpm/rpm | sudo tee /etc/yum.repos.d/bintray-sbt-rpm.repo
+[root@console ~]# yum install -y sbt
+</code></pre><h3 id="构建kafka-manager包"><a href="#构建kafka-manager包" class="headerlink" title="构建kafka manager包"></a>构建kafka manager包</h3><pre><code>[root@console ~]# git clone https://github.com/yahoo/kafka-manager.git
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/15.png" alt=""><br>        [root@console ~]# unzip -oq kafka-manager-upgrade-to-90.zip<br>        [root@console ~]# mv kafka-manager-upgrade-to-90 kafka-manager<br>        [root@console ~]# cd kafka-manager<br>        [root@console kafka-manager]# sbt clean dist<br>        The command below will create a zip file which can be used to deploy the application. 使用sbt编译打包的时候时间可能会比较长。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/16.png" alt=""><br>这个需要翻墙才能完成。配置代理：<br>        [root@console ~]# vim /usr/share/sbt-launcher-packaging/conf/sbtconfig.txt<br>        -Dhttp.proxyHost=proxy<br>        -Dhttp.proxyPort=8080<br>再次运行这个命令，依然需要等待较长的时间，有可能还会失败。如果失败就多次尝试打包：<br>        [root@console kafka-manager]# sbt clean dist<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/17.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/18.png" alt=""><br>打包完成后会创建一个zip压缩包，而这个压缩包可以用来部署该应用。生成的包会在kafka-manager/target/universal 下面。生成的包只需要java环境就可以运行了，在以后部署到其他机器上不需要安装sbt进行打包构建了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/19.png" alt=""></p>
+<h3 id="安装kafka-manager"><a href="#安装kafka-manager" class="headerlink" title="安装kafka manager"></a>安装kafka manager</h3><pre><code>[root@console kafka-manager]# cp target/universal/kafka-manager-1.3.0.6.zip ~/
+[root@console kafka-manager]# cd
+[root@console ~]# unzip -oq kafka-manager-1.3.0.6.zip
+</code></pre><h3 id="配置kafka-manager"><a href="#配置kafka-manager" class="headerlink" title="配置kafka-manager"></a>配置kafka-manager</h3><pre><code>[root@console ~]# cd kafka-manager-1.3.0.6/
+[root@console kafka-manager-1.3.0.6]# vim conf/application.conf
+</code></pre><p>设置zkhosts：<br>        kafka-manager.zkhosts=”114.55.29.246:2181,114.55.29.86:2181,114.55.29.241:2181”<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/20.png" alt=""></p>
+<h3 id="启动kafka-manager"><a href="#启动kafka-manager" class="headerlink" title="启动kafka-manager"></a>启动kafka-manager</h3><pre><code>[root@console kafka-manager-1.3.0.6]# bin/kafka-manager
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/21.png" alt=""><br>默认监听的端口是9000。你也可以在启动时指定配置文件和监听端口：</p>
+<pre><code># bin/kafka-manager -Dconfig.file=/path/to/application.conf -Dhttp.port=8080
+</code></pre><p>启动并置于后台运行：<br>        [kmanager@console kafka-manager-1.3.0.6]$ nohup bin/kafka-manager &gt; /dev/null 2&gt;&amp;1 &amp;</p>
+<h2 id="kafka-manager添加cluster"><a href="#kafka-manager添加cluster" class="headerlink" title="kafka-manager添加cluster"></a>kafka-manager添加cluster</h2><p>浏览器输入地址访问：<a href="http://114.55.29.246:9000/" target="_blank" rel="external">http://114.55.29.246:9000/</a><br><strong>注意:安装完成后需要手动添加Cluster。添加Cluster是指添加一个已有的Kafka集群进入监控列表，而非通过Kafka Manager部署一个新的Kafka Cluster，这一点与Cloudera Manager不同。</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/22.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/23.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png" alt=""></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kafka-大数据/" rel="tag">#Kafka 大数据</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/26/Zookeeper介绍及安装部署/" rel="prev" title="Zookeeper介绍及安装部署">
+                Zookeeper介绍及安装部署 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/05/28/Kafka介绍及安装部署/"
+           data-title="Kafka介绍及安装部署" data-url="http://yoursite.com/2017/05/28/Kafka介绍及安装部署/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">14</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/ju-feng-93" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-zhihu"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#消息中间件"><span class="nav-number">1.</span> <span class="nav-text">消息中间件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息中间件特点"><span class="nav-number">2.</span> <span class="nav-text">消息中间件特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息中间件的传递模型"><span class="nav-number">3.</span> <span class="nav-text">消息中间件的传递模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka介绍"><span class="nav-number">4.</span> <span class="nav-text">Kafka介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装部署Kafka集群"><span class="nav-number">5.</span> <span class="nav-text">安装部署Kafka集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息"><span class="nav-number">5.1.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装JDK1-7"><span class="nav-number">5.2.</span> <span class="nav-text">安装JDK1.7</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装集群"><span class="nav-number">5.3.</span> <span class="nav-text">安装集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动集群"><span class="nav-number">5.4.</span> <span class="nav-text">启动集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#脚本定期清理logs下的日志文件"><span class="nav-number">5.5.</span> <span class="nav-text">脚本定期清理logs下的日志文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#停止kafka命令"><span class="nav-number">5.6.</span> <span class="nav-text">停止kafka命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试集群"><span class="nav-number">5.7.</span> <span class="nav-text">测试集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建生产环境topic"><span class="nav-number">5.8.</span> <span class="nav-text">创建生产环境topic</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka常用命令"><span class="nav-number">5.9.</span> <span class="nav-text">Kafka常用命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Yahoo-kafka-manager"><span class="nav-number">6.</span> <span class="nav-text">安装Yahoo kafka manager</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Yahoo-kafka-manager介绍"><span class="nav-number">6.1.</span> <span class="nav-text">Yahoo kafka manager介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息-1"><span class="nav-number">6.2.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装jdk1-8"><span class="nav-number">6.3.</span> <span class="nav-text">安装jdk1.8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装sbt0-13-9"><span class="nav-number">6.4.</span> <span class="nav-text">安装sbt0.13.9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建kafka-manager包"><span class="nav-number">6.5.</span> <span class="nav-text">构建kafka manager包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装kafka-manager"><span class="nav-number">6.6.</span> <span class="nav-text">安装kafka manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置kafka-manager"><span class="nav-number">6.7.</span> <span class="nav-text">配置kafka-manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动kafka-manager"><span class="nav-number">6.8.</span> <span class="nav-text">启动kafka-manager</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kafka-manager添加cluster"><span class="nav-number">7.</span> <span class="nav-text">kafka-manager添加cluster</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jkzhao"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>

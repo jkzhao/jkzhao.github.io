@@ -125,7 +125,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/77.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/78.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/79.png">
-<meta property="og:updated_time" content="2017-05-16T03:28:39.000Z">
+<meta property="og:updated_time" content="2017-05-29T10:32:50.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zabbix监控Nginx">
 <meta name="twitter:description" content="https://nginx.org/en/docs/http/ngx_http_stub_status_module.html在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。">
@@ -406,7 +406,7 @@ UserParameter=Nginx.requests[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot
 </code></pre><h1 id="zabbix-web-gui配置监控项"><a href="#zabbix-web-gui配置监控项" class="headerlink" title="zabbix web gui配置监控项"></a>zabbix web gui配置监控项</h1><h2 id="创建Nginx-Template"><a href="#创建Nginx-Template" class="headerlink" title="创建Nginx Template"></a>创建Nginx Template</h2><p>点击Configuration—&gt;Templates，点击右上角的Create template。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/66.png" alt=""><br>填写模板的信息，点击Add。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/67.png" alt=""></p>
 <h2 id="创建Application"><a href="#创建Application" class="headerlink" title="创建Application"></a>创建Application</h2><p><strong>生产环境下只需要把我写好的模板文件import进去就可以了，不需要像下面那样再去创建模板，下面只是介绍下创建模板的过程。</strong></p>
 <p>点击Configuration—&gt;Templates，找到刚才创建的Nginx template，点击所在行的Applications列。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/68.png" alt=""><br>点击右上角的Create application。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/69.png" alt=""><br>输入application的名字Nginx running status，点击Add。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/70.png" alt=""></p>
-<h2 id="创建Items"><a href="#创建Items" class="headerlink" title="创建Items"></a>创建Items</h2><p>点击Configuration—&gt;Templates，找到刚才创建的Nginx template，点击所在行的Items列。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/71.png" alt=""><br>点击右上角的Create item。分别创建5个监控项，如下图：</p>
+<h2 id="创建Items"><a href="#创建Items" class="headerlink" title="创建Items"></a>创建Items</h2><p>点击Configuration—&gt;Templates，找到刚才创建的Nginx template，点击所在行的Items列。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/71.png" alt=""><br>点击右上角的Create item。分别创建8个监控项，如下图：</p>
 <ol>
 <li>当前 Nginx 正处理的活动连接数（包括等待着的连接数）<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/72.png" alt=""></li>
 <li>Nginx一共处理了的连接数<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/73.png" alt=""></li>
@@ -529,7 +529,7 @@ UserParameter=Nginx.requests[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">13</span>
+              <span class="site-state-item-count">14</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -546,7 +546,7 @@ UserParameter=Nginx.requests[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-count">9</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
