@@ -137,7 +137,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png">
-<meta property="og:updated_time" content="2017-05-29T09:14:11.000Z">
+<meta property="og:updated_time" content="2017-05-31T01:27:37.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka介绍及安装部署">
 <meta name="twitter:description" content="消息中间件消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。">
@@ -400,7 +400,10 @@
 <ul>
 <li>每个消息只有一个消费者</li>
 <li>发送者和接受者没有时间依赖</li>
-<li>接受者确认消息接受和处理成功<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/1.png" alt=""><br>2.发布—订阅模型(Pub/Sub)<br>发布者/订阅者模型支持向一个特定的消息主题生产消息。0或多个订阅者可能对接收来自特定消息主题的消息感兴趣。在这种模型下，发布者和订阅者彼此不知道对方。这种模式好比是匿名公告板。这种模式被概括为：多个消费者可以获得消息。在发布者和订阅者之间存在时间依赖性。发布者需要建立一个订阅(subscription)，以便能够让消费者订阅。订阅者必须保持持续的活动状态以接收消息，除非订阅者建立了持久的订阅。在这种情况下，在订阅者未连接时发布的消息将在订阅者重新连接时重新发布。<br>其实消息中间件，像MySQL其实也可以作为消息中间件，只要你把消息中间件原理搞清楚，你会发现目前所有的存储，包括NoSQL，只要支持顺序性东西的，就可以作为一个消息中间件。就看你怎么去利用它了。就像redis里面那个队列list，就可以作为一个消息队列。<br>发布—订阅模型特性：</li>
+<li>接受者确认消息接受和处理成功<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/1.png" alt=""></li>
+</ul>
+<p>2.发布—订阅模型(Pub/Sub)<br>发布者/订阅者模型支持向一个特定的消息主题生产消息。0或多个订阅者可能对接收来自特定消息主题的消息感兴趣。在这种模型下，发布者和订阅者彼此不知道对方。这种模式好比是匿名公告板。这种模式被概括为：多个消费者可以获得消息。在发布者和订阅者之间存在时间依赖性。发布者需要建立一个订阅(subscription)，以便能够让消费者订阅。订阅者必须保持持续的活动状态以接收消息，除非订阅者建立了持久的订阅。在这种情况下，在订阅者未连接时发布的消息将在订阅者重新连接时重新发布。<br>其实消息中间件，像MySQL其实也可以作为消息中间件，只要你把消息中间件原理搞清楚，你会发现目前所有的存储，包括NoSQL，只要支持顺序性东西的，就可以作为一个消息中间件。就看你怎么去利用它了。就像redis里面那个队列list，就可以作为一个消息队列。<br>发布—订阅模型特性：</p>
+<ul>
 <li>每个消息可以有多个订阅者</li>
 <li>客户端只有订阅后才能接收到消息</li>
 <li>持久订阅和非持久订阅<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/2.png" alt=""><br>(1)发布者和订阅者有时间依赖<br>接收者和发布者只有建立订阅关系才能收到消息。<br>(2)持久订阅<br>订阅关系建立后，消息就不会消失，不管订阅者是否在线。<br>(3)非持久订阅<br>订阅者为了接收消息，必须一直在线<br>当只有一个订阅者时约等于点对点模式。<br><strong>大部分情况下会使用持久订阅。常用的消息队列有Kafka、RabbitMQ、ActiveMQ、metaq等</strong></li>
@@ -439,14 +442,29 @@
 <h3 id="安装JDK1-7"><a href="#安装JDK1-7" class="headerlink" title="安装JDK1.7"></a>安装JDK1.7</h3><p>3台机器都需要安装JDK1.7。<br>        [root@log1 local]# mkdir /usr/java<br>        [root@log1 local]# tar zxf jdk-7u80-linux-x64.gz -C /usr/java/<br>        [root@log1 local]# vim /etc/profile<br>        export JAVA_HOME=/usr/java/jdk1.7.0_80<br>        export PATH=$JAVA_HOME/bin:$PATH<br>        export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar<br>        [root@log1 local]# source /etc/profile</p>
 <h3 id="安装集群"><a href="#安装集群" class="headerlink" title="安装集群"></a>安装集群</h3><p>需要先安装好Zookeeper集群，见之前的文章《Zookeeper介绍及安装部署》。<br>1.创建消息持久化目录<br>[root@log1 ~]# mkdir /kafkaLogs</p>
 <p>2.下载解压kafka，版本是kafka_2.11-0.9.0.1<br>[root@log1 local]# wget <a href="http://mirrors.cnnic.cn/apache/kafka/0.9.0.1/kafka_2.11-0.9.0.1.tgz" target="_blank" rel="external">http://mirrors.cnnic.cn/apache/kafka/0.9.0.1/kafka_2.11-0.9.0.1.tgz</a><br>[root@log1 local]# tar zxf kafka_2.11-0.9.0.1.tgz</p>
-<p>3.修改配置<br>[root@log1 local]# cd kafka_2.11-0.9.0.1/config/<br>[root@log1 config]# vim server.properties<br>(1)修改broker.id<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/3.png" alt=""><br>(2)修改kafka监听地址<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/4.png" alt=""><br><strong>注意: advertised.host.name参数用来配置返回的host.name值，把这个参数配置为IP地址。这样客户端在使用java.net.InetAddress.getCanonicalHostName()获取时拿到的就是ip地址而不是主机名。</strong><br>(3)修改消息持久化目录<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/5.png" alt=""><br>(4)修改zk地址<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/6.png" alt=""><br>(5)添加启用删除topic配置<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/7.png" alt=""><br>(6)关闭自动创建topic<br>是否允许自动创建topic。如果设为true，那么produce，consume或者fetch metadata一个不存在的topic时，就会自动创建一个默认replication factor和partition number的topic。默认是true。<br>auto.create.topics.enable=false<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/8.png" alt=""></p>
-<p>4.把log1的配置好的kafka拷贝到log2和log3上<br>[root@log1 local]# scp -rp kafka_2.11-0.9.0.1 root@114.55.29.241:/usr/local/<br>[root@log1 local]# scp -rp kafka_2.11-0.9.0.1 root@114.55.253.15:/usr/local/</p>
-<p>5.log2和log3主机上创建消息持久化目录<br>[root@log2 ~]# mkdir /kafkaLogs<br>[root@log3 ~]# mkdir /kafkaLogs</p>
-<p>6.修改log2配置文件中的broker.id为1，log3主机的为2<br>[root@log2 config]# vim server.properties<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/9.png" alt=""></p>
-<h3 id="启动集群"><a href="#启动集群" class="headerlink" title="启动集群"></a>启动集群</h3><p>log1主机启动kafka：<br>        [root@log1 ~]# cd /usr/local/kafka_2.11-0.9.0.1/<br>        [root@log1 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/10.png" alt=""></p>
-<p>log2主机启动kafka：<br>        [root@log2 ~]# cd /usr/local/kafka_2.11-0.9.0.1/<br>        [root@log2 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;</p>
-<p>log3主机启动kafka：<br>        [root@log3 ~]# cd /usr/local/kafka_2.11-0.9.0.1/<br>        [root@log3 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;</p>
-<h3 id="脚本定期清理logs下的日志文件"><a href="#脚本定期清理logs下的日志文件" class="headerlink" title="脚本定期清理logs下的日志文件"></a>脚本定期清理logs下的日志文件</h3><p>默认kafka是按天切割日志的，而且不删除：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/11.png" alt=""><br>这里写一个简单的脚本来清理这些日志，主要是清理server.log和controller.log。</p>
+<p>3.修改配置<br>[root@log1 local]# cd kafka_2.11-0.9.0.1/config/<br>[root@log1 config]# vim server.properties<br>(1)修改broker.id<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/3.png" alt=""><br>(2)修改kafka监听地址<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/4.png" alt=""><br><strong>注意: advertised.host.name参数用来配置返回的host.name值，把这个参数配置为IP地址。这样客户端在使用java.net.InetAddress.getCanonicalHostName()获取时拿到的就是ip地址而不是主机名。</strong><br>(3)修改消息持久化目录<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/5.png" alt=""><br>(4)修改zk地址<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/6.png" alt=""><br>(5)添加启用删除topic配置<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/7.png" alt=""><br>(6)关闭自动创建topic<br>是否允许自动创建topic。如果设为true，那么produce，consume或者fetch metadata一个不存在的topic时，就会自动创建一个默认replication factor和partition number的topic。默认是true。</p>
+<pre><code>auto.create.topics.enable=false
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/8.png" alt=""></p>
+<p>4.把log1的配置好的kafka拷贝到log2和log3上</p>
+<pre><code>[root@log1 local]# scp -rp kafka_2.11-0.9.0.1 root@114.55.29.241:/usr/local/
+[root@log1 local]# scp -rp kafka_2.11-0.9.0.1 root@114.55.253.15:/usr/local/
+</code></pre><p>5.log2和log3主机上创建消息持久化目录</p>
+<pre><code>[root@log2 ~]# mkdir /kafkaLogs
+[root@log3 ~]# mkdir /kafkaLogs
+</code></pre><p>6.修改log2配置文件中的broker.id为1，log3主机的为2</p>
+<pre><code>[root@log2 config]# vim server.properties
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/9.png" alt=""></p>
+<h3 id="启动集群"><a href="#启动集群" class="headerlink" title="启动集群"></a>启动集群</h3><p>log1主机启动kafka：</p>
+<pre><code>[root@log1 ~]# cd /usr/local/kafka_2.11-0.9.0.1/
+[root@log1 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/10.png" alt=""></p>
+<p>log2主机启动kafka：</p>
+<pre><code>[root@log2 ~]# cd /usr/local/kafka_2.11-0.9.0.1/
+[root@log2 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;
+</code></pre><p>log3主机启动kafka：</p>
+<pre><code>[root@log3 ~]# cd /usr/local/kafka_2.11-0.9.0.1/
+[root@log3 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;
+</code></pre><h3 id="脚本定期清理logs下的日志文件"><a href="#脚本定期清理logs下的日志文件" class="headerlink" title="脚本定期清理logs下的日志文件"></a>脚本定期清理logs下的日志文件</h3><p>默认kafka是按天切割日志的，而且不删除：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/11.png" alt=""><br>这里写一个简单的脚本来清理这些日志，主要是清理server.log和controller.log。</p>
 <pre><code>[root@log1 ~]# cd /usr/local/kafka_2.11-0.9.0.1/
 [root@log1 kafka_2.11-0.9.0.1]# vim clean_kafkalog.sh
 #!/bin/bash
@@ -464,17 +482,34 @@ ls -t $logDir/server.log* | tail -n +$[$COUNT+1] | xargs rm -f
 ls -t $logDir/controller.log* | tail -n +$[$COUNT+1] | xargs rm -f
 ls -t $logDir/state-change.log* | tail -n +$[$COUNT+1] | xargs rm -f
 ls -t $logDir/log-cleaner.log* | tail -n +$[$COUNT+1] | xargs rm –f
-</code></pre><p>赋予脚本执行权限：<br>        [root@log1 kafka_2.11-0.9.0.1]# chmod +x clean_kafkalog.sh<br>周期性任务策略：每周日的0点0分去执行这个脚本。<br>        [root@log1 logs]# crontab -e<br>0 0 <em> </em> 0 /usr/local/kafka_2.11-0.9.0.1/clean_kafkalog.sh<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/12.png" alt=""><br>把清理日志的脚本拷贝到第二台和第三台主机：<br>        [root@log1 kafka_2.11-0.9.0.1]# scp -p clean_kafkalog.sh root@114.55.29.241:/usr/local/kafka_2.11-0.9.0.1<br>        [root@log1 kafka_2.11-0.9.0.1]# scp -p clean_kafkalog.sh root@114.55.253.15:/usr/local/kafka_2.11-0.9.0.1<br>同样的配置周期性任务策略。</p>
+</code></pre><p>赋予脚本执行权限：</p>
+<pre><code>[root@log1 kafka_2.11-0.9.0.1]# chmod +x clean_kafkalog.sh
+</code></pre><p>周期性任务策略：每周日的0点0分去执行这个脚本。</p>
+<pre><code>[root@log1 logs]# crontab -e
+0 0 * * 0 /usr/local/kafka_2.11-0.9.0.1/clean_kafkalog.sh
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/12.png" alt=""><br>把清理日志的脚本拷贝到第二台和第三台主机：</p>
+<pre><code>[root@log1 kafka_2.11-0.9.0.1]# scp -p clean_kafkalog.sh root@114.55.29.241:/usr/local/kafka_2.11-0.9.0.1
+[root@log1 kafka_2.11-0.9.0.1]# scp -p clean_kafkalog.sh root@114.55.253.15:/usr/local/kafka_2.11-0.9.0.1
+</code></pre><p>同样的需要配置周期性任务策略。</p>
 <h3 id="停止kafka命令"><a href="#停止kafka命令" class="headerlink" title="停止kafka命令"></a>停止kafka命令</h3><pre><code>[root@log1 ~]# /usr/local/kafka_2.11-0.9.0.1/bin/kafka-server-stop.sh
-</code></pre><h3 id="测试集群"><a href="#测试集群" class="headerlink" title="测试集群"></a>测试集群</h3><p>1.log1主机上创建一个名为test的topic<br>        [root@log1 kafka_2.11-0.9.0.1]# bin/kafka-topics.sh –create –zookeeper localhost:2181 –replication-factor 1 –partitions 1 –topic test</p>
-<p>2.log2和log3主机上利用命令行工具创建一个consumer程序<br>        [root@log2 kafka_2.11-0.9.0.1]# bin/kafka-console-consumer.sh –zookeeper localhost:2181 –topic test –from-beginning<br>        [root@log2 kafka_2.11-0.9.0.1]# bin/kafka-console-consumer.sh –zookeeper localhost:2181 –topic test –from-beginning</p>
-<p>3.log1主机上利用命令行工具创建一个producer程序<br>        [root@log1 kafka_2.11-0.9.0.1]# bin/kafka-console-producer.sh –broker-list localhost:9092 –topic test</p>
-<p>log1主机上终端输入message，然后到log2和log3主机的终端查看<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/13.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/14.png" alt=""></p>
-<h3 id="创建生产环境topic"><a href="#创建生产环境topic" class="headerlink" title="创建生产环境topic"></a>创建生产环境topic</h3><p>如果kafka集群是3台，我们创建一个名为business的Topic，如下：<br>        bin/kafka-topics.sh –create –zookeeper localhost:2181 –replication-factor 2 –partitions 3 –topic business<br><strong>注意:为Topic创建分区时，–partitions(分区数)最好是broker数量的整数倍，这样才能使一个Topic的分区均匀的分布在整个Kafka集群中。</strong></p>
-<h3 id="Kafka常用命令"><a href="#Kafka常用命令" class="headerlink" title="Kafka常用命令"></a>Kafka常用命令</h3><p>1.启动kafka<br>        nohup bin/kafka-server-start.sh config/server.properties &gt; /dev/null 2&gt;&amp;1 &amp;</p>
-<p>2.查看topic<br>        bin/kafka-topics.sh –list –zookeeper localhost:2181</p>
-<p>3.控制台消费<br>        bin/kafka-console-consumer.sh –zookeeper localhost:2181 –topic middleware –from-beginning</p>
-<p>4.删除topic<br>(1)删除kafka存储目录（server.properties文件log.dirs配置，默认为”/tmp/kafka-logs”）相关topic目录<br>(2)如果配置了delete.topic.enable=true直接通过命令删除，如果命令删除不掉，直接通过zookeeper-client 删除掉”/brokers/topics/“目录下相关topic节点。<br>【注意】: 1.如果你要删除一个topic并且重建，那么必须重新启动kafka，否则新建的topic在zookeeper的/brokers/topics/test-topic/目录下没有partitions这个目录，也就是没有分区信息。</p>
+</code></pre><h3 id="测试集群"><a href="#测试集群" class="headerlink" title="测试集群"></a>测试集群</h3><p>1.log1主机上创建一个名为test的topic</p>
+<pre><code>[root@log1 kafka_2.11-0.9.0.1]# bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+</code></pre><p>2.log2和log3主机上利用命令行工具创建一个consumer程序</p>
+<pre><code>[root@log2 kafka_2.11-0.9.0.1]# bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic test --from-beginning
+[root@log2 kafka_2.11-0.9.0.1]# bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic test --from-beginning
+</code></pre><p>3.log1主机上利用命令行工具创建一个producer程序</p>
+<pre><code>[root@log1 kafka_2.11-0.9.0.1]# bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+</code></pre><p>log1主机上终端输入message，然后到log2和log3主机的终端查看<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/13.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/14.png" alt=""></p>
+<h3 id="创建生产环境topic"><a href="#创建生产环境topic" class="headerlink" title="创建生产环境topic"></a>创建生产环境topic</h3><p>如果kafka集群是3台，我们创建一个名为business的Topic，如下：</p>
+<pre><code>bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 2 --partitions 3 --topic business
+</code></pre><p><strong>注意:为Topic创建分区时，–partitions(分区数)最好是broker数量的整数倍，这样才能使一个Topic的分区均匀的分布在整个Kafka集群中。</strong></p>
+<h3 id="Kafka常用命令"><a href="#Kafka常用命令" class="headerlink" title="Kafka常用命令"></a>Kafka常用命令</h3><p>1.启动kafka</p>
+<pre><code>nohup bin/kafka-server-start.sh config/server.properties &gt; /dev/null 2&gt;&amp;1 &amp;
+</code></pre><p>2.查看topic</p>
+<pre><code>bin/kafka-topics.sh --list --zookeeper localhost:2181
+</code></pre><p>3.控制台消费</p>
+<pre><code>bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic middleware --from-beginning
+</code></pre><p>4.删除topic<br>(1)删除kafka存储目录（server.properties文件log.dirs配置，默认为”/tmp/kafka-logs”）相关topic目录<br>(2)如果配置了delete.topic.enable=true直接通过命令删除，如果命令删除不掉，直接通过zookeeper-client 删除掉”/brokers/topics/“目录下相关topic节点。<br><strong>注意: 如果你要删除一个topic并且重建，那么必须重新启动kafka，否则新建的topic在zookeeper的/brokers/topics/test-topic/目录下没有partitions这个目录，也就是没有分区信息。</strong></p>
 <h2 id="安装Yahoo-kafka-manager"><a href="#安装Yahoo-kafka-manager" class="headerlink" title="安装Yahoo kafka manager"></a>安装Yahoo kafka manager</h2><h3 id="Yahoo-kafka-manager介绍"><a href="#Yahoo-kafka-manager介绍" class="headerlink" title="Yahoo kafka manager介绍"></a>Yahoo kafka manager介绍</h3><p>项目地址：<a href="https://github.com/yahoo/kafka-manager" target="_blank" rel="external">https://github.com/yahoo/kafka-manager</a><br>Requirements：</p>
 <ul>
 <li>Kafka 0.8.1.1 or 0.8.2.*</li>
@@ -509,22 +544,41 @@ ls -t $logDir/log-cleaner.log* | tail -n +$[$COUNT+1] | xargs rm –f
 </table>
 <p>Kafka Manager可以装在任何一台机器上，我这里部署在一台单独的机器上。</p>
 <h3 id="安装jdk1-8"><a href="#安装jdk1-8" class="headerlink" title="安装jdk1.8"></a>安装jdk1.8</h3><pre><code>[root@console local]# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
-</code></pre><p>配置PATH环境变量:<br>        [root@console ~]# vim /etc/profile<br>        export JAVA_HOME=/usr/java/jdk1.8.0_73<br>        export PATH=$JAVA_HOME/bin:$PATH<br>        export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar</p>
-<h3 id="安装sbt0-13-9"><a href="#安装sbt0-13-9" class="headerlink" title="安装sbt0.13.9"></a>安装sbt0.13.9</h3><pre><code>[root@console ~]# curl https://bintray.com/sbt/rpm/rpm | sudo tee /etc/yum.repos.d/bintray-sbt-rpm.repo
+</code></pre><p>配置PATH环境变量:</p>
+<pre><code>[root@console ~]# vim /etc/profile
+export JAVA_HOME=/usr/java/jdk1.8.0_73
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+</code></pre><h3 id="安装sbt0-13-9"><a href="#安装sbt0-13-9" class="headerlink" title="安装sbt0.13.9"></a>安装sbt0.13.9</h3><pre><code>[root@console ~]# curl https://bintray.com/sbt/rpm/rpm | sudo tee /etc/yum.repos.d/bintray-sbt-rpm.repo
 [root@console ~]# yum install -y sbt
 </code></pre><h3 id="构建kafka-manager包"><a href="#构建kafka-manager包" class="headerlink" title="构建kafka manager包"></a>构建kafka manager包</h3><pre><code>[root@console ~]# git clone https://github.com/yahoo/kafka-manager.git
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/15.png" alt=""><br>        [root@console ~]# unzip -oq kafka-manager-upgrade-to-90.zip<br>        [root@console ~]# mv kafka-manager-upgrade-to-90 kafka-manager<br>        [root@console ~]# cd kafka-manager<br>        [root@console kafka-manager]# sbt clean dist<br>        The command below will create a zip file which can be used to deploy the application. 使用sbt编译打包的时候时间可能会比较长。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/16.png" alt=""><br>这个需要翻墙才能完成。配置代理：<br>        [root@console ~]# vim /usr/share/sbt-launcher-packaging/conf/sbtconfig.txt<br>        -Dhttp.proxyHost=proxy<br>        -Dhttp.proxyPort=8080<br>再次运行这个命令，依然需要等待较长的时间，有可能还会失败。如果失败就多次尝试打包：<br>        [root@console kafka-manager]# sbt clean dist<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/17.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/18.png" alt=""><br>打包完成后会创建一个zip压缩包，而这个压缩包可以用来部署该应用。生成的包会在kafka-manager/target/universal 下面。生成的包只需要java环境就可以运行了，在以后部署到其他机器上不需要安装sbt进行打包构建了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/19.png" alt=""></p>
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/15.png" alt="">    </p>
+<pre><code>[root@console ~]# unzip -oq kafka-manager-upgrade-to-90.zip
+[root@console ~]# mv kafka-manager-upgrade-to-90 kafka-manager
+[root@console ~]# cd kafka-manager
+[root@console kafka-manager]# sbt clean dist
+The command below will create a zip file which can be used to deploy the application. 使用sbt编译打包的时候时间可能会比较长。
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/16.png" alt=""><br>这个需要翻墙才能完成。配置代理：</p>
+<pre><code>[root@console ~]# vim /usr/share/sbt-launcher-packaging/conf/sbtconfig.txt
+-Dhttp.proxyHost=proxy
+-Dhttp.proxyPort=8080
+</code></pre><p>再次运行这个命令，依然需要等待较长的时间，有可能还会失败。如果失败就多次尝试打包：</p>
+<pre><code>[root@console kafka-manager]# sbt clean dist
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/17.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/18.png" alt=""><br>打包完成后会创建一个zip压缩包，而这个压缩包可以用来部署该应用。生成的包会在kafka-manager/target/universal 下面。生成的包只需要java环境就可以运行了，在以后部署到其他机器上不需要安装sbt进行打包构建了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/19.png" alt=""></p>
 <h3 id="安装kafka-manager"><a href="#安装kafka-manager" class="headerlink" title="安装kafka manager"></a>安装kafka manager</h3><pre><code>[root@console kafka-manager]# cp target/universal/kafka-manager-1.3.0.6.zip ~/
 [root@console kafka-manager]# cd
 [root@console ~]# unzip -oq kafka-manager-1.3.0.6.zip
 </code></pre><h3 id="配置kafka-manager"><a href="#配置kafka-manager" class="headerlink" title="配置kafka-manager"></a>配置kafka-manager</h3><pre><code>[root@console ~]# cd kafka-manager-1.3.0.6/
 [root@console kafka-manager-1.3.0.6]# vim conf/application.conf
-</code></pre><p>设置zkhosts：<br>        kafka-manager.zkhosts=”114.55.29.246:2181,114.55.29.86:2181,114.55.29.241:2181”<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/20.png" alt=""></p>
+</code></pre><p>设置zkhosts：</p>
+<pre><code>kafka-manager.zkhosts=&quot;114.55.29.246:2181,114.55.29.86:2181,114.55.29.241:2181&quot;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/20.png" alt=""></p>
 <h3 id="启动kafka-manager"><a href="#启动kafka-manager" class="headerlink" title="启动kafka-manager"></a>启动kafka-manager</h3><pre><code>[root@console kafka-manager-1.3.0.6]# bin/kafka-manager
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/21.png" alt=""><br>默认监听的端口是9000。你也可以在启动时指定配置文件和监听端口：</p>
 <pre><code># bin/kafka-manager -Dconfig.file=/path/to/application.conf -Dhttp.port=8080
-</code></pre><p>启动并置于后台运行：<br>        [kmanager@console kafka-manager-1.3.0.6]$ nohup bin/kafka-manager &gt; /dev/null 2&gt;&amp;1 &amp;</p>
-<h2 id="kafka-manager添加cluster"><a href="#kafka-manager添加cluster" class="headerlink" title="kafka-manager添加cluster"></a>kafka-manager添加cluster</h2><p>浏览器输入地址访问：<a href="http://114.55.29.246:9000/" target="_blank" rel="external">http://114.55.29.246:9000/</a><br><strong>注意:安装完成后需要手动添加Cluster。添加Cluster是指添加一个已有的Kafka集群进入监控列表，而非通过Kafka Manager部署一个新的Kafka Cluster，这一点与Cloudera Manager不同。</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/22.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/23.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png" alt=""></p>
+</code></pre><p>启动并置于后台运行：</p>
+<pre><code>[kmanager@console kafka-manager-1.3.0.6]$ nohup bin/kafka-manager &gt; /dev/null 2&gt;&amp;1 &amp;
+</code></pre><h2 id="kafka-manager添加cluster"><a href="#kafka-manager添加cluster" class="headerlink" title="kafka-manager添加cluster"></a>kafka-manager添加cluster</h2><p>浏览器输入地址访问：<a href="http://114.55.29.246:9000/" target="_blank" rel="external">http://114.55.29.246:9000/</a><br><strong>注意:安装完成后需要手动添加Cluster。添加Cluster是指添加一个已有的Kafka集群进入监控列表，而非通过Kafka Manager部署一个新的Kafka Cluster，这一点与Cloudera Manager不同。</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/22.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/23.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png" alt=""></p>
 
       
     </div>
