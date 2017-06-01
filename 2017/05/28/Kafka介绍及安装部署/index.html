@@ -104,13 +104,13 @@
 
 
 
-<meta name="description" content="消息中间件消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。">
+<meta name="description" content="一、消息中间件消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。">
 <meta name="keywords" content="消息队列 Kafka 大数据">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka介绍及安装部署">
 <meta property="og:url" content="http://yoursite.com/2017/05/28/Kafka介绍及安装部署/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
-<meta property="og:description" content="消息中间件消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。">
+<meta property="og:description" content="一、消息中间件消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/1.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/2.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/3.png">
@@ -137,10 +137,10 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png">
-<meta property="og:updated_time" content="2017-05-31T02:00:41.000Z">
+<meta property="og:updated_time" content="2017-06-01T13:33:04.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka介绍及安装部署">
-<meta name="twitter:description" content="消息中间件消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。">
+<meta name="twitter:description" content="一、消息中间件消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/1.png">
 
 
@@ -389,8 +389,8 @@
       
 
       
-        <h2 id="消息中间件"><a href="#消息中间件" class="headerlink" title="消息中间件"></a>消息中间件</h2><p>消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。<br><a id="more"></a></p>
-<h2 id="消息中间件特点"><a href="#消息中间件特点" class="headerlink" title="消息中间件特点"></a>消息中间件特点</h2><p>1.采用异步处理模式<br>消息发送者可以发送一个消息而无须等待响应。消息发送者将消息发送到一条虚拟的通道（主题或者队列）上，消息接收者则订阅或者监听该通道。一条消息可能最终转发给一个或多个消息接收者，这些接收者都无需对消息发送者做出同步回应。整个过程是异步的。</p>
+        <h2 id="一、消息中间件"><a href="#一、消息中间件" class="headerlink" title="一、消息中间件"></a>一、消息中间件</h2><p>消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。<br><a id="more"></a></p>
+<h2 id="二、消息中间件特点"><a href="#二、消息中间件特点" class="headerlink" title="二、消息中间件特点"></a>二、消息中间件特点</h2><p>1.采用异步处理模式<br>消息发送者可以发送一个消息而无须等待响应。消息发送者将消息发送到一条虚拟的通道（主题或者队列）上，消息接收者则订阅或者监听该通道。一条消息可能最终转发给一个或多个消息接收者，这些接收者都无需对消息发送者做出同步回应。整个过程是异步的。</p>
 <ul>
 <li>比如用户信息注册。注册完成后过段时间发送邮件或者短信。</li>
 </ul>
@@ -399,7 +399,7 @@
 <li>发送者和接收者不必要了解对方、只需要确认消息</li>
 <li>发送者和接收者不必同时在线<br>比如在线交易系统为了保证数据的最终一致，在支付系统处理完成后会把支付结果放到信息中间件里通知订单系统修改订单支付状态。两个系统通过消息中间件解耦。</li>
 </ul>
-<h2 id="消息中间件的传递模型"><a href="#消息中间件的传递模型" class="headerlink" title="消息中间件的传递模型"></a>消息中间件的传递模型</h2><p><strong>1.点对点模型(PTP)</strong><br>点对点模型用于消息生产者和消息消费者之间点对点的通信。消息生产者将消息发送到由某个名字标识的特定消费者。这个名字实际上对应于消费服务中的一个队列(Queue)，在消息传递给消费者之前它被存储在这个队列中。队列消息可以放在内存中也可以是持久的，以保证在消息服务出现故障时仍然能够传递消息。<br>点对点模型特性：</p>
+<h2 id="三、消息中间件的传递模型"><a href="#三、消息中间件的传递模型" class="headerlink" title="三、消息中间件的传递模型"></a>三、消息中间件的传递模型</h2><p><strong>1.点对点模型(PTP)</strong><br>点对点模型用于消息生产者和消息消费者之间点对点的通信。消息生产者将消息发送到由某个名字标识的特定消费者。这个名字实际上对应于消费服务中的一个队列(Queue)，在消息传递给消费者之前它被存储在这个队列中。队列消息可以放在内存中也可以是持久的，以保证在消息服务出现故障时仍然能够传递消息。<br>点对点模型特性：</p>
 <ul>
 <li>每个消息只有一个消费者</li>
 <li>发送者和接受者没有时间依赖</li>
@@ -411,8 +411,8 @@
 <li>客户端只有订阅后才能接收到消息</li>
 <li>持久订阅和非持久订阅<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/2.png" alt=""><br>(1)发布者和订阅者有时间依赖<br>接收者和发布者只有建立订阅关系才能收到消息。<br>(2)持久订阅<br>订阅关系建立后，消息就不会消失，不管订阅者是否在线。<br>(3)非持久订阅<br>订阅者为了接收消息，必须一直在线<br>当只有一个订阅者时约等于点对点模式。<br><strong>大部分情况下会使用持久订阅。常用的消息队列有Kafka、RabbitMQ、ActiveMQ、metaq等</strong></li>
 </ul>
-<h2 id="Kafka介绍"><a href="#Kafka介绍" class="headerlink" title="Kafka介绍"></a>Kafka介绍</h2><p>Kafka是一种分布式消息系统，由LinkedIn使用Scala编写，用作LinkedIn的活动流(Activity Stream)和运营数据处理管道(Pipeline)的基础，具有高水平扩展和高吞吐量。<br>目前越来越多的开源分布式处理系统如Apache flume、Apache Storm、Spark、Elasticsearch都支持与Kafka集成。</p>
-<h2 id="安装部署Kafka集群"><a href="#安装部署Kafka集群" class="headerlink" title="安装部署Kafka集群"></a>安装部署Kafka集群</h2><h3 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h3><table>
+<h2 id="四、Kafka介绍"><a href="#四、Kafka介绍" class="headerlink" title="四、Kafka介绍"></a>四、Kafka介绍</h2><p>Kafka是一种分布式消息系统，由LinkedIn使用Scala编写，用作LinkedIn的活动流(Activity Stream)和运营数据处理管道(Pipeline)的基础，具有高水平扩展和高吞吐量。<br>目前越来越多的开源分布式处理系统如Apache flume、Apache Storm、Spark、Elasticsearch都支持与Kafka集成。</p>
+<h2 id="五、安装部署Kafka集群"><a href="#五、安装部署Kafka集群" class="headerlink" title="五、安装部署Kafka集群"></a>五、安装部署Kafka集群</h2><h3 id="1-环境信息"><a href="#1-环境信息" class="headerlink" title="1.环境信息"></a>1.环境信息</h3><table>
 <thead>
 <tr>
 <th>主机名</th>
@@ -442,7 +442,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="安装JDK1-7"><a href="#安装JDK1-7" class="headerlink" title="安装JDK1.7"></a>安装JDK1.7</h3><p>3台机器都需要安装JDK1.7。</p>
+<h3 id="2-安装JDK1-7"><a href="#2-安装JDK1-7" class="headerlink" title="2.安装JDK1.7"></a>2.安装JDK1.7</h3><p>3台机器都需要安装JDK1.7。</p>
 <pre><code>[root@log1 local]# mkdir /usr/java
 [root@log1 local]# tar zxf jdk-7u80-linux-x64.gz -C /usr/java/
 [root@log1 local]# vim /etc/profile
@@ -450,7 +450,7 @@ export JAVA_HOME=/usr/java/jdk1.7.0_80
 export PATH=$JAVA_HOME/bin:$PATH
 export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 [root@log1 local]# source /etc/profile
-</code></pre><h3 id="安装集群"><a href="#安装集群" class="headerlink" title="安装集群"></a>安装集群</h3><p>需要先安装好Zookeeper集群，见之前的文章《Zookeeper介绍及安装部署》。<br>1.创建消息持久化目录</p>
+</code></pre><h3 id="3-安装集群"><a href="#3-安装集群" class="headerlink" title="3.安装集群"></a>3.安装集群</h3><p>需要先安装好Zookeeper集群，见之前的文章《Zookeeper介绍及安装部署》。<br>1.创建消息持久化目录</p>
 <pre><code>[root@log1 ~]# mkdir /kafkaLogs
 </code></pre><p>2.下载解压kafka，版本是kafka_2.11-0.9.0.1</p>
 <pre><code>[root@log1 local]# wget http://mirrors.cnnic.cn/apache/kafka/0.9.0.1/kafka_2.11-0.9.0.1.tgz
@@ -470,7 +470,7 @@ export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 </code></pre><p>6.修改log2配置文件中的broker.id为1，log3主机的为2</p>
 <pre><code>[root@log2 config]# vim server.properties
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/9.png" alt=""></p>
-<h3 id="启动集群"><a href="#启动集群" class="headerlink" title="启动集群"></a>启动集群</h3><p>log1主机启动kafka：</p>
+<h3 id="4-启动集群"><a href="#4-启动集群" class="headerlink" title="4.启动集群"></a>4.启动集群</h3><p>log1主机启动kafka：</p>
 <pre><code>[root@log1 ~]# cd /usr/local/kafka_2.11-0.9.0.1/
 [root@log1 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/10.png" alt=""></p>
@@ -480,7 +480,7 @@ export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 </code></pre><p>log3主机启动kafka：</p>
 <pre><code>[root@log3 ~]# cd /usr/local/kafka_2.11-0.9.0.1/
 [root@log3 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;
-</code></pre><h3 id="脚本定期清理logs下的日志文件"><a href="#脚本定期清理logs下的日志文件" class="headerlink" title="脚本定期清理logs下的日志文件"></a>脚本定期清理logs下的日志文件</h3><p>默认kafka是按天切割日志的，而且不删除：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/11.png" alt=""><br>这里写一个简单的脚本来清理这些日志，主要是清理server.log和controller.log。</p>
+</code></pre><h3 id="5-脚本定期清理logs下的日志文件"><a href="#5-脚本定期清理logs下的日志文件" class="headerlink" title="5.脚本定期清理logs下的日志文件"></a>5.脚本定期清理logs下的日志文件</h3><p>默认kafka是按天切割日志的，而且不删除：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/11.png" alt=""><br>这里写一个简单的脚本来清理这些日志，主要是清理server.log和controller.log。</p>
 <pre><code>[root@log1 ~]# cd /usr/local/kafka_2.11-0.9.0.1/
 [root@log1 kafka_2.11-0.9.0.1]# vim clean_kafkalog.sh
 #!/bin/bash
@@ -507,8 +507,8 @@ ls -t $logDir/log-cleaner.log* | tail -n +$[$COUNT+1] | xargs rm –f
 <pre><code>[root@log1 kafka_2.11-0.9.0.1]# scp -p clean_kafkalog.sh root@114.55.29.241:/usr/local/kafka_2.11-0.9.0.1
 [root@log1 kafka_2.11-0.9.0.1]# scp -p clean_kafkalog.sh root@114.55.253.15:/usr/local/kafka_2.11-0.9.0.1
 </code></pre><p>同样的需要配置周期性任务策略。</p>
-<h3 id="停止kafka命令"><a href="#停止kafka命令" class="headerlink" title="停止kafka命令"></a>停止kafka命令</h3><pre><code>[root@log1 ~]# /usr/local/kafka_2.11-0.9.0.1/bin/kafka-server-stop.sh
-</code></pre><h3 id="测试集群"><a href="#测试集群" class="headerlink" title="测试集群"></a>测试集群</h3><p>1.log1主机上创建一个名为test的topic</p>
+<h3 id="6-停止kafka命令"><a href="#6-停止kafka命令" class="headerlink" title="6.停止kafka命令"></a>6.停止kafka命令</h3><pre><code>[root@log1 ~]# /usr/local/kafka_2.11-0.9.0.1/bin/kafka-server-stop.sh
+</code></pre><h3 id="7-测试集群"><a href="#7-测试集群" class="headerlink" title="7.测试集群"></a>7.测试集群</h3><p>1.log1主机上创建一个名为test的topic</p>
 <pre><code>[root@log1 kafka_2.11-0.9.0.1]# bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
 </code></pre><p>2.log2和log3主机上利用命令行工具创建一个consumer程序</p>
 <pre><code>[root@log2 kafka_2.11-0.9.0.1]# bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic test --from-beginning
@@ -516,17 +516,17 @@ ls -t $logDir/log-cleaner.log* | tail -n +$[$COUNT+1] | xargs rm –f
 </code></pre><p>3.log1主机上利用命令行工具创建一个producer程序</p>
 <pre><code>[root@log1 kafka_2.11-0.9.0.1]# bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
 </code></pre><p>log1主机上终端输入message，然后到log2和log3主机的终端查看<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/13.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/14.png" alt=""></p>
-<h3 id="创建生产环境topic"><a href="#创建生产环境topic" class="headerlink" title="创建生产环境topic"></a>创建生产环境topic</h3><p>如果kafka集群是3台，我们创建一个名为business的Topic，如下：</p>
+<h3 id="8-创建生产环境topic"><a href="#8-创建生产环境topic" class="headerlink" title="8.创建生产环境topic"></a>8.创建生产环境topic</h3><p>如果kafka集群是3台，我们创建一个名为business的Topic，如下：</p>
 <pre><code>bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 2 --partitions 3 --topic business
 </code></pre><p><strong>注意:为Topic创建分区时，–partitions(分区数)最好是broker数量的整数倍，这样才能使一个Topic的分区均匀的分布在整个Kafka集群中。</strong></p>
-<h3 id="Kafka常用命令"><a href="#Kafka常用命令" class="headerlink" title="Kafka常用命令"></a>Kafka常用命令</h3><p>1.启动kafka</p>
+<h3 id="9-Kafka常用命令"><a href="#9-Kafka常用命令" class="headerlink" title="9.Kafka常用命令"></a>9.Kafka常用命令</h3><p>1.启动kafka</p>
 <pre><code>nohup bin/kafka-server-start.sh config/server.properties &gt; /dev/null 2&gt;&amp;1 &amp;
 </code></pre><p>2.查看topic</p>
 <pre><code>bin/kafka-topics.sh --list --zookeeper localhost:2181
 </code></pre><p>3.控制台消费</p>
 <pre><code>bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic middleware --from-beginning
 </code></pre><p>4.删除topic<br>(1)删除kafka存储目录（server.properties文件log.dirs配置，默认为”/tmp/kafka-logs”）相关topic目录<br>(2)如果配置了delete.topic.enable=true直接通过命令删除，如果命令删除不掉，直接通过zookeeper-client 删除掉”/brokers/topics/“目录下相关topic节点。<br><strong>注意: 如果你要删除一个topic并且重建，那么必须重新启动kafka，否则新建的topic在zookeeper的/brokers/topics/test-topic/目录下没有partitions这个目录，也就是没有分区信息。</strong></p>
-<h2 id="安装Yahoo-kafka-manager"><a href="#安装Yahoo-kafka-manager" class="headerlink" title="安装Yahoo kafka manager"></a>安装Yahoo kafka manager</h2><h3 id="Yahoo-kafka-manager介绍"><a href="#Yahoo-kafka-manager介绍" class="headerlink" title="Yahoo kafka manager介绍"></a>Yahoo kafka manager介绍</h3><p>项目地址：<a href="https://github.com/yahoo/kafka-manager" target="_blank" rel="external">https://github.com/yahoo/kafka-manager</a><br>Requirements：</p>
+<h2 id="六、安装Yahoo-kafka-manager"><a href="#六、安装Yahoo-kafka-manager" class="headerlink" title="六、安装Yahoo kafka manager"></a>六、安装Yahoo kafka manager</h2><h3 id="1-Yahoo-kafka-manager介绍"><a href="#1-Yahoo-kafka-manager介绍" class="headerlink" title="1.Yahoo kafka manager介绍"></a>1.Yahoo kafka manager介绍</h3><p>项目地址：<a href="https://github.com/yahoo/kafka-manager" target="_blank" rel="external">https://github.com/yahoo/kafka-manager</a><br>Requirements：</p>
 <ul>
 <li>Kafka 0.8.1.1 or 0.8.2.*</li>
 <li>sbt 0.13.x</li>
@@ -540,7 +540,7 @@ ls -t $logDir/log-cleaner.log* | tail -n +$[$COUNT+1] | xargs rm –f
 <li>产生分区分配(Generate partition assignments)基于集群的当前状态；</li>
 <li>重新分配分区。</li>
 </ul>
-<h3 id="环境信息-1"><a href="#环境信息-1" class="headerlink" title="环境信息"></a>环境信息</h3><table>
+<h3 id="2-环境信息"><a href="#2-环境信息" class="headerlink" title="2.环境信息"></a>2.环境信息</h3><table>
 <thead>
 <tr>
 <th>主机名</th>
@@ -559,15 +559,15 @@ ls -t $logDir/log-cleaner.log* | tail -n +$[$COUNT+1] | xargs rm –f
 </tbody>
 </table>
 <p>Kafka Manager可以装在任何一台机器上，我这里部署在一台单独的机器上。</p>
-<h3 id="安装jdk1-8"><a href="#安装jdk1-8" class="headerlink" title="安装jdk1.8"></a>安装jdk1.8</h3><pre><code>[root@console local]# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
+<h3 id="3-安装jdk1-8"><a href="#3-安装jdk1-8" class="headerlink" title="3.安装jdk1.8"></a>3.安装jdk1.8</h3><pre><code>[root@console local]# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
 </code></pre><p>配置PATH环境变量:</p>
 <pre><code>[root@console ~]# vim /etc/profile
 export JAVA_HOME=/usr/java/jdk1.8.0_73
 export PATH=$JAVA_HOME/bin:$PATH
 export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-</code></pre><h3 id="安装sbt0-13-9"><a href="#安装sbt0-13-9" class="headerlink" title="安装sbt0.13.9"></a>安装sbt0.13.9</h3><pre><code>[root@console ~]# curl https://bintray.com/sbt/rpm/rpm | sudo tee /etc/yum.repos.d/bintray-sbt-rpm.repo
+</code></pre><h3 id="4-安装sbt0-13-9"><a href="#4-安装sbt0-13-9" class="headerlink" title="4.安装sbt0.13.9"></a>4.安装sbt0.13.9</h3><pre><code>[root@console ~]# curl https://bintray.com/sbt/rpm/rpm | sudo tee /etc/yum.repos.d/bintray-sbt-rpm.repo
 [root@console ~]# yum install -y sbt
-</code></pre><h3 id="构建kafka-manager包"><a href="#构建kafka-manager包" class="headerlink" title="构建kafka manager包"></a>构建kafka manager包</h3><pre><code>[root@console ~]# git clone https://github.com/yahoo/kafka-manager.git
+</code></pre><h3 id="5-构建kafka-manager包"><a href="#5-构建kafka-manager包" class="headerlink" title="5.构建kafka manager包"></a>5.构建kafka manager包</h3><pre><code>[root@console ~]# git clone https://github.com/yahoo/kafka-manager.git
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/15.png" alt="">    </p>
 <pre><code>[root@console ~]# unzip -oq kafka-manager-upgrade-to-90.zip
 [root@console ~]# mv kafka-manager-upgrade-to-90 kafka-manager
@@ -581,20 +581,20 @@ The command below will create a zip file which can be used to deploy the applica
 </code></pre><p>再次运行这个命令，依然需要等待较长的时间，有可能还会失败。如果失败就多次尝试打包：</p>
 <pre><code>[root@console kafka-manager]# sbt clean dist
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/17.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/18.png" alt=""><br>打包完成后会创建一个zip压缩包，而这个压缩包可以用来部署该应用。生成的包会在kafka-manager/target/universal 下面。生成的包只需要java环境就可以运行了，在以后部署到其他机器上不需要安装sbt进行打包构建了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/19.png" alt=""></p>
-<h3 id="安装kafka-manager"><a href="#安装kafka-manager" class="headerlink" title="安装kafka manager"></a>安装kafka manager</h3><pre><code>[root@console kafka-manager]# cp target/universal/kafka-manager-1.3.0.6.zip ~/
+<h3 id="6-安装kafka-manager"><a href="#6-安装kafka-manager" class="headerlink" title="6.安装kafka manager"></a>6.安装kafka manager</h3><pre><code>[root@console kafka-manager]# cp target/universal/kafka-manager-1.3.0.6.zip ~/
 [root@console kafka-manager]# cd
 [root@console ~]# unzip -oq kafka-manager-1.3.0.6.zip
-</code></pre><h3 id="配置kafka-manager"><a href="#配置kafka-manager" class="headerlink" title="配置kafka-manager"></a>配置kafka-manager</h3><pre><code>[root@console ~]# cd kafka-manager-1.3.0.6/
+</code></pre><h3 id="7-配置kafka-manager"><a href="#7-配置kafka-manager" class="headerlink" title="7.配置kafka-manager"></a>7.配置kafka-manager</h3><pre><code>[root@console ~]# cd kafka-manager-1.3.0.6/
 [root@console kafka-manager-1.3.0.6]# vim conf/application.conf
 </code></pre><p>设置zkhosts：</p>
 <pre><code>kafka-manager.zkhosts=&quot;114.55.29.246:2181,114.55.29.86:2181,114.55.29.241:2181&quot;
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/20.png" alt=""></p>
-<h3 id="启动kafka-manager"><a href="#启动kafka-manager" class="headerlink" title="启动kafka-manager"></a>启动kafka-manager</h3><pre><code>[root@console kafka-manager-1.3.0.6]# bin/kafka-manager
+<h3 id="8-启动kafka-manager"><a href="#8-启动kafka-manager" class="headerlink" title="8.启动kafka-manager"></a>8.启动kafka-manager</h3><pre><code>[root@console kafka-manager-1.3.0.6]# bin/kafka-manager
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/21.png" alt=""><br>默认监听的端口是9000。你也可以在启动时指定配置文件和监听端口：</p>
 <pre><code># bin/kafka-manager -Dconfig.file=/path/to/application.conf -Dhttp.port=8080
 </code></pre><p>启动并置于后台运行：</p>
 <pre><code>[kmanager@console kafka-manager-1.3.0.6]$ nohup bin/kafka-manager &gt; /dev/null 2&gt;&amp;1 &amp;
-</code></pre><h2 id="kafka-manager添加cluster"><a href="#kafka-manager添加cluster" class="headerlink" title="kafka-manager添加cluster"></a>kafka-manager添加cluster</h2><p>浏览器输入地址访问：<a href="http://114.55.29.246:9000/" target="_blank" rel="external">http://114.55.29.246:9000/</a><br><strong>注意:安装完成后需要手动添加Cluster。添加Cluster是指添加一个已有的Kafka集群进入监控列表，而非通过Kafka Manager部署一个新的Kafka Cluster，这一点与Cloudera Manager不同。</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/22.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/23.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png" alt=""></p>
+</code></pre><h2 id="七、kafka-manager添加cluster"><a href="#七、kafka-manager添加cluster" class="headerlink" title="七、kafka-manager添加cluster"></a>七、kafka-manager添加cluster</h2><p>浏览器输入地址访问：<a href="http://114.55.29.246:9000/" target="_blank" rel="external">http://114.55.29.246:9000/</a><br><strong>注意:安装完成后需要手动添加Cluster。添加Cluster是指添加一个已有的Kafka集群进入监控列表，而非通过Kafka Manager部署一个新的Kafka Cluster，这一点与Cloudera Manager不同。</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/22.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/23.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png" alt=""></p>
 
       
     </div>
@@ -795,7 +795,7 @@ The command below will create a zip file which can be used to deploy the applica
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#消息中间件"><span class="nav-number">1.</span> <span class="nav-text">消息中间件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息中间件特点"><span class="nav-number">2.</span> <span class="nav-text">消息中间件特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息中间件的传递模型"><span class="nav-number">3.</span> <span class="nav-text">消息中间件的传递模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka介绍"><span class="nav-number">4.</span> <span class="nav-text">Kafka介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装部署Kafka集群"><span class="nav-number">5.</span> <span class="nav-text">安装部署Kafka集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息"><span class="nav-number">5.1.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装JDK1-7"><span class="nav-number">5.2.</span> <span class="nav-text">安装JDK1.7</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装集群"><span class="nav-number">5.3.</span> <span class="nav-text">安装集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动集群"><span class="nav-number">5.4.</span> <span class="nav-text">启动集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#脚本定期清理logs下的日志文件"><span class="nav-number">5.5.</span> <span class="nav-text">脚本定期清理logs下的日志文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#停止kafka命令"><span class="nav-number">5.6.</span> <span class="nav-text">停止kafka命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试集群"><span class="nav-number">5.7.</span> <span class="nav-text">测试集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建生产环境topic"><span class="nav-number">5.8.</span> <span class="nav-text">创建生产环境topic</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka常用命令"><span class="nav-number">5.9.</span> <span class="nav-text">Kafka常用命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Yahoo-kafka-manager"><span class="nav-number">6.</span> <span class="nav-text">安装Yahoo kafka manager</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Yahoo-kafka-manager介绍"><span class="nav-number">6.1.</span> <span class="nav-text">Yahoo kafka manager介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息-1"><span class="nav-number">6.2.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装jdk1-8"><span class="nav-number">6.3.</span> <span class="nav-text">安装jdk1.8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装sbt0-13-9"><span class="nav-number">6.4.</span> <span class="nav-text">安装sbt0.13.9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建kafka-manager包"><span class="nav-number">6.5.</span> <span class="nav-text">构建kafka manager包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装kafka-manager"><span class="nav-number">6.6.</span> <span class="nav-text">安装kafka manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置kafka-manager"><span class="nav-number">6.7.</span> <span class="nav-text">配置kafka-manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动kafka-manager"><span class="nav-number">6.8.</span> <span class="nav-text">启动kafka-manager</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kafka-manager添加cluster"><span class="nav-number">7.</span> <span class="nav-text">kafka-manager添加cluster</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、消息中间件"><span class="nav-number">1.</span> <span class="nav-text">一、消息中间件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、消息中间件特点"><span class="nav-number">2.</span> <span class="nav-text">二、消息中间件特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、消息中间件的传递模型"><span class="nav-number">3.</span> <span class="nav-text">三、消息中间件的传递模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、Kafka介绍"><span class="nav-number">4.</span> <span class="nav-text">四、Kafka介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、安装部署Kafka集群"><span class="nav-number">5.</span> <span class="nav-text">五、安装部署Kafka集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-环境信息"><span class="nav-number">5.1.</span> <span class="nav-text">1.环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-安装JDK1-7"><span class="nav-number">5.2.</span> <span class="nav-text">2.安装JDK1.7</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-安装集群"><span class="nav-number">5.3.</span> <span class="nav-text">3.安装集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-启动集群"><span class="nav-number">5.4.</span> <span class="nav-text">4.启动集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-脚本定期清理logs下的日志文件"><span class="nav-number">5.5.</span> <span class="nav-text">5.脚本定期清理logs下的日志文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-停止kafka命令"><span class="nav-number">5.6.</span> <span class="nav-text">6.停止kafka命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-测试集群"><span class="nav-number">5.7.</span> <span class="nav-text">7.测试集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-创建生产环境topic"><span class="nav-number">5.8.</span> <span class="nav-text">8.创建生产环境topic</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-Kafka常用命令"><span class="nav-number">5.9.</span> <span class="nav-text">9.Kafka常用命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#六、安装Yahoo-kafka-manager"><span class="nav-number">6.</span> <span class="nav-text">六、安装Yahoo kafka manager</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Yahoo-kafka-manager介绍"><span class="nav-number">6.1.</span> <span class="nav-text">1.Yahoo kafka manager介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-环境信息"><span class="nav-number">6.2.</span> <span class="nav-text">2.环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-安装jdk1-8"><span class="nav-number">6.3.</span> <span class="nav-text">3.安装jdk1.8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-安装sbt0-13-9"><span class="nav-number">6.4.</span> <span class="nav-text">4.安装sbt0.13.9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-构建kafka-manager包"><span class="nav-number">6.5.</span> <span class="nav-text">5.构建kafka manager包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-安装kafka-manager"><span class="nav-number">6.6.</span> <span class="nav-text">6.安装kafka manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-配置kafka-manager"><span class="nav-number">6.7.</span> <span class="nav-text">7.配置kafka-manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-启动kafka-manager"><span class="nav-number">6.8.</span> <span class="nav-text">8.启动kafka-manager</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#七、kafka-manager添加cluster"><span class="nav-number">7.</span> <span class="nav-text">七、kafka-manager添加cluster</span></a></li></ol></div>
             
           </div>
         </section>
