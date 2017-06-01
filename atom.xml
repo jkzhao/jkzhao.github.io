@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-06-01T13:08:11.000Z</updated>
+  <updated>2017-06-01T13:09:59.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -17,10 +17,10 @@
   
   <entry>
     <title>RabbitMQ介绍及安装部署</title>
-    <link href="http://yoursite.com/2017/05/31/RabbitMQ%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
-    <id>http://yoursite.com/2017/05/31/RabbitMQ介绍及安装部署/</id>
-    <published>2017-05-31T02:00:01.000Z</published>
-    <updated>2017-06-01T13:08:11.000Z</updated>
+    <link href="http://yoursite.com/2017/06/01/RabbitMQ%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
+    <id>http://yoursite.com/2017/06/01/RabbitMQ介绍及安装部署/</id>
+    <published>2017-06-01T02:00:01.000Z</published>
+    <updated>2017-06-01T13:09:59.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;一、RabbitMQ介绍&quot;&gt;&lt;a href=&quot;#一、RabbitMQ介绍&quot; class=&quot;headerlink&quot; title=&quot;一、RabbitMQ介绍&quot;&gt;&lt;/a&gt;一、RabbitMQ介绍&lt;/h2&gt;&lt;p&gt;消息系统通过将消息的发送和接收分离来实现应用程序的异步和解偶。&lt;br&gt;或许你正在考虑进行数据投递，非阻塞操作或推送通知。或许你想要实现发布／订阅，异步处理，或者工作队列。所有这些都属于消息系统的模式。&lt;br&gt;RabbitMQ是一个消息代理，一个消息系统的媒介。它可以为你的应用提供一个通用的消息发送和接收平台，并且保证消息再传输过程中的安全。&lt;br&gt;RabbitMQ是一个在AMQP协议标准上完整的、可复用的企业消息系统。它遵循Mozilla Public License开源协议，采用Erlang语言实现的工业级的消息队列。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;二、RabbitMQ运行原理&quot;&gt;&lt;a href=&quot;#二、RabbitMQ运行原理&quot; class=&quot;headerlink&quot; title=&quot;二、RabbitMQ运行原理&quot;&gt;&lt;/a&gt;二、RabbitMQ运行原理&lt;/h2&gt;&lt;p&gt;RabbitMQ的两大核心组件是Exchange和Queue，以下是它的运行原理图：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
