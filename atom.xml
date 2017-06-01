@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-31T06:03:59.000Z</updated>
+  <updated>2017-06-01T10:44:12.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/05/31/RabbitMQ%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2017/05/31/RabbitMQ介绍及安装部署/</id>
     <published>2017-05-31T02:00:01.000Z</published>
-    <updated>2017-05-31T06:03:59.000Z</updated>
+    <updated>2017-06-01T10:44:12.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;RabbitMQ介绍&quot;&gt;&lt;a href=&quot;#RabbitMQ介绍&quot; class=&quot;headerlink&quot; title=&quot;RabbitMQ介绍&quot;&gt;&lt;/a&gt;RabbitMQ介绍&lt;/h2&gt;&lt;p&gt;消息系统通过将消息的发送和接收分离来实现应用程序的异步和解偶。&lt;br&gt;或许你正在考虑进行数据投递，非阻塞操作或推送通知。或许你想要实现发布／订阅，异步处理，或者工作队列。所有这些都属于消息系统的模式。&lt;br&gt;RabbitMQ是一个消息代理，一个消息系统的媒介。它可以为你的应用提供一个通用的消息发送和接收平台，并且保证消息再传输过程中的安全。&lt;br&gt;RabbitMQ是一个在AMQP协议标准上完整的、可复用的企业消息系统。它遵循Mozilla Public License开源协议，采用Erlang语言实现的工业级的消息队列。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;RabbitMQ运行原理&quot;&gt;&lt;a href=&quot;#RabbitMQ运行原理&quot; class=&quot;headerlink&quot; title=&quot;RabbitMQ运行原理&quot;&gt;&lt;/a&gt;RabbitMQ运行原理&lt;/h2&gt;&lt;p&gt;RabbitMQ的两大核心组件是Exchange和Queue，以下是它的运行原理图：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
@@ -49,19 +49,19 @@
 &lt;td&gt;console&lt;/td&gt;
 &lt;td&gt;CentOS 7.0&lt;/td&gt;
 &lt;td&gt;114.55.248.157&lt;/td&gt;
-&lt;td&gt;haproxy&lt;/td&gt;
+&lt;td&gt;haproxy-1.5.14&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;log1&lt;/td&gt;
 &lt;td&gt;CentOS 7.0&lt;/td&gt;
 &lt;td&gt;114.55.29.86&lt;/td&gt;
-&lt;td&gt;erlang、rabbitmq server&lt;/td&gt;
+&lt;td&gt;erlang、rabbitmq-server-3.5.0-1.noarch.rpm&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;log2&lt;/td&gt;
 &lt;td&gt;CentOS 7.0&lt;/td&gt;
 &lt;td&gt;114.55.29.241&lt;/td&gt;
-&lt;td&gt;erlang、rabbitmq server&lt;/td&gt;
+&lt;td&gt;erlang、rabbitmq-server-3.5.0-1.noarch.rpm&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -136,7 +136,39 @@ Warning: PID file not written; -detached was passed.
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/11.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@log2 rabbitmq]# rabbitmqctl cluster_status
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/12.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这样RabbitMQ集群就正常工作了。可以访问任意一个web管控台：&lt;a href=&quot;http://ip/15672&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://ip/15672&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/13.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;添加镜像模式配置&quot;&gt;&lt;a href=&quot;#添加镜像模式配置&quot; class=&quot;headerlink&quot; title=&quot;添加镜像模式配置&quot;&gt;&lt;/a&gt;添加镜像模式配置&lt;/h3&gt;</content>
+&lt;h3 id=&quot;添加镜像模式配置&quot;&gt;&lt;a href=&quot;#添加镜像模式配置&quot; class=&quot;headerlink&quot; title=&quot;添加镜像模式配置&quot;&gt;&lt;/a&gt;添加镜像模式配置&lt;/h3&gt;&lt;p&gt;上面配置RabbitMQ默认集群模式，但并不保证队列的高可用性，尽管交换机、绑定这些可以复制到集群里的任何一个节点，但是队列内容不会复制，虽然该模式解决一部分节点压力，但队列节点宕机直接导致该队列无法使用，只能等待重启，所以要想在队列节点宕机或故障也能正常使用，就要复制队列内容到集群里的每个节点，需要创建镜像队列。&lt;br&gt;1.安装haproxy&lt;br&gt;haproxy是在主机名为console上安装的。可以选择源代码编译安装或者yum安装，在这里我选择了yum安装。安装版本：haproxy-1.5.14-3.el7.x86_64 &lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# yum install -y haproxy
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.修改配置/etc/haproxy/haproxy.cfg&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# vim /etc/haproxy/haproxy.cfg
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;删除 main frontend which proxys to the backends以下的所有内容，并添加&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;listen rabbitmq_cluster 0.0.0.0:5672
+    mode tcp
+    balance roundrobin
+    server   rqslave1 114.55.29.241:5672 check inter 2000 rise 2 fall 3
+    server   rqmaster 114.55.29.86:5672 check inter 2000 rise 2 fall 3
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果有3台或3台以上，可以把disc节点注释掉，原因就是让rabbitmq性能最佳化。这样负载均衡器会监听5672端口，轮询多个内存节点的5672端口，磁盘节点可以只做备份不提供给生产者、消费者使用，当然如果我们服务器资源充足情况也可以配置多个磁盘节点。此外，还需要修改defaults段配置：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/14.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;检查配置文件语法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# haproxy -c -f /etc/haproxy/haproxy.cfg
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动haproxy：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# service haproxy start
+Redirecting to /bin/systemctl start  haproxy.service
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.配置策略：设置ha模式&lt;br&gt;使用Rabbit镜像功能，需要基于rabbitmq策略来实现，政策是用来控制和修改群集范围的某个vhost队列行为和Exchange行为。&lt;br&gt;其中ha-mode有三种模式:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;all: 同步至所有的；&lt;/li&gt;
+&lt;li&gt;exactly: 同步最多N个机器. 当现有集群机器数小于N时,同步所有,大于等于N时则不进行同步. N需要额外通过ha-params来指定；&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;nodes: 只同步至符合指定名称的nodes. N需要额外通过ha-params来指定。&lt;br&gt;在cluster中任意节点启用策略，策略会自动同步到集群节点。我这里设置的是同步全部的queue, 可以按需自己选择指定的queue。语法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;rabbitmqctl set_policy  [-p  vhostpath ] { name } { pattern } { definition } [ priority ]
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在log1主机上执行如下命令：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 ~]# rabbitmqctl set_policy ha-all &amp;quot;^&amp;quot; &amp;apos;{&amp;quot;ha-mode&amp;quot;:&amp;quot;all&amp;quot;}&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/15.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这行命令创建了一个策略，策略名称为ha-all,策略模式为 all ，即复制到所有节点，包含新增节点，策略正则表达式为 “^” 表示所有匹配所有队列名称。&lt;/p&gt;
+&lt;h3 id=&quot;集群退出&quot;&gt;&lt;a href=&quot;#集群退出&quot; class=&quot;headerlink&quot; title=&quot;集群退出&quot;&gt;&lt;/a&gt;集群退出&lt;/h3&gt;&lt;p&gt;假设要把log2退出集群。&lt;br&gt;在log2上执行：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#rabbitmqctl stop_app
+#rabbitmqctl reset
+#rabbitmqctl start_app 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在集群主节点上执行：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# rabbitmqctl forget_cluster_node rabbit@log2
+&lt;/code&gt;&lt;/pre&gt;</content>
     
     <summary type="html">
     

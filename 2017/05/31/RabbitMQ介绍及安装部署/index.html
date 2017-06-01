@@ -124,7 +124,9 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/11.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/12.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/13.png">
-<meta property="og:updated_time" content="2017-05-31T06:03:59.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/14.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/15.png">
+<meta property="og:updated_time" content="2017-06-01T10:44:12.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="RabbitMQ介绍及安装部署">
 <meta name="twitter:description" content="RabbitMQ介绍消息系统通过将消息的发送和接收分离来实现应用程序的异步和解偶。或许你正在考虑进行数据投递，非阻塞操作或推送通知。或许你想要实现发布／订阅，异步处理，或者工作队列。所有这些都属于消息系统的模式。RabbitMQ是一个消息代理，一个消息系统的媒介。它可以为你的应用提供一个通用的消息发送和接收平台，并且保证消息再传输过程中的安全。RabbitMQ是一个在AMQP协议标准上完整的、可复">
@@ -403,19 +405,19 @@
 <td>console</td>
 <td>CentOS 7.0</td>
 <td>114.55.248.157</td>
-<td>haproxy</td>
+<td>haproxy-1.5.14</td>
 </tr>
 <tr>
 <td>log1</td>
 <td>CentOS 7.0</td>
 <td>114.55.29.86</td>
-<td>erlang、rabbitmq server</td>
+<td>erlang、rabbitmq-server-3.5.0-1.noarch.rpm</td>
 </tr>
 <tr>
 <td>log2</td>
 <td>CentOS 7.0</td>
 <td>114.55.29.241</td>
-<td>erlang、rabbitmq server</td>
+<td>erlang、rabbitmq-server-3.5.0-1.noarch.rpm</td>
 </tr>
 </tbody>
 </table>
@@ -490,7 +492,39 @@ Warning: PID file not written; -detached was passed.
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/11.png" alt=""></p>
 <pre><code>[root@log2 rabbitmq]# rabbitmqctl cluster_status
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/12.png" alt=""><br>这样RabbitMQ集群就正常工作了。可以访问任意一个web管控台：<a href="http://ip/15672" target="_blank" rel="external">http://ip/15672</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/13.png" alt=""></p>
-<h3 id="添加镜像模式配置"><a href="#添加镜像模式配置" class="headerlink" title="添加镜像模式配置"></a>添加镜像模式配置</h3>
+<h3 id="添加镜像模式配置"><a href="#添加镜像模式配置" class="headerlink" title="添加镜像模式配置"></a>添加镜像模式配置</h3><p>上面配置RabbitMQ默认集群模式，但并不保证队列的高可用性，尽管交换机、绑定这些可以复制到集群里的任何一个节点，但是队列内容不会复制，虽然该模式解决一部分节点压力，但队列节点宕机直接导致该队列无法使用，只能等待重启，所以要想在队列节点宕机或故障也能正常使用，就要复制队列内容到集群里的每个节点，需要创建镜像队列。<br>1.安装haproxy<br>haproxy是在主机名为console上安装的。可以选择源代码编译安装或者yum安装，在这里我选择了yum安装。安装版本：haproxy-1.5.14-3.el7.x86_64 </p>
+<pre><code>[root@console ~]# yum install -y haproxy
+</code></pre><p>2.修改配置/etc/haproxy/haproxy.cfg</p>
+<pre><code>[root@console ~]# vim /etc/haproxy/haproxy.cfg
+</code></pre><p>删除 main frontend which proxys to the backends以下的所有内容，并添加</p>
+<pre><code>listen rabbitmq_cluster 0.0.0.0:5672
+    mode tcp
+    balance roundrobin
+    server   rqslave1 114.55.29.241:5672 check inter 2000 rise 2 fall 3
+    server   rqmaster 114.55.29.86:5672 check inter 2000 rise 2 fall 3
+</code></pre><p>如果有3台或3台以上，可以把disc节点注释掉，原因就是让rabbitmq性能最佳化。这样负载均衡器会监听5672端口，轮询多个内存节点的5672端口，磁盘节点可以只做备份不提供给生产者、消费者使用，当然如果我们服务器资源充足情况也可以配置多个磁盘节点。此外，还需要修改defaults段配置：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/14.png" alt=""><br>检查配置文件语法：</p>
+<pre><code>[root@console ~]# haproxy -c -f /etc/haproxy/haproxy.cfg
+</code></pre><p>启动haproxy：</p>
+<pre><code>[root@console ~]# service haproxy start
+Redirecting to /bin/systemctl start  haproxy.service
+</code></pre><p>3.配置策略：设置ha模式<br>使用Rabbit镜像功能，需要基于rabbitmq策略来实现，政策是用来控制和修改群集范围的某个vhost队列行为和Exchange行为。<br>其中ha-mode有三种模式:</p>
+<ul>
+<li>all: 同步至所有的；</li>
+<li>exactly: 同步最多N个机器. 当现有集群机器数小于N时,同步所有,大于等于N时则不进行同步. N需要额外通过ha-params来指定；</li>
+<li><p>nodes: 只同步至符合指定名称的nodes. N需要额外通过ha-params来指定。<br>在cluster中任意节点启用策略，策略会自动同步到集群节点。我这里设置的是同步全部的queue, 可以按需自己选择指定的queue。语法：</p>
+<pre><code>rabbitmqctl set_policy  [-p  vhostpath ] { name } { pattern } { definition } [ priority ]
+</code></pre></li>
+</ul>
+<p>在log1主机上执行如下命令：</p>
+<pre><code>[root@log1 ~]# rabbitmqctl set_policy ha-all &quot;^&quot; &apos;{&quot;ha-mode&quot;:&quot;all&quot;}&apos;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/15.png" alt=""><br>这行命令创建了一个策略，策略名称为ha-all,策略模式为 all ，即复制到所有节点，包含新增节点，策略正则表达式为 “^” 表示所有匹配所有队列名称。</p>
+<h3 id="集群退出"><a href="#集群退出" class="headerlink" title="集群退出"></a>集群退出</h3><p>假设要把log2退出集群。<br>在log2上执行：</p>
+<pre><code>#rabbitmqctl stop_app
+#rabbitmqctl reset
+#rabbitmqctl start_app 
+</code></pre><p>在集群主节点上执行：</p>
+<pre><code># rabbitmqctl forget_cluster_node rabbit@log2
+</code></pre>
       
     </div>
 
@@ -690,7 +724,7 @@ Warning: PID file not written; -detached was passed.
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMQ介绍"><span class="nav-number">1.</span> <span class="nav-text">RabbitMQ介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMQ运行原理"><span class="nav-number">2.</span> <span class="nav-text">RabbitMQ运行原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMQ重要术语"><span class="nav-number">3.</span> <span class="nav-text">RabbitMQ重要术语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三种ExchangeType"><span class="nav-number">4.</span> <span class="nav-text">三种ExchangeType</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#直接式交换器类型-Direct"><span class="nav-number">4.1.</span> <span class="nav-text">直接式交换器类型(Direct)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#广播式交换机类型-Fanout"><span class="nav-number">4.2.</span> <span class="nav-text">广播式交换机类型(Fanout)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主题式交换金类型-Topic"><span class="nav-number">4.3.</span> <span class="nav-text">主题式交换金类型(Topic)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMQ集群种类"><span class="nav-number">5.</span> <span class="nav-text">RabbitMQ集群种类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群基本概念"><span class="nav-number">6.</span> <span class="nav-text">集群基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#镜像模式部署集群"><span class="nav-number">7.</span> <span class="nav-text">镜像模式部署集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息"><span class="nav-number">7.1.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集群每个节点安装rabbitmq-server"><span class="nav-number">7.2.</span> <span class="nav-text">集群每个节点安装rabbitmq server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置每个节点Cookie"><span class="nav-number">7.3.</span> <span class="nav-text">设置每个节点Cookie</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加镜像模式配置"><span class="nav-number">7.4.</span> <span class="nav-text">添加镜像模式配置</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMQ介绍"><span class="nav-number">1.</span> <span class="nav-text">RabbitMQ介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMQ运行原理"><span class="nav-number">2.</span> <span class="nav-text">RabbitMQ运行原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMQ重要术语"><span class="nav-number">3.</span> <span class="nav-text">RabbitMQ重要术语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三种ExchangeType"><span class="nav-number">4.</span> <span class="nav-text">三种ExchangeType</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#直接式交换器类型-Direct"><span class="nav-number">4.1.</span> <span class="nav-text">直接式交换器类型(Direct)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#广播式交换机类型-Fanout"><span class="nav-number">4.2.</span> <span class="nav-text">广播式交换机类型(Fanout)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主题式交换金类型-Topic"><span class="nav-number">4.3.</span> <span class="nav-text">主题式交换金类型(Topic)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMQ集群种类"><span class="nav-number">5.</span> <span class="nav-text">RabbitMQ集群种类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群基本概念"><span class="nav-number">6.</span> <span class="nav-text">集群基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#镜像模式部署集群"><span class="nav-number">7.</span> <span class="nav-text">镜像模式部署集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息"><span class="nav-number">7.1.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集群每个节点安装rabbitmq-server"><span class="nav-number">7.2.</span> <span class="nav-text">集群每个节点安装rabbitmq server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置每个节点Cookie"><span class="nav-number">7.3.</span> <span class="nav-text">设置每个节点Cookie</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加镜像模式配置"><span class="nav-number">7.4.</span> <span class="nav-text">添加镜像模式配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集群退出"><span class="nav-number">7.5.</span> <span class="nav-text">集群退出</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
