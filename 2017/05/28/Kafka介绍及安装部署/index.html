@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Kafka 大数据," />
+  <meta name="keywords" content="消息队列 Kafka 大数据," />
 
 
 
@@ -105,7 +105,7 @@
 
 
 <meta name="description" content="消息中间件消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。">
-<meta name="keywords" content="Kafka 大数据">
+<meta name="keywords" content="消息队列 Kafka 大数据">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka介绍及安装部署">
 <meta property="og:url" content="http://yoursite.com/2017/05/28/Kafka介绍及安装部署/index.html">
@@ -137,7 +137,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png">
-<meta property="og:updated_time" content="2017-05-31T01:34:08.000Z">
+<meta property="og:updated_time" content="2017-05-31T02:00:41.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka介绍及安装部署">
 <meta name="twitter:description" content="消息中间件消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。">
@@ -167,6 +167,16 @@
   
 
 
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
 
 
 
@@ -359,13 +369,6 @@
           
 
           
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2017/05/28/Kafka介绍及安装部署/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/28/Kafka介绍及安装部署/" itemprop="commentsCount"></span>
-                </a>
-              </span>
             
           
 
@@ -613,7 +616,7 @@ The command below will create a zip file which can be used to deploy the applica
       
         <div class="post-tags">
           
-            <a href="/tags/Kafka-大数据/" rel="tag">#Kafka 大数据</a>
+            <a href="/tags/消息队列-Kafka-大数据/" rel="tag">#消息队列 Kafka 大数据</a>
           
         </div>
       
@@ -621,6 +624,10 @@ The command below will create a zip file which can be used to deploy the applica
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/31/RabbitMQ介绍及安装部署/" rel="next" title="RabbitMQ介绍及安装部署">
+                <i class="fa fa-chevron-left"></i> RabbitMQ介绍及安装部署
+              </a>
             
           </div>
 
@@ -653,10 +660,6 @@ The command below will create a zip file which can be used to deploy the applica
 
           
   <div class="comments" id="comments">
-    
-      <div class="ds-thread" data-thread-key="2017/05/28/Kafka介绍及安装部署/"
-           data-title="Kafka介绍及安装部署" data-url="http://yoursite.com/2017/05/28/Kafka介绍及安装部署/">
-      </div>
     
   </div>
 
@@ -700,7 +703,7 @@ The command below will create a zip file which can be used to deploy the applica
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">14</span>
+              <span class="site-state-item-count">15</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -717,7 +720,7 @@ The command below will create a zip file which can be used to deploy the applica
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-count">10</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -917,32 +920,9 @@ The command below will create a zip file which can be used to deploy the applica
 
   
 
-  
-    
-  
-
-  <script type="text/javascript">
-    var duoshuoQuery = {short_name:"jkzhao"};
-    (function() {
-      var ds = document.createElement('script');
-      ds.type = 'text/javascript';ds.async = true;
-      ds.id = 'duoshuo-script';
-      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-      ds.charset = 'UTF-8';
-      (document.getElementsByTagName('head')[0]
-      || document.getElementsByTagName('body')[0]).appendChild(ds);
-    })();
-  </script>
-
-  
-    
-      
-      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
-      <script src="/js/src/hook-duoshuo.js"></script>
-    
-  
 
 
+  
 
 
 
