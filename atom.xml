@@ -2014,7 +2014,7 @@ Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf
     <link href="http://yoursite.com/2016/06/08/%E4%BD%BF%E7%94%A8Github-Pages%E4%B8%8EHexo%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/"/>
     <id>http://yoursite.com/2016/06/08/使用Github-Pages与Hexo搭建博客/</id>
     <published>2016-06-08T09:58:10.000Z</published>
-    <updated>2017-06-02T07:13:43.000Z</updated>
+    <updated>2017-06-02T08:19:46.000Z</updated>
     
     <content type="html">&lt;h1 id=&quot;什么是Git-Github-Github-Pages&quot;&gt;&lt;a href=&quot;#什么是Git-Github-Github-Pages&quot; class=&quot;headerlink&quot; title=&quot;什么是Git, Github, Github Pages?&quot;&gt;&lt;/a&gt;什么是Git, Github, Github Pages?&lt;/h1&gt;&lt;p&gt;1.Git是一个开源的分布式版本控制系统，用以有效、高速的处理从很小到非常大的项目版本管理。&lt;br&gt;2.GitHub是一个具有版本管理功能的代码仓库，每个项目都有一个主页，列出项目的源文件。许多重要的项目都托管在上面。&lt;br&gt;3.GitHub Pages免费的静态站点，三个特点：免费托管、自带主题、支持自制页面和Jekyll。Github Pages 是面向用户、组织和项目开放的公共静态页面搭建托管服务，站点可以被免费托管在 Github 上，你可以选择使用 Github Pages 默认提供的域名 github.io 或者自定义域名来发布站点。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;更详尽的概念介绍见：&lt;a href=&quot;http://jmcglone.com/guides/github-pages/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;在Github上搭建和管理个人网站&lt;/a&gt;&lt;/p&gt;
@@ -2079,12 +2079,26 @@ Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf
 &lt;p&gt;4.菜单设置中添加留言菜单。找到NexT主题设置的_config.yml文件里面的menu项，加入如下内容：&lt;/p&gt;
 &lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/toJKP6L.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;添加LiveRe评论支持&quot;&gt;&lt;a href=&quot;#添加LiveRe评论支持&quot; class=&quot;headerlink&quot; title=&quot;添加LiveRe评论支持&quot;&gt;&lt;/a&gt;添加LiveRe评论支持&lt;/h3&gt;&lt;p&gt;最近多说倒闭了，来试试LiveRe（来必力）的评论插件，韩国出的。&lt;br&gt;1.注册 LiveRe&lt;br&gt;进入 &lt;a href=&quot;https://livere.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;LiveRe&lt;/a&gt;，注册账号。&lt;br&gt;注意注册后，登录时输入邮箱和密码后，会跳到一个韩文页面，有个文本框需要填写，网站会向你的邮箱发一封韩文的邮件，里面有一串数字，填入到文本框中，点击韩文的登录即可。&lt;/p&gt;
-&lt;p&gt;LiveRe 有两个版本：&lt;/p&gt;
+&lt;h3 id=&quot;添加LiveRe评论支持&quot;&gt;&lt;a href=&quot;#添加LiveRe评论支持&quot; class=&quot;headerlink&quot; title=&quot;添加LiveRe评论支持&quot;&gt;&lt;/a&gt;添加LiveRe评论支持&lt;/h3&gt;&lt;p&gt;最近多说倒闭了，来试试LiveRe（来必力）的评论插件，韩国出的。&lt;br&gt;&lt;strong&gt;1.注册 LiveRe&lt;/strong&gt;&lt;br&gt;(1)进入 &lt;a href=&quot;https://livere.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;LiveRe&lt;/a&gt;，注册账号。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;注意注册后，登录时输入邮箱和密码后，会跳到一个韩文页面，有个文本框需要填写，网站会向你的邮箱发一封韩文的邮件，里面有一串数字，填入到文本框中，点击韩文的登录即可。&lt;br&gt;(2)登录成功后，点击右上角的头像，选择“管理页面”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(3)点击“实行”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;LiveRe 有两个版本：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;City 版：是一款适合所有人使用的免费版本；&lt;/li&gt;
-&lt;li&gt;Premium 版：是一款能够帮助企业实现自动化管理的多功能收费版本。&lt;br&gt;我们使用 City 版就够了。&lt;/li&gt;
+&lt;li&gt;Premium 版：是一款能够帮助企业实现自动化管理的多功能收费版本。&lt;br&gt;我们使用 City 版就够了，点击”现在安装“。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(4)输入网站基本信息，点击”申请获取代码“。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(5)填写完成后，进入到 管理页面 -&amp;gt; 代码管理 -&amp;gt; 一般网站 代码中，data-uid 即为所需 uid。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/6.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
 &lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;2.Next主题添加 LiveRe 插件&lt;/strong&gt;&lt;br&gt;(1)首先在 _config.yml 文件中添加如下配置：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# Support for LiveRe comments system.
+# You can get your uid from https://livere.com/insight/myCode (General web site)
+livere_uid: your uid
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中 livere_uid 即上一步获取到的 uid。&lt;/p&gt;
+&lt;p&gt;(2)在 next/layout/_scripts/third-party/comments/ 目录中添加 livere.swig，文件内容如下：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;#123;% if not (theme.duoshuo and theme.duoshuo.shortname) and not theme.duoshuo_shortname and not theme.disqus_shortname and not theme.hypercomments_id and not theme.gentie_productKey %&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  &amp;#123;% if theme.livere_uid %&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;lt;script type=&amp;quot;text/javascript&amp;quot;&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      (function(d, s) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        var j, e = d.getElementsByTagName(s)[0];&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        if (typeof LivereTower === &amp;apos;function&amp;apos;) &amp;#123; return; &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        j = d.createElement(s);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        j.src = &amp;apos;https://cdn-city.livere.com/js/embed.dist.js&amp;apos;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        j.async = true;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        e.parentNode.insertBefore(j, e);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      &amp;#125;)(document, &amp;apos;script&amp;apos;);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;lt;/script&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  &amp;#123;% endif %&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#123;% endif %&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;优先使用其他评论插件，如果其他评论插件没有开启，且 LiveRe 评论插件配置开启了，则使用 LiveRe。其中脚本代码为上一步管理页面中获取到的。&lt;/p&gt;
+&lt;p&gt;(3)在 next/layout/_scripts/third-party/comments.swig 文件中追加：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{% include &#39;./comments/livere.swig&#39; %}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;引入 LiveRe 评论插件。&lt;/p&gt;
+&lt;p&gt;(4)最后，在 next/layout/_partials/comments.swig 文件中条件最后追加 LiveRe 插件是否引用的判断逻辑：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{% if theme.livere_uid %}
+              &lt;div id=&quot;lv-container&quot; data-id=&quot;city&quot; data-uid=&quot;{{ theme.livere_uid }}&quot;&gt;&lt;/div&gt;
+        {% endif %}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;至此，为 NexT 主题添加 LiveRe 评论插件完成。&lt;/p&gt;
 &lt;h3 id=&quot;设置每篇文章在博客首页显示的预览内容&quot;&gt;&lt;a href=&quot;#设置每篇文章在博客首页显示的预览内容&quot; class=&quot;headerlink&quot; title=&quot;设置每篇文章在博客首页显示的预览内容&quot;&gt;&lt;/a&gt;设置每篇文章在博客首页显示的预览内容&lt;/h3&gt;&lt;p&gt;在写博文时，在希望展示在预览的部分下面写入：&lt;!-- more --&gt;，比如：&lt;/p&gt;
 &lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/lLl6w9m.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
 

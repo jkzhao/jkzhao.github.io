@@ -135,10 +135,16 @@
 <meta property="og:image" content="http://i.imgur.com/W7DvGfr.png">
 <meta property="og:image" content="http://i.imgur.com/GyU4Le4.png">
 <meta property="og:image" content="http://i.imgur.com/toJKP6L.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/6.png">
 <meta property="og:image" content="http://i.imgur.com/lLl6w9m.png">
 <meta property="og:image" content="http://i.imgur.com/vmIRWP7.png">
 <meta property="og:image" content="http://i.imgur.com/52V2yDF.png">
-<meta property="og:updated_time" content="2017-06-02T07:13:43.000Z">
+<meta property="og:updated_time" content="2017-06-02T08:19:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Github Pages与Hexo搭建博客">
 <meta name="twitter:description" content="什么是Git, Github, Github Pages?1.Git是一个开源的分布式版本控制系统，用以有效、高速的处理从很小到非常大的项目版本管理。2.GitHub是一个具有版本管理功能的代码仓库，每个项目都有一个主页，列出项目的源文件。许多重要的项目都托管在上面。3.GitHub Pages免费的静态站点，三个特点：免费托管、自带主题、支持自制页面和Jekyll。Github Pages 是面">
@@ -472,12 +478,26 @@
 <p>4.菜单设置中添加留言菜单。找到NexT主题设置的_config.yml文件里面的menu项，加入如下内容：</p>
 <div align="center"><br><img src="http://i.imgur.com/toJKP6L.png"><br></div>
 
-<h3 id="添加LiveRe评论支持"><a href="#添加LiveRe评论支持" class="headerlink" title="添加LiveRe评论支持"></a>添加LiveRe评论支持</h3><p>最近多说倒闭了，来试试LiveRe（来必力）的评论插件，韩国出的。<br>1.注册 LiveRe<br>进入 <a href="https://livere.com/" target="_blank" rel="external">LiveRe</a>，注册账号。<br>注意注册后，登录时输入邮箱和密码后，会跳到一个韩文页面，有个文本框需要填写，网站会向你的邮箱发一封韩文的邮件，里面有一串数字，填入到文本框中，点击韩文的登录即可。</p>
-<p>LiveRe 有两个版本：</p>
+<h3 id="添加LiveRe评论支持"><a href="#添加LiveRe评论支持" class="headerlink" title="添加LiveRe评论支持"></a>添加LiveRe评论支持</h3><p>最近多说倒闭了，来试试LiveRe（来必力）的评论插件，韩国出的。<br><strong>1.注册 LiveRe</strong><br>(1)进入 <a href="https://livere.com/" target="_blank" rel="external">LiveRe</a>，注册账号。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/1.png" alt=""><br>注意注册后，登录时输入邮箱和密码后，会跳到一个韩文页面，有个文本框需要填写，网站会向你的邮箱发一封韩文的邮件，里面有一串数字，填入到文本框中，点击韩文的登录即可。<br>(2)登录成功后，点击右上角的头像，选择“管理页面”。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/2.png" alt=""><br>(3)点击“实行”。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/3.png" alt=""><br>LiveRe 有两个版本：</p>
 <ul>
 <li>City 版：是一款适合所有人使用的免费版本；</li>
-<li>Premium 版：是一款能够帮助企业实现自动化管理的多功能收费版本。<br>我们使用 City 版就够了。</li>
+<li>Premium 版：是一款能够帮助企业实现自动化管理的多功能收费版本。<br>我们使用 City 版就够了，点击”现在安装“。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/4.png" alt=""><br>(4)输入网站基本信息，点击”申请获取代码“。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/5.png" alt=""><br>(5)填写完成后，进入到 管理页面 -&gt; 代码管理 -&gt; 一般网站 代码中，data-uid 即为所需 uid。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/6.png" alt=""></li>
 </ul>
+<p><strong>2.Next主题添加 LiveRe 插件</strong><br>(1)首先在 _config.yml 文件中添加如下配置：</p>
+<pre><code># Support for LiveRe comments system.
+# You can get your uid from https://livere.com/insight/myCode (General web site)
+livere_uid: your uid
+</code></pre><p>其中 livere_uid 即上一步获取到的 uid。</p>
+<p>(2)在 next/layout/_scripts/third-party/comments/ 目录中添加 livere.swig，文件内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">&#123;% if not (theme.duoshuo and theme.duoshuo.shortname) and not theme.duoshuo_shortname and not theme.disqus_shortname and not theme.hypercomments_id and not theme.gentie_productKey %&#125;</div><div class="line">  &#123;% if theme.livere_uid %&#125;</div><div class="line">    &lt;script type=&quot;text/javascript&quot;&gt;</div><div class="line">      (function(d, s) &#123;</div><div class="line">        var j, e = d.getElementsByTagName(s)[0];</div><div class="line">        if (typeof LivereTower === &apos;function&apos;) &#123; return; &#125;</div><div class="line">        j = d.createElement(s);</div><div class="line">        j.src = &apos;https://cdn-city.livere.com/js/embed.dist.js&apos;;</div><div class="line">        j.async = true;</div><div class="line">        e.parentNode.insertBefore(j, e);</div><div class="line">      &#125;)(document, &apos;script&apos;);</div><div class="line">    &lt;/script&gt;</div><div class="line">  &#123;% endif %&#125;</div><div class="line">&#123;% endif %&#125;</div></pre></td></tr></table></figure></p>
+<p>优先使用其他评论插件，如果其他评论插件没有开启，且 LiveRe 评论插件配置开启了，则使用 LiveRe。其中脚本代码为上一步管理页面中获取到的。</p>
+<p>(3)在 next/layout/_scripts/third-party/comments.swig 文件中追加：</p>
+<pre><code>{% include './comments/livere.swig' %}
+</code></pre><p>引入 LiveRe 评论插件。</p>
+<p>(4)最后，在 next/layout/_partials/comments.swig 文件中条件最后追加 LiveRe 插件是否引用的判断逻辑：</p>
+<pre><code>{% if theme.livere_uid %}
+              <div id="lv-container" data-id="city" data-uid="{{ theme.livere_uid }}"></div>
+        {% endif %}
+</code></pre><p>至此，为 NexT 主题添加 LiveRe 评论插件完成。</p>
 <h3 id="设置每篇文章在博客首页显示的预览内容"><a href="#设置每篇文章在博客首页显示的预览内容" class="headerlink" title="设置每篇文章在博客首页显示的预览内容"></a>设置每篇文章在博客首页显示的预览内容</h3><p>在写博文时，在希望展示在预览的部分下面写入：<!-- more -->，比如：</p>
 <div align="center"><br><img src="http://i.imgur.com/lLl6w9m.png"><br></div>
 
@@ -558,6 +578,8 @@
     
   </div>
 
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
 
         </div>
         
@@ -819,6 +841,20 @@
 
   
 
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
 
 
   
