@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-06-10T07:47:55.000Z</updated>
+  <updated>2017-06-12T04:36:51.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,9 +20,9 @@
     <link href="http://yoursite.com/2017/06/10/Storm%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2017/06/10/Storm介绍及安装部署/</id>
     <published>2017-06-10T02:39:13.000Z</published>
-    <updated>2017-06-10T07:47:55.000Z</updated>
+    <updated>2017-06-12T04:36:51.000Z</updated>
     
-    <content type="html">&lt;h2 id=&quot;Apache-Storm是什么&quot;&gt;&lt;a href=&quot;#Apache-Storm是什么&quot; class=&quot;headerlink&quot; title=&quot;Apache Storm是什么&quot;&gt;&lt;/a&gt;Apache Storm是什么&lt;/h2&gt;&lt;p&gt;Apache Storm是自由开源的分布式实时计算系统，擅长处理海量数据，适用于数据实时处理而非批处理。&lt;br&gt;批处理使用的大多是鼎鼎大名的hadoop或者hive，作为一个批处理系统，hadoop以其吞吐量大、自动容错等优点，在海量数据处理上得到了广泛的使用。但是，hadoop不擅长实时计算，因为它天然就是为批处理而生的，这也是业界一致的共识。否则最近几年也不会有s4,storm,puma这些实时计算系统如雨后春笋般冒出来啦。&lt;br&gt;举个搜索场景中的例子，当一个卖家发布了一条宝贝信息时，他希望的当然是这个宝贝马上就可以被卖家搜索出来、点击、购买啦，相反，如果这个宝贝要等到第二天或者更久才可以被搜出来，估计就会有不少损失了。&lt;br&gt;再举一个推荐的例子，如果用户昨天在淘宝上买了一双袜子，今天想买一副泳镜去游泳，但是却发现系统在不遗余力地给他推荐袜子、鞋子，根本对他今天寻找泳镜的行为视而不见，这样商家的利益就有所损失。这是因为后台系统做的是每天一次的全量处理，而且大多是在夜深人静之时做的，那么客户今天白天做的事情要到明天才能反映出来。这也就是为什么需要实时处理的原因。&lt;/p&gt;
+    <content type="html">&lt;h2 id=&quot;Apache-Storm是什么&quot;&gt;&lt;a href=&quot;#Apache-Storm是什么&quot; class=&quot;headerlink&quot; title=&quot;Apache Storm是什么&quot;&gt;&lt;/a&gt;Apache Storm是什么&lt;/h2&gt;&lt;p&gt;Apache Storm是自由开源的分布式实时计算系统，擅长处理海量数据，适用于数据实时处理而非批处理。&lt;br&gt;批处理使用的大多是鼎鼎大名的hadoop或者hive，作为一个批处理系统，hadoop以其吞吐量大、自动容错等优点，在海量数据处理上得到了广泛的使用。但是，hadoop不擅长实时计算，因为它天然就是为批处理而生的，这也是业界一致的共识。否则最近几年也不会有s4,storm,puma这些实时计算系统如雨后春笋般冒出来啦。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;举个搜索场景中的例子，当一个卖家发布了一条宝贝信息时，他希望的当然是这个宝贝马上就可以被卖家搜索出来、点击、购买啦，相反，如果这个宝贝要等到第二天或者更久才可以被搜出来，估计就会有不少损失了。&lt;br&gt;再举一个推荐的例子，如果用户昨天在淘宝上买了一双袜子，今天想买一副泳镜去游泳，但是却发现系统在不遗余力地给他推荐袜子、鞋子，根本对他今天寻找泳镜的行为视而不见，这样商家的利益就有所损失。这是因为后台系统做的是每天一次的全量处理，而且大多是在夜深人静之时做的，那么客户今天白天做的事情要到明天才能反映出来。这也就是为什么需要实时处理的原因。&lt;/p&gt;
 &lt;h2 id=&quot;Apache-Storm核心概念&quot;&gt;&lt;a href=&quot;#Apache-Storm核心概念&quot; class=&quot;headerlink&quot; title=&quot;Apache Storm核心概念&quot;&gt;&lt;/a&gt;Apache Storm核心概念&lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;Nimbus：Storm集群主节点，负责资源分配和任务调度。我们提交任务和截止任务都是在Nimbus上操作的。一个Storm集群只有一个Nimbus节点。&lt;/li&gt;
 &lt;li&gt;Supervisor：Storm集群工作节点，接受Nimbus分配任务，管理所有Worker。&lt;/li&gt;
@@ -106,7 +106,7 @@ export PATH=$STORM_HOME/bin:$PATH
     
     <summary type="html">
     
-      &lt;h2 id=&quot;Apache-Storm是什么&quot;&gt;&lt;a href=&quot;#Apache-Storm是什么&quot; class=&quot;headerlink&quot; title=&quot;Apache Storm是什么&quot;&gt;&lt;/a&gt;Apache Storm是什么&lt;/h2&gt;&lt;p&gt;Apache Storm是自由开源的
+      &lt;h2 id=&quot;Apache-Storm是什么&quot;&gt;&lt;a href=&quot;#Apache-Storm是什么&quot; class=&quot;headerlink&quot; title=&quot;Apache Storm是什么&quot;&gt;&lt;/a&gt;Apache Storm是什么&lt;/h2&gt;&lt;p&gt;Apache Storm是自由开源的分布式实时计算系统，擅长处理海量数据，适用于数据实时处理而非批处理。&lt;br&gt;批处理使用的大多是鼎鼎大名的hadoop或者hive，作为一个批处理系统，hadoop以其吞吐量大、自动容错等优点，在海量数据处理上得到了广泛的使用。但是，hadoop不擅长实时计算，因为它天然就是为批处理而生的，这也是业界一致的共识。否则最近几年也不会有s4,storm,puma这些实时计算系统如雨后春笋般冒出来啦。&lt;br&gt;
     
     </summary>
     
