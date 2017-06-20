@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-06-12T04:36:51.000Z</updated>
+  <updated>2017-06-20T07:10:35.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,193 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Elasticsearch介绍及安装部署</title>
+    <link href="http://yoursite.com/2017/06/20/Elasticsearch%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
+    <id>http://yoursite.com/2017/06/20/Elasticsearch介绍及安装部署/</id>
+    <published>2017-06-20T03:29:04.000Z</published>
+    <updated>2017-06-20T07:10:35.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Elasticsearch介绍&quot;&gt;&lt;a href=&quot;#Elasticsearch介绍&quot; class=&quot;headerlink&quot; title=&quot;Elasticsearch介绍&quot;&gt;&lt;/a&gt;Elasticsearch介绍&lt;/h2&gt;&lt;p&gt;Elasticsearch是一个分布式搜索服务，提供Restful API，底层基于Lucene，采用多shard的方式保证数据安全，并且提供自动resharding的功能，加之github等大型的站点也采用 Elasticsearch作为其搜索服务。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;Elasticsearch集群安装部署&quot;&gt;&lt;a href=&quot;#Elasticsearch集群安装部署&quot; class=&quot;headerlink&quot; title=&quot;Elasticsearch集群安装部署&quot;&gt;&lt;/a&gt;Elasticsearch集群安装部署&lt;/h2&gt;&lt;h3 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;安装软件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;log1&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;114.55.29.86&lt;/td&gt;
+&lt;td&gt;JDK1.7、elasticsearch-2.2.3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;log2&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;114.55.29.241&lt;/td&gt;
+&lt;td&gt;JDK1.7、elasticsearch-2.2.3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;log3&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;114.55.253.15&lt;/td&gt;
+&lt;td&gt;JDK1.7、elasticsearch-2.2.3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&quot;安装JDK1-8&quot;&gt;&lt;a href=&quot;#安装JDK1-8&quot; class=&quot;headerlink&quot; title=&quot;安装JDK1.8&quot;&gt;&lt;/a&gt;安装JDK1.8&lt;/h3&gt;&lt;p&gt;版本是Elasticsearch 2.2.3，官方建议jdk是1.8。&lt;br&gt;&lt;strong&gt;3台机器都需要安装jdk1.7，添加新用户es。&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# mkdir /usr/java
+[root@log1 local]# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;添加用户&quot;&gt;&lt;a href=&quot;#添加用户&quot; class=&quot;headerlink&quot; title=&quot;添加用户&quot;&gt;&lt;/a&gt;添加用户&lt;/h3&gt;&lt;p&gt;Elasticsearch不能使用root用户去启动。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# groupadd -g 510 es
+[root@log1 local]# useradd -g 510 -u 510 es
+[root@log1 local]# echo &amp;quot;wisedu123&amp;quot; | passwd --stdin es &amp;amp;&amp;gt; /dev/null
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;用新创建的用户登录shell，配置PATH环境变量。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[es@log1 ~]$ vim ~/.bashrc
+export JAVA_HOME=/usr/java/jdk1.8.0_73
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+[es@log1 ~]$ source ~/.bashrc
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;创建安装elasticsearch的目录。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# mkdir /usr/local/elasticsearch
+# chown -R es.es elasticsearch
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;下载安装elasticsearch&quot;&gt;&lt;a href=&quot;#下载安装elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;下载安装elasticsearch&quot;&gt;&lt;/a&gt;下载安装elasticsearch&lt;/h3&gt;&lt;p&gt;es用户登录shell，下载安装elasticsearch。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[es@log1 ~]$ cd /usr/local/elasticsearch/
+[es@log1 elasticsearch]$ wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.2.3/elasticsearch-2.2.3.tar.gz 
+[es@log1 elasticsearch]$ tar zxf elasticsearch-2.2.3.tar.gz 
+[es@log1 elasticsearch]$ mv elasticsearch-2.2.1/* ./
+[es@log1 elasticsearch]$ rm -rf elasticsearch-2.2.1
+[es@log1 elasticsearch]$ rm -f elasticsearch-2.2.1.tar.gz
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置elasticsearch&quot;&gt;&lt;a href=&quot;#配置elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;配置elasticsearch&quot;&gt;&lt;/a&gt;配置elasticsearch&lt;/h3&gt;&lt;p&gt;1.配置elasticsearch 堆内存，编辑bin/elasticsearch.in.sh&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[es@log1 elasticsearch]$ vim bin/elasticsearch.in.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;将参数：ES_MIN_MEM、ES_MAX_MEM设置为当前物理机内存的一半（注意单位，并保证两个值相等）&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;2.配置Elasticsearch集群名称以及节点名称、是否为主节点、path data等信息&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[es@log1 elasticsearch]$ vim config/elasticsearch.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/3.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;3.配置保护Elasticsearch使用的内存防止其被swapped。&lt;br&gt;在memory section下，启用配置：bootstrap.mlockall: true&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/4.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;4.配置network host&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;【注意】:另外，请在Network段在多加两个配置，内容如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;network.bind_host: 114.55.29.86
+# Set the address other nodes will use to communicate with this node. If not 
+# set, it is automatically derived. It must point to an actual IP address.
+network.publish_host: 114.55.29.86
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;如果不加上如上的配置，程序在连接时会报错：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;^A[2016-03-28 16:18:08.791] [ERROR] [godseye] [godseye] [RMI TCP Connection(2)-127.0.0.1] [com.wisedu.godseye.search.util.SearchUtil] [buildIndex:70] NoNodeAvailableException[None of the configured nodes are available: [{#transport#-1}{114.55.29.86}{114.55.29.86:9300}]]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.配置Elasticsearch的自动发现机制&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/7.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;另外两台也是做如上的安装配置。只不过在配置中需要修改下面几处。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/8.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/9.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;Elasticsearch优化&quot;&gt;&lt;a href=&quot;#Elasticsearch优化&quot; class=&quot;headerlink&quot; title=&quot;Elasticsearch优化&quot;&gt;&lt;/a&gt;Elasticsearch优化&lt;/h2&gt;&lt;p&gt;1.检验配置中的bootstrap.mlockall: true是否生效&lt;br&gt;启动Elasticsearch：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[es@log1 elasticsearch]$ bin/elasticsearch -d
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在shell终端执行命令：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;curl http://114.55.29.86:9200/_nodes/process?pretty
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;关注这个这个请求返回数据中的mlockall的值，如果为false，则说明锁定内存失败，这可能由于运行elasticsearch的用户不具备这样的权限。解决该问题的方法是：&lt;br&gt;在运行elasticsearch之前，以root身份执行：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;ulimit -l unlimited
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后再次重启elasticsearch。并查看上面的请求中的mlockall的值是否为true。&lt;br&gt;&lt;strong&gt;【注意】：这时候需要在root执行ulimit -l unlimited的shell终端上su - es，然后重启elasticsearch。因为这是命令行设置的ulimit -l unlimited，只对当前会话生效。&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 ~]# ulimit -l unlimited
+[root@log1 ~]# su - es
+[es@log1 ~]$ ps -ef|grep elasticsearch
+[es@log1 ~]$ kill -9 27189
+[es@log1 ~]$ /usr/local/elasticsearch/bin/elasticsearch -d
+[es@log1 ~]$ curl http://114.55.29.86:9200/_nodes/process?pretty
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/10.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;如果仍然是false，可能是下面的原因：&lt;br&gt;Another possible reason why mlockall can fail is that the temporary directory (usually /tmp) is mounted with the noexec option. This can be solved by specifying a new temp directory, by starting Elasticsearch with:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;./bin/elasticsearch -Djna.tmpdir=/path/to/new/dir
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;要想永久修改锁定内存大小无限制，需修改/etc/security/limits.conf，添加下面的内容，改完不需要重启系统，但是需要重新打开一个shell建立会话。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;es - memlock -1
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中，es代表运行elasticsearch的用户，-表示同时设置了soft和hard，memlock代表设置的是”锁定内存”这个类型，-1(unlimited或者infinity)代表没限制。&lt;/p&gt;
+&lt;p&gt;2.配置操作系统文件描述符数&lt;br&gt;查看elasticsearch能打开的最大文件描述符个数：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;curl http://114.55.29.86:9200/_nodes/stats/process?pretty
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看参数：max_file_descriptors&lt;br&gt;推荐设置到32K甚至64K。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/11.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;或者输入下面的命令进行查看：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ ulimit -a
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/12.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;设置需要修改：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;vim /etc/security/limits.conf
+es               -       nofile          65535
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.增大虚拟内存mmap count配置&lt;br&gt;备注：如果你以.deb或.rpm包安装，则默认不需要设置此项，因为已经被自动设置，查看方式为：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;sysctl vm.max_map_count
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果是手动安装，以root身份执行如下命令：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;sysctl vm.max_map_count=262144
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;并修改文件使设置永久生效：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 ~]# vim /etc/sysctl.conf    
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;添加一行：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;vm.max_map_count = 262144
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;使生效：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 ~]# sysctl -p
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;改完后，重启elasticsearch。&lt;br&gt;在浏览器输入&lt;a href=&quot;http://ip:9200/，查看页面信息，是否正常启动。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://ip:9200/，查看页面信息，是否正常启动。&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/13.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;另外两台也需要做这些优化。&lt;/p&gt;
+&lt;h2 id=&quot;安装插件：中文分词器ik&quot;&gt;&lt;a href=&quot;#安装插件：中文分词器ik&quot; class=&quot;headerlink&quot; title=&quot;安装插件：中文分词器ik&quot;&gt;&lt;/a&gt;安装插件：中文分词器ik&lt;/h2&gt;&lt;p&gt;elasticsearch-analysis-ik 是一款中文的分词插件，支持自定义词库。项目地址为：&lt;a href=&quot;https://github.com/medcl/elasticsearch-analysis-ik&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/medcl/elasticsearch-analysis-ik&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;安装Maven&quot;&gt;&lt;a href=&quot;#安装Maven&quot; class=&quot;headerlink&quot; title=&quot;安装Maven&quot;&gt;&lt;/a&gt;安装Maven&lt;/h3&gt;&lt;p&gt;由于该项目使用了Maven来管理，源代码放到github上。所以要先在服务器上面安装Maven，便可以直接在服务器上面生成项目jar包，部署起来更加方便了。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 ~]# yum install -y maven
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装ik&quot;&gt;&lt;a href=&quot;#安装ik&quot; class=&quot;headerlink&quot; title=&quot;安装ik&quot;&gt;&lt;/a&gt;安装ik&lt;/h3&gt;&lt;p&gt;注意分词插件的版本，2.2.3对应的插件版本是1.9.3&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/14.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[es@log1 ~]$ git clone https://github.com/medcl/elasticsearch-analysis-ik.git
+[es@log1 ~]$ cd elasticsearch-analysis-ik/
+[es@log1 elasticsearch-analysis-ik]$ mvn package
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;拷贝和解压&quot;&gt;&lt;a href=&quot;#拷贝和解压&quot; class=&quot;headerlink&quot; title=&quot;拷贝和解压&quot;&gt;&lt;/a&gt;拷贝和解压&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[es@log1 elasticsearch-analysis-ik]$ mkdir -p /usr/local/elasticsearch/plugins/ik
+[es@log1 elasticsearch-analysis-ik]$ cp target/releases/elasticsearch-analysis-ik-1.9.3.zip /usr/local/elasticsearch/plugins/ik
+[es@log1 ~]$ cd /usr/local/elasticsearch/plugins/ik/
+[es@log1 ik]$ unzip -oq elasticsearch-analysis-ik-1.9.3.zip
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;重启elasticsearch&quot;&gt;&lt;a href=&quot;#重启elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;重启elasticsearch&quot;&gt;&lt;/a&gt;重启elasticsearch&lt;/h3&gt;&lt;p&gt;直接重启就可以了，不需要在Elasticsearch中添加配置index.analysis.analyzer.ik.type : “ik”  。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[es@log1 ik]$ cd /usr/local/elasticsearch/bin/
+[es@log1 bin]$ jps
+20221 Jps
+14910 Elasticsearch
+[es@log1 bin]$ kill -9 14910
+[es@log1 elasticsearch]$ bin/elasticsearch -d
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;另外两台也需要解压这个插件进去，重新启动。&lt;/p&gt;
+&lt;h3 id=&quot;分词测试&quot;&gt;&lt;a href=&quot;#分词测试&quot; class=&quot;headerlink&quot; title=&quot;分词测试&quot;&gt;&lt;/a&gt;分词测试&lt;/h3&gt;&lt;p&gt;①    创建一个索引，名为index&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[es@log1 elasticsearch]$ curl -XPUT http://114.55.29.86:9200/index
+{&amp;quot;acknowledged&amp;quot;:true}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;②    index some docs&lt;br&gt;命令行输入以下内容：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;curl -XPOST http://114.55.29.86:9200/index/fulltext/1 -d&amp;apos;
+{&amp;quot;content&amp;quot;:&amp;quot;美国留给伊拉克的是个烂摊子吗&amp;quot;}
+&amp;apos;
+
+curl -XPOST http://114.55.29.86:9200/index/fulltext/2 -d&amp;apos;
+{&amp;quot;content&amp;quot;:&amp;quot;公安部：各地校车将享最高路权&amp;quot;}
+&amp;apos;
+
+curl -XPOST http:// 114.55.29.86:9200/index/fulltext/3 -d&amp;apos;
+{&amp;quot;content&amp;quot;:&amp;quot;中韩渔警冲突调查：韩警平均每天扣1艘中国渔船&amp;quot;}
+&amp;apos;
+
+curl -XPOST http:// 114.55.29.86:9200/index/fulltext/4 -d&amp;apos;
+{&amp;quot;content&amp;quot;:&amp;quot;中国驻洛杉矶领事馆遭亚裔男子枪击 嫌犯已自首&amp;quot;}
+&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;③    测试&lt;br&gt;命令行输入：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;curl -XPOST http://114.55.29.86:9200/index/fulltext/_search  -d&amp;apos;
+{
+    &amp;quot;query&amp;quot; : { &amp;quot;term&amp;quot; : { &amp;quot;content&amp;quot; : &amp;quot;中国&amp;quot; }},
+    &amp;quot;highlight&amp;quot; : {
+        &amp;quot;pre_tags&amp;quot; : [&amp;quot;&amp;lt;tag1&amp;gt;&amp;quot;, &amp;quot;&amp;lt;tag2&amp;gt;&amp;quot;],
+        &amp;quot;post_tags&amp;quot; : [&amp;quot;&amp;lt;/tag1&amp;gt;&amp;quot;, &amp;quot;&amp;lt;/tag2&amp;gt;&amp;quot;],
+        &amp;quot;fields&amp;quot; : {
+            &amp;quot;content&amp;quot; : {}
+        }
+    }
+}
+&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;结果：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{&amp;quot;took&amp;quot;:74,&amp;quot;timed_out&amp;quot;:false,&amp;quot;_shards&amp;quot;:{&amp;quot;total&amp;quot;:5,&amp;quot;successful&amp;quot;:5,&amp;quot;failed&amp;quot;:0},&amp;quot;hits&amp;quot;:{&amp;quot;total&amp;quot;:2,&amp;quot;max_score&amp;quot;:1.5,&amp;quot;hits&amp;quot;:[{&amp;quot;_index&amp;quot;:&amp;quot;index&amp;quot;,&amp;quot;_type&amp;quot;:&amp;quot;fulltext&amp;quot;,&amp;quot;_id&amp;quot;:&amp;quot;4&amp;quot;,&amp;quot;_score&amp;quot;:1.5,&amp;quot;_source&amp;quot;:
+{&amp;quot;content&amp;quot;:&amp;quot;中国驻洛杉矶领事馆遭亚裔男子枪击 嫌犯已自首&amp;quot;}
+,&amp;quot;highlight&amp;quot;:{&amp;quot;content&amp;quot;:[&amp;quot;&amp;lt;tag1&amp;gt;中国&amp;lt;/tag1&amp;gt;驻洛杉矶领事馆遭亚裔男子枪击 嫌犯已自首&amp;quot;]}},{&amp;quot;_index&amp;quot;:&amp;quot;index&amp;quot;,&amp;quot;_type&amp;quot;:&amp;quot;fulltext&amp;quot;,&amp;quot;_id&amp;quot;:&amp;quot;3&amp;quot;,&amp;quot;_score&amp;quot;:0.53699243,&amp;quot;_source&amp;quot;:
+{&amp;quot;content&amp;quot;:&amp;quot;中韩渔警冲突调查：韩警平均每天扣1艘中国渔船&amp;quot;}
+,&amp;quot;highlight&amp;quot;:{&amp;quot;content&amp;quot;:[&amp;quot;中韩渔警冲突调查：韩警平均每天扣1艘&amp;lt;tag1&amp;gt;中国&amp;lt;/tag1&amp;gt;渔船&amp;quot;]}}]}}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/15.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Elasticsearch介绍&quot;&gt;&lt;a href=&quot;#Elasticsearch介绍&quot; class=&quot;headerlink&quot; title=&quot;Elasticsearch介绍&quot;&gt;&lt;/a&gt;Elasticsearch介绍&lt;/h2&gt;&lt;p&gt;Elasticsearch是一个分布式搜索服务，提供Restful API，底层基于Lucene，采用多shard的方式保证数据安全，并且提供自动resharding的功能，加之github等大型的站点也采用 Elasticsearch作为其搜索服务。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="搜索" scheme="http://yoursite.com/categories/%E6%90%9C%E7%B4%A2/"/>
+    
+    
+      <category term="搜索 Elasticsearch" scheme="http://yoursite.com/tags/%E6%90%9C%E7%B4%A2-Elasticsearch/"/>
+    
+  </entry>
   
   <entry>
     <title>Storm介绍及安装部署</title>

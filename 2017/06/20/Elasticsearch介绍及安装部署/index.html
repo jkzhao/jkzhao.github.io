@@ -1,0 +1,917 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="搜索 Elasticsearch," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Elasticsearch介绍Elasticsearch是一个分布式搜索服务，提供Restful API，底层基于Lucene，采用多shard的方式保证数据安全，并且提供自动resharding的功能，加之github等大型的站点也采用 Elasticsearch作为其搜索服务。">
+<meta name="keywords" content="搜索 Elasticsearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elasticsearch介绍及安装部署">
+<meta property="og:url" content="http://yoursite.com/2017/06/20/Elasticsearch介绍及安装部署/index.html">
+<meta property="og:site_name" content="jkzhao's blog">
+<meta property="og:description" content="Elasticsearch介绍Elasticsearch是一个分布式搜索服务，提供Restful API，底层基于Lucene，采用多shard的方式保证数据安全，并且提供自动resharding的功能，加之github等大型的站点也采用 Elasticsearch作为其搜索服务。">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/6.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/7.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/8.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/9.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/10.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/12.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/13.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/14.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/15.png">
+<meta property="og:updated_time" content="2017-06-20T07:10:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Elasticsearch介绍及安装部署">
+<meta name="twitter:description" content="Elasticsearch介绍Elasticsearch是一个分布式搜索服务，提供Restful API，底层基于Lucene，采用多shard的方式保证数据安全，并且提供自动resharding的功能，加之github等大型的站点也采用 Elasticsearch作为其搜索服务。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Elasticsearch介绍及安装部署 | jkzhao's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Elasticsearch介绍及安装部署
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-06-20T11:29:04+08:00" content="2017-06-20">
+              2017-06-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/搜索/" itemprop="url" rel="index">
+                    <span itemprop="name">搜索</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Elasticsearch介绍"><a href="#Elasticsearch介绍" class="headerlink" title="Elasticsearch介绍"></a>Elasticsearch介绍</h2><p>Elasticsearch是一个分布式搜索服务，提供Restful API，底层基于Lucene，采用多shard的方式保证数据安全，并且提供自动resharding的功能，加之github等大型的站点也采用 Elasticsearch作为其搜索服务。<br><a id="more"></a></p>
+<h2 id="Elasticsearch集群安装部署"><a href="#Elasticsearch集群安装部署" class="headerlink" title="Elasticsearch集群安装部署"></a>Elasticsearch集群安装部署</h2><h3 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h3><table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>操作系统版本</th>
+<th>IP地址</th>
+<th>安装软件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>log1</td>
+<td>CentOS 7.0</td>
+<td>114.55.29.86</td>
+<td>JDK1.7、elasticsearch-2.2.3</td>
+</tr>
+<tr>
+<td>log2</td>
+<td>CentOS 7.0</td>
+<td>114.55.29.241</td>
+<td>JDK1.7、elasticsearch-2.2.3</td>
+</tr>
+<tr>
+<td>log3</td>
+<td>CentOS 7.0</td>
+<td>114.55.253.15</td>
+<td>JDK1.7、elasticsearch-2.2.3</td>
+</tr>
+</tbody>
+</table>
+<h3 id="安装JDK1-8"><a href="#安装JDK1-8" class="headerlink" title="安装JDK1.8"></a>安装JDK1.8</h3><p>版本是Elasticsearch 2.2.3，官方建议jdk是1.8。<br><strong>3台机器都需要安装jdk1.7，添加新用户es。</strong></p>
+<pre><code>[root@log1 local]# mkdir /usr/java
+[root@log1 local]# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
+</code></pre><h3 id="添加用户"><a href="#添加用户" class="headerlink" title="添加用户"></a>添加用户</h3><p>Elasticsearch不能使用root用户去启动。</p>
+<pre><code>[root@log1 local]# groupadd -g 510 es
+[root@log1 local]# useradd -g 510 -u 510 es
+[root@log1 local]# echo &quot;wisedu123&quot; | passwd --stdin es &amp;&gt; /dev/null
+</code></pre><p>用新创建的用户登录shell，配置PATH环境变量。</p>
+<pre><code>[es@log1 ~]$ vim ~/.bashrc
+export JAVA_HOME=/usr/java/jdk1.8.0_73
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+[es@log1 ~]$ source ~/.bashrc
+</code></pre><p>创建安装elasticsearch的目录。</p>
+<pre><code># mkdir /usr/local/elasticsearch
+# chown -R es.es elasticsearch
+</code></pre><h3 id="下载安装elasticsearch"><a href="#下载安装elasticsearch" class="headerlink" title="下载安装elasticsearch"></a>下载安装elasticsearch</h3><p>es用户登录shell，下载安装elasticsearch。</p>
+<pre><code>[es@log1 ~]$ cd /usr/local/elasticsearch/
+[es@log1 elasticsearch]$ wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.2.3/elasticsearch-2.2.3.tar.gz 
+[es@log1 elasticsearch]$ tar zxf elasticsearch-2.2.3.tar.gz 
+[es@log1 elasticsearch]$ mv elasticsearch-2.2.1/* ./
+[es@log1 elasticsearch]$ rm -rf elasticsearch-2.2.1
+[es@log1 elasticsearch]$ rm -f elasticsearch-2.2.1.tar.gz
+</code></pre><h3 id="配置elasticsearch"><a href="#配置elasticsearch" class="headerlink" title="配置elasticsearch"></a>配置elasticsearch</h3><p>1.配置elasticsearch 堆内存，编辑bin/elasticsearch.in.sh</p>
+<pre><code>[es@log1 elasticsearch]$ vim bin/elasticsearch.in.sh
+</code></pre><p>将参数：ES_MIN_MEM、ES_MAX_MEM设置为当前物理机内存的一半（注意单位，并保证两个值相等）<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/1.png" alt=""></p>
+<p>2.配置Elasticsearch集群名称以及节点名称、是否为主节点、path data等信息</p>
+<pre><code>[es@log1 elasticsearch]$ vim config/elasticsearch.yml
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/2.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/3.png" alt=""></p>
+<p>3.配置保护Elasticsearch使用的内存防止其被swapped。<br>在memory section下，启用配置：bootstrap.mlockall: true<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/4.png" alt=""></p>
+<p>4.配置network host<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/5.png" alt=""><br>【注意】:另外，请在Network段在多加两个配置，内容如下：</p>
+<pre><code>network.bind_host: 114.55.29.86
+# Set the address other nodes will use to communicate with this node. If not 
+# set, it is automatically derived. It must point to an actual IP address.
+network.publish_host: 114.55.29.86
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/6.png" alt=""><br>如果不加上如上的配置，程序在连接时会报错：</p>
+<pre><code>^A[2016-03-28 16:18:08.791] [ERROR] [godseye] [godseye] [RMI TCP Connection(2)-127.0.0.1] [com.wisedu.godseye.search.util.SearchUtil] [buildIndex:70] NoNodeAvailableException[None of the configured nodes are available: [{#transport#-1}{114.55.29.86}{114.55.29.86:9300}]]
+</code></pre><p>5.配置Elasticsearch的自动发现机制<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/7.png" alt=""></p>
+<p>另外两台也是做如上的安装配置。只不过在配置中需要修改下面几处。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/8.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/9.png" alt=""></p>
+<h2 id="Elasticsearch优化"><a href="#Elasticsearch优化" class="headerlink" title="Elasticsearch优化"></a>Elasticsearch优化</h2><p>1.检验配置中的bootstrap.mlockall: true是否生效<br>启动Elasticsearch：</p>
+<pre><code>[es@log1 elasticsearch]$ bin/elasticsearch -d
+</code></pre><p>在shell终端执行命令：</p>
+<pre><code>curl http://114.55.29.86:9200/_nodes/process?pretty
+</code></pre><p>关注这个这个请求返回数据中的mlockall的值，如果为false，则说明锁定内存失败，这可能由于运行elasticsearch的用户不具备这样的权限。解决该问题的方法是：<br>在运行elasticsearch之前，以root身份执行：</p>
+<pre><code>ulimit -l unlimited
+</code></pre><p>然后再次重启elasticsearch。并查看上面的请求中的mlockall的值是否为true。<br><strong>【注意】：这时候需要在root执行ulimit -l unlimited的shell终端上su - es，然后重启elasticsearch。因为这是命令行设置的ulimit -l unlimited，只对当前会话生效。</strong></p>
+<pre><code>[root@log1 ~]# ulimit -l unlimited
+[root@log1 ~]# su - es
+[es@log1 ~]$ ps -ef|grep elasticsearch
+[es@log1 ~]$ kill -9 27189
+[es@log1 ~]$ /usr/local/elasticsearch/bin/elasticsearch -d
+[es@log1 ~]$ curl http://114.55.29.86:9200/_nodes/process?pretty
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/10.png" alt=""><br>如果仍然是false，可能是下面的原因：<br>Another possible reason why mlockall can fail is that the temporary directory (usually /tmp) is mounted with the noexec option. This can be solved by specifying a new temp directory, by starting Elasticsearch with:</p>
+<pre><code>./bin/elasticsearch -Djna.tmpdir=/path/to/new/dir
+</code></pre><p>要想永久修改锁定内存大小无限制，需修改/etc/security/limits.conf，添加下面的内容，改完不需要重启系统，但是需要重新打开一个shell建立会话。</p>
+<pre><code>es - memlock -1
+</code></pre><p>其中，es代表运行elasticsearch的用户，-表示同时设置了soft和hard，memlock代表设置的是”锁定内存”这个类型，-1(unlimited或者infinity)代表没限制。</p>
+<p>2.配置操作系统文件描述符数<br>查看elasticsearch能打开的最大文件描述符个数：</p>
+<pre><code>curl http://114.55.29.86:9200/_nodes/stats/process?pretty
+</code></pre><p>查看参数：max_file_descriptors<br>推荐设置到32K甚至64K。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/11.png" alt=""><br>或者输入下面的命令进行查看：</p>
+<pre><code>$ ulimit -a
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/12.png" alt=""><br>设置需要修改：</p>
+<pre><code>vim /etc/security/limits.conf
+es               -       nofile          65535
+</code></pre><p>3.增大虚拟内存mmap count配置<br>备注：如果你以.deb或.rpm包安装，则默认不需要设置此项，因为已经被自动设置，查看方式为：</p>
+<pre><code>sysctl vm.max_map_count
+</code></pre><p>如果是手动安装，以root身份执行如下命令：</p>
+<pre><code>sysctl vm.max_map_count=262144
+</code></pre><p>并修改文件使设置永久生效：</p>
+<pre><code>[root@log1 ~]# vim /etc/sysctl.conf    
+</code></pre><p>添加一行：</p>
+<pre><code>vm.max_map_count = 262144
+</code></pre><p>使生效：</p>
+<pre><code>[root@log1 ~]# sysctl -p
+</code></pre><p>改完后，重启elasticsearch。<br>在浏览器输入<a href="http://ip:9200/，查看页面信息，是否正常启动。" target="_blank" rel="external">http://ip:9200/，查看页面信息，是否正常启动。</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/13.png" alt=""></p>
+<p>另外两台也需要做这些优化。</p>
+<h2 id="安装插件：中文分词器ik"><a href="#安装插件：中文分词器ik" class="headerlink" title="安装插件：中文分词器ik"></a>安装插件：中文分词器ik</h2><p>elasticsearch-analysis-ik 是一款中文的分词插件，支持自定义词库。项目地址为：<a href="https://github.com/medcl/elasticsearch-analysis-ik" target="_blank" rel="external">https://github.com/medcl/elasticsearch-analysis-ik</a></p>
+<h3 id="安装Maven"><a href="#安装Maven" class="headerlink" title="安装Maven"></a>安装Maven</h3><p>由于该项目使用了Maven来管理，源代码放到github上。所以要先在服务器上面安装Maven，便可以直接在服务器上面生成项目jar包，部署起来更加方便了。</p>
+<pre><code>[root@log1 ~]# yum install -y maven
+</code></pre><h3 id="安装ik"><a href="#安装ik" class="headerlink" title="安装ik"></a>安装ik</h3><p>注意分词插件的版本，2.2.3对应的插件版本是1.9.3<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/14.png" alt=""></p>
+<pre><code>[es@log1 ~]$ git clone https://github.com/medcl/elasticsearch-analysis-ik.git
+[es@log1 ~]$ cd elasticsearch-analysis-ik/
+[es@log1 elasticsearch-analysis-ik]$ mvn package
+</code></pre><h3 id="拷贝和解压"><a href="#拷贝和解压" class="headerlink" title="拷贝和解压"></a>拷贝和解压</h3><pre><code>[es@log1 elasticsearch-analysis-ik]$ mkdir -p /usr/local/elasticsearch/plugins/ik
+[es@log1 elasticsearch-analysis-ik]$ cp target/releases/elasticsearch-analysis-ik-1.9.3.zip /usr/local/elasticsearch/plugins/ik
+[es@log1 ~]$ cd /usr/local/elasticsearch/plugins/ik/
+[es@log1 ik]$ unzip -oq elasticsearch-analysis-ik-1.9.3.zip
+</code></pre><h3 id="重启elasticsearch"><a href="#重启elasticsearch" class="headerlink" title="重启elasticsearch"></a>重启elasticsearch</h3><p>直接重启就可以了，不需要在Elasticsearch中添加配置index.analysis.analyzer.ik.type : “ik”  。</p>
+<pre><code>[es@log1 ik]$ cd /usr/local/elasticsearch/bin/
+[es@log1 bin]$ jps
+20221 Jps
+14910 Elasticsearch
+[es@log1 bin]$ kill -9 14910
+[es@log1 elasticsearch]$ bin/elasticsearch -d
+</code></pre><p>另外两台也需要解压这个插件进去，重新启动。</p>
+<h3 id="分词测试"><a href="#分词测试" class="headerlink" title="分词测试"></a>分词测试</h3><p>①    创建一个索引，名为index</p>
+<pre><code>[es@log1 elasticsearch]$ curl -XPUT http://114.55.29.86:9200/index
+{&quot;acknowledged&quot;:true}
+</code></pre><p>②    index some docs<br>命令行输入以下内容：</p>
+<pre><code>curl -XPOST http://114.55.29.86:9200/index/fulltext/1 -d&apos;
+{&quot;content&quot;:&quot;美国留给伊拉克的是个烂摊子吗&quot;}
+&apos;
+
+curl -XPOST http://114.55.29.86:9200/index/fulltext/2 -d&apos;
+{&quot;content&quot;:&quot;公安部：各地校车将享最高路权&quot;}
+&apos;
+
+curl -XPOST http:// 114.55.29.86:9200/index/fulltext/3 -d&apos;
+{&quot;content&quot;:&quot;中韩渔警冲突调查：韩警平均每天扣1艘中国渔船&quot;}
+&apos;
+
+curl -XPOST http:// 114.55.29.86:9200/index/fulltext/4 -d&apos;
+{&quot;content&quot;:&quot;中国驻洛杉矶领事馆遭亚裔男子枪击 嫌犯已自首&quot;}
+&apos;
+</code></pre><p>③    测试<br>命令行输入：</p>
+<pre><code>curl -XPOST http://114.55.29.86:9200/index/fulltext/_search  -d&apos;
+{
+    &quot;query&quot; : { &quot;term&quot; : { &quot;content&quot; : &quot;中国&quot; }},
+    &quot;highlight&quot; : {
+        &quot;pre_tags&quot; : [&quot;&lt;tag1&gt;&quot;, &quot;&lt;tag2&gt;&quot;],
+        &quot;post_tags&quot; : [&quot;&lt;/tag1&gt;&quot;, &quot;&lt;/tag2&gt;&quot;],
+        &quot;fields&quot; : {
+            &quot;content&quot; : {}
+        }
+    }
+}
+&apos;
+</code></pre><p>结果：</p>
+<pre><code>{&quot;took&quot;:74,&quot;timed_out&quot;:false,&quot;_shards&quot;:{&quot;total&quot;:5,&quot;successful&quot;:5,&quot;failed&quot;:0},&quot;hits&quot;:{&quot;total&quot;:2,&quot;max_score&quot;:1.5,&quot;hits&quot;:[{&quot;_index&quot;:&quot;index&quot;,&quot;_type&quot;:&quot;fulltext&quot;,&quot;_id&quot;:&quot;4&quot;,&quot;_score&quot;:1.5,&quot;_source&quot;:
+{&quot;content&quot;:&quot;中国驻洛杉矶领事馆遭亚裔男子枪击 嫌犯已自首&quot;}
+,&quot;highlight&quot;:{&quot;content&quot;:[&quot;&lt;tag1&gt;中国&lt;/tag1&gt;驻洛杉矶领事馆遭亚裔男子枪击 嫌犯已自首&quot;]}},{&quot;_index&quot;:&quot;index&quot;,&quot;_type&quot;:&quot;fulltext&quot;,&quot;_id&quot;:&quot;3&quot;,&quot;_score&quot;:0.53699243,&quot;_source&quot;:
+{&quot;content&quot;:&quot;中韩渔警冲突调查：韩警平均每天扣1艘中国渔船&quot;}
+,&quot;highlight&quot;:{&quot;content&quot;:[&quot;中韩渔警冲突调查：韩警平均每天扣1艘&lt;tag1&gt;中国&lt;/tag1&gt;渔船&quot;]}}]}}
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/15.png" alt=""></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/搜索-Elasticsearch/" rel="tag">#搜索 Elasticsearch</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/10/Storm介绍及安装部署/" rel="prev" title="Storm介绍及安装部署">
+                Storm介绍及安装部署 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">17</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/ju-feng-93" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-zhihu"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch介绍"><span class="nav-number">1.</span> <span class="nav-text">Elasticsearch介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch集群安装部署"><span class="nav-number">2.</span> <span class="nav-text">Elasticsearch集群安装部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息"><span class="nav-number">2.1.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装JDK1-8"><span class="nav-number">2.2.</span> <span class="nav-text">安装JDK1.8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加用户"><span class="nav-number">2.3.</span> <span class="nav-text">添加用户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载安装elasticsearch"><span class="nav-number">2.4.</span> <span class="nav-text">下载安装elasticsearch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置elasticsearch"><span class="nav-number">2.5.</span> <span class="nav-text">配置elasticsearch</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch优化"><span class="nav-number">3.</span> <span class="nav-text">Elasticsearch优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装插件：中文分词器ik"><span class="nav-number">4.</span> <span class="nav-text">安装插件：中文分词器ik</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Maven"><span class="nav-number">4.1.</span> <span class="nav-text">安装Maven</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装ik"><span class="nav-number">4.2.</span> <span class="nav-text">安装ik</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#拷贝和解压"><span class="nav-number">4.3.</span> <span class="nav-text">拷贝和解压</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重启elasticsearch"><span class="nav-number">4.4.</span> <span class="nav-text">重启elasticsearch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分词测试"><span class="nav-number">4.5.</span> <span class="nav-text">分词测试</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>
