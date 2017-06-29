@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-06-29T07:07:43.000Z</updated>
+  <updated>2017-06-29T07:36:52.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/06/29/Elasticsearch%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98/"/>
     <id>http://yoursite.com/2017/06/29/Elasticsearch安全问题/</id>
     <published>2017-06-29T03:51:51.000Z</published>
-    <updated>2017-06-29T07:07:43.000Z</updated>
+    <updated>2017-06-29T07:36:52.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Elasticsearch设计之初就定位在纯私网环境而不做权限和安全控制，虽然有个叫Security Manager的配置，但是显然是不够的。但是后来专门出了个收费的shield来保护Elasticsearch，可是毕竟是收费的。当然我们也有替代品：search-guard。下面介绍下 Elasticsearch 围绕安全方面的的几点使用事项：&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;修改默认的-Elasticsearch-集群名称&quot;&gt;&lt;a href=&quot;#修改默认的-Elasticsearch-集群名称&quot; class=&quot;headerlink&quot; title=&quot;修改默认的 Elasticsearch 集群名称&quot;&gt;&lt;/a&gt;修改默认的 Elasticsearch 集群名称&lt;/h2&gt;&lt;p&gt;Elasticsearch 默认的集群名称是 elasticsearch，请在生成环境上一定要修改成其他的名称，并且不同的环境和不同的集群要保证不相同，监控集群节点情况，如果有未知节点加入，一定要及时预警。&lt;/p&gt;
@@ -61,8 +61,99 @@
 &lt;pre&gt;&lt;code&gt;[es@log1 example-pki-scripts]$ cp truststore.jks node-0-keystore.jks /usr/local/elasticsearch/config/
 [es@log1 example-pki-scripts]$ scp -p truststore.jks node-1-keystore.jks es@log2:/usr/local/elasticsearch/config/
 [es@log1 example-pki-scripts]$ scp -p truststore.jks node-2-keystore.jks es@log3:/usr/local/elasticsearch/config/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.在Elasticsearch中添加search-guard和search-guard-ssl的配置项&lt;br&gt;找到config/elasticsearch.yml文件，添加以下配置项：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;################################################################################                                     SEARCH GUARD SSL                                                                             ##                                       Configuration                                                                                            ################################################################################################################################################################ Transport layer SSL                                                                                                                       ##                                                                                                                                                         ####################################################################################节点下放的是node-*，这里就写哪个searchguard.ssl.transport.enabled: truesearchguard.ssl.transport.keystore_filepath: node-0-keystore.jkssearchguard.ssl.transport.keystore_password: changeitsearchguard.ssl.transport.truststore_filepath: truststore.jkssearchguard.ssl.transport.truststore_password: changeitsearchguard.ssl.transport.enforce_hostname_verification: falsesearchguard.ssl.transport.resolve_hostname: falsesearchguard.ssl.transport.enabled_protocols: - &amp;quot;TLSv1&amp;quot; - &amp;quot;TLSv1.1&amp;quot; - &amp;quot;TLSv1.2&amp;quot;################################################################################ HTTP/REST layer SSL                                                                                                                  ##                                                                                                                                                         ################################################################################searchguard.ssl.http.enabled: truesearchguard.ssl.http.keystore_filepath: node-0-keystore.jkssearchguard.ssl.http.truststore_filepath: truststore.jkssearchguard.ssl.http.truststore_password: changeitsearchguard.ssl.http.enabled_protocols: - &amp;quot;TLSv1&amp;quot; - &amp;quot;TLSv1.1&amp;quot; - &amp;quot;TLSv1.2&amp;quot;##### 管理员账号配置searchguard.authcz.admin_dn:  - &amp;quot;CN=admin, OU=client, O=client, L=Test, C=DE&amp;quot;```**注意：配置文件的node-x-keystore.jks对应每台config目录下放置的文件。**  &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4.重启集群中的各台Elasticsearch然后初始化search-guard的配置项        $ bin/elasticsearch -d&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        3台集群中的节点都要重启。重启后，elasticsearch 之间的连接已经是加密的了。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;在log1上初始化searchguard索引：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```$ cd /usr/local/elasticsearch$ plugins/search-guard-2/tools/sgadmin.sh -cd plugins/search-guard-2/sgconfig -ts plugins/search-guard-2/sgconfig/truststore.jks -ks  plugins/search-guard-2/sgconfig/admin-keystore.jks -kspass changeit -tspass changeit  -icl -nhnv -h 114.55.253.15 Will connect to 114.55.253.15:9300 ... doneContacting elasticsearch cluster &amp;apos;elasticsearch&amp;apos; and wait for YELLOW clusterstate ...Clustername: wiseduClusterstate: GREENNumber of nodes: 3Number of data nodes: 3searchguard index does not exists, attempt to create it ... done (with 2 replicas, auto expand replicas is off)Populate config from /usr/local/elasticsearch/plugins/search-guard-2/sgconfigWill update &amp;apos;config&amp;apos; with plugins/search-guard-2/sgconfig/sg_config.yml   SUCC: Configuration for &amp;apos;config&amp;apos; created or updatedWill update &amp;apos;roles&amp;apos; with plugins/search-guard-2/sgconfig/sg_roles.yml   SUCC: Configuration for &amp;apos;roles&amp;apos; created or updatedWill update &amp;apos;rolesmapping&amp;apos; with plugins/search-guard-2/sgconfig/sg_roles_mapping.yml   SUCC: Configuration for &amp;apos;rolesmapping&amp;apos; created or updatedWill update &amp;apos;internalusers&amp;apos; with plugins/search-guard-2/sgconfig/sg_internal_users.yml   SUCC: Configuration for &amp;apos;internalusers&amp;apos; created or updatedWill update &amp;apos;actiongroups&amp;apos; with plugins/search-guard-2/sgconfig/sg_action_groups.yml   SUCC: Configuration for &amp;apos;actiongroups&amp;apos; created or updatedDone with success &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;```                      这里的-icl是忽略集群的名称，不加会报错。**注意1：如果修改了searchguard，则需要重新加载配置执行。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;注意2：search-guard配置的相关改动不需要重启elasticsearch，相关的配置实际上存储在searchguard 的indice下了。**&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;其中 sg_internal_users.yml 保存着默认的用户和密码：```[es@log1 elasticsearch]$ cd plugins/search-guard-2/sgconfig/[es@log1 sgconfig]$ head -n 5  sg_internal_users.yml# This is the internal user database# The hash value is a bcrypt hash and can be generated with plugin/tools/hash.shadmin:  hash: $2a$12$VcCDgh2NDk07JGN0rjGbM.Ad41qVR/YFJcgHp0UGns5JDymv..TOG  #password is: admin```浏览器输入https://114.55.253.15:9200/，输入用户名和密码admin/admin&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/17.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/18.png)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;### HTTP和Java Api方式访问ElasticSearch&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#### HTTP方式访问Elasticsearch1.在浏览器上访问Elasticsearch，会直接出弹窗，输入用户名密码即可。2.在服务器上使用curl的话需要加上参数-u adminName，类似如下：        curl -u adminName:adminname -XGET &amp;quot;http://114.55.253.15:9200/blog/article/1?pretty&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#### Java API中使用search-guard1.加入jar包进到/usr/local/elasticsearch/plugins/search-guard-ssl目录下拷贝以下jar包加到CLASSPATH中。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        search-guard-ssl-2.3.4.14.jar        netty-buffer-4.0.37.Final.jar        netty-codec-4.0.37.Final.jar        netty-common-4.0.37.Final.jar        netty-handler-4.0.37.Final.jar        netty-transport-4.0.37.Final.jar&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2.修改setting以下部分需要从ES节点的这个目录下复制出来放到工程中，并且修改为你实际的路径。目录：/usr/local/elasticsearch/plugins/search-guard-2/sgconfig中。```import java.net.InetAddress;import java.net.InetSocketAddress;import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;import org.elasticsearch.common.transport.InetSocketTransportAddress;import com.floragunn.searchguard.ssl.SearchGuardSSLPlugin; Settings settings = Settings.settingsBuilder()        .put(&amp;quot;path.home&amp;quot;, &amp;quot;.&amp;quot;)        .put(&amp;quot;cluster.name&amp;quot;, &amp;quot;wisedu&amp;quot;)        .put(&amp;quot;searchguard.ssl.transport.enabled&amp;quot;, true)        .put(&amp;quot;searchguard.ssl.transport.keystore_filepath&amp;quot;, &amp;quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/admin-keystore.jks&amp;quot;)        .put(&amp;quot;searchguard.ssl.transport.truststore_filepath&amp;quot;, &amp;quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/truststore.jks&amp;quot;)        .put(&amp;quot;searchguard.ssl.transport.enforce_hostname_verification&amp;quot;, false)                      .build();&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;3.修改client&lt;br&gt;以下为你想要连接的ES节点的ip和port，请修改为你实际的。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.在Elasticsearch中添加search-guard和search-guard-ssl的配置项&lt;br&gt;找到config/elasticsearch.yml文件，添加以下配置项：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;##########################################################
+# SEARCH GUARD SSL                                                                             
+# Configuration
+##########################################################
+################## Transport layer SSL ###################                        
+####节点下放的是node-*，这里就写哪个
+searchguard.ssl.transport.enabled: true
+searchguard.ssl.transport.keystore_filepath: node-0-keystore.jks
+searchguard.ssl.transport.keystore_password: changeit
+searchguard.ssl.transport.truststore_filepath: truststore.jks
+searchguard.ssl.transport.truststore_password: changeit
+searchguard.ssl.transport.enforce_hostname_verification: false
+searchguard.ssl.transport.resolve_hostname: false
+searchguard.ssl.transport.enabled_protocols:
+ - &amp;quot;TLSv1&amp;quot;
+ - &amp;quot;TLSv1.1&amp;quot;
+ - &amp;quot;TLSv1.2&amp;quot;
+
+################# HTTP/REST layer SSL ####################
+searchguard.ssl.http.enabled: true
+searchguard.ssl.http.keystore_filepath: node-0-keystore.jks
+searchguard.ssl.http.truststore_filepath: truststore.jks
+searchguard.ssl.http.truststore_password: changeit
+searchguard.ssl.http.enabled_protocols:
+ - &amp;quot;TLSv1&amp;quot;
+ - &amp;quot;TLSv1.1&amp;quot;
+ - &amp;quot;TLSv1.2&amp;quot;
+
+##### 管理员账号配置
+searchguard.authcz.admin_dn:
+  - &amp;quot;CN=admin, OU=client, O=client, L=Test, C=DE&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;注意：配置文件的node-x-keystore.jks对应每台config目录下放置的文件。&lt;/strong&gt;  &lt;/p&gt;
+&lt;p&gt;4.重启集群中的各台Elasticsearch然后初始化search-guard的配置项&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ bin/elasticsearch -d
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3台集群中的节点都要重启。重启后，elasticsearch 之间的连接已经是加密的了。&lt;/p&gt;
+&lt;p&gt;在log1上初始化searchguard索引：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ cd /usr/local/elasticsearch
+$ plugins/search-guard-2/tools/sgadmin.sh -cd plugins/search-guard-2/sgconfig -ts plugins/search-guard-2/sgconfig/truststore.jks -ks  plugins/search-guard-2/sgconfig/admin-keystore.jks -kspass changeit -tspass changeit  -icl -nhnv -h 114.55.253.15 
+Will connect to 114.55.253.15:9300 ... done
+Contacting elasticsearch cluster &amp;apos;elasticsearch&amp;apos; and wait for YELLOW clusterstate ...
+Clustername: wisedu
+Clusterstate: GREEN
+Number of nodes: 3
+Number of data nodes: 3
+searchguard index does not exists, attempt to create it ... done (with 2 replicas, auto expand replicas is off)
+Populate config from /usr/local/elasticsearch/plugins/search-guard-2/sgconfig
+Will update &amp;apos;config&amp;apos; with plugins/search-guard-2/sgconfig/sg_config.yml
+   SUCC: Configuration for &amp;apos;config&amp;apos; created or updated
+Will update &amp;apos;roles&amp;apos; with plugins/search-guard-2/sgconfig/sg_roles.yml
+   SUCC: Configuration for &amp;apos;roles&amp;apos; created or updated
+Will update &amp;apos;rolesmapping&amp;apos; with plugins/search-guard-2/sgconfig/sg_roles_mapping.yml
+   SUCC: Configuration for &amp;apos;rolesmapping&amp;apos; created or updated
+Will update &amp;apos;internalusers&amp;apos; with plugins/search-guard-2/sgconfig/sg_internal_users.yml
+   SUCC: Configuration for &amp;apos;internalusers&amp;apos; created or updated
+Will update &amp;apos;actiongroups&amp;apos; with plugins/search-guard-2/sgconfig/sg_action_groups.yml
+   SUCC: Configuration for &amp;apos;actiongroups&amp;apos; created or updated
+Done with success 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这里的-icl是忽略集群的名称，不加会报错。&lt;br&gt;&lt;strong&gt;注意1：如果修改了searchguard，则需要重新加载配置执行。&lt;br&gt;注意2：search-guard配置的相关改动不需要重启elasticsearch，相关的配置实际上存储在searchguard 的indice下了。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;其中 sg_internal_users.yml 保存着默认的用户和密码：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[es@log1 elasticsearch]$ cd plugins/search-guard-2/sgconfig/
+[es@log1 sgconfig]$ head -n 5  sg_internal_users.yml
+# This is the internal user database
+# The hash value is a bcrypt hash and can be generated with plugin/tools/hash.sh
+admin:
+  hash: $2a$12$VcCDgh2NDk07JGN0rjGbM.Ad41qVR/YFJcgHp0UGns5JDymv..TOG
+  #password is: admin
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;浏览器输入&lt;a href=&quot;https://114.55.253.15:9200/，输入用户名和密码admin/admin&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://114.55.253.15:9200/，输入用户名和密码admin/admin&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/17.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/18.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;HTTP和Java-Api方式访问ElasticSearch&quot;&gt;&lt;a href=&quot;#HTTP和Java-Api方式访问ElasticSearch&quot; class=&quot;headerlink&quot; title=&quot;HTTP和Java Api方式访问ElasticSearch&quot;&gt;&lt;/a&gt;HTTP和Java Api方式访问ElasticSearch&lt;/h3&gt;&lt;h4 id=&quot;HTTP方式访问Elasticsearch&quot;&gt;&lt;a href=&quot;#HTTP方式访问Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;HTTP方式访问Elasticsearch&quot;&gt;&lt;/a&gt;HTTP方式访问Elasticsearch&lt;/h4&gt;&lt;p&gt;1.在浏览器上访问Elasticsearch，会直接出弹窗，输入用户名密码即可。&lt;br&gt;2.在服务器上使用curl的话需要加上参数-u adminName，类似如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;curl -u adminName:adminname -XGET &amp;quot;http://114.55.253.15:9200/blog/article/1?pretty&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;Java-API中使用search-guard&quot;&gt;&lt;a href=&quot;#Java-API中使用search-guard&quot; class=&quot;headerlink&quot; title=&quot;Java API中使用search-guard&quot;&gt;&lt;/a&gt;Java API中使用search-guard&lt;/h4&gt;&lt;p&gt;1.加入jar包&lt;br&gt;进到/usr/local/elasticsearch/plugins/search-guard-ssl目录下拷贝以下jar包加到CLASSPATH中。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;search-guard-ssl-2.3.4.14.jar
+netty-buffer-4.0.37.Final.jar
+netty-codec-4.0.37.Final.jar
+netty-common-4.0.37.Final.jar
+netty-handler-4.0.37.Final.jar
+netty-transport-4.0.37.Final.jar
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.修改setting&lt;br&gt;以下部分需要从ES节点的这个目录下复制出来放到工程中，并且修改为你实际的路径。&lt;br&gt;目录：/usr/local/elasticsearch/plugins/search-guard-2/sgconfig中。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import com.floragunn.searchguard.ssl.SearchGuardSSLPlugin;
+
+Settings settings = Settings.settingsBuilder()
+.put(&amp;quot;path.home&amp;quot;, &amp;quot;.&amp;quot;)
+.put(&amp;quot;cluster.name&amp;quot;, &amp;quot;wisedu&amp;quot;)
+.put(&amp;quot;searchguard.ssl.transport.enabled&amp;quot;, true)
+.put(&amp;quot;searchguard.ssl.transport.keystore_filepath&amp;quot;, &amp;quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/admin-keystore.jks&amp;quot;)
+.put(&amp;quot;searchguard.ssl.transport.truststore_filepath&amp;quot;, &amp;quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/truststore.jks&amp;quot;)
+.put(&amp;quot;searchguard.ssl.transport.enforce_hostname_verification&amp;quot;, false)              
+.build();
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.修改client&lt;br&gt;以下为你想要连接的ES节点的ip和port，请修改为你实际的。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;TransportClient client = TransportClient.builder().settings(settings).addPlugin(SearchGuardSSLPlugin.class).build();
 TransportClient addTransportAddress = client.addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(&amp;quot;114.55.253.15&amp;quot;, 9300)));
 //do something with tc
@@ -70,59 +161,108 @@ NodesInfoRequest nodesInfoRequest= new NodesInfoRequest();
 nodesInfoRequest.putHeader(&amp;quot;sg.impersonate.as&amp;quot;, &amp;quot;worf&amp;quot;);
 client.admin().cluster().nodesInfo(new NodesInfoRequest()).actionGet();                               
 client.admin().cluster().nodesInfo(nodesInfoRequest).actionGet();
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;### search-guard中的用户权限管理&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;相关配置文件的介绍:searchguard 主要有5个配置文件在/ultra/ES/elasticsearch-2.3.4/plugins/search-guard-2/sgconfig 下：1.sg_config.yml：主配置文件不需要做改动。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2.sg_internal_users.yml：本地用户文件，定义用户密码以及对应的权限。例如：对于 ELK 我们需要一个 kibana 登录用户和一个 logstash 用户，如下所示：```kibana4:  hash: $2a$12$xZOcnwYPYQ3zIadnlQIJ0eNhX1ngwMkTN.oMwkKxoGvDVPn4/6XtO  #password is: kirk  roles:    - kibana4logstash:  hash: $2a$12$xZOcnwYPYQ3zIadnlQIJ0eNhX1ngwMkTN.oMwkKxoGvDVPn4/6XtO  roles:   - logstash&lt;/div&gt;&lt;div class=&quot;line&quot;&gt; ```**注意：用户的密码可用plugins/search-guard-2/tools/hash.sh生成。比如修改admin用户的默认密码为wisedu123：**        [es@log1 tools]$ ./hash.sh -p wisedu123        $2a$12$AmrZnl1wYGLGNODLDMY5/O86wmYE9eBcXtVa6AQjfzsF1gcKhkXqe3.sg_roles.yml：权限配置文件，以下为kibana4 和 logstash 的权限样例：```#&amp;lt;sg_role_name&amp;gt;:#  cluster:#    - &amp;apos;&amp;lt;permission&amp;gt;&amp;apos;#  indices:#    &amp;apos;&amp;lt;indexname or alias&amp;gt;&amp;apos;:#      &amp;apos;&amp;lt;type&amp;gt;&amp;apos;:  #        - &amp;apos;&amp;lt;permission&amp;gt;&amp;apos;#      _dls_: &amp;apos;&amp;lt;querydsl query&amp;gt;&amp;apos;#      _fls_:#        - &amp;apos;&amp;lt;field&amp;gt;&amp;apos;#        - &amp;apos;&amp;lt;field&amp;gt;&amp;apos;sg_kibana4:  cluster:      - cluster:monitor/nodes/info      - cluster:monitor/health  indices:    &amp;apos;*&amp;apos;:      &amp;apos;*&amp;apos;:        - indices:admin/mappings/fields/get        - indices:admin/validate/query        - indices:data/read/search        - indices:data/read/msearch        - indices:admin/get        - indices:data/read/field_stats    &amp;apos;?kibana&amp;apos;:      &amp;apos;*&amp;apos;:        - indices:admin/exists        - indices:admin/mapping/put        - indices:admin/mappings/fields/get        - indices:admin/refresh        - indices:admin/validate/query        - indices:data/read/getsg_logstash:  cluster:    - indices:admin/template/get    - indices:admin/template/put  indices:    &amp;apos;logstash-*&amp;apos;:      &amp;apos;*&amp;apos;:        - WRITE        - indices:data/write/bulk        - indices:data/write/delete        - indices:data/write/update        - indices:data/read/search        - indices:data/read/scroll        - CREATE_INDEX&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;search-guard中的用户权限管理&quot;&gt;&lt;a href=&quot;#search-guard中的用户权限管理&quot; class=&quot;headerlink&quot; title=&quot;search-guard中的用户权限管理&quot;&gt;&lt;/a&gt;search-guard中的用户权限管理&lt;/h3&gt;&lt;p&gt;相关配置文件的介绍:&lt;br&gt;searchguard 主要有5个配置文件在/ultra/ES/elasticsearch-2.3.4/plugins/search-guard-2/sgconfig 下：&lt;br&gt;1.sg_config.yml：主配置文件不需要做改动。&lt;/p&gt;
+&lt;p&gt;2.sg_internal_users.yml：本地用户文件，定义用户密码以及对应的权限。例如：对于 ELK 我们需要一个 kibana 登录用户和一个 logstash 用户，如下所示：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;kibana4:
+  hash: $2a$12$xZOcnwYPYQ3zIadnlQIJ0eNhX1ngwMkTN.oMwkKxoGvDVPn4/6XtO
+  #password is: kirk
+  roles:
+    - kibana4
+logstash:
+  hash: $2a$12$xZOcnwYPYQ3zIadnlQIJ0eNhX1ngwMkTN.oMwkKxoGvDVPn4/6XtO
+  roles:
+    - logstash
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;注意：用户的密码可用plugins/search-guard-2/tools/hash.sh生成。比如修改admin用户的默认密码为wisedu123：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[es@log1 tools]$ ./hash.sh -p wisedu123
+$2a$12$AmrZnl1wYGLGNODLDMY5/O86wmYE9eBcXtVa6AQjfzsF1gcKhkXqe
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.sg_roles.yml：权限配置文件，以下为kibana4 和 logstash 的权限样例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#&amp;lt;sg_role_name&amp;gt;:
+#  cluster:
+#    - &amp;apos;&amp;lt;permission&amp;gt;&amp;apos;
+#  indices:
+#    &amp;apos;&amp;lt;indexname or alias&amp;gt;&amp;apos;:
+#      &amp;apos;&amp;lt;type&amp;gt;&amp;apos;:  
+#        - &amp;apos;&amp;lt;permission&amp;gt;&amp;apos;
+#      _dls_: &amp;apos;&amp;lt;querydsl query&amp;gt;&amp;apos;
+#      _fls_:
+#        - &amp;apos;&amp;lt;field&amp;gt;&amp;apos;
+#        - &amp;apos;&amp;lt;field&amp;gt;&amp;apos;
+sg_kibana4:
+  cluster:
+      - cluster:monitor/nodes/info
+      - cluster:monitor/health
+  indices:
+    &amp;apos;*&amp;apos;:
+      &amp;apos;*&amp;apos;:
+        - indices:admin/mappings/fields/get
+        - indices:admin/validate/query
+        - indices:data/read/search
+        - indices:data/read/msearch
+        - indices:admin/get
+        - indices:data/read/field_stats
+    &amp;apos;?kibana&amp;apos;:
+      &amp;apos;*&amp;apos;:
+        - indices:admin/exists
+        - indices:admin/mapping/put
+        - indices:admin/mappings/fields/get
+        - indices:admin/refresh
+        - indices:admin/validate/query
+        - indices:data/read/get
+sg_logstash:
+  cluster:
+    - indices:admin/template/get
+    - indices:admin/template/put
+  indices:
+    &amp;apos;logstash-*&amp;apos;:
+      &amp;apos;*&amp;apos;:
+        - WRITE
+        - indices:data/write/bulk
+        - indices:data/write/delete
+        - indices:data/write/update
+        - indices:data/read/search
+        - indices:data/read/scroll
+        - CREATE_INDEX
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.sg_roles_mapping.yml:定义用户的映射关系，添加 kibana 及 logstash 用户对应的映射如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;sg_logstash:
+  users:
+    - logstash
+sg_kibana4:
+  backendroles:
+    - kibana
+  users:
+    - kibana4
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.sg_action_groups.yml：定义权限。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;补充一点：Search Guard可以实现和Logstash、Kibana的完美结合，对于使用ELK的用户大可不必担心，修改集成很容易的。&lt;br&gt;并且，Elasticsearch在5.x之后，对Search Guard、Search Guard SSL （当然还有Logstash 、Kibana）等插件的版本号都做了统一，变得更加的简单直观了。&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&quot;利用操作系统防火墙设置规避9200端口开放问题&quot;&gt;&lt;a href=&quot;#利用操作系统防火墙设置规避9200端口开放问题&quot; class=&quot;headerlink&quot; title=&quot;利用操作系统防火墙设置规避9200端口开放问题&quot;&gt;&lt;/a&gt;利用操作系统防火墙设置规避9200端口开放问题&lt;/h2&gt;&lt;p&gt;对于search-guard插件配置繁琐，也可以使用操作系统防火墙对访问源IP进行隔离控制。&lt;br&gt;架设Nginx反向代理服务器，ES主机防火墙设置仅允许Nginx所在主机访问ES主机的9200端口。&lt;/p&gt;
+&lt;p&gt;在centos7上停止firewalld，启用iptables。&lt;br&gt;停止firewalld：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# systemctl stop firewalld.service   #停止firewall
+# systemctl disable firewalld.service    #禁止firewall开机启动
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;安装iptables防火墙：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# yum install -y iptables-services
+# vim /etc/sysconfig/iptables     #修改默认的配置文件
 
+*filter
+:INPUT ACCEPT [1837:149118]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [1656:224717]
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+-A INPUT -s 114.55.248.157/32 -p tcp -m tcp --dport 9200 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 9200 -j DROP
+COMMIT
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/19.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;其实也就是加了两条规则：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;iptables -A INPUT -s 114.55.248.157 -p TCP --dport 9200 -j ACCEPT
+iptables -A INPUT -p TCP --dport 9200 -j DROP
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动防火墙和设置开机启动：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# systemctl start iptables.service      
+# systemctl enable iptables.service    
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Nginx主要配置：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;upstream elasticsearch_servers {
+        server 114.55.253.15:9200;
+        server 114.55.132.143:9200;
+        server 114.55.252.185:9200;
+}
 
-4.sg_roles_mapping.yml:定义用户的映射关系，添加 kibana 及 logstash 用户对应的映射如下：
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;sg_logstash:&lt;br&gt;  users:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- logstash
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;sg_kibana4:&lt;br&gt;  backendroles:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- kibana
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;  users:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- kibana4
-&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;
-5.sg_action_groups.yml：定义权限。
-
-**补充一点：Search Guard可以实现和Logstash、Kibana的完美结合，对于使用ELK的用户大可不必担心，修改集成很容易的。
-并且，Elasticsearch在5.x之后，对Search Guard、Search Guard SSL （当然还有Logstash 、Kibana）等插件的版本号都做了统一，变得更加的简单直观了。**
-
-## 利用操作系统防火墙设置规避9200端口开放问题
-对于search-guard插件配置繁琐，也可以使用操作系统防火墙对访问源IP进行隔离控制。
-架设Nginx反向代理服务器，ES主机防火墙设置仅允许Nginx所在主机访问ES主机的9200端口。
-
-在centos7上停止firewalld，启用iptables。
-停止firewalld：
-
-        # systemctl stop firewalld.service   #停止firewall
-        # systemctl disable firewalld.service    #禁止firewall开机启动
-
-安装iptables防火墙：
-
-        # yum install -y iptables-services
-        # vim /etc/sysconfig/iptables     #修改默认的配置文件
-
-        *filter
-        :INPUT ACCEPT [1837:149118]
-        :FORWARD ACCEPT [0:0]
-        :OUTPUT ACCEPT [1656:224717]
-        -A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
-        -A INPUT -s 114.55.248.157/32 -p tcp -m tcp --dport 9200 -j ACCEPT
-        -A INPUT -p tcp -m tcp --dport 9200 -j DROP
-        COMMIT
-![](https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/19.png)
-其实也就是加了两条规则：
-
-        iptables -A INPUT -s 114.55.248.157 -p TCP --dport 9200 -j ACCEPT
-        iptables -A INPUT -p TCP --dport 9200 -j DROP
-
-启动防火墙和设置开机启动：
-
-        # systemctl start iptables.service      
-        # systemctl enable iptables.service    
-
-Nginx主要配置：
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;upstream elasticsearch_servers {&lt;br&gt;        server 114.55.253.15:9200;&lt;br&gt;        server 114.55.132.143:9200;&lt;br&gt;        server 114.55.252.185:9200;&lt;br&gt;    }&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;server {
+server {
         listen  8080;
         access_log logs/es_access.log main;
 
@@ -135,8 +275,7 @@ Nginx主要配置：
         }
 
 }
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;```&lt;/p&gt;
-</content>
+&lt;/code&gt;&lt;/pre&gt;</content>
     
     <summary type="html">
     
