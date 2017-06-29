@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-06-29T07:36:52.000Z</updated>
+  <updated>2017-06-29T07:41:35.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/06/29/Elasticsearch%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98/"/>
     <id>http://yoursite.com/2017/06/29/Elasticsearch安全问题/</id>
     <published>2017-06-29T03:51:51.000Z</published>
-    <updated>2017-06-29T07:36:52.000Z</updated>
+    <updated>2017-06-29T07:41:35.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Elasticsearch设计之初就定位在纯私网环境而不做权限和安全控制，虽然有个叫Security Manager的配置，但是显然是不够的。但是后来专门出了个收费的shield来保护Elasticsearch，可是毕竟是收费的。当然我们也有替代品：search-guard。下面介绍下 Elasticsearch 围绕安全方面的的几点使用事项：&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;修改默认的-Elasticsearch-集群名称&quot;&gt;&lt;a href=&quot;#修改默认的-Elasticsearch-集群名称&quot; class=&quot;headerlink&quot; title=&quot;修改默认的 Elasticsearch 集群名称&quot;&gt;&lt;/a&gt;修改默认的 Elasticsearch 集群名称&lt;/h2&gt;&lt;p&gt;Elasticsearch 默认的集群名称是 elasticsearch，请在生成环境上一定要修改成其他的名称，并且不同的环境和不同的集群要保证不相同，监控集群节点情况，如果有未知节点加入，一定要及时预警。&lt;/p&gt;
@@ -146,13 +146,13 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import com.floragunn.searchguard.ssl.SearchGuardSSLPlugin;
 
 Settings settings = Settings.settingsBuilder()
-.put(&amp;quot;path.home&amp;quot;, &amp;quot;.&amp;quot;)
-.put(&amp;quot;cluster.name&amp;quot;, &amp;quot;wisedu&amp;quot;)
-.put(&amp;quot;searchguard.ssl.transport.enabled&amp;quot;, true)
-.put(&amp;quot;searchguard.ssl.transport.keystore_filepath&amp;quot;, &amp;quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/admin-keystore.jks&amp;quot;)
-.put(&amp;quot;searchguard.ssl.transport.truststore_filepath&amp;quot;, &amp;quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/truststore.jks&amp;quot;)
-.put(&amp;quot;searchguard.ssl.transport.enforce_hostname_verification&amp;quot;, false)              
-.build();
+        .put(&amp;quot;path.home&amp;quot;, &amp;quot;.&amp;quot;)
+        .put(&amp;quot;cluster.name&amp;quot;, &amp;quot;wisedu&amp;quot;)
+        .put(&amp;quot;searchguard.ssl.transport.enabled&amp;quot;, true)
+        .put(&amp;quot;searchguard.ssl.transport.keystore_filepath&amp;quot;, &amp;quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/admin-keystore.jks&amp;quot;)
+        .put(&amp;quot;searchguard.ssl.transport.truststore_filepath&amp;quot;, &amp;quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/truststore.jks&amp;quot;)
+        .put(&amp;quot;searchguard.ssl.transport.enforce_hostname_verification&amp;quot;, false)              
+        .build();
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.修改client&lt;br&gt;以下为你想要连接的ES节点的ip和port，请修改为你实际的。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;TransportClient client = TransportClient.builder().settings(settings).addPlugin(SearchGuardSSLPlugin.class).build();
 TransportClient addTransportAddress = client.addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(&amp;quot;114.55.253.15&amp;quot;, 9300)));
@@ -234,12 +234,12 @@ sg_kibana4:
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.sg_action_groups.yml：定义权限。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;补充一点：Search Guard可以实现和Logstash、Kibana的完美结合，对于使用ELK的用户大可不必担心，修改集成很容易的。&lt;br&gt;并且，Elasticsearch在5.x之后，对Search Guard、Search Guard SSL （当然还有Logstash 、Kibana）等插件的版本号都做了统一，变得更加的简单直观了。&lt;/strong&gt;&lt;/p&gt;
 &lt;h2 id=&quot;利用操作系统防火墙设置规避9200端口开放问题&quot;&gt;&lt;a href=&quot;#利用操作系统防火墙设置规避9200端口开放问题&quot; class=&quot;headerlink&quot; title=&quot;利用操作系统防火墙设置规避9200端口开放问题&quot;&gt;&lt;/a&gt;利用操作系统防火墙设置规避9200端口开放问题&lt;/h2&gt;&lt;p&gt;对于search-guard插件配置繁琐，也可以使用操作系统防火墙对访问源IP进行隔离控制。&lt;br&gt;架设Nginx反向代理服务器，ES主机防火墙设置仅允许Nginx所在主机访问ES主机的9200端口。&lt;/p&gt;
-&lt;p&gt;在centos7上停止firewalld，启用iptables。&lt;br&gt;停止firewalld：&lt;/p&gt;
+&lt;h3 id=&quot;安装防火墙&quot;&gt;&lt;a href=&quot;#安装防火墙&quot; class=&quot;headerlink&quot; title=&quot;安装防火墙&quot;&gt;&lt;/a&gt;安装防火墙&lt;/h3&gt;&lt;p&gt;在centos7上停止firewalld，启用iptables。&lt;br&gt;停止firewalld：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# systemctl stop firewalld.service   #停止firewall
 # systemctl disable firewalld.service    #禁止firewall开机启动
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;安装iptables防火墙：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# yum install -y iptables-services
-# vim /etc/sysconfig/iptables     #修改默认的配置文件
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置防火墙&quot;&gt;&lt;a href=&quot;#配置防火墙&quot; class=&quot;headerlink&quot; title=&quot;配置防火墙&quot;&gt;&lt;/a&gt;配置防火墙&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# vim /etc/sysconfig/iptables     #修改默认的配置文件
 
 *filter
 :INPUT ACCEPT [1837:149118]
@@ -255,7 +255,7 @@ iptables -A INPUT -p TCP --dport 9200 -j DROP
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动防火墙和设置开机启动：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# systemctl start iptables.service      
 # systemctl enable iptables.service    
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Nginx主要配置：&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置Nginx&quot;&gt;&lt;a href=&quot;#配置Nginx&quot; class=&quot;headerlink&quot; title=&quot;配置Nginx&quot;&gt;&lt;/a&gt;配置Nginx&lt;/h3&gt;&lt;p&gt;Nginx主要配置：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;upstream elasticsearch_servers {
         server 114.55.253.15:9200;
         server 114.55.132.143:9200;

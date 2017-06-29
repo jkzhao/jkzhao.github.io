@@ -115,7 +115,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/17.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/18.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/19.png">
-<meta property="og:updated_time" content="2017-06-29T07:36:52.000Z">
+<meta property="og:updated_time" content="2017-06-29T07:41:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Elasticsearch安全问题">
 <meta name="twitter:description" content="背景Elasticsearch设计之初就定位在纯私网环境而不做权限和安全控制，虽然有个叫Security Manager的配置，但是显然是不够的。但是后来专门出了个收费的shield来保护Elasticsearch，可是毕竟是收费的。当然我们也有替代品：search-guard。下面介绍下 Elasticsearch 围绕安全方面的的几点使用事项：">
@@ -510,13 +510,13 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import com.floragunn.searchguard.ssl.SearchGuardSSLPlugin;
 
 Settings settings = Settings.settingsBuilder()
-.put(&quot;path.home&quot;, &quot;.&quot;)
-.put(&quot;cluster.name&quot;, &quot;wisedu&quot;)
-.put(&quot;searchguard.ssl.transport.enabled&quot;, true)
-.put(&quot;searchguard.ssl.transport.keystore_filepath&quot;, &quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/admin-keystore.jks&quot;)
-.put(&quot;searchguard.ssl.transport.truststore_filepath&quot;, &quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/truststore.jks&quot;)
-.put(&quot;searchguard.ssl.transport.enforce_hostname_verification&quot;, false)              
-.build();
+        .put(&quot;path.home&quot;, &quot;.&quot;)
+        .put(&quot;cluster.name&quot;, &quot;wisedu&quot;)
+        .put(&quot;searchguard.ssl.transport.enabled&quot;, true)
+        .put(&quot;searchguard.ssl.transport.keystore_filepath&quot;, &quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/admin-keystore.jks&quot;)
+        .put(&quot;searchguard.ssl.transport.truststore_filepath&quot;, &quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/truststore.jks&quot;)
+        .put(&quot;searchguard.ssl.transport.enforce_hostname_verification&quot;, false)              
+        .build();
 </code></pre><p>3.修改client<br>以下为你想要连接的ES节点的ip和port，请修改为你实际的。</p>
 <pre><code>TransportClient client = TransportClient.builder().settings(settings).addPlugin(SearchGuardSSLPlugin.class).build();
 TransportClient addTransportAddress = client.addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(&quot;114.55.253.15&quot;, 9300)));
@@ -598,12 +598,12 @@ sg_kibana4:
 </code></pre><p>5.sg_action_groups.yml：定义权限。</p>
 <p><strong>补充一点：Search Guard可以实现和Logstash、Kibana的完美结合，对于使用ELK的用户大可不必担心，修改集成很容易的。<br>并且，Elasticsearch在5.x之后，对Search Guard、Search Guard SSL （当然还有Logstash 、Kibana）等插件的版本号都做了统一，变得更加的简单直观了。</strong></p>
 <h2 id="利用操作系统防火墙设置规避9200端口开放问题"><a href="#利用操作系统防火墙设置规避9200端口开放问题" class="headerlink" title="利用操作系统防火墙设置规避9200端口开放问题"></a>利用操作系统防火墙设置规避9200端口开放问题</h2><p>对于search-guard插件配置繁琐，也可以使用操作系统防火墙对访问源IP进行隔离控制。<br>架设Nginx反向代理服务器，ES主机防火墙设置仅允许Nginx所在主机访问ES主机的9200端口。</p>
-<p>在centos7上停止firewalld，启用iptables。<br>停止firewalld：</p>
+<h3 id="安装防火墙"><a href="#安装防火墙" class="headerlink" title="安装防火墙"></a>安装防火墙</h3><p>在centos7上停止firewalld，启用iptables。<br>停止firewalld：</p>
 <pre><code># systemctl stop firewalld.service   #停止firewall
 # systemctl disable firewalld.service    #禁止firewall开机启动
 </code></pre><p>安装iptables防火墙：</p>
 <pre><code># yum install -y iptables-services
-# vim /etc/sysconfig/iptables     #修改默认的配置文件
+</code></pre><h3 id="配置防火墙"><a href="#配置防火墙" class="headerlink" title="配置防火墙"></a>配置防火墙</h3><pre><code># vim /etc/sysconfig/iptables     #修改默认的配置文件
 
 *filter
 :INPUT ACCEPT [1837:149118]
@@ -619,7 +619,7 @@ iptables -A INPUT -p TCP --dport 9200 -j DROP
 </code></pre><p>启动防火墙和设置开机启动：</p>
 <pre><code># systemctl start iptables.service      
 # systemctl enable iptables.service    
-</code></pre><p>Nginx主要配置：</p>
+</code></pre><h3 id="配置Nginx"><a href="#配置Nginx" class="headerlink" title="配置Nginx"></a>配置Nginx</h3><p>Nginx主要配置：</p>
 <pre><code>upstream elasticsearch_servers {
         server 114.55.253.15:9200;
         server 114.55.132.143:9200;
@@ -841,7 +841,7 @@ server {
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改默认的-Elasticsearch-集群名称"><span class="nav-number">2.</span> <span class="nav-text">修改默认的 Elasticsearch 集群名称</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不要暴露-Elasticsearch-在公网上"><span class="nav-number">3.</span> <span class="nav-text">不要暴露 Elasticsearch 在公网上</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不要以-root-身份运行-Elasticsearch"><span class="nav-number">4.</span> <span class="nav-text">不要以 root 身份运行 Elasticsearch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定期对-Elasticsearch-进行备份"><span class="nav-number">5.</span> <span class="nav-text">定期对 Elasticsearch 进行备份</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Elasticsearch的权限系统插件-SearchGuard"><span class="nav-number">6.</span> <span class="nav-text">安装Elasticsearch的权限系统插件-SearchGuard</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装插件"><span class="nav-number">6.1.</span> <span class="nav-text">安装插件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#证书"><span class="nav-number">6.2.</span> <span class="nav-text">证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP和Java-Api方式访问ElasticSearch"><span class="nav-number">6.3.</span> <span class="nav-text">HTTP和Java Api方式访问ElasticSearch</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP方式访问Elasticsearch"><span class="nav-number">6.3.1.</span> <span class="nav-text">HTTP方式访问Elasticsearch</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Java-API中使用search-guard"><span class="nav-number">6.3.2.</span> <span class="nav-text">Java API中使用search-guard</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#search-guard中的用户权限管理"><span class="nav-number">6.4.</span> <span class="nav-text">search-guard中的用户权限管理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#利用操作系统防火墙设置规避9200端口开放问题"><span class="nav-number">7.</span> <span class="nav-text">利用操作系统防火墙设置规避9200端口开放问题</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改默认的-Elasticsearch-集群名称"><span class="nav-number">2.</span> <span class="nav-text">修改默认的 Elasticsearch 集群名称</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不要暴露-Elasticsearch-在公网上"><span class="nav-number">3.</span> <span class="nav-text">不要暴露 Elasticsearch 在公网上</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不要以-root-身份运行-Elasticsearch"><span class="nav-number">4.</span> <span class="nav-text">不要以 root 身份运行 Elasticsearch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定期对-Elasticsearch-进行备份"><span class="nav-number">5.</span> <span class="nav-text">定期对 Elasticsearch 进行备份</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Elasticsearch的权限系统插件-SearchGuard"><span class="nav-number">6.</span> <span class="nav-text">安装Elasticsearch的权限系统插件-SearchGuard</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装插件"><span class="nav-number">6.1.</span> <span class="nav-text">安装插件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#证书"><span class="nav-number">6.2.</span> <span class="nav-text">证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP和Java-Api方式访问ElasticSearch"><span class="nav-number">6.3.</span> <span class="nav-text">HTTP和Java Api方式访问ElasticSearch</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP方式访问Elasticsearch"><span class="nav-number">6.3.1.</span> <span class="nav-text">HTTP方式访问Elasticsearch</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Java-API中使用search-guard"><span class="nav-number">6.3.2.</span> <span class="nav-text">Java API中使用search-guard</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#search-guard中的用户权限管理"><span class="nav-number">6.4.</span> <span class="nav-text">search-guard中的用户权限管理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#利用操作系统防火墙设置规避9200端口开放问题"><span class="nav-number">7.</span> <span class="nav-text">利用操作系统防火墙设置规避9200端口开放问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装防火墙"><span class="nav-number">7.1.</span> <span class="nav-text">安装防火墙</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置防火墙"><span class="nav-number">7.2.</span> <span class="nav-text">配置防火墙</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Nginx"><span class="nav-number">7.3.</span> <span class="nav-text">配置Nginx</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
