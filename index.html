@@ -382,73 +382,12 @@
 
       
         
-          
-            <h2 id="Flume简介"><a href="#Flume简介" class="headerlink" title="Flume简介"></a>Flume简介</h2><p>Flume是一个分布式、可靠、高可用的海量日志聚合系统，支持在系统中定制各类数据发送方，用于收集数据；同时，Flume提供对数据的简单处理，并写到各种数据接收方的能力。<br>Flume在0.9.x和1.x之间有较大的架构调整，1.x版本之后的改称为Flume NG。0.9.x的称为Flume OG。<br>Flume OG体系架构如下，Flume OG已经不再进行版本更新：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/1.png" alt=""><br>Flume NG体系架构如下：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/2.png" alt=""><br>最新的Flume NG是1.7.0，运行最新版本的Flume NG时，机器必须安装JDK7.0或以上的版本，并且，Flume目前在只有在Linux系统的启动脚本，没有Windows环境的启动脚本。</p>
-<h2 id="Flume-NG核心组件"><a href="#Flume-NG核心组件" class="headerlink" title="Flume NG核心组件"></a>Flume NG核心组件</h2><p>Flume NG主要由3个重要的组件构成：</p>
-<ul>
-<li>Source</li>
-<li>Sink</li>
-<li>Channel</li>
-</ul>
-<h3 id="Source"><a href="#Source" class="headerlink" title="Source"></a>Source</h3><p>完成对日志数据的收集，分成transtion和event打入到channel中。<br>Flume提供了各种source的实现，包括Avro Source(监控端口)、Exce Source(对命令监控)、Spooling Directory Source(监控某个目录)、NetCat Source、Syslog Source、Syslog TCP Source、Syslog UDP Source、HTTP Source、HDFS Source等。<br>对现有程序改动最小的使用方式是使用直接读取程序原来记录的日志文件，基本可以实现无缝接入，不需要对现有程序进行任何改动。直接读取文件Source，有两种方式：</p>
-<ul>
-<li>Exec Source<br>以运行Linux命令的方式，持续的输出最新的数据，如tail -f 文件名，在这种方式下，取的文件名必须是指定的。        </li>
-<li>Spool Source<br>是监测配置的目录下新增的文件，并将文件中的数据读取出来。使用Spool Source需要注意：<br>(1)拷贝到spool目录下的文件不可以再打开编辑。因为放进去的目录可能在一直被读，一般不可以再被打开了。<br>(2)spool目录下不可包含相应的子目录。</li>
-</ul>
-<p>Spool Source如何使用？<br>在实际使用过程中，可以结合log4j使用，使用log4j的时候，将log4j的文件切割机制设为1分钟1次，将文件拷贝到spool的监控目录。log4j有一个TimeRolling的插件，可以把log4j分割的文件到spool目录。基本实现了实时的监控。Flume在传完文件之后，将会修改文件的后缀，变为.COMPLETED(后缀也可以在配置文件中灵活指定)。</p>
-<p>Exec Source和Spool Source比较？<br>Exec Source可以实现对日志的实时收集，但是存在Flume不运行或者指令执行出错时，将无法收集到日志数据，无法保证日志数据的完整性。<br>Spool Source虽然无法实现实时的收集数据，但是可以使用以分钟的方式切割文件，趋近于实时。<br>总结：如果应用无法实现以分钟切割文件的话，可以两种收集方式结合使用。</p>
-<h3 id="Sink"><a href="#Sink" class="headerlink" title="Sink"></a>Sink</h3><p>Flume Sink取出Channel中的数据，进行相应的存储文件系统，数据库，或者提交到远程服务器。<br>Flume也提供了各种sink的实现，包括HDFS sink、Logger sink、Avro sink、File Roll sink、Null sink、HBase sink等。<br>Flume Sink在设置数据存储时，可以向文件系统中、数据库中、hadoop中储数据，在日志数据较少时，可以将数据存储在文件系统中，并且设定一定的时间间隔保存数据。在日志数据较多时，可以将相应的日志数据存储到Hadoop中，便于日后进行相应的数据分析。</p>
-<h3 id="Channel"><a href="#Channel" class="headerlink" title="Channel"></a>Channel</h3><p>Flume Channel主要提供一个队列的功能，对Source提供中的数据进行简单的缓存。<br>Flume对于Channel，则提供了Memory Channel、JDBC Channel、File Channel等。</p>
-<ul>
-<li>MemoryChannel<br>可以实现高速的吞吐，但是无法保证数据的完整性。</li>
-<li>MemoryRecoverChannel<br>官方文档建议使用FileChannel来替换。</li>
-<li>FileChannel<br>保证数据的完整性和一致性。在具体配置不现的FileChannel时，建议FileChannel设置的目录和程序日志文件保存的目录设成不同的磁盘，以便提高效率。</li>
-</ul>
-<h2 id="Flume部署种类"><a href="#Flume部署种类" class="headerlink" title="Flume部署种类"></a>Flume部署种类</h2><p><strong>1.单一代理流程</strong><br>就是只有一个agent在客户端采集。</p>
-<p><strong>2.多代理流程</strong><br>就是一个agent通过中转的Avro传到下一个agent。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/3.png" alt=""><br><strong>3.流合并</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/4.png" alt=""><br><strong>4.多路复用流</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/5.png" alt=""></p>
-<h2 id="Flume单机安装"><a href="#Flume单机安装" class="headerlink" title="Flume单机安装"></a>Flume单机安装</h2><h3 id="安装JDK1-6"><a href="#安装JDK1-6" class="headerlink" title="安装JDK1.6"></a>安装JDK1.6</h3><pre><code>[root@log1 local]# mkdir /usr/java
-[root@log1 local]# tar zxf jdk-7u80-linux-x64.gz -C /usr/java/
-[root@log1 local]# vim /etc/profile
-export JAVA_HOME=/usr/java/jdk1.7.0_80
-export PATH=$JAVA_HOME/bin:$PATH
-export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-[root@log1 local]# source /etc/profile
-</code></pre><h3 id="安装Flume-NG"><a href="#安装Flume-NG" class="headerlink" title="安装Flume NG"></a>安装Flume NG</h3><pre><code>[root@db local]# tar zxf apache-flume-1.7.0-bin.tar.gz 
-[root@db local]# cd apache-flume-1.7.0-bin
-</code></pre><h3 id="一个简单的例子"><a href="#一个简单的例子" class="headerlink" title="一个简单的例子"></a>一个简单的例子</h3><p>下面写一个单节点的配置文件。这个配置文件让flume接收事件，并输出到终端。</p>
-<pre><code>[root@db apache-flume-1.7.0-bin]# vim conf/example.conf
-# example.conf: A single-node Flume configuration
-
-# Name the components on this agent
-a1.sources = r1
-a1.sinks = k1
-a1.channels = c1
-
-# Describe/configure the source
-a1.sources.r1.type = netcat
-a1.sources.r1.bind = localhost
-a1.sources.r1.port = 44444
-
-# Describe the sink
-a1.sinks.k1.type = logger
-
-# Use a channel which buffers events in memory
-a1.channels.c1.type = memory
-a1.channels.c1.capacity = 1000
-a1.channels.c1.transactionCapacity = 100
-
-# Bind the source and sink to the channel
-a1.sources.r1.channels = c1
-a1.sinks.k1.channel = c1
-</code></pre><p>这个配置文件定义了一个单agent名字叫a1。a1有一个source在端口44444监听数据，a1的channel是Memory channel，sink是直接输送到终端上，</p>
-<p>启动Flume NG：</p>
-<pre><code>[root@db apache-flume-1.7.0-bin]# bin/flume-ng agent --conf conf --conf-file conf/example.conf --name a1 -Dflume.root.logger=INFO,console
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/6.png" alt=""></p>
-<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>打开另外一个终端，telnet端口44444，然后发送一个事件：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/7.png" alt=""><br>查看原来的终端，可以看到如下的内容：</p>
-<pre><code>2017-07-02 11:43:37,111 (SinkRunner-PollingRunner-DefaultSinkProcessor) [INFO - org.apache.flume.sink.LoggerSink.process(LoggerSink.java:95)] Event: { headers:{} body: 48 65 6C 6C 6F 20 4D 61 6E 21 0D                Hello Man!. }
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/8.png" alt=""></p>
-
-          
+          <h2 id="Flume简介"><a href="#Flume简介" class="headerlink" title="Flume简介"></a>Flume简介</h2><p>Flume是一个分布式、可靠、高可用的海量日志聚合系统，支持在系统中定制各类数据发送方，用于收集数据；同时，Flume提供对数据的简单处理，并写到各种数据接收方的能力。<br>Flume在0.9.x和1.x之间有较大的架构调整，1.x版本之后的改称为Flume NG。0.9.x的称为Flume OG。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/07/01/FlumeNG介绍及安装部署/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
