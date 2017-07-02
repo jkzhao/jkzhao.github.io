@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-06-29T07:41:35.000Z</updated>
+  <updated>2017-07-02T03:45:56.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,97 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>FlumeNG介绍及安装部署</title>
+    <link href="http://yoursite.com/2017/07/01/FlumeNG%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
+    <id>http://yoursite.com/2017/07/01/FlumeNG介绍及安装部署/</id>
+    <published>2017-07-01T12:53:40.000Z</published>
+    <updated>2017-07-02T03:45:56.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Flume简介&quot;&gt;&lt;a href=&quot;#Flume简介&quot; class=&quot;headerlink&quot; title=&quot;Flume简介&quot;&gt;&lt;/a&gt;Flume简介&lt;/h2&gt;&lt;p&gt;Flume是一个分布式、可靠、高可用的海量日志聚合系统，支持在系统中定制各类数据发送方，用于收集数据；同时，Flume提供对数据的简单处理，并写到各种数据接收方的能力。&lt;br&gt;Flume在0.9.x和1.x之间有较大的架构调整，1.x版本之后的改称为Flume NG。0.9.x的称为Flume OG。&lt;br&gt;Flume OG体系架构如下，Flume OG已经不再进行版本更新：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;Flume NG体系架构如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;最新的Flume NG是1.7.0，运行最新版本的Flume NG时，机器必须安装JDK7.0或以上的版本，并且，Flume目前在只有在Linux系统的启动脚本，没有Windows环境的启动脚本。&lt;/p&gt;
+&lt;h2 id=&quot;Flume-NG核心组件&quot;&gt;&lt;a href=&quot;#Flume-NG核心组件&quot; class=&quot;headerlink&quot; title=&quot;Flume NG核心组件&quot;&gt;&lt;/a&gt;Flume NG核心组件&lt;/h2&gt;&lt;p&gt;Flume NG主要由3个重要的组件构成：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Source&lt;/li&gt;
+&lt;li&gt;Sink&lt;/li&gt;
+&lt;li&gt;Channel&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;Source&quot;&gt;&lt;a href=&quot;#Source&quot; class=&quot;headerlink&quot; title=&quot;Source&quot;&gt;&lt;/a&gt;Source&lt;/h3&gt;&lt;p&gt;完成对日志数据的收集，分成transtion和event打入到channel中。&lt;br&gt;Flume提供了各种source的实现，包括Avro Source(监控端口)、Exce Source(对命令监控)、Spooling Directory Source(监控某个目录)、NetCat Source、Syslog Source、Syslog TCP Source、Syslog UDP Source、HTTP Source、HDFS Source等。&lt;br&gt;对现有程序改动最小的使用方式是使用直接读取程序原来记录的日志文件，基本可以实现无缝接入，不需要对现有程序进行任何改动。直接读取文件Source，有两种方式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Exec Source&lt;br&gt;以运行Linux命令的方式，持续的输出最新的数据，如tail -f 文件名，在这种方式下，取的文件名必须是指定的。        &lt;/li&gt;
+&lt;li&gt;Spool Source&lt;br&gt;是监测配置的目录下新增的文件，并将文件中的数据读取出来。使用Spool Source需要注意：&lt;br&gt;(1)拷贝到spool目录下的文件不可以再打开编辑。因为放进去的目录可能在一直被读，一般不可以再被打开了。&lt;br&gt;(2)spool目录下不可包含相应的子目录。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Spool Source如何使用？&lt;br&gt;在实际使用过程中，可以结合log4j使用，使用log4j的时候，将log4j的文件切割机制设为1分钟1次，将文件拷贝到spool的监控目录。log4j有一个TimeRolling的插件，可以把log4j分割的文件到spool目录。基本实现了实时的监控。Flume在传完文件之后，将会修改文件的后缀，变为.COMPLETED(后缀也可以在配置文件中灵活指定)。&lt;/p&gt;
+&lt;p&gt;Exec Source和Spool Source比较？&lt;br&gt;Exec Source可以实现对日志的实时收集，但是存在Flume不运行或者指令执行出错时，将无法收集到日志数据，无法保证日志数据的完整性。&lt;br&gt;Spool Source虽然无法实现实时的收集数据，但是可以使用以分钟的方式切割文件，趋近于实时。&lt;br&gt;总结：如果应用无法实现以分钟切割文件的话，可以两种收集方式结合使用。&lt;/p&gt;
+&lt;h3 id=&quot;Sink&quot;&gt;&lt;a href=&quot;#Sink&quot; class=&quot;headerlink&quot; title=&quot;Sink&quot;&gt;&lt;/a&gt;Sink&lt;/h3&gt;&lt;p&gt;Flume Sink取出Channel中的数据，进行相应的存储文件系统，数据库，或者提交到远程服务器。&lt;br&gt;Flume也提供了各种sink的实现，包括HDFS sink、Logger sink、Avro sink、File Roll sink、Null sink、HBase sink等。&lt;br&gt;Flume Sink在设置数据存储时，可以向文件系统中、数据库中、hadoop中储数据，在日志数据较少时，可以将数据存储在文件系统中，并且设定一定的时间间隔保存数据。在日志数据较多时，可以将相应的日志数据存储到Hadoop中，便于日后进行相应的数据分析。&lt;/p&gt;
+&lt;h3 id=&quot;Channel&quot;&gt;&lt;a href=&quot;#Channel&quot; class=&quot;headerlink&quot; title=&quot;Channel&quot;&gt;&lt;/a&gt;Channel&lt;/h3&gt;&lt;p&gt;Flume Channel主要提供一个队列的功能，对Source提供中的数据进行简单的缓存。&lt;br&gt;Flume对于Channel，则提供了Memory Channel、JDBC Channel、File Channel等。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;MemoryChannel&lt;br&gt;可以实现高速的吞吐，但是无法保证数据的完整性。&lt;/li&gt;
+&lt;li&gt;MemoryRecoverChannel&lt;br&gt;官方文档建议使用FileChannel来替换。&lt;/li&gt;
+&lt;li&gt;FileChannel&lt;br&gt;保证数据的完整性和一致性。在具体配置不现的FileChannel时，建议FileChannel设置的目录和程序日志文件保存的目录设成不同的磁盘，以便提高效率。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;Flume部署种类&quot;&gt;&lt;a href=&quot;#Flume部署种类&quot; class=&quot;headerlink&quot; title=&quot;Flume部署种类&quot;&gt;&lt;/a&gt;Flume部署种类&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.单一代理流程&lt;/strong&gt;&lt;br&gt;就是只有一个agent在客户端采集。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2.多代理流程&lt;/strong&gt;&lt;br&gt;就是一个agent通过中转的Avro传到下一个agent。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;3.流合并&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;4.多路复用流&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/5.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;Flume单机安装&quot;&gt;&lt;a href=&quot;#Flume单机安装&quot; class=&quot;headerlink&quot; title=&quot;Flume单机安装&quot;&gt;&lt;/a&gt;Flume单机安装&lt;/h2&gt;&lt;h3 id=&quot;安装JDK1-6&quot;&gt;&lt;a href=&quot;#安装JDK1-6&quot; class=&quot;headerlink&quot; title=&quot;安装JDK1.6&quot;&gt;&lt;/a&gt;安装JDK1.6&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@log1 local]# mkdir /usr/java
+[root@log1 local]# tar zxf jdk-7u80-linux-x64.gz -C /usr/java/
+[root@log1 local]# vim /etc/profile
+export JAVA_HOME=/usr/java/jdk1.7.0_80
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+[root@log1 local]# source /etc/profile
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装Flume-NG&quot;&gt;&lt;a href=&quot;#安装Flume-NG&quot; class=&quot;headerlink&quot; title=&quot;安装Flume NG&quot;&gt;&lt;/a&gt;安装Flume NG&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@db local]# tar zxf apache-flume-1.7.0-bin.tar.gz 
+[root@db local]# cd apache-flume-1.7.0-bin
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;一个简单的例子&quot;&gt;&lt;a href=&quot;#一个简单的例子&quot; class=&quot;headerlink&quot; title=&quot;一个简单的例子&quot;&gt;&lt;/a&gt;一个简单的例子&lt;/h3&gt;&lt;p&gt;下面写一个单节点的配置文件。这个配置文件让flume接收事件，并输出到终端。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@db apache-flume-1.7.0-bin]# vim conf/example.conf
+# example.conf: A single-node Flume configuration
+
+# Name the components on this agent
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# Describe/configure the source
+a1.sources.r1.type = netcat
+a1.sources.r1.bind = localhost
+a1.sources.r1.port = 44444
+
+# Describe the sink
+a1.sinks.k1.type = logger
+
+# Use a channel which buffers events in memory
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+# Bind the source and sink to the channel
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个配置文件定义了一个单agent名字叫a1。a1有一个source在端口44444监听数据，a1的channel是Memory channel，sink是直接输送到终端上，&lt;/p&gt;
+&lt;p&gt;启动Flume NG：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@db apache-flume-1.7.0-bin]# bin/flume-ng agent --conf conf --conf-file conf/example.conf --name a1 -Dflume.root.logger=INFO,console
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/6.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;测试&quot;&gt;&lt;a href=&quot;#测试&quot; class=&quot;headerlink&quot; title=&quot;测试&quot;&gt;&lt;/a&gt;测试&lt;/h3&gt;&lt;p&gt;打开另外一个终端，telnet端口44444，然后发送一个事件：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;查看原来的终端，可以看到如下的内容：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;2017-07-02 11:43:37,111 (SinkRunner-PollingRunner-DefaultSinkProcessor) [INFO - org.apache.flume.sink.LoggerSink.process(LoggerSink.java:95)] Event: { headers:{} body: 48 65 6C 6C 6F 20 4D 61 6E 21 0D                Hello Man!. }
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/8.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Flume简介&quot;&gt;&lt;a href=&quot;#Flume简介&quot; class=&quot;headerlink&quot; title=&quot;Flume简介&quot;&gt;&lt;/a&gt;Flume简介&lt;/h2&gt;&lt;p&gt;Flume是一个分布式、可靠、高可用的海量日志聚合系统，支持在系统中定制各类数据发送方，用于收集数据
+    
+    </summary>
+    
+      <category term="数据采集" scheme="http://yoursite.com/categories/%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86/"/>
+    
+    
+      <category term="Flume 数据采集" scheme="http://yoursite.com/tags/Flume-%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Elasticsearch安全问题</title>
     <link href="http://yoursite.com/2017/06/29/Elasticsearch%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98/"/>
     <id>http://yoursite.com/2017/06/29/Elasticsearch安全问题/</id>
     <published>2017-06-29T03:51:51.000Z</published>
-    <updated>2017-06-29T07:41:35.000Z</updated>
+    <updated>2017-06-29T07:42:19.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Elasticsearch设计之初就定位在纯私网环境而不做权限和安全控制，虽然有个叫Security Manager的配置，但是显然是不够的。但是后来专门出了个收费的shield来保护Elasticsearch，可是毕竟是收费的。当然我们也有替代品：search-guard。下面介绍下 Elasticsearch 围绕安全方面的的几点使用事项：&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;修改默认的-Elasticsearch-集群名称&quot;&gt;&lt;a href=&quot;#修改默认的-Elasticsearch-集群名称&quot; class=&quot;headerlink&quot; title=&quot;修改默认的 Elasticsearch 集群名称&quot;&gt;&lt;/a&gt;修改默认的 Elasticsearch 集群名称&lt;/h2&gt;&lt;p&gt;Elasticsearch 默认的集群名称是 elasticsearch，请在生成环境上一定要修改成其他的名称，并且不同的环境和不同的集群要保证不相同，监控集群节点情况，如果有未知节点加入，一定要及时预警。&lt;/p&gt;
@@ -980,7 +1066,7 @@ The command below will create a zip file which can be used to deploy the applica
     <link href="http://yoursite.com/2017/05/26/Zookeeper%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2017/05/26/Zookeeper介绍及安装部署/</id>
     <published>2017-05-26T01:20:04.000Z</published>
-    <updated>2017-05-26T03:26:37.000Z</updated>
+    <updated>2017-06-29T10:10:38.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Zookeeper介绍&quot;&gt;&lt;a href=&quot;#Zookeeper介绍&quot; class=&quot;headerlink&quot; title=&quot;Zookeeper介绍&quot;&gt;&lt;/a&gt;Zookeeper介绍&lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;是一个针对大型分布式系统的可靠协调系统；&lt;/li&gt;
@@ -1206,6 +1292,8 @@ ls -t $dataLogDir/log.* | tail -n +$[$COUNT+1] | xargs rm -f
 &lt;li&gt;Zookeeper已经成为Hadoop生态系统中的基础组件。
     
     </summary>
+    
+      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
     
     
       <category term="大数据 Zookeeper" scheme="http://yoursite.com/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE-Zookeeper/"/>
