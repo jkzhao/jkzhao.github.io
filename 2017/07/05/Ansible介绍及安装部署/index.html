@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Flume 数据采集," />
+  <meta name="keywords" content="Ansible 运维自动化," />
 
 
 
@@ -104,26 +104,24 @@
 
 
 
-<meta name="description" content="Flume简介Flume是一个分布式、可靠、高可用的海量日志聚合系统，支持在系统中定制各类数据发送方，用于收集数据；同时，Flume提供对数据的简单处理，并写到各种数据接收方的能力。Flume在0.9.x和1.x之间有较大的架构调整，1.x版本之后的改称为Flume NG。0.9.x的称为Flume OG。">
-<meta name="keywords" content="Flume 数据采集">
+<meta name="description" content="运维工具作为一个Linux运维人员，需要了解大量的运维工具，并熟知这些工具的差异，能够熟练运用这些工具去解决一些手动重复的劳动，一方面是避免人工操作失误，另一方面也可以提高工作效率。同时还能将自己从这些重复的工作中解放出来，以便研究更新和更深的技术。运维工具大体上可以分为3类：  OS Provisioning：提供操作系统安装的。PXE，Cobbler(repository,distrituti">
+<meta name="keywords" content="Ansible 运维自动化">
 <meta property="og:type" content="article">
-<meta property="og:title" content="FlumeNG介绍及安装部署">
-<meta property="og:url" content="http://yoursite.com/2017/07/01/FlumeNG介绍及安装部署/index.html">
+<meta property="og:title" content="Ansible介绍及安装部署">
+<meta property="og:url" content="http://yoursite.com/2017/07/05/Ansible介绍及安装部署/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
-<meta property="og:description" content="Flume简介Flume是一个分布式、可靠、高可用的海量日志聚合系统，支持在系统中定制各类数据发送方，用于收集数据；同时，Flume提供对数据的简单处理，并写到各种数据接收方的能力。Flume在0.9.x和1.x之间有较大的架构调整，1.x版本之后的改称为Flume NG。0.9.x的称为Flume OG。">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/1.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/2.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/3.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/4.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/5.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/6.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/7.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/8.png">
-<meta property="og:updated_time" content="2017-07-02T03:58:56.000Z">
+<meta property="og:description" content="运维工具作为一个Linux运维人员，需要了解大量的运维工具，并熟知这些工具的差异，能够熟练运用这些工具去解决一些手动重复的劳动，一方面是避免人工操作失误，另一方面也可以提高工作效率。同时还能将自己从这些重复的工作中解放出来，以便研究更新和更深的技术。运维工具大体上可以分为3类：  OS Provisioning：提供操作系统安装的。PXE，Cobbler(repository,distrituti">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/6.png">
+<meta property="og:updated_time" content="2017-07-05T08:44:22.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="FlumeNG介绍及安装部署">
-<meta name="twitter:description" content="Flume简介Flume是一个分布式、可靠、高可用的海量日志聚合系统，支持在系统中定制各类数据发送方，用于收集数据；同时，Flume提供对数据的简单处理，并写到各种数据接收方的能力。Flume在0.9.x和1.x之间有较大的架构调整，1.x版本之后的改称为Flume NG。0.9.x的称为Flume OG。">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/1.png">
+<meta name="twitter:title" content="Ansible介绍及安装部署">
+<meta name="twitter:description" content="运维工具作为一个Linux运维人员，需要了解大量的运维工具，并熟知这些工具的差异，能够熟练运用这些工具去解决一些手动重复的劳动，一方面是避免人工操作失误，另一方面也可以提高工作效率。同时还能将自己从这些重复的工作中解放出来，以便研究更新和更深的技术。运维工具大体上可以分为3类：  OS Provisioning：提供操作系统安装的。PXE，Cobbler(repository,distrituti">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/1.png">
 
 
 
@@ -141,7 +139,7 @@
   };
 </script>
 
-  <title> FlumeNG介绍及安装部署 | jkzhao's blog </title>
+  <title> Ansible介绍及安装部署 | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -331,7 +329,7 @@
             
             
               
-                FlumeNG介绍及安装部署
+                Ansible介绍及安装部署
               
             
           </h1>
@@ -343,8 +341,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-01T20:53:40+08:00" content="2017-07-01">
-              2017-07-01
+            <time itemprop="dateCreated" datetime="2017-07-05T15:33:54+08:00" content="2017-07-05">
+              2017-07-05
             </time>
           </span>
 
@@ -357,8 +355,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/数据采集/" itemprop="url" rel="index">
-                    <span itemprop="name">数据采集</span>
+                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
+                    <span itemprop="name">运维自动化</span>
                   </a>
                 </span>
 
@@ -390,70 +388,86 @@
       
 
       
-        <h2 id="Flume简介"><a href="#Flume简介" class="headerlink" title="Flume简介"></a>Flume简介</h2><p>Flume是一个分布式、可靠、高可用的海量日志聚合系统，支持在系统中定制各类数据发送方，用于收集数据；同时，Flume提供对数据的简单处理，并写到各种数据接收方的能力。<br>Flume在0.9.x和1.x之间有较大的架构调整，1.x版本之后的改称为Flume NG。0.9.x的称为Flume OG。<br><a id="more"></a><br>Flume OG体系架构如下，Flume OG已经不再进行版本更新：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/1.png" alt=""><br>Flume NG体系架构如下：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/2.png" alt=""><br>最新的Flume NG是1.7.0，运行最新版本的Flume NG时，机器必须安装JDK7.0或以上的版本，并且，Flume目前在只有在Linux系统的启动脚本，没有Windows环境的启动脚本。</p>
-<h2 id="Flume-NG核心组件"><a href="#Flume-NG核心组件" class="headerlink" title="Flume NG核心组件"></a>Flume NG核心组件</h2><p>Flume NG主要由3个重要的组件构成：</p>
+        <h2 id="运维工具"><a href="#运维工具" class="headerlink" title="运维工具"></a>运维工具</h2><p>作为一个Linux运维人员，需要了解大量的运维工具，并熟知这些工具的差异，能够熟练运用这些工具去解决一些手动重复的劳动，一方面是避免人工操作失误，另一方面也可以提高工作效率。同时还能将自己从这些重复的工作中解放出来，以便研究更新和更深的技术。<br>运维工具大体上可以分为3类：</p>
 <ul>
-<li>Source</li>
-<li>Sink</li>
-<li>Channel</li>
+<li>OS Provisioning：提供操作系统安装的。PXE，Cobbler(repository,distritution,profile)。</li>
+<li>OS Config：cfengine、puppet、saltstack、chef、func、Task Excute工具(fabric、func、saltstack)</li>
+<li>Deployment：capistranoc、fabric<br>而Ansible是一款较新的工具，可以实现OS Config、Task Excute和Deployment。<a id="more"></a>
+运维工具实现远程管理的两种方式：<br>1.有agent：puppet、saltstack、func<br>2.agentless：ansible、fabric</li>
 </ul>
-<h3 id="Source"><a href="#Source" class="headerlink" title="Source"></a>Source</h3><p>完成对日志数据的收集，分成transtion和event打入到channel中。<br>Flume提供了各种source的实现，包括Avro Source(监控端口)、Exce Source(对命令监控)、Spooling Directory Source(监控某个目录)、NetCat Source、Syslog Source、Syslog TCP Source、Syslog UDP Source、HTTP Source、HDFS Source等。<br>对现有程序改动最小的使用方式是使用直接读取程序原来记录的日志文件，基本可以实现无缝接入，不需要对现有程序进行任何改动。直接读取文件Source，有两种方式：</p>
+<h2 id="Ansible特性"><a href="#Ansible特性" class="headerlink" title="Ansible特性"></a>Ansible特性</h2><ul>
+<li>学习曲线平缓；</li>
+<li>不需要agent；</li>
+<li>没有有线状态图，没有次序，我们自己定义动作间的依赖关系就行，任何一个任务出错会很快出错，你可以立即进行修改；</li>
+<li>没有代理；</li>
+<li>没有服务端；</li>
+<li>依赖ssh来工作，无需ssl，也就无需证书等功能；</li>
+<li>模块可以使用任何编程语言来编写，包括shell脚本；</li>
+<li>默认使用ssh工作；</li>
+<li>支持多级的解决方案。</li>
+</ul>
+<h2 id="Ansible架构图和核心组件"><a href="#Ansible架构图和核心组件" class="headerlink" title="Ansible架构图和核心组件"></a>Ansible架构图和核心组件</h2><p><strong>架构图：</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/1.png" alt=""><br>ansible是Python编写的，Python有一个模块叫paramiko，paramiko组件能够实现并行地基于ssh协议远程连接至各主机的库。ansible就是用了paramiko。</p>
+<p><strong>核心组件：</strong></p>
 <ul>
-<li>Exec Source<br>以运行Linux命令的方式，持续的输出最新的数据，如tail -f 文件名，在这种方式下，取的文件名必须是指定的。        </li>
-<li>Spool Source<br>是监测配置的目录下新增的文件，并将文件中的数据读取出来。使用Spool Source需要注意：<br>(1)拷贝到spool目录下的文件不可以再打开编辑。因为放进去的目录可能在一直被读，一般不可以再被打开了。<br>(2)spool目录下不可包含相应的子目录。</li>
+<li>ansible core：ansible核心。</li>
+<li>host inventory：主机池，或叫主机列表，主机归档文件。</li>
+<li>core modules：ansible核心模块。</li>
+<li>custom modules：用户可以自定义模块</li>
+<li>playbook：将多个任务写在一个yaml格式的配置文件中。支持使用Python的jinjia2来定义模板。同一个playbook应用带同一台主机上，无论你应用多少次，他们的结果都是相等的，不会重复执行。这种特性我们称为幂等性。</li>
+<li>connect plugins：连接插件</li>
+<li>plugins：其他的一些插件，比如email、logging等等。</li>
 </ul>
-<p>Spool Source如何使用？<br>在实际使用过程中，可以结合log4j使用，使用log4j的时候，将log4j的文件切割机制设为1分钟1次，将文件拷贝到spool的监控目录。log4j有一个TimeRolling的插件，可以把log4j分割的文件到spool目录。基本实现了实时的监控。Flume在传完文件之后，将会修改文件的后缀，变为.COMPLETED(后缀也可以在配置文件中灵活指定)。</p>
-<p>Exec Source和Spool Source比较？<br>Exec Source可以实现对日志的实时收集，但是存在Flume不运行或者指令执行出错时，将无法收集到日志数据，无法保证日志数据的完整性。<br>Spool Source虽然无法实现实时的收集数据，但是可以使用以分钟的方式切割文件，趋近于实时。<br>总结：如果应用无法实现以分钟切割文件的话，可以两种收集方式结合使用。</p>
-<h3 id="Sink"><a href="#Sink" class="headerlink" title="Sink"></a>Sink</h3><p>Flume Sink取出Channel中的数据，进行相应的存储文件系统，数据库，或者提交到远程服务器。<br>Flume也提供了各种sink的实现，包括HDFS sink、Logger sink、Avro sink、File Roll sink、Null sink、HBase sink等。<br>Flume Sink在设置数据存储时，可以向文件系统中、数据库中、hadoop中储数据，在日志数据较少时，可以将数据存储在文件系统中，并且设定一定的时间间隔保存数据。在日志数据较多时，可以将相应的日志数据存储到Hadoop中，便于日后进行相应的数据分析。</p>
-<h3 id="Channel"><a href="#Channel" class="headerlink" title="Channel"></a>Channel</h3><p>Flume Channel主要提供一个队列的功能，对Source提供中的数据进行简单的缓存。<br>Flume对于Channel，则提供了Memory Channel、JDBC Channel、File Channel等。</p>
-<ul>
-<li>MemoryChannel<br>可以实现高速的吞吐，但是无法保证数据的完整性。</li>
-<li>MemoryRecoverChannel<br>官方文档建议使用FileChannel来替换。</li>
-<li>FileChannel<br>保证数据的完整性和一致性。在具体配置不现的FileChannel时，建议FileChannel设置的目录和程序日志文件保存的目录设成不同的磁盘，以便提高效率。</li>
-</ul>
-<h2 id="Flume部署种类"><a href="#Flume部署种类" class="headerlink" title="Flume部署种类"></a>Flume部署种类</h2><p><strong>1.单一代理流程</strong><br>就是只有一个agent在客户端采集。</p>
-<p><strong>2.多代理流程</strong><br>就是一个agent通过中转的Avro传到下一个agent。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/3.png" alt=""><br><strong>3.流合并</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/4.png" alt=""><br><strong>4.多路复用流</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/5.png" alt=""></p>
-<h2 id="Flume单机安装"><a href="#Flume单机安装" class="headerlink" title="Flume单机安装"></a>Flume单机安装</h2><h3 id="安装JDK1-6"><a href="#安装JDK1-6" class="headerlink" title="安装JDK1.6"></a>安装JDK1.6</h3><pre><code>[root@log1 local]# mkdir /usr/java
-[root@log1 local]# tar zxf jdk-7u80-linux-x64.gz -C /usr/java/
-[root@log1 local]# vim /etc/profile
-export JAVA_HOME=/usr/java/jdk1.7.0_80
-export PATH=$JAVA_HOME/bin:$PATH
-export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-[root@log1 local]# source /etc/profile
-</code></pre><h3 id="安装Flume-NG"><a href="#安装Flume-NG" class="headerlink" title="安装Flume NG"></a>安装Flume NG</h3><pre><code>[root@db local]# tar zxf apache-flume-1.7.0-bin.tar.gz 
-[root@db local]# cd apache-flume-1.7.0-bin
-</code></pre><h3 id="一个简单的例子"><a href="#一个简单的例子" class="headerlink" title="一个简单的例子"></a>一个简单的例子</h3><p>下面写一个单节点的配置文件。这个配置文件让flume接收事件，并输出到终端。</p>
-<pre><code>[root@db apache-flume-1.7.0-bin]# vim conf/example.conf
-# example.conf: A single-node Flume configuration
-
-# Name the components on this agent
-a1.sources = r1
-a1.sinks = k1
-a1.channels = c1
-
-# Describe/configure the source
-a1.sources.r1.type = netcat
-a1.sources.r1.bind = localhost
-a1.sources.r1.port = 44444
-
-# Describe the sink
-a1.sinks.k1.type = logger
-
-# Use a channel which buffers events in memory
-a1.channels.c1.type = memory
-a1.channels.c1.capacity = 1000
-a1.channels.c1.transactionCapacity = 100
-
-# Bind the source and sink to the channel
-a1.sources.r1.channels = c1
-a1.sinks.k1.channel = c1
-</code></pre><p>这个配置文件定义了一个单agent名字叫a1。a1有一个source在端口44444监听数据，a1的channel是Memory channel，sink是直接输送到终端上，</p>
-<p>启动Flume NG：</p>
-<pre><code>[root@db apache-flume-1.7.0-bin]# bin/flume-ng agent --conf conf --conf-file conf/example.conf --name a1 -Dflume.root.logger=INFO,console
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/6.png" alt=""></p>
-<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>打开另外一个终端，telnet端口44444，然后发送一个事件：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/7.png" alt=""><br>查看原来的终端，可以看到如下的内容：</p>
-<pre><code>2017-07-02 11:43:37,111 (SinkRunner-PollingRunner-DefaultSinkProcessor) [INFO - org.apache.flume.sink.LoggerSink.process(LoggerSink.java:95)] Event: { headers:{} body: 48 65 6C 6C 6F 20 4D 61 6E 21 0D                Hello Man!. }
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/8.png" alt=""></p>
+<h2 id="安装Ansible"><a href="#安装Ansible" class="headerlink" title="安装Ansible"></a>安装Ansible</h2><p>可以选择源码编译安装或者yum安装。ansible的rpm包在epel源中，事先安装好epel源。我这里实验环境是CentOS 7。<br>安装：</p>
+<pre><code># yum install ansible -y
+</code></pre><p>查看安装的rpm包里有哪些文件：</p>
+<pre><code># rpm -ql ansible | more
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/2.png" alt=""><br>ansible配置文件：/etc/ansible/ansible.cfg<br>inventory文件：/etc/ansible/hosts</p>
+<h2 id="演示使用示例"><a href="#演示使用示例" class="headerlink" title="演示使用示例"></a>演示使用示例</h2><h3 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h3><table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>操作系统版本</th>
+<th>IP地址</th>
+<th>安装软件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>node1</td>
+<td>CentOS 7.0</td>
+<td>172.16.7.151</td>
+<td>ansible-noarh-2.2.0.0-4.el7</td>
+</tr>
+<tr>
+<td>node2</td>
+<td>CentOS 7.0</td>
+<td>172.16.7.152</td>
+<td>无</td>
+</tr>
+<tr>
+<td>node3</td>
+<td>CentOS 7.0</td>
+<td>172.16.7.153</td>
+<td>无</td>
+</tr>
+</tbody>
+</table>
+<h3 id="配置Ansible主机登录其他主机使用密钥登录"><a href="#配置Ansible主机登录其他主机使用密钥登录" class="headerlink" title="配置Ansible主机登录其他主机使用密钥登录"></a>配置Ansible主机登录其他主机使用密钥登录</h3><p>由于Ansible默认使用ssh管理主机，所以首先需要配置Ansible所在主机登录其他被管理主机不需要输入密码。在node1主机上执行如下命令：</p>
+<pre><code>[root@node1 ~]# ssh-keygen -t rsa -P &apos;&apos;
+[root@node1 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@172.16.7.151
+[root@node1 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@172.16.7.152
+[root@node1 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@172.16.7.153
+</code></pre><h3 id="定义主机"><a href="#定义主机" class="headerlink" title="定义主机"></a>定义主机</h3><p>每一个主机可以使用主机名，也可以使用ip地址。也可以把多个主机定义到一个组里。比如：</p>
+<pre><code>[root@node1 ~]# vim /etc/ansible/hosts
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/3.png" alt=""></p>
+<h3 id="使用模块"><a href="#使用模块" class="headerlink" title="使用模块"></a>使用模块</h3><p>Ansible是依赖模块进行工作的，里面有大量的模块帮助我们去完成任务。比如使用command模块：</p>
+<pre><code>[root@node1 ~]# ansible 172.16.7.152 -m command -a &quot;date&quot;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/4.png" alt=""></p>
+<p>列出当前主机可以使用的ansible模块：</p>
+<pre><code>[root@node1 ~]# ansible-doc -l
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/5.png" alt=""><br>常用的模块有：user、yum、copy、command等。如果想知道某个模块怎么使用的，比如想知道yum怎么用：</p>
+<pre><code>[root@node1 ~]# ansible-doc -s yum
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/6.png" alt=""></p>
 
       
     </div>
@@ -475,7 +489,7 @@ a1.sinks.k1.channel = c1
       
         <div class="post-tags">
           
-            <a href="/tags/Flume-数据采集/" rel="tag">#Flume 数据采集</a>
+            <a href="/tags/Ansible-运维自动化/" rel="tag">#Ansible 运维自动化</a>
           
         </div>
       
@@ -484,16 +498,12 @@ a1.sinks.k1.channel = c1
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/07/05/Ansible介绍及安装部署/" rel="next" title="Ansible介绍及安装部署">
-                <i class="fa fa-chevron-left"></i> Ansible介绍及安装部署
-              </a>
-            
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/06/29/Elasticsearch安全问题/" rel="prev" title="Elasticsearch安全问题">
-                Elasticsearch安全问题 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/07/01/FlumeNG介绍及安装部署/" rel="prev" title="FlumeNG介绍及安装部署">
+                FlumeNG介绍及安装部署 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -660,7 +670,7 @@ a1.sinks.k1.channel = c1
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Flume简介"><span class="nav-number">1.</span> <span class="nav-text">Flume简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flume-NG核心组件"><span class="nav-number">2.</span> <span class="nav-text">Flume NG核心组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Source"><span class="nav-number">2.1.</span> <span class="nav-text">Source</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sink"><span class="nav-number">2.2.</span> <span class="nav-text">Sink</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel"><span class="nav-number">2.3.</span> <span class="nav-text">Channel</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flume部署种类"><span class="nav-number">3.</span> <span class="nav-text">Flume部署种类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flume单机安装"><span class="nav-number">4.</span> <span class="nav-text">Flume单机安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装JDK1-6"><span class="nav-number">4.1.</span> <span class="nav-text">安装JDK1.6</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Flume-NG"><span class="nav-number">4.2.</span> <span class="nav-text">安装Flume NG</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一个简单的例子"><span class="nav-number">4.3.</span> <span class="nav-text">一个简单的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试"><span class="nav-number">4.4.</span> <span class="nav-text">测试</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#运维工具"><span class="nav-number">1.</span> <span class="nav-text">运维工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ansible特性"><span class="nav-number">2.</span> <span class="nav-text">Ansible特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ansible架构图和核心组件"><span class="nav-number">3.</span> <span class="nav-text">Ansible架构图和核心组件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Ansible"><span class="nav-number">4.</span> <span class="nav-text">安装Ansible</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#演示使用示例"><span class="nav-number">5.</span> <span class="nav-text">演示使用示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息"><span class="nav-number">5.1.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Ansible主机登录其他主机使用密钥登录"><span class="nav-number">5.2.</span> <span class="nav-text">配置Ansible主机登录其他主机使用密钥登录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定义主机"><span class="nav-number">5.3.</span> <span class="nav-text">定义主机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用模块"><span class="nav-number">5.4.</span> <span class="nav-text">使用模块</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
