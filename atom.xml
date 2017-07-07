@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-07-05T08:44:22.000Z</updated>
+  <updated>2017-07-07T03:01:28.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,160 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Ansible常见模块介绍</title>
+    <link href="http://yoursite.com/2017/07/07/Ansible%E5%B8%B8%E8%A7%81%E6%A8%A1%E5%9D%97%E4%BB%8B%E7%BB%8D/"/>
+    <id>http://yoursite.com/2017/07/07/Ansible常见模块介绍/</id>
+    <published>2017-07-07T00:48:26.000Z</published>
+    <updated>2017-07-07T03:01:28.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;ansible命令基础&quot;&gt;&lt;a href=&quot;#ansible命令基础&quot; class=&quot;headerlink&quot; title=&quot;ansible命令基础&quot;&gt;&lt;/a&gt;ansible命令基础&lt;/h2&gt;&lt;p&gt;语法：ansible &lt;host-pattern&gt; [-f forks] [-m module_name] [-a args] [options] &lt;/host-pattern&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;host-pattern：这次的命令对哪些主机生效；&lt;/li&gt;
+&lt;li&gt;-f forks：启动的并发线程数，就是一次并行处理多少主机；&lt;/li&gt;
+&lt;li&gt;-m module_name：要使用的模块；&lt;/li&gt;
+&lt;li&gt;-a args：模块特有的参数。&lt;br&gt;常见的模块：&lt;/li&gt;
+&lt;li&gt;user&lt;/li&gt;
+&lt;li&gt;yum&lt;/li&gt;
+&lt;li&gt;copy&lt;/li&gt;
+&lt;li&gt;cron&lt;/li&gt;
+&lt;li&gt;command：这是默认的模块，表示在被管理主机上运行一个命令。对于command模块，-a不再是指定参数，而是命令本身。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;常见模块举例&quot;&gt;&lt;a href=&quot;#常见模块举例&quot; class=&quot;headerlink&quot; title=&quot;常见模块举例&quot;&gt;&lt;/a&gt;常见模块举例&lt;/h2&gt;&lt;h3 id=&quot;etc-ansible-hosts配置文件内容&quot;&gt;&lt;a href=&quot;#etc-ansible-hosts配置文件内容&quot; class=&quot;headerlink&quot; title=&quot;/etc/ansible/hosts配置文件内容&quot;&gt;&lt;/a&gt;/etc/ansible/hosts配置文件内容&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/7.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;command模块&quot;&gt;&lt;a href=&quot;#command模块&quot; class=&quot;headerlink&quot; title=&quot;command模块&quot;&gt;&lt;/a&gt;command模块&lt;/h3&gt;&lt;p&gt;command模块是默认的模块，表示在被管理主机上运行一个命令。对于command模块，-a不再是指定参数，而是命令本身。所以这个模块有个缺陷，运行的命令中不能使用变量或者参数。&lt;br&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible nginx -m command -a &amp;quot;date&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/8.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible mysql -m command -a &amp;quot;tail -3 /etc/passwd&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/9.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;cron模块&quot;&gt;&lt;a href=&quot;#cron模块&quot; class=&quot;headerlink&quot; title=&quot;cron模块&quot;&gt;&lt;/a&gt;cron模块&lt;/h3&gt;&lt;p&gt;cron模块可以让每一个被管理节点能够自动生成一个定期任务计划。查看cron模块的用法：&lt;br&gt;[root@node1 ~]# ansible-doc -s cron&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/10.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;几个主要参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;state：present表示安装crontab任务&lt;pre&gt;&lt;code&gt;absent表示移除crontab任务
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;job：指明运行的命令是什么&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;name：crontab任务的名字&lt;br&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible mysql -m cron -a &amp;apos;minute=&amp;quot;*/10&amp;quot; job=&amp;quot;/usr/bin/echo hello&amp;quot; name=&amp;quot;test cron job&amp;quot;&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/11.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;注意：&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;所有的参数可以用””包含起来&lt;/li&gt;
+&lt;li&gt;day之类的参数没有指定，默认都是*&lt;/li&gt;
+&lt;li&gt;默认state参数的值为present&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/12.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;user模块&quot;&gt;&lt;a href=&quot;#user模块&quot; class=&quot;headerlink&quot; title=&quot;user模块&quot;&gt;&lt;/a&gt;user模块&lt;/h3&gt;&lt;p&gt;user模块实现用户账号管理。查看user模块的用法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-doc -s user
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;几个主要参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;name=：用户名&lt;/li&gt;
+&lt;li&gt;uid：用户的uid&lt;/li&gt;
+&lt;li&gt;group：所属组，即私有组&lt;/li&gt;
+&lt;li&gt;groups：附加组。&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;state：状态。&lt;br&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible mysql -m user -a &amp;apos;name=&amp;quot;jack&amp;quot;&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/13.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible mysql -m user -a &amp;apos;name=&amp;quot;jack&amp;quot; state=absent&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/14.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;group模块&quot;&gt;&lt;a href=&quot;#group模块&quot; class=&quot;headerlink&quot; title=&quot;group模块&quot;&gt;&lt;/a&gt;group模块&lt;/h3&gt;&lt;p&gt;group模块：组管理。查看group模块的用法：&lt;br&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-doc -s group
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/15.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible mysql -m group -a &amp;apos;name=mysql gid=306 system=yes&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/16.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;copy模块&quot;&gt;&lt;a href=&quot;#copy模块&quot; class=&quot;headerlink&quot; title=&quot;copy模块&quot;&gt;&lt;/a&gt;copy模块&lt;/h3&gt;&lt;p&gt;copy模块实现文件复制。查看copy模块的用法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-doc -s copy
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;几个主要参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;src=：指明源文件本地路径。可以是绝对路径，也可以是相对路径。可以不使用src，使用content。就是说用content内容来生成文件。&lt;/li&gt;
+&lt;li&gt;dest=：定义远程目标文件路径，只能使用绝对路径。&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;content=：可以不使用src，使用content。就是说用content内容来生成文件。&lt;br&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible mysql -m copy -a &amp;apos;src=/etc/fstab dest=/tmp/fstab.ansible owner=root mode=640&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/17.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible mysql -m copy -a &amp;apos;content=&amp;quot;Hello World\nGood boy&amp;quot; dest=/tmp/test.txt owner=root mode=640&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/18.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;file模块&quot;&gt;&lt;a href=&quot;#file模块&quot; class=&quot;headerlink&quot; title=&quot;file模块&quot;&gt;&lt;/a&gt;file模块&lt;/h3&gt;&lt;p&gt;file模块可以设定文件属性，还可以创建文件的符号链接。查看file模块的用法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-doc -s file
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;几个重要参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;path=：指明对哪个文件做管理。也可以使用dest和name。&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;创建文件的符号链接：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;src=：指明源文件&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;path=：指明符号链接文件路径&lt;br&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;  [root@node1 ~]# ansible mysql -m file -a ‘owner=root group=mysql mode=644 path=/tmp/test.txt’&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/19.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;  [root@node1 ~]# ansible mysql -m file -a ‘path=/tmp/test.link src=/tmp/test.txt state=link’&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/20.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;ping模块&quot;&gt;&lt;a href=&quot;#ping模块&quot; class=&quot;headerlink&quot; title=&quot;ping模块&quot;&gt;&lt;/a&gt;ping模块&lt;/h3&gt;&lt;p&gt;ping模块测试指定主机是否能连接。查看ping模块的用法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-doc -s ping
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible nginx -m ping
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/21.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;service模块&quot;&gt;&lt;a href=&quot;#service模块&quot; class=&quot;headerlink&quot; title=&quot;service模块&quot;&gt;&lt;/a&gt;service模块&lt;/h3&gt;&lt;p&gt;service模块是管理服务的。查看service模块的用法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-doc -s service
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/22.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;几个重要参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;enabled=：是否开机自动启动，取值为true或false；&lt;/li&gt;
+&lt;li&gt;name=：服务名字；&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;state=：状态，取值有started，stoped    ，restarted。&lt;br&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible 172.16.7.151 -m service -a &amp;apos;enabled=true name=httpd state=stopped&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/23.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;shell模块&quot;&gt;&lt;a href=&quot;#shell模块&quot; class=&quot;headerlink&quot; title=&quot;shell模块&quot;&gt;&lt;/a&gt;shell模块&lt;/h3&gt;&lt;p&gt;shell模块：和command模块类似，但是可以使用变量。用于执行一些复杂的命令。查看shell模块的使用方法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-doc -s shell
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible mysql -m user -a &amp;apos;name=&amp;quot;test&amp;quot;&amp;apos;
+[root@node1 ~]# ansible mysql -m command -a &amp;apos;echo wisedu | passwd --stdin test&amp;apos;
+[root@node1 ~]# ansible mysql -m command -a &amp;apos;tail -1 /etc/passwd&amp;apos; 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/24.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible mysql -m shell -a &amp;apos;echo wisedu | passwd --stdin user1&amp;apos;
+[root@node1 ~]# ansible mysql -m command -a &amp;apos;tail -1 /etc/shadow&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/25.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;所以一旦有管道、变量之类的，你最好使用shell模块，而不要用command模块。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&quot;script模块&quot;&gt;&lt;a href=&quot;#script模块&quot; class=&quot;headerlink&quot; title=&quot;script模块&quot;&gt;&lt;/a&gt;script模块&lt;/h3&gt;&lt;p&gt;script模块将本地脚本复制到远程主机并运行之。查看script模块的用法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-doc -s script
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim test.sh
+#/bin/bash                                                                                                                                    
+echo &amp;quot;hello world&amp;quot; &amp;gt;/tmp/nba.txt
+ [root@node1 ~]# chmod +x test.sh 
+ [root@node1 ~]# ansible mysql -m script -a &amp;apos;/root/test.sh&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/26.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;yum模块&quot;&gt;&lt;a href=&quot;#yum模块&quot; class=&quot;headerlink&quot; title=&quot;yum模块&quot;&gt;&lt;/a&gt;yum模块&lt;/h3&gt;&lt;p&gt;yum模块管理程序包。查看yum模块的用法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-doc -s yum        
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;几个重要参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;name=：指定要安装的程序包，可以带上版本号，否则安装最新版本；&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;state=：present表示安装，absent表示卸载。&lt;br&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible mysql -m yum -a &amp;apos;name=ksh&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/27.png&quot; alt=&quot;&quot;&gt; &lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;setup模块&quot;&gt;&lt;a href=&quot;#setup模块&quot; class=&quot;headerlink&quot; title=&quot;setup模块&quot;&gt;&lt;/a&gt;setup模块&lt;/h3&gt;&lt;p&gt;setup模块：收集远程主机的facts。ansbile在管理每一个主机时，这些主机在被运行管理命令之前，会首先向ansible节点报告自己主机当前的各种可能被ansible主机用到的状态信息，如操作系统版本、ip地址等信息，这些信息都是以变量的形式，ansible主机可以在jinjia2中调用，为不同的服务器生成不同的配置文件。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible mysql -m setup
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/28.png&quot; alt=&quot;&quot;&gt;  &lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;ansible命令基础&quot;&gt;&lt;a href=&quot;#ansible命令基础&quot; class=&quot;headerlink&quot; title=&quot;ansible命令基础&quot;&gt;&lt;/a&gt;ansible命令基础&lt;/h2&gt;&lt;p&gt;语法：ansible &lt;host-pattern&gt; [-f fork
+    
+    </summary>
+    
+      <category term="运维自动化" scheme="http://yoursite.com/categories/%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
+    
+    
+      <category term="Ansible 运维自动化" scheme="http://yoursite.com/tags/Ansible-%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Ansible介绍及安装部署</title>
     <link href="http://yoursite.com/2017/07/05/Ansible%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2017/07/05/Ansible介绍及安装部署/</id>
     <published>2017-07-05T07:33:54.000Z</published>
-    <updated>2017-07-05T08:44:22.000Z</updated>
+    <updated>2017-07-07T01:17:11.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;运维工具&quot;&gt;&lt;a href=&quot;#运维工具&quot; class=&quot;headerlink&quot; title=&quot;运维工具&quot;&gt;&lt;/a&gt;运维工具&lt;/h2&gt;&lt;p&gt;作为一个Linux运维人员，需要了解大量的运维工具，并熟知这些工具的差异，能够熟练运用这些工具去解决一些手动重复的劳动，一方面是避免人工操作失误，另一方面也可以提高工作效率。同时还能将自己从这些重复的工作中解放出来，以便研究更新和更深的技术。&lt;br&gt;运维工具大体上可以分为3类：&lt;/p&gt;
 &lt;ul&gt;
@@ -96,7 +245,7 @@
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/3.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h3 id=&quot;使用模块&quot;&gt;&lt;a href=&quot;#使用模块&quot; class=&quot;headerlink&quot; title=&quot;使用模块&quot;&gt;&lt;/a&gt;使用模块&lt;/h3&gt;&lt;p&gt;Ansible是依赖模块进行工作的，里面有大量的模块帮助我们去完成任务。比如使用command模块：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible 172.16.7.152 -m command -a &amp;quot;date&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/4.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;如上，在执行任务时，可以指定IP，也可以指定组名，ansible有个默认的组叫all，代表/etc/ansible/hosts文件里的所有主机。&lt;/p&gt;
 &lt;p&gt;列出当前主机可以使用的ansible模块：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-doc -l
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;常用的模块有：user、yum、copy、command等。如果想知道某个模块怎么使用的，比如想知道yum怎么用：&lt;/p&gt;
@@ -3116,29 +3265,6 @@ livere_uid: your uid
     
     
       <category term="Nginx" scheme="http://yoursite.com/tags/Nginx/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>个人这一年半以来的运维总结</title>
-    <link href="http://yoursite.com/2016/05/23/%E4%B8%AA%E4%BA%BA%E8%BF%99%E4%B8%80%E5%B9%B4%E5%8D%8A%E4%BB%A5%E6%9D%A5%E7%9A%84%E8%BF%90%E7%BB%B4%E6%80%BB%E7%BB%93/"/>
-    <id>http://yoursite.com/2016/05/23/个人这一年半以来的运维总结/</id>
-    <published>2016-05-23T05:29:35.000Z</published>
-    <updated>2016-06-08T09:40:34.000Z</updated>
-    
-    <content type="html">&lt;hr&gt;
-&lt;p&gt;从事了一年半的运维工作，更多的是做业务运维，或者说是应用运维。对于机房内的一些基础设施，比如交换机、路由器并不清楚怎么去配置。&lt;br&gt;&lt;br&gt;对于一个大公司来说，如果有成型的运维体系，运维按照工作内容来看，可分为基础运维、业务运维、监控运维和产品运维。而我的工作内容就是一些开源组件和商用中间件集群的部署和调优，并写一些脚本做一些简单的自动化部署。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;最近调到其他产品组开始搞大数据运维，同时也开始着手docker的调研。一个人去做这些事情有好处也有坏处，好处是培养自己解决问题的能力，因为处于研发部，研发人员对运维的工作懂得少之又少，所以遇到问题也只能自己想办法去学习相关的知识或者去google解决；而坏处就是去调研一个东西花的时间较长，而且很多东西只能有自己这一个思维去想，不少问题考虑的不够全面。解决问题花的时间也比较长，我记得最长的一次是花了4天。&lt;br&gt;&lt;br&gt;这一年多以来，加了无数的班，基本没什么事情都是在公司学习。学习Linux基础，学习各种服务的原理和部署，学习各种自动化工具，无论说这些东西公司用到用不到。当然，公司产品组用到的一些，也提供了我场景，让我去应用。但是毕竟不是互联网公司，用到的东西不多，而且业务量不大，所以用的也不深。至于加班不加班这种事情，就看自己怎么想了，你觉得你是为公司加班的，而公司又不给加班费，那么你可能会觉得很不爽。如果你觉得你是为自己提升技术能力加班的，那么可能就不会有这方面的怨言了。当然，我们公司也是没有加班费的。&lt;br&gt;&lt;br&gt;干了一年多，也学了不少东西。但是由于身边也没什么做运维工作的人，所以对自己现在所处的水平也是比较疑惑。于是陆续也查看了各大招聘网站上对于Linux运维工程师的要求，也投出了不少，面试了几家。其中包括杭州的几家互联网公司(基本都是6000上以上的)、南京的一些大小公司。杭州的互联网公司面试时相对比较专业，一般都有好几轮，一面会针对简历上的技术点进行询问，二面就是针对整体架构、设计上的一些询问，平时思考问题的方式等。&lt;br&gt;&lt;br&gt;之前一直对自己的能力也不是很清楚，但是经过这几家的面试，发现即便是杭州的互联网公司，自己还是能够定岗到中级运维工程师，也算是对我这一年多的肯定吧。但是与一些运维资深人员交流下来发现两个问题，第一是对一些开源的东西理解的还不够深入；第二是不懂代码，真的很多事情做不了。就如自己一直想要去做运维开发这块，想要去做运维自动化平台，去解决公司环境部署、版本迭代这些重复劳动的工作。但是由于coding能力不足，人手短缺，这块也只是用jenkins+shell做了简单的持续集成和自动发布。还有就是不懂代码，对一些开源的项目理解不够深入，仅仅会使用是完全不够的。要想想它是怎么实现的，如何实现的，以及为什么要这么来实现。在学习的时候，不能浮于表面，要多思考。&lt;br&gt;&lt;br&gt;纵观大多数大型公司的招聘Linux运维工程师的要求，大多都有一条熟悉shell/python/ruby中的一门或两门语言，遇到大数据这种职位，还会要求你精通java。我也打算从java入手，在学校里也是学过java的，只是没做过什么大项目。正好我这个组也就是在做大数据产品，接下来又要经过一段艰难的时光了。当然运维这块工作还是要由我来做，只是把工作的重心转移到开发上来。&lt;br&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;hr&gt;
-&lt;p&gt;从事了一年半的运维工作，更多的是做业务运维，或者说是应用运维。对于机房内的一些基础设施，比如交换机、路由器并不清楚怎么去配置。&lt;br /&gt;&lt;br&gt;对于一个大公司来说，如果有成型的运维体系，运维按照工作内容来看，可分为基础运维、业务运维、监控运维和产品运维。而我的工作内容就是一些开源组件和商用中间件集群的部署和调优，并写一些脚本做一些简单的自动化部署。&lt;br&gt;
-    
-    </summary>
-    
-    
-      <category term="Linux" scheme="http://yoursite.com/tags/Linux/"/>
     
   </entry>
   

@@ -1,0 +1,994 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Ansible 运维自动化," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="ansible命令基础语法：ansible  [-f forks] [-m module_name] [-a args] [options]   host-pattern：这次的命令对哪些主机生效； -f forks：启动的并发线程数，就是一次并行处理多少主机； -m module_name：要使用的模块； -a args：模块特有的参数。常见的模块： user yum copy cron com">
+<meta name="keywords" content="Ansible 运维自动化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible常见模块介绍">
+<meta property="og:url" content="http://yoursite.com/2017/07/07/Ansible常见模块介绍/index.html">
+<meta property="og:site_name" content="jkzhao's blog">
+<meta property="og:description" content="ansible命令基础语法：ansible  [-f forks] [-m module_name] [-a args] [options]   host-pattern：这次的命令对哪些主机生效； -f forks：启动的并发线程数，就是一次并行处理多少主机； -m module_name：要使用的模块； -a args：模块特有的参数。常见的模块： user yum copy cron com">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/7.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/8.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/9.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/10.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/12.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/13.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/14.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/15.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/16.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/17.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/18.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/19.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/20.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/21.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/22.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/23.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/24.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/25.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/26.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/27.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/28.png">
+<meta property="og:updated_time" content="2017-07-07T03:01:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ansible常见模块介绍">
+<meta name="twitter:description" content="ansible命令基础语法：ansible  [-f forks] [-m module_name] [-a args] [options]   host-pattern：这次的命令对哪些主机生效； -f forks：启动的并发线程数，就是一次并行处理多少主机； -m module_name：要使用的模块； -a args：模块特有的参数。常见的模块： user yum copy cron com">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/7.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Ansible常见模块介绍 | jkzhao's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Ansible常见模块介绍
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-07-07T08:48:26+08:00" content="2017-07-07">
+              2017-07-07
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
+                    <span itemprop="name">运维自动化</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/07/07/Ansible常见模块介绍/" class="leancloud_visitors" data-flag-title="Ansible常见模块介绍">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="ansible命令基础"><a href="#ansible命令基础" class="headerlink" title="ansible命令基础"></a>ansible命令基础</h2><p>语法：ansible <host-pattern> [-f forks] [-m module_name] [-a args] [options] </host-pattern></p>
+<ul>
+<li>host-pattern：这次的命令对哪些主机生效；</li>
+<li>-f forks：启动的并发线程数，就是一次并行处理多少主机；</li>
+<li>-m module_name：要使用的模块；</li>
+<li>-a args：模块特有的参数。<br>常见的模块：</li>
+<li>user</li>
+<li>yum</li>
+<li>copy</li>
+<li>cron</li>
+<li>command：这是默认的模块，表示在被管理主机上运行一个命令。对于command模块，-a不再是指定参数，而是命令本身。</li>
+</ul>
+<h2 id="常见模块举例"><a href="#常见模块举例" class="headerlink" title="常见模块举例"></a>常见模块举例</h2><h3 id="etc-ansible-hosts配置文件内容"><a href="#etc-ansible-hosts配置文件内容" class="headerlink" title="/etc/ansible/hosts配置文件内容"></a>/etc/ansible/hosts配置文件内容</h3><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/7.png" alt=""></p>
+<h3 id="command模块"><a href="#command模块" class="headerlink" title="command模块"></a>command模块</h3><p>command模块是默认的模块，表示在被管理主机上运行一个命令。对于command模块，-a不再是指定参数，而是命令本身。所以这个模块有个缺陷，运行的命令中不能使用变量或者参数。<br><strong>示例：</strong></p>
+<pre><code>[root@node1 ~]# ansible nginx -m command -a &quot;date&quot;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/8.png" alt=""></p>
+<pre><code>[root@node1 ~]# ansible mysql -m command -a &quot;tail -3 /etc/passwd&quot;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/9.png" alt=""></p>
+<h3 id="cron模块"><a href="#cron模块" class="headerlink" title="cron模块"></a>cron模块</h3><p>cron模块可以让每一个被管理节点能够自动生成一个定期任务计划。查看cron模块的用法：<br>[root@node1 ~]# ansible-doc -s cron<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/10.png" alt=""><br>几个主要参数：</p>
+<ul>
+<li>state：present表示安装crontab任务<pre><code>absent表示移除crontab任务
+</code></pre></li>
+<li>job：指明运行的命令是什么</li>
+<li><p>name：crontab任务的名字<br><strong>示例：</strong></p>
+<pre><code>[root@node1 ~]# ansible mysql -m cron -a &apos;minute=&quot;*/10&quot; job=&quot;/usr/bin/echo hello&quot; name=&quot;test cron job&quot;&apos;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/11.png" alt=""><br>注意：</p>
+</li>
+<li>所有的参数可以用””包含起来</li>
+<li>day之类的参数没有指定，默认都是*</li>
+<li>默认state参数的值为present<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/12.png" alt=""></li>
+</ul>
+<h3 id="user模块"><a href="#user模块" class="headerlink" title="user模块"></a>user模块</h3><p>user模块实现用户账号管理。查看user模块的用法：</p>
+<pre><code>[root@node1 ~]# ansible-doc -s user
+</code></pre><p>几个主要参数：</p>
+<ul>
+<li>name=：用户名</li>
+<li>uid：用户的uid</li>
+<li>group：所属组，即私有组</li>
+<li>groups：附加组。</li>
+<li><p>state：状态。<br><strong>示例：</strong></p>
+<pre><code>[root@node1 ~]# ansible mysql -m user -a &apos;name=&quot;jack&quot;&apos;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/13.png" alt=""></p>
+<pre><code>[root@node1 ~]# ansible mysql -m user -a &apos;name=&quot;jack&quot; state=absent&apos;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/14.png" alt=""></p>
+</li>
+</ul>
+<h3 id="group模块"><a href="#group模块" class="headerlink" title="group模块"></a>group模块</h3><p>group模块：组管理。查看group模块的用法：<br><strong>示例：</strong></p>
+<pre><code>[root@node1 ~]# ansible-doc -s group
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/15.png" alt=""></p>
+<pre><code>[root@node1 ~]# ansible mysql -m group -a &apos;name=mysql gid=306 system=yes&apos;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/16.png" alt=""></p>
+<h3 id="copy模块"><a href="#copy模块" class="headerlink" title="copy模块"></a>copy模块</h3><p>copy模块实现文件复制。查看copy模块的用法：</p>
+<pre><code>[root@node1 ~]# ansible-doc -s copy
+</code></pre><p>几个主要参数：</p>
+<ul>
+<li>src=：指明源文件本地路径。可以是绝对路径，也可以是相对路径。可以不使用src，使用content。就是说用content内容来生成文件。</li>
+<li>dest=：定义远程目标文件路径，只能使用绝对路径。</li>
+<li><p>content=：可以不使用src，使用content。就是说用content内容来生成文件。<br><strong>示例：</strong></p>
+<pre><code>[root@node1 ~]# ansible mysql -m copy -a &apos;src=/etc/fstab dest=/tmp/fstab.ansible owner=root mode=640&apos;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/17.png" alt=""></p>
+<pre><code>[root@node1 ~]# ansible mysql -m copy -a &apos;content=&quot;Hello World\nGood boy&quot; dest=/tmp/test.txt owner=root mode=640&apos;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/18.png" alt=""></p>
+</li>
+</ul>
+<h3 id="file模块"><a href="#file模块" class="headerlink" title="file模块"></a>file模块</h3><p>file模块可以设定文件属性，还可以创建文件的符号链接。查看file模块的用法：</p>
+<pre><code>[root@node1 ~]# ansible-doc -s file
+</code></pre><p>几个重要参数：</p>
+<ul>
+<li>path=：指明对哪个文件做管理。也可以使用dest和name。</li>
+<li><p>创建文件的符号链接：</p>
+<ul>
+<li>src=：指明源文件</li>
+<li><p>path=：指明符号链接文件路径<br><strong>示例：</strong></p>
+<p>  [root@node1 ~]# ansible mysql -m file -a ‘owner=root group=mysql mode=644 path=/tmp/test.txt’<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/19.png" alt=""></p>
+<p>  [root@node1 ~]# ansible mysql -m file -a ‘path=/tmp/test.link src=/tmp/test.txt state=link’<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/20.png" alt=""></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="ping模块"><a href="#ping模块" class="headerlink" title="ping模块"></a>ping模块</h3><p>ping模块测试指定主机是否能连接。查看ping模块的用法：</p>
+<pre><code>[root@node1 ~]# ansible-doc -s ping
+</code></pre><p><strong>示例：</strong></p>
+<pre><code>[root@node1 ~]# ansible nginx -m ping
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/21.png" alt=""></p>
+<h3 id="service模块"><a href="#service模块" class="headerlink" title="service模块"></a>service模块</h3><p>service模块是管理服务的。查看service模块的用法：</p>
+<pre><code>[root@node1 ~]# ansible-doc -s service
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/22.png" alt=""><br>几个重要参数：</p>
+<ul>
+<li>enabled=：是否开机自动启动，取值为true或false；</li>
+<li>name=：服务名字；</li>
+<li><p>state=：状态，取值有started，stoped    ，restarted。<br><strong>示例：</strong></p>
+<pre><code>[root@node1 ~]# ansible 172.16.7.151 -m service -a &apos;enabled=true name=httpd state=stopped&apos;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/23.png" alt=""></p>
+</li>
+</ul>
+<h3 id="shell模块"><a href="#shell模块" class="headerlink" title="shell模块"></a>shell模块</h3><p>shell模块：和command模块类似，但是可以使用变量。用于执行一些复杂的命令。查看shell模块的使用方法：</p>
+<pre><code>[root@node1 ~]# ansible-doc -s shell
+</code></pre><p><strong>示例：</strong></p>
+<pre><code>[root@node1 ~]# ansible mysql -m user -a &apos;name=&quot;test&quot;&apos;
+[root@node1 ~]# ansible mysql -m command -a &apos;echo wisedu | passwd --stdin test&apos;
+[root@node1 ~]# ansible mysql -m command -a &apos;tail -1 /etc/passwd&apos; 
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/24.png" alt=""></p>
+<pre><code>[root@node1 ~]# ansible mysql -m shell -a &apos;echo wisedu | passwd --stdin user1&apos;
+[root@node1 ~]# ansible mysql -m command -a &apos;tail -1 /etc/shadow&apos;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/25.png" alt=""><br><strong>所以一旦有管道、变量之类的，你最好使用shell模块，而不要用command模块。</strong></p>
+<h3 id="script模块"><a href="#script模块" class="headerlink" title="script模块"></a>script模块</h3><p>script模块将本地脚本复制到远程主机并运行之。查看script模块的用法：</p>
+<pre><code>[root@node1 ~]# ansible-doc -s script
+</code></pre><p><strong>示例：</strong></p>
+<pre><code>[root@node1 ~]# vim test.sh
+#/bin/bash                                                                                                                                    
+echo &quot;hello world&quot; &gt;/tmp/nba.txt
+ [root@node1 ~]# chmod +x test.sh 
+ [root@node1 ~]# ansible mysql -m script -a &apos;/root/test.sh&apos;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/26.png" alt=""></p>
+<h3 id="yum模块"><a href="#yum模块" class="headerlink" title="yum模块"></a>yum模块</h3><p>yum模块管理程序包。查看yum模块的用法：</p>
+<pre><code>[root@node1 ~]# ansible-doc -s yum        
+</code></pre><p>几个重要参数：</p>
+<ul>
+<li>name=：指定要安装的程序包，可以带上版本号，否则安装最新版本；</li>
+<li><p>state=：present表示安装，absent表示卸载。<br><strong>示例：</strong></p>
+<pre><code>[root@node1 ~]# ansible mysql -m yum -a &apos;name=ksh&apos;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/27.png" alt=""> </p>
+</li>
+</ul>
+<h3 id="setup模块"><a href="#setup模块" class="headerlink" title="setup模块"></a>setup模块</h3><p>setup模块：收集远程主机的facts。ansbile在管理每一个主机时，这些主机在被运行管理命令之前，会首先向ansible节点报告自己主机当前的各种可能被ansible主机用到的状态信息，如操作系统版本、ip地址等信息，这些信息都是以变量的形式，ansible主机可以在jinjia2中调用，为不同的服务器生成不同的配置文件。</p>
+<pre><code>[root@node1 ~]# ansible mysql -m setup
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/28.png" alt="">  </p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Ansible-运维自动化/" rel="tag">#Ansible 运维自动化</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/05/Ansible介绍及安装部署/" rel="prev" title="Ansible介绍及安装部署">
+                Ansible介绍及安装部署 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/ju-feng-93" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-zhihu"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ansible命令基础"><span class="nav-number">1.</span> <span class="nav-text">ansible命令基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见模块举例"><span class="nav-number">2.</span> <span class="nav-text">常见模块举例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#etc-ansible-hosts配置文件内容"><span class="nav-number">2.1.</span> <span class="nav-text">/etc/ansible/hosts配置文件内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#command模块"><span class="nav-number">2.2.</span> <span class="nav-text">command模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cron模块"><span class="nav-number">2.3.</span> <span class="nav-text">cron模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#user模块"><span class="nav-number">2.4.</span> <span class="nav-text">user模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#group模块"><span class="nav-number">2.5.</span> <span class="nav-text">group模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#copy模块"><span class="nav-number">2.6.</span> <span class="nav-text">copy模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#file模块"><span class="nav-number">2.7.</span> <span class="nav-text">file模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ping模块"><span class="nav-number">2.8.</span> <span class="nav-text">ping模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#service模块"><span class="nav-number">2.9.</span> <span class="nav-text">service模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shell模块"><span class="nav-number">2.10.</span> <span class="nav-text">shell模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#script模块"><span class="nav-number">2.11.</span> <span class="nav-text">script模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yum模块"><span class="nav-number">2.12.</span> <span class="nav-text">yum模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#setup模块"><span class="nav-number">2.13.</span> <span class="nav-text">setup模块</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>
