@@ -104,13 +104,13 @@
 
 
 
-<meta name="description" content="ansible命令基础语法：ansible  [-f forks] [-m module_name] [-a args] [options]   host-pattern：这次的命令对哪些主机生效； -f forks：启动的并发线程数，就是一次并行处理多少主机； -m module_name：要使用的模块； -a args：模块特有的参数。常见的模块： user yum copy cron com">
+<meta name="description" content="ansible命令基础语法：ansible  [-f forks] [-m module_name] [-a args] [options]   host-pattern：这次的命令对哪些主机生效； -f forks：启动的并发线程数，就是一次并行处理多少主机； -m module_name：要使用的模块； -a args：模块特有的参数。">
 <meta name="keywords" content="Ansible 运维自动化">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Ansible常见模块介绍">
 <meta property="og:url" content="http://yoursite.com/2017/07/07/Ansible常见模块介绍/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
-<meta property="og:description" content="ansible命令基础语法：ansible  [-f forks] [-m module_name] [-a args] [options]   host-pattern：这次的命令对哪些主机生效； -f forks：启动的并发线程数，就是一次并行处理多少主机； -m module_name：要使用的模块； -a args：模块特有的参数。常见的模块： user yum copy cron com">
+<meta property="og:description" content="ansible命令基础语法：ansible  [-f forks] [-m module_name] [-a args] [options]   host-pattern：这次的命令对哪些主机生效； -f forks：启动的并发线程数，就是一次并行处理多少主机； -m module_name：要使用的模块； -a args：模块特有的参数。">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/7.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/8.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/9.png">
@@ -133,10 +133,10 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/26.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/27.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/28.png">
-<meta property="og:updated_time" content="2017-07-07T03:04:26.000Z">
+<meta property="og:updated_time" content="2017-07-07T03:06:49.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Ansible常见模块介绍">
-<meta name="twitter:description" content="ansible命令基础语法：ansible  [-f forks] [-m module_name] [-a args] [options]   host-pattern：这次的命令对哪些主机生效； -f forks：启动的并发线程数，就是一次并行处理多少主机； -m module_name：要使用的模块； -a args：模块特有的参数。常见的模块： user yum copy cron com">
+<meta name="twitter:description" content="ansible命令基础语法：ansible  [-f forks] [-m module_name] [-a args] [options]   host-pattern：这次的命令对哪些主机生效； -f forks：启动的并发线程数，就是一次并行处理多少主机； -m module_name：要使用的模块； -a args：模块特有的参数。">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/7.png">
 
 
@@ -418,13 +418,17 @@
 <li>host-pattern：这次的命令对哪些主机生效；</li>
 <li>-f forks：启动的并发线程数，就是一次并行处理多少主机；</li>
 <li>-m module_name：要使用的模块；</li>
-<li>-a args：模块特有的参数。<br>常见的模块：</li>
+<li>-a args：模块特有的参数。<a id="more"></a>
+</li>
+</ul>
+<p>常见的模块：</p>
+<ul>
 <li>user</li>
 <li>yum</li>
 <li>copy</li>
 <li>cron</li>
-<li>command：这是默认的模块，表示在被管理主机上运行一个命令。对于command模块，-a不再是指定参数，而是命令本身。<a id="more"></a>
-</li>
+<li>command：这是默认的模块，表示在被管理主机上运行一个命令。对于command模块，-a不再是指定参数，而是命令本身。</li>
+<li>shell</li>
 </ul>
 <h2 id="常见模块举例"><a href="#常见模块举例" class="headerlink" title="常见模块举例"></a>常见模块举例</h2><h3 id="etc-ansible-hosts配置文件内容"><a href="#etc-ansible-hosts配置文件内容" class="headerlink" title="/etc/ansible/hosts配置文件内容"></a>/etc/ansible/hosts配置文件内容</h3><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/7.png" alt=""></p>
 <h3 id="command模块"><a href="#command模块" class="headerlink" title="command模块"></a>command模块</h3><p>command模块是默认的模块，表示在被管理主机上运行一个命令。对于command模块，-a不再是指定参数，而是命令本身。所以这个模块有个缺陷，运行的命令中不能使用变量或者参数。<br><strong>示例：</strong></p>
