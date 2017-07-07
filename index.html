@@ -391,8 +391,7 @@
 
       
         
-          
-            <h2 id="ansible命令基础"><a href="#ansible命令基础" class="headerlink" title="ansible命令基础"></a>ansible命令基础</h2><p>语法：ansible <host-pattern> [-f forks] [-m module_name] [-a args] [options] </host-pattern></p>
+          <h2 id="ansible命令基础"><a href="#ansible命令基础" class="headerlink" title="ansible命令基础"></a>ansible命令基础</h2><p>语法：ansible <host-pattern> [-f forks] [-m module_name] [-a args] [options] </p>
 <ul>
 <li>host-pattern：这次的命令对哪些主机生效；</li>
 <li>-f forks：启动的并发线程数，就是一次并行处理多少主机；</li>
@@ -402,125 +401,12 @@
 <li>yum</li>
 <li>copy</li>
 <li>cron</li>
-<li>command：这是默认的模块，表示在被管理主机上运行一个命令。对于command模块，-a不再是指定参数，而是命令本身。</li>
-</ul>
-<h2 id="常见模块举例"><a href="#常见模块举例" class="headerlink" title="常见模块举例"></a>常见模块举例</h2><h3 id="etc-ansible-hosts配置文件内容"><a href="#etc-ansible-hosts配置文件内容" class="headerlink" title="/etc/ansible/hosts配置文件内容"></a>/etc/ansible/hosts配置文件内容</h3><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/7.png" alt=""></p>
-<h3 id="command模块"><a href="#command模块" class="headerlink" title="command模块"></a>command模块</h3><p>command模块是默认的模块，表示在被管理主机上运行一个命令。对于command模块，-a不再是指定参数，而是命令本身。所以这个模块有个缺陷，运行的命令中不能使用变量或者参数。<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible nginx -m command -a &quot;date&quot;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/8.png" alt=""></p>
-<pre><code>[root@node1 ~]# ansible mysql -m command -a &quot;tail -3 /etc/passwd&quot;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/9.png" alt=""></p>
-<h3 id="cron模块"><a href="#cron模块" class="headerlink" title="cron模块"></a>cron模块</h3><p>cron模块可以让每一个被管理节点能够自动生成一个定期任务计划。查看cron模块的用法：<br>[root@node1 ~]# ansible-doc -s cron<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/10.png" alt=""><br>几个主要参数：</p>
-<ul>
-<li>state：present表示安装crontab任务<pre><code>absent表示移除crontab任务
-</code></pre></li>
-<li>job：指明运行的命令是什么</li>
-<li><p>name：crontab任务的名字<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible mysql -m cron -a &apos;minute=&quot;*/10&quot; job=&quot;/usr/bin/echo hello&quot; name=&quot;test cron job&quot;&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/11.png" alt=""><br>注意：</p>
-</li>
-<li>所有的参数可以用””包含起来</li>
-<li>day之类的参数没有指定，默认都是*</li>
-<li>默认state参数的值为present<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/12.png" alt=""></li>
-</ul>
-<h3 id="user模块"><a href="#user模块" class="headerlink" title="user模块"></a>user模块</h3><p>user模块实现用户账号管理。查看user模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s user
-</code></pre><p>几个主要参数：</p>
-<ul>
-<li>name=：用户名</li>
-<li>uid：用户的uid</li>
-<li>group：所属组，即私有组</li>
-<li>groups：附加组。</li>
-<li><p>state：状态。<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible mysql -m user -a &apos;name=&quot;jack&quot;&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/13.png" alt=""></p>
-<pre><code>[root@node1 ~]# ansible mysql -m user -a &apos;name=&quot;jack&quot; state=absent&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/14.png" alt=""></p>
-</li>
-</ul>
-<h3 id="group模块"><a href="#group模块" class="headerlink" title="group模块"></a>group模块</h3><p>group模块：组管理。查看group模块的用法：<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible-doc -s group
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/15.png" alt=""></p>
-<pre><code>[root@node1 ~]# ansible mysql -m group -a &apos;name=mysql gid=306 system=yes&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/16.png" alt=""></p>
-<h3 id="copy模块"><a href="#copy模块" class="headerlink" title="copy模块"></a>copy模块</h3><p>copy模块实现文件复制。查看copy模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s copy
-</code></pre><p>几个主要参数：</p>
-<ul>
-<li>src=：指明源文件本地路径。可以是绝对路径，也可以是相对路径。可以不使用src，使用content。就是说用content内容来生成文件。</li>
-<li>dest=：定义远程目标文件路径，只能使用绝对路径。</li>
-<li><p>content=：可以不使用src，使用content。就是说用content内容来生成文件。<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible mysql -m copy -a &apos;src=/etc/fstab dest=/tmp/fstab.ansible owner=root mode=640&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/17.png" alt=""></p>
-<pre><code>[root@node1 ~]# ansible mysql -m copy -a &apos;content=&quot;Hello World\nGood boy&quot; dest=/tmp/test.txt owner=root mode=640&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/18.png" alt=""></p>
-</li>
-</ul>
-<h3 id="file模块"><a href="#file模块" class="headerlink" title="file模块"></a>file模块</h3><p>file模块可以设定文件属性，还可以创建文件的符号链接。查看file模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s file
-</code></pre><p>几个重要参数：</p>
-<ul>
-<li>path=：指明对哪个文件做管理。也可以使用dest和name。</li>
-<li><p>创建文件的符号链接：</p>
-<ul>
-<li>src=：指明源文件</li>
-<li><p>path=：指明符号链接文件路径<br><strong>示例：</strong></p>
-<p>  [root@node1 ~]# ansible mysql -m file -a ‘owner=root group=mysql mode=644 path=/tmp/test.txt’<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/19.png" alt=""></p>
-<p>  [root@node1 ~]# ansible mysql -m file -a ‘path=/tmp/test.link src=/tmp/test.txt state=link’<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/20.png" alt=""></p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="ping模块"><a href="#ping模块" class="headerlink" title="ping模块"></a>ping模块</h3><p>ping模块测试指定主机是否能连接。查看ping模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s ping
-</code></pre><p><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible nginx -m ping
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/21.png" alt=""></p>
-<h3 id="service模块"><a href="#service模块" class="headerlink" title="service模块"></a>service模块</h3><p>service模块是管理服务的。查看service模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s service
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/22.png" alt=""><br>几个重要参数：</p>
-<ul>
-<li>enabled=：是否开机自动启动，取值为true或false；</li>
-<li>name=：服务名字；</li>
-<li><p>state=：状态，取值有started，stoped    ，restarted。<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible 172.16.7.151 -m service -a &apos;enabled=true name=httpd state=stopped&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/23.png" alt=""></p>
-</li>
-</ul>
-<h3 id="shell模块"><a href="#shell模块" class="headerlink" title="shell模块"></a>shell模块</h3><p>shell模块：和command模块类似，但是可以使用变量。用于执行一些复杂的命令。查看shell模块的使用方法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s shell
-</code></pre><p><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible mysql -m user -a &apos;name=&quot;test&quot;&apos;
-[root@node1 ~]# ansible mysql -m command -a &apos;echo wisedu | passwd --stdin test&apos;
-[root@node1 ~]# ansible mysql -m command -a &apos;tail -1 /etc/passwd&apos; 
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/24.png" alt=""></p>
-<pre><code>[root@node1 ~]# ansible mysql -m shell -a &apos;echo wisedu | passwd --stdin user1&apos;
-[root@node1 ~]# ansible mysql -m command -a &apos;tail -1 /etc/shadow&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/25.png" alt=""><br><strong>所以一旦有管道、变量之类的，你最好使用shell模块，而不要用command模块。</strong></p>
-<h3 id="script模块"><a href="#script模块" class="headerlink" title="script模块"></a>script模块</h3><p>script模块将本地脚本复制到远程主机并运行之。查看script模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s script
-</code></pre><p><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# vim test.sh
-#/bin/bash                                                                                                                                    
-echo &quot;hello world&quot; &gt;/tmp/nba.txt
- [root@node1 ~]# chmod +x test.sh 
- [root@node1 ~]# ansible mysql -m script -a &apos;/root/test.sh&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/26.png" alt=""></p>
-<h3 id="yum模块"><a href="#yum模块" class="headerlink" title="yum模块"></a>yum模块</h3><p>yum模块管理程序包。查看yum模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s yum        
-</code></pre><p>几个重要参数：</p>
-<ul>
-<li>name=：指定要安装的程序包，可以带上版本号，否则安装最新版本；</li>
-<li><p>state=：present表示安装，absent表示卸载。<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible mysql -m yum -a &apos;name=ksh&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/27.png" alt=""> </p>
-</li>
-</ul>
-<h3 id="setup模块"><a href="#setup模块" class="headerlink" title="setup模块"></a>setup模块</h3><p>setup模块：收集远程主机的facts。ansbile在管理每一个主机时，这些主机在被运行管理命令之前，会首先向ansible节点报告自己主机当前的各种可能被ansible主机用到的状态信息，如操作系统版本、ip地址等信息，这些信息都是以变量的形式，ansible主机可以在jinjia2中调用，为不同的服务器生成不同的配置文件。</p>
-<pre><code>[root@node1 ~]# ansible mysql -m setup
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/28.png" alt="">  </p>
-
-          
+<li>command：这是默认的模块，表示在被管理主机上运行一个命令。对于command模块，-a不再是指定参数，而是命令本身。
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/07/07/Ansible常见模块介绍/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
