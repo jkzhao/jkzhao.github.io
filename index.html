@@ -391,105 +391,12 @@
 
       
         
-          
-            <h2 id="YAML"><a href="#YAML" class="headerlink" title="YAML"></a>YAML</h2><h3 id="YAML介绍"><a href="#YAML介绍" class="headerlink" title="YAML介绍"></a>YAML介绍</h3><p>YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。<br>YAML Ain’t Markup Language，即YAML不是XML。不过，在开发的这种语言时，YAML的意思其实是：”Yet Another Markup Language”（仍是一种标记语言）。其特性：</p>
-<ul>
-<li>YAML的可读性好</li>
-<li>YAML和脚本语言的交互性好</li>
-<li>YAML使用实现语言的数据类型</li>
-<li>YAML有一个一致的信息模型</li>
-<li>YAML易于实现</li>
-<li>YAML可以基于流来处理</li>
-<li>YAML表达能力强，扩展性好<br>更多的内容及规范参见<a href="http://www.yaml.org。" target="_blank" rel="external">http://www.yaml.org。</a></li>
-</ul>
-<h3 id="YAML语法"><a href="#YAML语法" class="headerlink" title="YAML语法"></a>YAML语法</h3><p>YAML的语法和其他高阶语言类似，并且可以简单表达清单、散列表、标量等数据结构。其结构（Structure）通过空格来展示，序列（Sequence）里的项用”-“来代表，Map里的键值对用”:”分隔。下面是一个示例。YAML是用键值对和缩进来表示的。</p>
-<pre><code>name: John Smith
-age: 41
-gender: Male
-spouse:                         
-    name: Jane Smith
-    age: 37
-    gender: Female
-children:                     
-    - name: Jimmy Smith
-      age: 17
-      gender: Male
-    - name: Jenny Smith
-      age 13
-      gender: Female
-</code></pre><p>YAML文件扩展名通常为.yaml，如example.yaml。</p>
-<h3 id="Ansible常用的数据类型"><a href="#Ansible常用的数据类型" class="headerlink" title="Ansible常用的数据类型"></a>Ansible常用的数据类型</h3><p>在ansible中常用的数据类型有序列(list)，也叫列表，还有字典，这些都很类似Python语言。</p>
-<h4 id="list"><a href="#list" class="headerlink" title="list"></a>list</h4><p>列表中的所有元素都使用“-”打头，例如：A list of tasty fruits</p>
-<ul>
-<li>Apple</li>
-<li>Orange</li>
-<li>Strawberry</li>
-<li>Mango</li>
-</ul>
-<h4 id="dictionary"><a href="#dictionary" class="headerlink" title="dictionary"></a>dictionary</h4><h2 id="字典通过key与value进行标识，例如："><a href="#字典通过key与value进行标识，例如：" class="headerlink" title="字典通过key与value进行标识，例如："></a>字典通过key与value进行标识，例如：</h2><p>An employee record：</p>
-<pre><code>name: Example Developer
-job: Developer
-skill: Elite
-</code></pre><h2 id="也可以将key-value放置于-中进行表示，例如："><a href="#也可以将key-value放置于-中进行表示，例如：" class="headerlink" title="也可以将key:value放置于{}中进行表示，例如："></a>也可以将key:value放置于{}中进行表示，例如：</h2><p>An employ record：</p>
-<pre><code>{name: Example Developer, job: Developer, skill: Elite}
-</code></pre><h2 id="Ansible基础元素"><a href="#Ansible基础元素" class="headerlink" title="Ansible基础元素"></a>Ansible基础元素</h2><h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><h4 id="变量命名"><a href="#变量命名" class="headerlink" title="变量命名"></a>变量命名</h4><p>变量名仅能由字母、数字和下划线组成，而且只能以字母开头。</p>
-<h4 id="facts"><a href="#facts" class="headerlink" title="facts"></a>facts</h4><p>facts是由正在通信的远程目标主机发回的信息，这些信息被保存在ansible变量中。要获取指定的远程主机所支持的所有facts，可使用如下命令进行：</p>
-<pre><code># ansible hostname -m setup
-</code></pre><h4 id="register"><a href="#register" class="headerlink" title="register"></a>register</h4><p>把任务的输出定义为变量，然后用于其他任务，示例如下：</p>
-<pre><code>tasks:
-  - shell: /usr/bin/foo
-    register: foo_result
-    ignore_errors: True
-</code></pre><h4 id="通过命令行传递变量"><a href="#通过命令行传递变量" class="headerlink" title="通过命令行传递变量"></a>通过命令行传递变量</h4><p>在运行playbook的时候也可以传递一些变量供playbook使用，示例如下：</p>
-<pre><code>ansible-playbook test.yml --extra-vars &quot;hosts=www user=magedu&quot;
-</code></pre><p>就是说hosts和user这两个变量可以在test.yml文件中直接调用</p>
-<h4 id="通过roles传递变量"><a href="#通过roles传递变量" class="headerlink" title="通过roles传递变量"></a>通过roles传递变量</h4><p>当给一个主机应用角色的时候可以传递变量，然后在角色内使用这些变量，示例如下：</p>
-<pre><code>- hosts: webservers
-  roles: 
-      - common
-      - { role: foo_app_instance, dir: &apos;/web/htdocs/a.com&apos;, port: 8080 }
-</code></pre><p><strong>注意:role、dir、port是变量名，冒号后面的是变量值。</strong></p>
-<h3 id="Inventory"><a href="#Inventory" class="headerlink" title="Inventory"></a>Inventory</h3><p>ansible的主要功能在于批量主机操作，为了便捷地使用其中的部分主机，可以在inventory file中将其分组命名。默认的inventory file为/etc/ansible/hosts。<br>inventory file可以有多个，且也可以通过Dynamic Inventory来动态生成。</p>
-<h4 id="inventory文件格式"><a href="#inventory文件格式" class="headerlink" title="inventory文件格式"></a>inventory文件格式</h4><p>inventory文件遵循INI文件风格，中括号中的字符为组名。可以将同一个主机同时归并到多个不同的组中；此外，当如若目标主机使用了非默认的SSH端口，还可以在主机名称之后使用冒号加端口号标明。</p>
-<pre><code>[webservers]
-www1.wisedu.com:8888
-www2.wisedu.com
-</code></pre><p>如果主机名称遵循相似的命名模式，还可以使用列表的方式标识各主机，例如：</p>
-<pre><code>[webservers]
-www[01:50].example.com
-
-[databases]
-db-[a:f].example.com
-</code></pre><h4 id="主机变量"><a href="#主机变量" class="headerlink" title="主机变量"></a>主机变量</h4><p>可以在inventory中定义主机时为其添加主机变量以便于在playbook中使用，例如：</p>
-<pre><code>[webservers]
-www1.wisedu.com http_port=80 maxRequestsPerChild=808
-www2.wisedu.com http_port=8080 maxRequestsPerChild=909
-</code></pre><h4 id="组变量"><a href="#组变量" class="headerlink" title="组变量"></a>组变量</h4><p>组变量是指赋予给指定组内所有主机上的在playbook中可用的变量。例如：</p>
-<pre><code> [webservers]
- www1.wisedu.com
- www2.wisedu.com
-
-[webservers:vars]   # 表示向webservers这组主机定义变量如下，回头这两台主机上都可以调用变量ntp_server和nfs_server
-ntp_server=ntp.wisedu.com
-nfs_server=ntp.wisedu.com
-</code></pre><h4 id="组嵌套"><a href="#组嵌套" class="headerlink" title="组嵌套"></a>组嵌套</h4><p>inventory中，组还可以包含其它的组，并且也可以向组中的主机指定变量。不过，这些变量只能在ansible-playbook中使用，而ansible不支持。例如：</p>
-<pre><code>[apache]
-httpd1.wisedu.com
-httpd2.wisedu.com
-
-[nginx]
-ngx1.wisedu.com
-ngx2.wisedu.com
-
-[webservers:children]     # 注意:children是固定格式
-apache
-nginx
-
-[webservers:vars]
-ntp_server=ntp.wisedu.com
-</code></pre><h4 id="inventory参数"><a href="#inventory参数" class="headerlink" title="inventory参数"></a>inventory参数</h4><p>ansible基于ssh连接inventory中指定的远程主机时，还可以通过参数指定其交互方式，这些参数如下所示：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/29.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/30.png" alt=""></p>
-
-          
+          <h2 id="YAML"><a href="#YAML" class="headerlink" title="YAML"></a>YAML</h2><h3 id="YAML介绍"><a href="#YAML介绍" class="headerlink" title="YAML介绍"></a>YAML介绍</h3><p>YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。<br>YAML Ain’t Markup Language，即YAML不是XML。不过，在开发的这种语言时，YAML的意思其实是：”Yet Another Markup Language”（仍是一种标记语言）。其特性：<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/07/11/Ansible的基础元素和YAML介绍/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
