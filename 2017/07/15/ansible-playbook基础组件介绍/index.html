@@ -104,20 +104,26 @@
 
 
 
-<meta name="description" content="YAMLYAML介绍YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。YAML Ain’t Markup Language，即YAML不是XML。不过，在开发的">
+<meta name="description" content="ansible playbook介绍playbook是由一个或多个“play”组成的列表(剧本是由多出戏组成的)。play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联同起来按事先编排的机制同唱一台大戏。下面是一个简单示例。">
 <meta name="keywords" content="Ansible 运维自动化">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Ansible的基础元素和YAML介绍">
-<meta property="og:url" content="http://yoursite.com/2017/07/11/Ansible的基础元素和YAML介绍/index.html">
+<meta property="og:title" content="ansible playbook基础组件介绍">
+<meta property="og:url" content="http://yoursite.com/2017/07/15/ansible-playbook基础组件介绍/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
-<meta property="og:description" content="YAMLYAML介绍YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。YAML Ain’t Markup Language，即YAML不是XML。不过，在开发的">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/29.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/30.png">
-<meta property="og:updated_time" content="2017-07-14T08:03:58.000Z">
+<meta property="og:description" content="ansible playbook介绍playbook是由一个或多个“play”组成的列表(剧本是由多出戏组成的)。play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联同起来按事先编排的机制同唱一台大戏。下面是一个简单示例。">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/31.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/32.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/33.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/34.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/35.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/36.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/38.png">
+<meta property="og:updated_time" content="2017-07-17T04:14:39.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Ansible的基础元素和YAML介绍">
-<meta name="twitter:description" content="YAMLYAML介绍YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。YAML Ain’t Markup Language，即YAML不是XML。不过，在开发的">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/29.png">
+<meta name="twitter:title" content="ansible playbook基础组件介绍">
+<meta name="twitter:description" content="ansible playbook介绍playbook是由一个或多个“play”组成的列表(剧本是由多出戏组成的)。play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联同起来按事先编排的机制同唱一台大戏。下面是一个简单示例。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/31.png">
 
 
 
@@ -135,7 +141,7 @@
   };
 </script>
 
-  <title> Ansible的基础元素和YAML介绍 | jkzhao's blog </title>
+  <title> ansible playbook基础组件介绍 | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -325,7 +331,7 @@
             
             
               
-                Ansible的基础元素和YAML介绍
+                ansible playbook基础组件介绍
               
             
           </h1>
@@ -337,8 +343,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-11T18:37:28+08:00" content="2017-07-11">
-              2017-07-11
+            <time itemprop="dateCreated" datetime="2017-07-15T15:24:31+08:00" content="2017-07-15">
+              2017-07-15
             </time>
           </span>
 
@@ -371,7 +377,7 @@
 
           
           
-             <span id="/2017/07/11/Ansible的基础元素和YAML介绍/" class="leancloud_visitors" data-flag-title="Ansible的基础元素和YAML介绍">
+             <span id="/2017/07/15/ansible-playbook基础组件介绍/" class="leancloud_visitors" data-flag-title="ansible playbook基础组件介绍">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -393,102 +399,145 @@
       
 
       
-        <h2 id="YAML"><a href="#YAML" class="headerlink" title="YAML"></a>YAML</h2><h3 id="YAML介绍"><a href="#YAML介绍" class="headerlink" title="YAML介绍"></a>YAML介绍</h3><p>YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。<br>YAML Ain’t Markup Language，即YAML不是XML。不过，在开发的这种语言时，YAML的意思其实是：”Yet Another Markup Language”（仍是一种标记语言）。其特性：<br><a id="more"></a></p>
+        <h2 id="ansible-playbook介绍"><a href="#ansible-playbook介绍" class="headerlink" title="ansible playbook介绍"></a>ansible playbook介绍</h2><p>playbook是由一个或多个“play”组成的列表(剧本是由多出戏组成的)。play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联同起来按事先编排的机制同唱一台大戏。下面是一个简单示例。<br><a id="more"></a></p>
+<pre><code>- hosts: webnodes
+  vars:
+  http_port: 80
+  max_clients: 256
+remote_user: root
+tasks:          
+- name: ensure apache is at the latest version
+  yum: name=httpd state=latest
+- name: ensure apache is running
+  service: name=httpd state=started
+handlers:
+- name: restart apache
+  service: name=httpd state=restarted
+</code></pre><p>其中，tasks是一个一个任务。</p>
+<h2 id="ansible-playbook基础组件"><a href="#ansible-playbook基础组件" class="headerlink" title="ansible playbook基础组件"></a>ansible playbook基础组件</h2><p>Playbooks结构：</p>
 <ul>
-<li>YAML的可读性好</li>
-<li>YAML和脚本语言的交互性好</li>
-<li>YAML使用实现语言的数据类型</li>
-<li>YAML有一个一致的信息模型</li>
-<li>YAML易于实现</li>
-<li>YAML可以基于流来处理</li>
-<li>YAML表达能力强，扩展性好<br>更多的内容及规范参见<a href="http://www.yaml.org。" target="_blank" rel="external">http://www.yaml.org。</a></li>
+<li>Tasks：任务，即调用模块完成的某操作。</li>
+<li>Variables：变量</li>
+<li>Templates：模板</li>
+<li>Handlers：处理器，指的是在某条件满足时能够触发完成的功能，或者说是由某事件触发执行的操作</li>
+<li>Roles：角色。</li>
 </ul>
-<h3 id="YAML语法"><a href="#YAML语法" class="headerlink" title="YAML语法"></a>YAML语法</h3><p>YAML的语法和其他高阶语言类似，并且可以简单表达清单、散列表、标量等数据结构。其结构（Structure）通过空格来展示，序列（Sequence）里的项用”-“来代表，Map里的键值对用”:”分隔。下面是一个示例。YAML是用键值对和缩进来表示的。</p>
-<pre><code>name: John Smith
-age: 41
-gender: Male
-spouse:                         
-    name: Jane Smith
-    age: 37
-    gender: Female
-children:                     
-    - name: Jimmy Smith
-      age: 17
-      gender: Male
-    - name: Jenny Smith
-      age 13
-      gender: Female
-</code></pre><p>YAML文件扩展名通常为.yaml，如example.yaml。</p>
-<h3 id="Ansible常用的数据类型"><a href="#Ansible常用的数据类型" class="headerlink" title="Ansible常用的数据类型"></a>Ansible常用的数据类型</h3><p>在ansible中常用的数据类型有序列(list)，也叫列表，还有字典，这些都很类似Python语言。</p>
-<h4 id="list"><a href="#list" class="headerlink" title="list"></a>list</h4><p>列表中的所有元素都使用“-”打头，例如：A list of tasty fruits</p>
-<ul>
-<li>Apple</li>
-<li>Orange</li>
-<li>Strawberry</li>
-<li>Mango</li>
-</ul>
-<h4 id="dictionary"><a href="#dictionary" class="headerlink" title="dictionary"></a>dictionary</h4><h2 id="字典通过key与value进行标识，例如："><a href="#字典通过key与value进行标识，例如：" class="headerlink" title="字典通过key与value进行标识，例如："></a>字典通过key与value进行标识，例如：</h2><p>An employee record：</p>
-<pre><code>name: Example Developer
-job: Developer
-skill: Elite
-</code></pre><h2 id="也可以将key-value放置于-中进行表示，例如："><a href="#也可以将key-value放置于-中进行表示，例如：" class="headerlink" title="也可以将key:value放置于{}中进行表示，例如："></a>也可以将key:value放置于{}中进行表示，例如：</h2><p>An employ record：</p>
-<pre><code>{name: Example Developer, job: Developer, skill: Elite}
-</code></pre><h2 id="Ansible基础元素"><a href="#Ansible基础元素" class="headerlink" title="Ansible基础元素"></a>Ansible基础元素</h2><h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><h4 id="变量命名"><a href="#变量命名" class="headerlink" title="变量命名"></a>变量命名</h4><p>变量名仅能由字母、数字和下划线组成，而且只能以字母开头。</p>
-<h4 id="facts"><a href="#facts" class="headerlink" title="facts"></a>facts</h4><p>facts是由正在通信的远程目标主机发回的信息，这些信息被保存在ansible变量中。要获取指定的远程主机所支持的所有facts，可使用如下命令进行：</p>
-<pre><code># ansible hostname -m setup
-</code></pre><h4 id="register"><a href="#register" class="headerlink" title="register"></a>register</h4><p>把任务的输出定义为变量，然后用于其他任务，示例如下：</p>
+<h3 id="Hosts和Users"><a href="#Hosts和Users" class="headerlink" title="Hosts和Users"></a>Hosts和Users</h3><p>playbook中的每一个play的目的都是为了让某个或某些主机以某个指定的用户身份执行任务。hosts用于指定要执行指定任务的主机，其可以是一个或多个由冒号分隔主机组；remote_user则用于指定远程主机上的执行任务的用户。如上面示例中的</p>
+<pre><code>-hosts: webnodes
+ remote_user: root
+</code></pre><p>不过，remote_user也可用于各task中。也可以通过指定其通过sudo的方式在远程主机上执行任务，其可用于play全局或某任务；此外，甚至可以在sudo时使用sudo_user指定sudo时切换的用户。</p>
+<pre><code>- hosts: webnodes
+ remote_user: mageedu
+ tasks:
+   - name: test connection
+     ping:
+     remote_user: mageedu
+     sudo: yes
+</code></pre><p>比如写一个最简单的playbook，里面写了两个play，一个play是在nginx组的主机上都创建一个nginx组，nginx用户，另一个play是复制一个文件到mysql组的主机上：</p>
+<pre><code>[root@node1 ~]# vim nginx.yml
+- hosts: nginx                                                                                                                                
+  remote_user: root
+  tasks:
+  - name: create nginx group
+    group: name=nginx system=yes gid=208
+  - name: create nginx user
+    user: name=nginx uid=208 group=nginx system=yes
+- hosts: mysql
+  remote_user: root
+  tasks:
+  - name: copy file to mysql hosts
+    copy: src=/etc/inittab dest=/tmp/inittab.ans
+</code></pre><p>查看ansible-playbook的使用方法：</p>
+<pre><code>[root@node1 ~]# man ansible-playbook
+</code></pre><p>运行playbook：</p>
+<pre><code>[root@node1 ~]# ansible-playbook nginx.yml 
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/31.png" alt=""></p>
+<h3 id="任务列表-Tasks-和action"><a href="#任务列表-Tasks-和action" class="headerlink" title="任务列表(Tasks)和action"></a>任务列表(Tasks)和action</h3><p>play的主体部分是task list。task list中的各任务按次序逐个在hosts中指定的所有主机上执行，即在所有主机上完成第一个任务后再开始第二个。在运行自下而下某playbook时，如果中途发生错误，所有已执行任务都可能回滚，因此，在更正playbook后重新执行一次即可。(因为具有幂等性)<br>task的目的是使用指定的参数执行模块，而在模块参数中可以使用变量。模块执行是幂等的，这意味着多次执行是安全的，因为其结果均一致。<br>每个task都应该有其name，用于playbook的执行结果输出，建议其内容尽可能清晰地描述任务执行步骤。如果未提供name，则action的结果将用于输出。<br>定义task的可以使用“action: module options”(这个在较新版本上才能执行)或“module: options”的格式，推荐使用后者以实现向后兼容。如果action一行的内容过多，也可以使用在行首使用几个空白字符进行换行。</p>
 <pre><code>tasks:
-  - shell: /usr/bin/foo
-    register: foo_result
-    ignore_errors: True
-</code></pre><h4 id="通过命令行传递变量"><a href="#通过命令行传递变量" class="headerlink" title="通过命令行传递变量"></a>通过命令行传递变量</h4><p>在运行playbook的时候也可以传递一些变量供playbook使用，示例如下：</p>
-<pre><code>ansible-playbook test.yml --extra-vars &quot;hosts=www user=magedu&quot;
-</code></pre><p>就是说hosts和user这两个变量可以在test.yml文件中直接调用</p>
-<h4 id="通过roles传递变量"><a href="#通过roles传递变量" class="headerlink" title="通过roles传递变量"></a>通过roles传递变量</h4><p>当给一个主机应用角色的时候可以传递变量，然后在角色内使用这些变量，示例如下：</p>
-<pre><code>- hosts: webservers
-  roles: 
-      - common
-      - { role: foo_app_instance, dir: &apos;/web/htdocs/a.com&apos;, port: 8080 }
-</code></pre><p><strong>注意:role、dir、port是变量名，冒号后面的是变量值。</strong></p>
-<h3 id="Inventory"><a href="#Inventory" class="headerlink" title="Inventory"></a>Inventory</h3><p>ansible的主要功能在于批量主机操作，为了便捷地使用其中的部分主机，可以在inventory file中将其分组命名。默认的inventory file为/etc/ansible/hosts。<br>inventory file可以有多个，且也可以通过Dynamic Inventory来动态生成。</p>
-<h4 id="inventory文件格式"><a href="#inventory文件格式" class="headerlink" title="inventory文件格式"></a>inventory文件格式</h4><p>inventory文件遵循INI文件风格，中括号中的字符为组名。可以将同一个主机同时归并到多个不同的组中；此外，当如若目标主机使用了非默认的SSH端口，还可以在主机名称之后使用冒号加端口号标明。</p>
-<pre><code>[webservers]
-www1.wisedu.com:8888
-www2.wisedu.com
-</code></pre><p>如果主机名称遵循相似的命名模式，还可以使用列表的方式标识各主机，例如：</p>
-<pre><code>[webservers]
-www[01:50].example.com
-
-[databases]
-db-[a:f].example.com
-</code></pre><h4 id="主机变量"><a href="#主机变量" class="headerlink" title="主机变量"></a>主机变量</h4><p>可以在inventory中定义主机时为其添加主机变量以便于在playbook中使用，例如：</p>
-<pre><code>[webservers]
-www1.wisedu.com http_port=80 maxRequestsPerChild=808
-www2.wisedu.com http_port=8080 maxRequestsPerChild=909
-</code></pre><h4 id="组变量"><a href="#组变量" class="headerlink" title="组变量"></a>组变量</h4><p>组变量是指赋予给指定组内所有主机上的在playbook中可用的变量。例如：</p>
-<pre><code> [webservers]
- www1.wisedu.com
- www2.wisedu.com
-
-[webservers:vars]   # 表示向webservers这组主机定义变量如下，回头这两台主机上都可以调用变量ntp_server和nfs_server
-ntp_server=ntp.wisedu.com
-nfs_server=ntp.wisedu.com
-</code></pre><h4 id="组嵌套"><a href="#组嵌套" class="headerlink" title="组嵌套"></a>组嵌套</h4><p>inventory中，组还可以包含其它的组，并且也可以向组中的主机指定变量。不过，这些变量只能在ansible-playbook中使用，而ansible不支持。例如：</p>
-<pre><code>[apache]
-httpd1.wisedu.com
-httpd2.wisedu.com
-
-[nginx]
-ngx1.wisedu.com
-ngx2.wisedu.com
-
-[webservers:children]     # 注意:children是固定格式
-apache
-nginx
-
-[webservers:vars]
-ntp_server=ntp.wisedu.com
-</code></pre><h4 id="inventory参数"><a href="#inventory参数" class="headerlink" title="inventory参数"></a>inventory参数</h4><p>ansible基于ssh连接inventory中指定的远程主机时，还可以通过参数指定其交互方式，这些参数如下所示：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/29.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/30.png" alt=""></p>
+- name: make sure apache is running
+  service: name=httpd state=running
+</code></pre><p>在众多模块中，只有command和shell模块仅需要给定一个列表而无需使用“key=value”格式，例如：</p>
+<pre><code>tasks:
+- name: disable selinux
+  command: /sbin/setenforce 0
+</code></pre><p>如果命令或脚本的退出码不为零，可能会阻止playbook继续往下执行可以使用如下方式替代：</p>
+<pre><code>tasks:
+- name: run this command and ignore the result
+  shell: /usr/bin/somecommand || /bin/true
+</code></pre><p>也就是说这个命令失败也是要继续往下走的，就是失败了但不要影响下面的操作。或者使用ignore_errors来忽略错误信息：</p>
+<pre><code>tasks:
+- name: run this command and ignore the result
+  shell: /usr/bin/somecommand
+  ignore_errors: True        
+</code></pre><h3 id="handlers"><a href="#handlers" class="headerlink" title="handlers"></a>handlers</h3><p><strong>用于当关注的资源发生变化时采取一定的操作。</strong><br>“notify”这个action可用于在每个play的最后被触发，这样可以避免多次有改变发生时每次都执行指定的操作，取而代之，仅在所有的变化发生完成后一次性地执行指定操作。在notify中列出的操作称为handler，也即notify中调用handler中定义的操作。</p>
+<pre><code>- name: template configuration file
+  template: src=template.j2 dest=/etc/foo.conf
+  notify:
+  - restart memcached
+  - restart apache    
+</code></pre><p>handler是task列表，这些task与前述的task并没有本质上的不同。</p>
+<pre><code>handlers:
+- name: restart memcached
+  service:  name=memcached state=restarted
+- name: restart apache
+  service: name=apache state=restarted
+</code></pre><p>【举例】：比如有个配置nginx的playbook，然后利用这个来说明handlers。<br>1.先创建一个apache.yml，里面定义play安装启动apache</p>
+<pre><code>[root@node1 ~]# vim apache.yml
+- hosts: mysql
+  remote_user: root
+  tasks:
+  - name: install httpd package
+    yum: name=httpd state=latest
+  - name: install configuration file for httpd
+    copy: src=/root/conf/httpd.conf dest=/etc/httpd/conf/httpd.conf 
+  - name: start httpd service 
+    service: enabled=true name=httpd state=started
+[root@node1 ~]# ansible-playbook apache.yml
+</code></pre><p>2.假如说某个时刻httpd.conf发生改变了，比如说不再监听在80，而是监听在8080端口，其他没变。修改/root/conf/httpd.conf，把端口改成8080，再执行这个playbook：</p>
+<pre><code>[root@node1 ~]# ansible-playbook apache.yml
+</code></pre><p>到mysql组所在的主机172.16.7.153上查看端口，发现监听端口仍然是80：</p>
+<pre><code>[root@node3 ~]# ss -tnlp
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/32.png" alt=""></p>
+<p>3.一个程序的配置文件发生了改变，那么程序应该重读配置文件才对。然而默认情况下，你多次唱同一个剧本，如果那个task此前执行过，为了保证幂等性，它是不会再被执行。handlers就是为了解决这种问题而生的。Handlers也是任务，但它不是上来就执行的，只有某个条件满足时才会执行。所以我们去修改apache.yml：</p>
+<pre><code>- hosts: mysql
+  remote_user: root
+  tasks:
+  - name: install httpd package
+    yum: name=httpd state=latest
+  - name: install configuration file for httpd
+    copy: src=/root/conf/httpd.conf dest=/etc/httpd/conf/httpd.conf 
+    notify:
+    - restart httpd
+  - name: start httpd service 
+    service: enabled=true name=httpd state=started
+  handlers:
+  - name: restart httpd
+    service: name=httpd state=restarted
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/33.png" alt=""><br>修改/root/conf/httpd.conf，把端口改成8090，再执行这个playbook：</p>
+<pre><code>[root@node1 ~]# ansible-playbook apache.yml
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/34.png" alt=""><br>到mysql组所在的主机172.16.7.153上查看端口，发现监听端口改变了，变成了8090：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/35.png" alt=""></p>
+<h2 id="playbook中使用变量"><a href="#playbook中使用变量" class="headerlink" title="playbook中使用变量"></a>playbook中使用变量</h2><pre><code>- hosts: mysql
+  remote_user: root
+  vars:
+  - package: nginx
+  tasks:
+  - name: install httpd package
+    yum: name={{ package }} state=latest                                                                                                      
+  - name: install configuration file for httpd
+    copy: src=/root/conf/httpd.conf dest=/etc/httpd/conf/httpd.conf 
+    notify:
+    - restart httpd
+  - name: start httpd service 
+    service: enabled=true name=httpd state=started
+  handlers:
+  - name: restart httpd
+    service: name=httpd state=restarted
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/36.png" alt=""><br><strong>【注意】：playbook中能使用的变量不仅仅是这里定义的变量，而是可以使用ansible中定义的所有变量。例如：</strong></p>
+<pre><code>[root@node1 ~]# ansible 172.16.7.152 -m setup
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png" alt=""></p>
+<p>另外，在inventory中定义的变量也可以在playbook中调用。例如：</p>
+<pre><code>[root@node1 ~]# vim /etc/ansible/hosts
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/38.png" alt=""></p>
 
       
     </div>
@@ -519,16 +568,12 @@ ntp_server=ntp.wisedu.com
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/07/15/ansible-playbook基础组件介绍/" rel="next" title="ansible playbook基础组件介绍">
-                <i class="fa fa-chevron-left"></i> ansible playbook基础组件介绍
-              </a>
-            
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/07/07/Ansible常见模块介绍/" rel="prev" title="Ansible常见模块介绍">
-                Ansible常见模块介绍 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/07/11/Ansible的基础元素和YAML介绍/" rel="prev" title="Ansible的基础元素和YAML介绍">
+                Ansible的基础元素和YAML介绍 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -695,7 +740,7 @@ ntp_server=ntp.wisedu.com
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#YAML"><span class="nav-number">1.</span> <span class="nav-text">YAML</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#YAML介绍"><span class="nav-number">1.1.</span> <span class="nav-text">YAML介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#YAML语法"><span class="nav-number">1.2.</span> <span class="nav-text">YAML语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ansible常用的数据类型"><span class="nav-number">1.3.</span> <span class="nav-text">Ansible常用的数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#list"><span class="nav-number">1.3.1.</span> <span class="nav-text">list</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dictionary"><span class="nav-number">1.3.2.</span> <span class="nav-text">dictionary</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字典通过key与value进行标识，例如："><span class="nav-number">2.</span> <span class="nav-text">字典通过key与value进行标识，例如：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#也可以将key-value放置于-中进行表示，例如："><span class="nav-number">3.</span> <span class="nav-text">也可以将key:value放置于{}中进行表示，例如：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ansible基础元素"><span class="nav-number">4.</span> <span class="nav-text">Ansible基础元素</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#变量"><span class="nav-number">4.1.</span> <span class="nav-text">变量</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#变量命名"><span class="nav-number">4.1.1.</span> <span class="nav-text">变量命名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#facts"><span class="nav-number">4.1.2.</span> <span class="nav-text">facts</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#register"><span class="nav-number">4.1.3.</span> <span class="nav-text">register</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过命令行传递变量"><span class="nav-number">4.1.4.</span> <span class="nav-text">通过命令行传递变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过roles传递变量"><span class="nav-number">4.1.5.</span> <span class="nav-text">通过roles传递变量</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Inventory"><span class="nav-number">4.2.</span> <span class="nav-text">Inventory</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#inventory文件格式"><span class="nav-number">4.2.1.</span> <span class="nav-text">inventory文件格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#主机变量"><span class="nav-number">4.2.2.</span> <span class="nav-text">主机变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#组变量"><span class="nav-number">4.2.3.</span> <span class="nav-text">组变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#组嵌套"><span class="nav-number">4.2.4.</span> <span class="nav-text">组嵌套</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#inventory参数"><span class="nav-number">4.2.5.</span> <span class="nav-text">inventory参数</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ansible-playbook介绍"><span class="nav-number">1.</span> <span class="nav-text">ansible playbook介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ansible-playbook基础组件"><span class="nav-number">2.</span> <span class="nav-text">ansible playbook基础组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hosts和Users"><span class="nav-number">2.1.</span> <span class="nav-text">Hosts和Users</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#任务列表-Tasks-和action"><span class="nav-number">2.2.</span> <span class="nav-text">任务列表(Tasks)和action</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#handlers"><span class="nav-number">2.3.</span> <span class="nav-text">handlers</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#playbook中使用变量"><span class="nav-number">3.</span> <span class="nav-text">playbook中使用变量</span></a></li></ol></div>
             
           </div>
         </section>

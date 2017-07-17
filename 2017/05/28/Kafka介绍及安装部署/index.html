@@ -137,7 +137,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png">
-<meta property="og:updated_time" content="2017-06-02T09:22:16.000Z">
+<meta property="og:updated_time" content="2017-07-15T02:11:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka介绍及安装部署">
 <meta name="twitter:description" content="消息中间件消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。">
@@ -454,19 +454,19 @@
 <td>log1</td>
 <td>CentOS 7.0</td>
 <td>114.55.29.86</td>
-<td>JDK1.7、kafka_2.11</td>
+<td>JDK1.7、kafka_2.11-0.9.0.1</td>
 </tr>
 <tr>
 <td>log2</td>
 <td>CentOS 7.0</td>
 <td>114.55.29.241</td>
-<td>JDK1.7、kafka_2.11</td>
+<td>JDK1.7、kafka_2.11-0.9.0.1</td>
 </tr>
 <tr>
 <td>log3</td>
 <td>CentOS 7.0</td>
 <td>114.55.253.15</td>
-<td>JDK1.7、kafka_2.11</td>
+<td>JDK1.7、kafka_2.11-0.9.0.1</td>
 </tr>
 </tbody>
 </table>
@@ -601,8 +601,8 @@ export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 [root@console ~]# mv kafka-manager-upgrade-to-90 kafka-manager
 [root@console ~]# cd kafka-manager
 [root@console kafka-manager]# sbt clean dist
-The command below will create a zip file which can be used to deploy the application. 使用sbt编译打包的时候时间可能会比较长。
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/16.png" alt=""><br>这个需要翻墙才能完成。配置代理：</p>
+The command below will create a zip file which can be used to deploy the application. 
+</code></pre><p>使用sbt编译打包的时候时间可能会比较长。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/16.png" alt=""><br>这个需要翻墙才能完成。配置代理：</p>
 <pre><code>[root@console ~]# vim /usr/share/sbt-launcher-packaging/conf/sbtconfig.txt
 -Dhttp.proxyHost=proxy
 -Dhttp.proxyPort=8080
@@ -622,7 +622,7 @@ The command below will create a zip file which can be used to deploy the applica
 <pre><code># bin/kafka-manager -Dconfig.file=/path/to/application.conf -Dhttp.port=8080
 </code></pre><p>启动并置于后台运行：</p>
 <pre><code>[kmanager@console kafka-manager-1.3.0.6]$ nohup bin/kafka-manager &gt; /dev/null 2&gt;&amp;1 &amp;
-</code></pre><h2 id="kafka-manager添加cluster"><a href="#kafka-manager添加cluster" class="headerlink" title="kafka-manager添加cluster"></a>kafka-manager添加cluster</h2><p>浏览器输入地址访问：<a href="http://114.55.29.246:9000/" target="_blank" rel="external">http://114.55.29.246:9000/</a><br><strong>注意:安装完成后需要手动添加Cluster。添加Cluster是指添加一个已有的Kafka集群进入监控列表，而非通过Kafka Manager部署一个新的Kafka Cluster，这一点与Cloudera Manager不同。</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/22.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/23.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png" alt=""></p>
+</code></pre><h2 id="kafka-manager添加kafka-cluster"><a href="#kafka-manager添加kafka-cluster" class="headerlink" title="kafka-manager添加kafka cluster"></a>kafka-manager添加kafka cluster</h2><p>浏览器输入地址访问：<a href="http://114.55.29.246:9000/" target="_blank" rel="external">http://114.55.29.246:9000/</a><br><strong>注意:安装完成后需要手动添加Cluster。添加Cluster是指添加一个已有的Kafka集群进入监控列表，而非通过Kafka Manager部署一个新的Kafka Cluster，这一点与Cloudera Manager不同。</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/22.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/23.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png" alt=""></p>
 
       
     </div>
@@ -733,7 +733,7 @@ The command below will create a zip file which can be used to deploy the applica
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-count">23</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -829,7 +829,7 @@ The command below will create a zip file which can be used to deploy the applica
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#消息中间件"><span class="nav-number">1.</span> <span class="nav-text">消息中间件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息中间件特点"><span class="nav-number">2.</span> <span class="nav-text">消息中间件特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息中间件的传递模型"><span class="nav-number">3.</span> <span class="nav-text">消息中间件的传递模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka介绍"><span class="nav-number">4.</span> <span class="nav-text">Kafka介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装部署Kafka集群"><span class="nav-number">5.</span> <span class="nav-text">安装部署Kafka集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息"><span class="nav-number">5.1.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装JDK1-7"><span class="nav-number">5.2.</span> <span class="nav-text">安装JDK1.7</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装集群"><span class="nav-number">5.3.</span> <span class="nav-text">安装集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动集群"><span class="nav-number">5.4.</span> <span class="nav-text">启动集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#脚本定期清理logs下的日志文件"><span class="nav-number">5.5.</span> <span class="nav-text">脚本定期清理logs下的日志文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#停止kafka命令"><span class="nav-number">5.6.</span> <span class="nav-text">停止kafka命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试集群"><span class="nav-number">5.7.</span> <span class="nav-text">测试集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建生产环境topic"><span class="nav-number">5.8.</span> <span class="nav-text">创建生产环境topic</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka常用命令"><span class="nav-number">5.9.</span> <span class="nav-text">Kafka常用命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Yahoo-kafka-manager"><span class="nav-number">6.</span> <span class="nav-text">安装Yahoo kafka manager</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Yahoo-kafka-manager介绍"><span class="nav-number">6.1.</span> <span class="nav-text">Yahoo kafka manager介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息-1"><span class="nav-number">6.2.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装jdk1-8"><span class="nav-number">6.3.</span> <span class="nav-text">安装jdk1.8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装sbt0-13-9"><span class="nav-number">6.4.</span> <span class="nav-text">安装sbt0.13.9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建kafka-manager包"><span class="nav-number">6.5.</span> <span class="nav-text">构建kafka manager包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装kafka-manager"><span class="nav-number">6.6.</span> <span class="nav-text">安装kafka manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置kafka-manager"><span class="nav-number">6.7.</span> <span class="nav-text">配置kafka-manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动kafka-manager"><span class="nav-number">6.8.</span> <span class="nav-text">启动kafka-manager</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kafka-manager添加cluster"><span class="nav-number">7.</span> <span class="nav-text">kafka-manager添加cluster</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#消息中间件"><span class="nav-number">1.</span> <span class="nav-text">消息中间件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息中间件特点"><span class="nav-number">2.</span> <span class="nav-text">消息中间件特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息中间件的传递模型"><span class="nav-number">3.</span> <span class="nav-text">消息中间件的传递模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka介绍"><span class="nav-number">4.</span> <span class="nav-text">Kafka介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装部署Kafka集群"><span class="nav-number">5.</span> <span class="nav-text">安装部署Kafka集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息"><span class="nav-number">5.1.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装JDK1-7"><span class="nav-number">5.2.</span> <span class="nav-text">安装JDK1.7</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装集群"><span class="nav-number">5.3.</span> <span class="nav-text">安装集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动集群"><span class="nav-number">5.4.</span> <span class="nav-text">启动集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#脚本定期清理logs下的日志文件"><span class="nav-number">5.5.</span> <span class="nav-text">脚本定期清理logs下的日志文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#停止kafka命令"><span class="nav-number">5.6.</span> <span class="nav-text">停止kafka命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试集群"><span class="nav-number">5.7.</span> <span class="nav-text">测试集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建生产环境topic"><span class="nav-number">5.8.</span> <span class="nav-text">创建生产环境topic</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka常用命令"><span class="nav-number">5.9.</span> <span class="nav-text">Kafka常用命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Yahoo-kafka-manager"><span class="nav-number">6.</span> <span class="nav-text">安装Yahoo kafka manager</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Yahoo-kafka-manager介绍"><span class="nav-number">6.1.</span> <span class="nav-text">Yahoo kafka manager介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息-1"><span class="nav-number">6.2.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装jdk1-8"><span class="nav-number">6.3.</span> <span class="nav-text">安装jdk1.8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装sbt0-13-9"><span class="nav-number">6.4.</span> <span class="nav-text">安装sbt0.13.9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建kafka-manager包"><span class="nav-number">6.5.</span> <span class="nav-text">构建kafka manager包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装kafka-manager"><span class="nav-number">6.6.</span> <span class="nav-text">安装kafka manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置kafka-manager"><span class="nav-number">6.7.</span> <span class="nav-text">配置kafka-manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动kafka-manager"><span class="nav-number">6.8.</span> <span class="nav-text">启动kafka-manager</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kafka-manager添加kafka-cluster"><span class="nav-number">7.</span> <span class="nav-text">kafka-manager添加kafka cluster</span></a></li></ol></div>
             
           </div>
         </section>

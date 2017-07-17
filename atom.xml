@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-07-14T08:03:58.000Z</updated>
+  <updated>2017-07-17T04:14:39.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,167 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>ansible playbook基础组件介绍</title>
+    <link href="http://yoursite.com/2017/07/15/ansible-playbook%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D/"/>
+    <id>http://yoursite.com/2017/07/15/ansible-playbook基础组件介绍/</id>
+    <published>2017-07-15T07:24:31.000Z</published>
+    <updated>2017-07-17T04:14:39.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;ansible-playbook介绍&quot;&gt;&lt;a href=&quot;#ansible-playbook介绍&quot; class=&quot;headerlink&quot; title=&quot;ansible playbook介绍&quot;&gt;&lt;/a&gt;ansible playbook介绍&lt;/h2&gt;&lt;p&gt;playbook是由一个或多个“play”组成的列表(剧本是由多出戏组成的)。play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联同起来按事先编排的机制同唱一台大戏。下面是一个简单示例。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;- hosts: webnodes
+  vars:
+  http_port: 80
+  max_clients: 256
+remote_user: root
+tasks:          
+- name: ensure apache is at the latest version
+  yum: name=httpd state=latest
+- name: ensure apache is running
+  service: name=httpd state=started
+handlers:
+- name: restart apache
+  service: name=httpd state=restarted
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中，tasks是一个一个任务。&lt;/p&gt;
+&lt;h2 id=&quot;ansible-playbook基础组件&quot;&gt;&lt;a href=&quot;#ansible-playbook基础组件&quot; class=&quot;headerlink&quot; title=&quot;ansible playbook基础组件&quot;&gt;&lt;/a&gt;ansible playbook基础组件&lt;/h2&gt;&lt;p&gt;Playbooks结构：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Tasks：任务，即调用模块完成的某操作。&lt;/li&gt;
+&lt;li&gt;Variables：变量&lt;/li&gt;
+&lt;li&gt;Templates：模板&lt;/li&gt;
+&lt;li&gt;Handlers：处理器，指的是在某条件满足时能够触发完成的功能，或者说是由某事件触发执行的操作&lt;/li&gt;
+&lt;li&gt;Roles：角色。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;Hosts和Users&quot;&gt;&lt;a href=&quot;#Hosts和Users&quot; class=&quot;headerlink&quot; title=&quot;Hosts和Users&quot;&gt;&lt;/a&gt;Hosts和Users&lt;/h3&gt;&lt;p&gt;playbook中的每一个play的目的都是为了让某个或某些主机以某个指定的用户身份执行任务。hosts用于指定要执行指定任务的主机，其可以是一个或多个由冒号分隔主机组；remote_user则用于指定远程主机上的执行任务的用户。如上面示例中的&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;-hosts: webnodes
+ remote_user: root
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;不过，remote_user也可用于各task中。也可以通过指定其通过sudo的方式在远程主机上执行任务，其可用于play全局或某任务；此外，甚至可以在sudo时使用sudo_user指定sudo时切换的用户。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;- hosts: webnodes
+ remote_user: mageedu
+ tasks:
+   - name: test connection
+     ping:
+     remote_user: mageedu
+     sudo: yes
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;比如写一个最简单的playbook，里面写了两个play，一个play是在nginx组的主机上都创建一个nginx组，nginx用户，另一个play是复制一个文件到mysql组的主机上：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim nginx.yml
+- hosts: nginx                                                                                                                                
+  remote_user: root
+  tasks:
+  - name: create nginx group
+    group: name=nginx system=yes gid=208
+  - name: create nginx user
+    user: name=nginx uid=208 group=nginx system=yes
+- hosts: mysql
+  remote_user: root
+  tasks:
+  - name: copy file to mysql hosts
+    copy: src=/etc/inittab dest=/tmp/inittab.ans
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看ansible-playbook的使用方法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# man ansible-playbook
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行playbook：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-playbook nginx.yml 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/31.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;任务列表-Tasks-和action&quot;&gt;&lt;a href=&quot;#任务列表-Tasks-和action&quot; class=&quot;headerlink&quot; title=&quot;任务列表(Tasks)和action&quot;&gt;&lt;/a&gt;任务列表(Tasks)和action&lt;/h3&gt;&lt;p&gt;play的主体部分是task list。task list中的各任务按次序逐个在hosts中指定的所有主机上执行，即在所有主机上完成第一个任务后再开始第二个。在运行自下而下某playbook时，如果中途发生错误，所有已执行任务都可能回滚，因此，在更正playbook后重新执行一次即可。(因为具有幂等性)&lt;br&gt;task的目的是使用指定的参数执行模块，而在模块参数中可以使用变量。模块执行是幂等的，这意味着多次执行是安全的，因为其结果均一致。&lt;br&gt;每个task都应该有其name，用于playbook的执行结果输出，建议其内容尽可能清晰地描述任务执行步骤。如果未提供name，则action的结果将用于输出。&lt;br&gt;定义task的可以使用“action: module options”(这个在较新版本上才能执行)或“module: options”的格式，推荐使用后者以实现向后兼容。如果action一行的内容过多，也可以使用在行首使用几个空白字符进行换行。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;tasks:
+- name: make sure apache is running
+  service: name=httpd state=running
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在众多模块中，只有command和shell模块仅需要给定一个列表而无需使用“key=value”格式，例如：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;tasks:
+- name: disable selinux
+  command: /sbin/setenforce 0
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果命令或脚本的退出码不为零，可能会阻止playbook继续往下执行可以使用如下方式替代：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;tasks:
+- name: run this command and ignore the result
+  shell: /usr/bin/somecommand || /bin/true
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;也就是说这个命令失败也是要继续往下走的，就是失败了但不要影响下面的操作。或者使用ignore_errors来忽略错误信息：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;tasks:
+- name: run this command and ignore the result
+  shell: /usr/bin/somecommand
+  ignore_errors: True        
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;handlers&quot;&gt;&lt;a href=&quot;#handlers&quot; class=&quot;headerlink&quot; title=&quot;handlers&quot;&gt;&lt;/a&gt;handlers&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;用于当关注的资源发生变化时采取一定的操作。&lt;/strong&gt;&lt;br&gt;“notify”这个action可用于在每个play的最后被触发，这样可以避免多次有改变发生时每次都执行指定的操作，取而代之，仅在所有的变化发生完成后一次性地执行指定操作。在notify中列出的操作称为handler，也即notify中调用handler中定义的操作。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;- name: template configuration file
+  template: src=template.j2 dest=/etc/foo.conf
+  notify:
+  - restart memcached
+  - restart apache    
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;handler是task列表，这些task与前述的task并没有本质上的不同。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;handlers:
+- name: restart memcached
+  service:  name=memcached state=restarted
+- name: restart apache
+  service: name=apache state=restarted
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【举例】：比如有个配置nginx的playbook，然后利用这个来说明handlers。&lt;br&gt;1.先创建一个apache.yml，里面定义play安装启动apache&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim apache.yml
+- hosts: mysql
+  remote_user: root
+  tasks:
+  - name: install httpd package
+    yum: name=httpd state=latest
+  - name: install configuration file for httpd
+    copy: src=/root/conf/httpd.conf dest=/etc/httpd/conf/httpd.conf 
+  - name: start httpd service 
+    service: enabled=true name=httpd state=started
+[root@node1 ~]# ansible-playbook apache.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.假如说某个时刻httpd.conf发生改变了，比如说不再监听在80，而是监听在8080端口，其他没变。修改/root/conf/httpd.conf，把端口改成8080，再执行这个playbook：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-playbook apache.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;到mysql组所在的主机172.16.7.153上查看端口，发现监听端口仍然是80：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node3 ~]# ss -tnlp
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/32.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;3.一个程序的配置文件发生了改变，那么程序应该重读配置文件才对。然而默认情况下，你多次唱同一个剧本，如果那个task此前执行过，为了保证幂等性，它是不会再被执行。handlers就是为了解决这种问题而生的。Handlers也是任务，但它不是上来就执行的，只有某个条件满足时才会执行。所以我们去修改apache.yml：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;- hosts: mysql
+  remote_user: root
+  tasks:
+  - name: install httpd package
+    yum: name=httpd state=latest
+  - name: install configuration file for httpd
+    copy: src=/root/conf/httpd.conf dest=/etc/httpd/conf/httpd.conf 
+    notify:
+    - restart httpd
+  - name: start httpd service 
+    service: enabled=true name=httpd state=started
+  handlers:
+  - name: restart httpd
+    service: name=httpd state=restarted
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/33.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;修改/root/conf/httpd.conf，把端口改成8090，再执行这个playbook：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-playbook apache.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/34.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;到mysql组所在的主机172.16.7.153上查看端口，发现监听端口改变了，变成了8090：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/35.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;playbook中使用变量&quot;&gt;&lt;a href=&quot;#playbook中使用变量&quot; class=&quot;headerlink&quot; title=&quot;playbook中使用变量&quot;&gt;&lt;/a&gt;playbook中使用变量&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;- hosts: mysql
+  remote_user: root
+  vars:
+  - package: nginx
+  tasks:
+  - name: install httpd package
+    yum: name={{ package }} state=latest                                                                                                      
+  - name: install configuration file for httpd
+    copy: src=/root/conf/httpd.conf dest=/etc/httpd/conf/httpd.conf 
+    notify:
+    - restart httpd
+  - name: start httpd service 
+    service: enabled=true name=httpd state=started
+  handlers:
+  - name: restart httpd
+    service: name=httpd state=restarted
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/36.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;【注意】：playbook中能使用的变量不仅仅是这里定义的变量，而是可以使用ansible中定义的所有变量。例如：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible 172.16.7.152 -m setup
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;另外，在inventory中定义的变量也可以在playbook中调用。例如：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim /etc/ansible/hosts
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/38.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;ansible-playbook介绍&quot;&gt;&lt;a href=&quot;#ansible-playbook介绍&quot; class=&quot;headerlink&quot; title=&quot;ansible playbook介绍&quot;&gt;&lt;/a&gt;ansible playbook介绍&lt;/h2&gt;&lt;p&gt;playbook是由一个或多个“play”组成的列表(剧本是由多出戏组成的)。play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联同起来按事先编排的机制同唱一台大戏。下面是一个简单示例。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="运维自动化" scheme="http://yoursite.com/categories/%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
+    
+    
+      <category term="Ansible 运维自动化" scheme="http://yoursite.com/tags/Ansible-%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
+    
+  </entry>
   
   <entry>
     <title>Ansible的基础元素和YAML介绍</title>
@@ -1053,7 +1214,7 @@ export PATH=$STORM_HOME/bin:$PATH
     <link href="http://yoursite.com/2017/06/04/RabbitMQ%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2017/06/04/RabbitMQ介绍及安装部署/</id>
     <published>2017-06-04T12:45:36.000Z</published>
-    <updated>2017-06-05T00:56:30.000Z</updated>
+    <updated>2017-07-16T08:01:05.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;RabbitMQ介绍&quot;&gt;&lt;a href=&quot;#RabbitMQ介绍&quot; class=&quot;headerlink&quot; title=&quot;RabbitMQ介绍&quot;&gt;&lt;/a&gt;RabbitMQ介绍&lt;/h2&gt;&lt;p&gt;消息系统通过将消息的发送和接收分离来实现应用程序的异步和解偶。&lt;br&gt;或许你正在考虑进行数据投递，非阻塞操作或推送通知。或许你想要实现发布／订阅，异步处理，或者工作队列。所有这些都属于消息系统的模式。&lt;br&gt;RabbitMQ是一个消息代理，一个消息系统的媒介。它可以为你的应用提供一个通用的消息发送和接收平台，并且保证消息再传输过程中的安全。&lt;br&gt;RabbitMQ是一个在AMQP协议标准上完整的、可复用的企业消息系统。它遵循Mozilla Public License开源协议，采用Erlang语言实现的工业级的消息队列。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;RabbitMQ运行原理&quot;&gt;&lt;a href=&quot;#RabbitMQ运行原理&quot; class=&quot;headerlink&quot; title=&quot;RabbitMQ运行原理&quot;&gt;&lt;/a&gt;RabbitMQ运行原理&lt;/h2&gt;&lt;p&gt;RabbitMQ的两大核心组件是Exchange和Queue，以下是它的运行原理图：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
@@ -1221,7 +1382,7 @@ Redirecting to /bin/systemctl start  haproxy.service
     <link href="http://yoursite.com/2017/05/28/Kafka%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2017/05/28/Kafka介绍及安装部署/</id>
     <published>2017-05-28T11:46:22.000Z</published>
-    <updated>2017-06-02T09:22:16.000Z</updated>
+    <updated>2017-07-15T02:11:35.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;消息中间件&quot;&gt;&lt;a href=&quot;#消息中间件&quot; class=&quot;headerlink&quot; title=&quot;消息中间件&quot;&gt;&lt;/a&gt;消息中间件&lt;/h2&gt;&lt;p&gt;消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;消息中间件特点&quot;&gt;&lt;a href=&quot;#消息中间件特点&quot; class=&quot;headerlink&quot; title=&quot;消息中间件特点&quot;&gt;&lt;/a&gt;消息中间件特点&lt;/h2&gt;&lt;p&gt;1.采用异步处理模式&lt;br&gt;消息发送者可以发送一个消息而无须等待响应。消息发送者将消息发送到一条虚拟的通道（主题或者队列）上，消息接收者则订阅或者监听该通道。一条消息可能最终转发给一个或多个消息接收者，这些接收者都无需对消息发送者做出同步回应。整个过程是异步的。&lt;/p&gt;
@@ -1260,19 +1421,19 @@ Redirecting to /bin/systemctl start  haproxy.service
 &lt;td&gt;log1&lt;/td&gt;
 &lt;td&gt;CentOS 7.0&lt;/td&gt;
 &lt;td&gt;114.55.29.86&lt;/td&gt;
-&lt;td&gt;JDK1.7、kafka_2.11&lt;/td&gt;
+&lt;td&gt;JDK1.7、kafka_2.11-0.9.0.1&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;log2&lt;/td&gt;
 &lt;td&gt;CentOS 7.0&lt;/td&gt;
 &lt;td&gt;114.55.29.241&lt;/td&gt;
-&lt;td&gt;JDK1.7、kafka_2.11&lt;/td&gt;
+&lt;td&gt;JDK1.7、kafka_2.11-0.9.0.1&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;log3&lt;/td&gt;
 &lt;td&gt;CentOS 7.0&lt;/td&gt;
 &lt;td&gt;114.55.253.15&lt;/td&gt;
-&lt;td&gt;JDK1.7、kafka_2.11&lt;/td&gt;
+&lt;td&gt;JDK1.7、kafka_2.11-0.9.0.1&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -1407,8 +1568,8 @@ export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 [root@console ~]# mv kafka-manager-upgrade-to-90 kafka-manager
 [root@console ~]# cd kafka-manager
 [root@console kafka-manager]# sbt clean dist
-The command below will create a zip file which can be used to deploy the application. 使用sbt编译打包的时候时间可能会比较长。
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/16.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这个需要翻墙才能完成。配置代理：&lt;/p&gt;
+The command below will create a zip file which can be used to deploy the application. 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;使用sbt编译打包的时候时间可能会比较长。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/16.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这个需要翻墙才能完成。配置代理：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@console ~]# vim /usr/share/sbt-launcher-packaging/conf/sbtconfig.txt
 -Dhttp.proxyHost=proxy
 -Dhttp.proxyPort=8080
@@ -1428,7 +1589,7 @@ The command below will create a zip file which can be used to deploy the applica
 &lt;pre&gt;&lt;code&gt;# bin/kafka-manager -Dconfig.file=/path/to/application.conf -Dhttp.port=8080
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动并置于后台运行：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[kmanager@console kafka-manager-1.3.0.6]$ nohup bin/kafka-manager &amp;gt; /dev/null 2&amp;gt;&amp;amp;1 &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;kafka-manager添加cluster&quot;&gt;&lt;a href=&quot;#kafka-manager添加cluster&quot; class=&quot;headerlink&quot; title=&quot;kafka-manager添加cluster&quot;&gt;&lt;/a&gt;kafka-manager添加cluster&lt;/h2&gt;&lt;p&gt;浏览器输入地址访问：&lt;a href=&quot;http://114.55.29.246:9000/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://114.55.29.246:9000/&lt;/a&gt;&lt;br&gt;&lt;strong&gt;注意:安装完成后需要手动添加Cluster。添加Cluster是指添加一个已有的Kafka集群进入监控列表，而非通过Kafka Manager部署一个新的Kafka Cluster，这一点与Cloudera Manager不同。&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/22.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/23.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;kafka-manager添加kafka-cluster&quot;&gt;&lt;a href=&quot;#kafka-manager添加kafka-cluster&quot; class=&quot;headerlink&quot; title=&quot;kafka-manager添加kafka cluster&quot;&gt;&lt;/a&gt;kafka-manager添加kafka cluster&lt;/h2&gt;&lt;p&gt;浏览器输入地址访问：&lt;a href=&quot;http://114.55.29.246:9000/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://114.55.29.246:9000/&lt;/a&gt;&lt;br&gt;&lt;strong&gt;注意:安装完成后需要手动添加Cluster。添加Cluster是指添加一个已有的Kafka集群进入监控列表，而非通过Kafka Manager部署一个新的Kafka Cluster，这一点与Cloudera Manager不同。&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/22.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/23.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 </content>
     
     <summary type="html">
@@ -3131,120 +3292,6 @@ Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf
     
     
       <category term="大数据，Hadoop" scheme="http://yoursite.com/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%EF%BC%8CHadoop/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>使用Github Pages与Hexo搭建博客</title>
-    <link href="http://yoursite.com/2016/06/08/%E4%BD%BF%E7%94%A8Github-Pages%E4%B8%8EHexo%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/"/>
-    <id>http://yoursite.com/2016/06/08/使用Github-Pages与Hexo搭建博客/</id>
-    <published>2016-06-08T09:58:10.000Z</published>
-    <updated>2017-07-06T14:15:43.000Z</updated>
-    
-    <content type="html">&lt;h1 id=&quot;什么是Git-Github-Github-Pages&quot;&gt;&lt;a href=&quot;#什么是Git-Github-Github-Pages&quot; class=&quot;headerlink&quot; title=&quot;什么是Git, Github, Github Pages?&quot;&gt;&lt;/a&gt;什么是Git, Github, Github Pages?&lt;/h1&gt;&lt;p&gt;1.Git是一个开源的分布式版本控制系统，用以有效、高速的处理从很小到非常大的项目版本管理。&lt;br&gt;2.GitHub是一个具有版本管理功能的代码仓库，每个项目都有一个主页，列出项目的源文件。许多重要的项目都托管在上面。&lt;br&gt;3.GitHub Pages免费的静态站点，三个特点：免费托管、自带主题、支持自制页面和Jekyll。Github Pages 是面向用户、组织和项目开放的公共静态页面搭建托管服务，站点可以被免费托管在 Github 上，你可以选择使用 Github Pages 默认提供的域名 github.io 或者自定义域名来发布站点。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;更详尽的概念介绍见：&lt;a href=&quot;http://jmcglone.com/guides/github-pages/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;在Github上搭建和管理个人网站&lt;/a&gt;&lt;/p&gt;
-&lt;h1 id=&quot;什么是Hexo？&quot;&gt;&lt;a href=&quot;#什么是Hexo？&quot; class=&quot;headerlink&quot; title=&quot;什么是Hexo？&quot;&gt;&lt;/a&gt;什么是Hexo？&lt;/h1&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/hexojs/hexo&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hexo&lt;/a&gt;是一个简单、快速、强大的静态博客框架,出自台湾大学生tommy351之手。相比于使用Jekyll、Octopress搭建个人博客，使用Hexo更轻便更快捷，下面是&lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hexo官网&lt;/a&gt;强调Hexo的四大特点：&lt;br&gt;1.极速生成静态页面&lt;br&gt;2.支持Markdown&lt;br&gt;3.一键部署博客&lt;br&gt;4.丰富的插件支持&lt;/p&gt;
-&lt;h1 id=&quot;安装Git工具&quot;&gt;&lt;a href=&quot;#安装Git工具&quot; class=&quot;headerlink&quot; title=&quot;安装Git工具&quot;&gt;&lt;/a&gt;安装Git工具&lt;/h1&gt;&lt;p&gt;依次下载安装。&lt;br&gt;1.&lt;a href=&quot;https://nodejs.org/en/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Node.js&lt;/a&gt;&lt;br&gt;2.&lt;a href=&quot;https://git-scm.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Git&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;如何打开Git？&quot;&gt;&lt;a href=&quot;#如何打开Git？&quot; class=&quot;headerlink&quot; title=&quot;如何打开Git？&quot;&gt;&lt;/a&gt;如何打开Git？&lt;/h2&gt;&lt;p&gt;1.开始菜单找到Git Bash&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/QWTgytB.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;2.鼠标右键打开Git Bash&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/wmVehZb.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;注册Github&quot;&gt;&lt;a href=&quot;#注册Github&quot; class=&quot;headerlink&quot; title=&quot;注册Github&quot;&gt;&lt;/a&gt;注册Github&lt;/h1&gt;&lt;p&gt;访问&lt;a href=&quot;https://github.com&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Github&lt;/a&gt;，填写注册信息，申请成功后，在GitHub官网上登录，并验证邮箱即可。 &lt;br&gt;&lt;/p&gt;
-&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/gNuzom3.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
-
-&lt;h1 id=&quot;配置SSH-Key&quot;&gt;&lt;a href=&quot;#配置SSH-Key&quot; class=&quot;headerlink&quot; title=&quot;配置SSH Key&quot;&gt;&lt;/a&gt;配置SSH Key&lt;/h1&gt;&lt;p&gt;我们如何让本地git项目与远程的GitHub建立联系呢？用SSH key。&lt;/p&gt;
-&lt;h2 id=&quot;检查SSH-keys的设置&quot;&gt;&lt;a href=&quot;#检查SSH-keys的设置&quot; class=&quot;headerlink&quot; title=&quot;检查SSH keys的设置&quot;&gt;&lt;/a&gt;检查SSH keys的设置&lt;/h2&gt;&lt;p&gt;首先我们需要检查你电脑上现有的ssh key，打开Git Bash，输入：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;$ cd ~/.ssh&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;如果提示：No such file or directory 说明你是第一次使用git。&lt;/p&gt;
-&lt;h2 id=&quot;生成新的SSH-Key&quot;&gt;&lt;a href=&quot;#生成新的SSH-Key&quot; class=&quot;headerlink&quot; title=&quot;生成新的SSH Key&quot;&gt;&lt;/a&gt;生成新的SSH Key&lt;/h2&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;$ ssh-keygen -t rsa -C &amp;quot;邮件地址@youremail.com&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Generating public/private rsa key pair.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Enter file in which to save the key (/Users/your_user_directory/.ssh/id_rsa):&amp;lt;这里回车就好&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;&lt;strong&gt;注意1:&lt;/strong&gt; 此处的邮箱地址，你可以输入自己的邮箱地址；&lt;strong&gt;注意2:&lt;/strong&gt; 此处的「-C」的是大写的「C」&lt;br&gt;然后系统会要你输入密码。在回车中会提示你输入一个密码，这个密码会在你提交项目时使用，如果为空的话提交项目时则不用输入。这个设置是防止别人往你的项目里提交内容。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;Enter passphrase (empty for no passphrase):&amp;lt;输入密码&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Enter same passphrase again:&amp;lt;再次输入密码&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;最后看到这样的界面，就成功设置ssh key了： &lt;/p&gt;
-&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/MRyuTxy.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;添加SSH-Key到GitHub&quot;&gt;&lt;a href=&quot;#添加SSH-Key到GitHub&quot; class=&quot;headerlink&quot; title=&quot;添加SSH Key到GitHub&quot;&gt;&lt;/a&gt;添加SSH Key到GitHub&lt;/h2&gt;&lt;p&gt;在本机设置SSH Key之后，需要添加到GitHub上，以完成SSH连接的设置。&lt;br&gt;1.登录&lt;a href=&quot;https://github.com&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Github&lt;/a&gt;，点击右上角的”Settings”，在点击左侧列表中的”SSH and GPG keys”，点击”New SSH Key”，见下图。 &lt;/p&gt;
-&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/39O4jsC.png&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/BEL2upr.png&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;2.把你本地生成的密钥(类似C:\Users\dell.ssh这个路径下有个id_rsa.pub文件，用文本编辑器打开这个文件)，把该文件中的全部内容复制到下面的文本框中，点击Add key。&lt;br&gt;&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/VBojDNs.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;测试设置是否成功&quot;&gt;&lt;a href=&quot;#测试设置是否成功&quot; class=&quot;headerlink&quot; title=&quot;测试设置是否成功&quot;&gt;&lt;/a&gt;测试设置是否成功&lt;/h2&gt;&lt;p&gt;可以输入下面的命令，看看设置是否成功，git@github.com的部分不要修改：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;$ ssh -T git@github.com&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;如果是下面的反馈：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;The authenticity of host &amp;apos;github.com (207.97.227.239)&amp;apos; can&amp;apos;t be established.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;RSA key fingerprint is 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Are you sure you want to continue connecting (yes/no)?&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;输入yes就好，然后会看到：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;Hi cnfeat! You&amp;apos;ve successfully authenticated, but GitHub does not provide shell access.&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;h2 id=&quot;设置用户信息&quot;&gt;&lt;a href=&quot;#设置用户信息&quot; class=&quot;headerlink&quot; title=&quot;设置用户信息&quot;&gt;&lt;/a&gt;设置用户信息&lt;/h2&gt;&lt;p&gt;现在你已经可以通过SSH连接到GitHub了，还有一些个人信息需要完善的。&lt;br&gt;Git会根据用户的名字和邮箱来记录提交。GitHub也是用这些信息来做权限的处理，输入下面的代码进行个人信息的设置，把名称和邮箱替换成你自己的。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;$ git config --global user.name &amp;quot;jkzhao&amp;quot;//用户名&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;$ git config --global user.email  &amp;quot;jk.zhaocoder@gmail.com&amp;quot;//填写自己的邮箱&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;#使用GitHub Pages建立博客&lt;br&gt;与 GitHub 建立好连接之后，就可以方便的使用它提供的 Pages 服务，GitHub Pages 分两种，一种是用你的GitHub用户名建立的username.github.io这样的用户&amp;amp;组织站点，另一种是依附项目的Pages。&lt;/p&gt;
-&lt;p&gt;想建立个人博客是用的第一种，形如username.github.io这样的可访问的站点，每个用户名下面只能建立一个。&lt;/p&gt;
-&lt;h2 id=&quot;在GitHub上建立仓库&quot;&gt;&lt;a href=&quot;#在GitHub上建立仓库&quot; class=&quot;headerlink&quot; title=&quot;在GitHub上建立仓库&quot;&gt;&lt;/a&gt;在GitHub上建立仓库&lt;/h2&gt;&lt;p&gt;访问&lt;a href=&quot;https://github.com&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Github&lt;/a&gt;，点击页面右上角「New Repository」: &lt;/p&gt;
-&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/RnRWWMa.png&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;填写项目信息：&lt;strong&gt;注意：&lt;/strong&gt;Github Pages的Repository名字是特定的，比如我Github账号是jkzhao，那么我Github Pages Repository名字就是jkzhao.github.io。&lt;br&gt;&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/3zQNxdx.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
-
-&lt;h1 id=&quot;使用Hexo创建博客框架&quot;&gt;&lt;a href=&quot;#使用Hexo创建博客框架&quot; class=&quot;headerlink&quot; title=&quot;使用Hexo创建博客框架&quot;&gt;&lt;/a&gt;使用Hexo创建博客框架&lt;/h1&gt;&lt;h2 id=&quot;Hexo安装&quot;&gt;&lt;a href=&quot;#Hexo安装&quot; class=&quot;headerlink&quot; title=&quot;Hexo安装&quot;&gt;&lt;/a&gt;Hexo安装&lt;/h2&gt;&lt;p&gt;鼠标右键打开Git Bash，输入以下命令：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;$ npm install -g hexo&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;h2 id=&quot;Hexo部署&quot;&gt;&lt;a href=&quot;#Hexo部署&quot; class=&quot;headerlink&quot; title=&quot;Hexo部署&quot;&gt;&lt;/a&gt;Hexo部署&lt;/h2&gt;&lt;p&gt;在我的电脑找个盘，建立一个名字叫「Hexo」的文件夹，然后在此文件夹中右键打开Git Bash。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;$ hexo init&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;Hexo随后会自动在目标文件夹建立网站所需要的所有文件。现在我们已经搭建起本地的hexo博客了，执行以下命令，然后到浏览器输入localhost:4000看看。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;$ hexo g&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;$ hexo s&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;此时打开浏览器，在浏览器地址栏输入 &lt;a href=&quot;http://localhost:4000/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://localhost:4000/&lt;/a&gt; （默认端口为4000）, 便可以看到最原始的博客了。以后发表博文想先预览，也可以通过 hexo server 在本地先跑起来，看看效果。&lt;br&gt;效果如下图所示： &lt;/p&gt;
-&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/iSsQF7B.png&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;此时个人博客的雏形已经有了。在 Git Bash 中按 Ctrl + C 可以停止该服务。&lt;br&gt;&lt;br&gt;## 将本地文件部署到 GitHub&lt;br&gt;### 修改 Hexo 中的 _config.yml 文件&lt;br&gt;在 Hexo 文件夹下找到 _config.yml 文件,如下图所示：&lt;br&gt;&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/HBDKyJv.png&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;打开这个文件，找到其中的 deploy 标签，改成下图所示形式(认真比对repository那一行的地址，最后的.git不要漏掉)，并保存。注意：冒号后面要加上一个空格，否则会报错。&lt;br&gt;&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/cAlEOWu.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;将其-deploy-到仓库中&quot;&gt;&lt;a href=&quot;#将其-deploy-到仓库中&quot; class=&quot;headerlink&quot; title=&quot;将其 deploy 到仓库中&quot;&gt;&lt;/a&gt;将其 deploy 到仓库中&lt;/h3&gt;&lt;p&gt;鼠标右击「Hexo」文件夹，点击Git Bash，依次输入下面的命令：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;hexo clean&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;hexo generate&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;hexo deploy&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;到这一步，个人博客就已经部署到 GitHub 上了，你可以到你的GitHub仓库查看是否已经更新。此时，通过 your_user_name.github.io（即你那个仓库的名称，形如：”你的 GitHub 用户名”.github.io）,就可以看到你的个人博客了。&lt;/p&gt;
-&lt;h1 id=&quot;安装NexT主题&quot;&gt;&lt;a href=&quot;#安装NexT主题&quot; class=&quot;headerlink&quot; title=&quot;安装NexT主题&quot;&gt;&lt;/a&gt;安装NexT主题&lt;/h1&gt;&lt;p&gt;使用Hexo生成的博客使用的是Hexo的默认主题：Landscape。后来选择了这个主题：&lt;a href=&quot;http://notes.iissnan.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;NexT&lt;/a&gt;。&lt;br&gt;1.简洁大方，比较符合我的品位；&lt;br&gt;2.作者iissnan很勤快，持续更新主题，作者博客的样式就是他正在开发而未上线的NexT主题新样式。&lt;/p&gt;
-&lt;h2 id=&quot;下载-NexT-主题&quot;&gt;&lt;a href=&quot;#下载-NexT-主题&quot; class=&quot;headerlink&quot; title=&quot;下载 NexT 主题&quot;&gt;&lt;/a&gt;下载 NexT 主题&lt;/h2&gt;&lt;p&gt;Hexo 有两份主要的配置文件（_config.yml），一份位于站点根目录下，另一份位于主题目录下。为了描述方便，在以下说明中，将前者称为&lt;strong&gt;站点配置文件&lt;/strong&gt;，后者称为&lt;strong&gt;主题配置文件&lt;/strong&gt;。&lt;br&gt;鼠标右击「Hexo」文件夹，点击Git Bash，依次输入下面的命令：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;git clone https://github.com/iissnan/hexo-theme-next themes/next&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;h2 id=&quot;启用NexT主题&quot;&gt;&lt;a href=&quot;#启用NexT主题&quot; class=&quot;headerlink&quot; title=&quot;启用NexT主题&quot;&gt;&lt;/a&gt;启用NexT主题&lt;/h2&gt;&lt;p&gt;下载完成后，打开 站点配置文件，找到 theme 字段，并将其值更改为 next。&lt;/p&gt;
-&lt;h2 id=&quot;验证主题是否启用&quot;&gt;&lt;a href=&quot;#验证主题是否启用&quot; class=&quot;headerlink&quot; title=&quot;验证主题是否启用&quot;&gt;&lt;/a&gt;验证主题是否启用&lt;/h2&gt;&lt;p&gt;鼠标右击「Hexo」文件夹，点击Git Bash，依次输入下面的命令：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;hexo clean&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;hexo generate&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;hexo deploy&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;然后浏览器访问你的个人博客，就能看到你设置的主题是否启用。&lt;/p&gt;
-&lt;h2 id=&quot;设置NexT主题和第三方服务&quot;&gt;&lt;a href=&quot;#设置NexT主题和第三方服务&quot; class=&quot;headerlink&quot; title=&quot;设置NexT主题和第三方服务&quot;&gt;&lt;/a&gt;设置NexT主题和第三方服务&lt;/h2&gt;&lt;h3 id=&quot;选择样式&quot;&gt;&lt;a href=&quot;#选择样式&quot; class=&quot;headerlink&quot; title=&quot;选择样式&quot;&gt;&lt;/a&gt;选择样式&lt;/h3&gt;&lt;p&gt;NexT默认的样式其实也比较丑，还有其他两种样式:Mist和Pisces。我这里用的是Pisces，启用 Pisces 很简单，仅需在 主题配置文件 中找到Scheme，添加一行scheme: Pisces。我这里的主题配置文件在路径：D:\Hexo\themes\next。&lt;/p&gt;
-&lt;h3 id=&quot;菜单设置&quot;&gt;&lt;a href=&quot;#菜单设置&quot; class=&quot;headerlink&quot; title=&quot;菜单设置&quot;&gt;&lt;/a&gt;菜单设置&lt;/h3&gt;&lt;p&gt;菜单配置在 主题配置文件 的menu，下面是菜单配置示例：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;menu:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  #home: /&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  archives: /archives&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  about: /about&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  categories: /categories&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  tags: /tags&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  #commonweal: /404.html&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;如果需要添加菜单，需要先命令行生成页面，在配置这个menu。这里菜单可以先不配置，先做下面的一些设置。&lt;/p&gt;
-&lt;h3 id=&quot;头像设置&quot;&gt;&lt;a href=&quot;#头像设置&quot; class=&quot;headerlink&quot; title=&quot;头像设置&quot;&gt;&lt;/a&gt;头像设置&lt;/h3&gt;&lt;p&gt;这里的头像是博客首页的一个头像，类似如下： &lt;/p&gt;
-&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/VzfVlWh.png&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;1.设置或者上网找一个头像，大小要在580X580像素左右。然后放入站点的类似如下的路径下：D:\Hexo\themes\next\source\images。&lt;br&gt;2.编辑 站点配置文件，找到Avatar，值设置成/images/avatar.jpg。&lt;br&gt;&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/rniNQoa.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;设置favicon图标&quot;&gt;&lt;a href=&quot;#设置favicon图标&quot; class=&quot;headerlink&quot; title=&quot;设置favicon图标&quot;&gt;&lt;/a&gt;设置favicon图标&lt;/h3&gt;&lt;p&gt;所谓的favicon图标是指网站logo，如下图： &lt;/p&gt;
-&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/HSx1YO1.png&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;1.首先要有一个常见格式名(如.jpg, .png等)的图片作为备选favicon，选择一个favicon制作网站完成制作，例如比特虫是一个免费的在线制作ico图标网站。或者自己上网下载一个大小适合的。logo最好设置32*32。&lt;br&gt;2.将favicon.ico文件放在next主题目录下的相应路径即可，类似路径为：D:\Hexo\themes\next\source\images。然后修改 主题配置文件，找到”favicon”,添加一行内容：favicon: images/favicon.ico &lt;br&gt;&lt;br&gt;&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/36nQihk.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;修改网站标题、副标题、作者信息、网站使用语言&quot;&gt;&lt;a href=&quot;#修改网站标题、副标题、作者信息、网站使用语言&quot; class=&quot;headerlink&quot; title=&quot;修改网站标题、副标题、作者信息、网站使用语言&quot;&gt;&lt;/a&gt;修改网站标题、副标题、作者信息、网站使用语言&lt;/h3&gt;&lt;p&gt;打开站点配置文件_config.yml，类似路径如下：D:\Hexo。找到Site段：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# Site &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;title: jkzhao&amp;apos;s blog   #网站标题 &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;subtitle: 学习 总结 思考  #网站副标题 &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;description: &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;author: Zhao Jiankai  #你的名字 &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;language: zh-Hans #网站使用的语言 &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;timezone: #网站时区。Hexo默认使用你电脑的时区 &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;email: jk.zhaocoder@gmail.com #你的邮箱地址&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;h3 id=&quot;添加社交链接&quot;&gt;&lt;a href=&quot;#添加社交链接&quot; class=&quot;headerlink&quot; title=&quot;添加社交链接&quot;&gt;&lt;/a&gt;添加社交链接&lt;/h3&gt;&lt;p&gt;1.以添加Github、微博和知乎为例，编辑 站点配置文件，找到Social Links，添加如下内容：&lt;/p&gt;
-&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/zpDQFBC.png&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;2.编辑 站点配置文件，找到Social Links Icons，添加如下内容：&lt;br&gt;&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/LYHTwIg.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;添加友情链接&quot;&gt;&lt;a href=&quot;#添加友情链接&quot; class=&quot;headerlink&quot; title=&quot;添加友情链接&quot;&gt;&lt;/a&gt;添加友情链接&lt;/h3&gt;&lt;p&gt;编辑 站点配置文件，找到”links_title: 友情链接”，添加类似如下内容：&lt;/p&gt;
-&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/qQOwbNm.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;添加评论区&quot;&gt;&lt;a href=&quot;#添加评论区&quot; class=&quot;headerlink&quot; title=&quot;添加评论区&quot;&gt;&lt;/a&gt;添加评论区&lt;/h3&gt;&lt;p&gt;支持Disqus和多说两种评论样式。建议中文网站选择多说，英文网站选择Disqus。下面以多说为例说明。&lt;br&gt;1.注册&lt;a href=&quot;http://duoshuo.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;多说&lt;/a&gt;。&lt;br&gt;2.使用多说钱，我们需要先在多说创建一个站点。登录&lt;a href=&quot;http://duoshuo.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;多说&lt;/a&gt;，在首页点击”我要安装”。&lt;/p&gt;
-&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/4hK6eAD.png&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;3.创建站点，填写站点相关信息。注意，&lt;em&gt;多说域名&lt;/em&gt;这一栏填写的即是你的duoshuo_shortname(这个等下要写到配置文件中，先记着)。类似如下：&lt;br&gt;&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/4ThHAmA.png&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;4.编辑站点的_config.yml，注意，添加 duoshuo_shortname 字段，设置如下：duoshuo_shortname: your-duoshuo-shortname。比如：&lt;br&gt;&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/W7DvGfr.png&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;&lt;strong&gt;注意：&lt;/strong&gt;duoshuo short name: 你的多说二级域名去掉 .duoshuo.com 部分。&lt;br&gt;&lt;br&gt;### 添加留言菜单&lt;br&gt;1.鼠标右击「Hexo」文件夹，点击Git Bash，输入下面的命令：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;hexo new page &amp;quot;guestbook&amp;quot;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;br&gt;&lt;br&gt;命令执行完后，就会发现在在 Hexo\source 目录中多了一个文件夹guestbook，里面还有一个index.md,这就代表我们新建了一个页面。 &lt;br&gt;&lt;br&gt;2.打开guestbook文件夹里的index.md，将下面的代码加到index.md底部就行。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;div class=&amp;quot;ds-recent-visitors&amp;quot; data-num-items=&amp;quot;28&amp;quot; data-avatar-size=&amp;quot;42&amp;quot; id=&amp;quot;ds-recent-visitors&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;br&gt;&lt;br&gt;3.然后要登录自己多说的站点(我这里就是上面设置的站点jkzhao blog)，进入设置-&amp;gt;自定义CSS，添加如下代码：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;#ds-reset .ds-avatar img,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#ds-recent-visitors .ds-avatar img &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    width: 54px;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    height: 54px;     /*設置图像的长和宽，这里要根据自己的评论框情況更改*/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    border-radius: 27px;     /*设置图像圆角效果,在这里我直接设置了超过width/2的像素，即为圆形了*/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    -webkit-border-radius: 27px;     /*圆角效果：兼容webkit浏览器*/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    -moz-border-radius: 27px;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    box-shadow: inset 0 -1px 0 #3333sf;     /*设置图像阴影效果*/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    -webkit-box-shadow: inset 0 -1px 0 #3333sf;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#ds-recent-visitors .ds-avatar &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    float: left&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;/*隐藏多說底部版权*/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#ds-thread #ds-reset .ds-powered-by &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    display: none;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;br&gt;&lt;br&gt;&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/GyU4Le4.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
-
-&lt;p&gt;4.菜单设置中添加留言菜单。找到NexT主题设置的_config.yml文件里面的menu项，加入如下内容：&lt;/p&gt;
-&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/toJKP6L.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;添加LiveRe评论支持&quot;&gt;&lt;a href=&quot;#添加LiveRe评论支持&quot; class=&quot;headerlink&quot; title=&quot;添加LiveRe评论支持&quot;&gt;&lt;/a&gt;添加LiveRe评论支持&lt;/h3&gt;&lt;p&gt;最近多说倒闭了，来试试LiveRe（来必力）的评论插件，韩国出的。&lt;br&gt;&lt;strong&gt;1.注册 LiveRe&lt;/strong&gt;&lt;br&gt;(1)进入 &lt;a href=&quot;https://livere.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;LiveRe&lt;/a&gt;，注册账号。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;注意注册后，登录时输入邮箱和密码后，会跳到一个韩文页面，有个文本框需要填写，网站会向你的邮箱发一封韩文的邮件，里面有一串数字，填入到文本框中，点击韩文的登录即可。&lt;br&gt;(2)登录成功后，点击右上角的头像，选择“管理页面”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(3)点击“实行”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;LiveRe 有两个版本：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;City 版：是一款适合所有人使用的免费版本；&lt;/li&gt;
-&lt;li&gt;Premium 版：是一款能够帮助企业实现自动化管理的多功能收费版本。&lt;br&gt;我们使用 City 版就够了，点击”现在安装“。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(4)输入网站基本信息，点击”申请获取代码“。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(5)填写完成后，进入到 管理页面 -&amp;gt; 代码管理 -&amp;gt; 一般网站 代码中，data-uid 即为所需 uid。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/6.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;2.Next主题添加 LiveRe 插件&lt;/strong&gt;&lt;br&gt;(1)首先在 _config.yml 文件中添加如下配置：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# Support for LiveRe comments system.
-# You can get your uid from https://livere.com/insight/myCode (General web site)
-livere_uid: your uid
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中 livere_uid 即上一步获取到的 uid。&lt;/p&gt;
-&lt;p&gt;(2)在 next/layout/_scripts/third-party/comments/ 目录中添加 livere.swig，文件内容如下：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;#123;% if not (theme.duoshuo and theme.duoshuo.shortname) and not theme.duoshuo_shortname and not theme.disqus_shortname and not theme.hypercomments_id and not theme.gentie_productKey %&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  &amp;#123;% if theme.livere_uid %&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;lt;script type=&amp;quot;text/javascript&amp;quot;&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      (function(d, s) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        var j, e = d.getElementsByTagName(s)[0];&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        if (typeof LivereTower === &amp;apos;function&amp;apos;) &amp;#123; return; &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        j = d.createElement(s);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        j.src = &amp;apos;https://cdn-city.livere.com/js/embed.dist.js&amp;apos;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        j.async = true;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        e.parentNode.insertBefore(j, e);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      &amp;#125;)(document, &amp;apos;script&amp;apos;);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;lt;/script&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  &amp;#123;% endif %&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#123;% endif %&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;优先使用其他评论插件，如果其他评论插件没有开启，且 LiveRe 评论插件配置开启了，则使用 LiveRe。其中脚本代码为上一步管理页面中获取到的。&lt;/p&gt;
-&lt;p&gt;(3)在 next/layout/_scripts/third-party/comments.swig 文件中追加：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;{% include &#39;./comments/livere.swig&#39; %}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;引入 LiveRe 评论插件。&lt;/p&gt;
-&lt;p&gt;(4)最后，在 next/layout/_partials/comments.swig 文件中条件最后追加 LiveRe 插件是否引用的判断逻辑：&lt;br&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;至此，为 NexT 主题添加 LiveRe 评论插件完成。&lt;/p&gt;
-&lt;h3 id=&quot;设置文章阅读量信息展示&quot;&gt;&lt;a href=&quot;#设置文章阅读量信息展示&quot; class=&quot;headerlink&quot; title=&quot;设置文章阅读量信息展示&quot;&gt;&lt;/a&gt;设置文章阅读量信息展示&lt;/h3&gt;&lt;p&gt;注册&lt;a href=&quot;https://leancloud.cn/dashboard/login.html#/signup&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;LeanCloud&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/8.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;登录LeanCloud，点击应用，创建新应用：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/9.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击存储：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/10.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击创建class，创建一个名为Counter的class：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/11.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击设置，点击应用Key：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/12.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;复制appid和appkey到主题配置文件 next/_config.yml 中的leancloud_visitors属性中，将enable修改为true：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/github博客搭建/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这样NexT主题已经集成了LeanCloud，就可以看到阅读次数信息了.&lt;/p&gt;
-&lt;h3 id=&quot;设置每篇文章在博客首页显示的预览内容&quot;&gt;&lt;a href=&quot;#设置每篇文章在博客首页显示的预览内容&quot; class=&quot;headerlink&quot; title=&quot;设置每篇文章在博客首页显示的预览内容&quot;&gt;&lt;/a&gt;设置每篇文章在博客首页显示的预览内容&lt;/h3&gt;&lt;p&gt;在写博文时，在希望展示在预览的部分下面写入：&lt;!-- more --&gt;，比如：&lt;/p&gt;
-&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/lLl6w9m.png&quot;&gt;&lt;br&gt;&lt;/div&gt;
-
-&lt;h1 id=&quot;发表博文&quot;&gt;&lt;a href=&quot;#发表博文&quot; class=&quot;headerlink&quot; title=&quot;发表博文&quot;&gt;&lt;/a&gt;发表博文&lt;/h1&gt;&lt;h2 id=&quot;新建博文&quot;&gt;&lt;a href=&quot;#新建博文&quot; class=&quot;headerlink&quot; title=&quot;新建博文&quot;&gt;&lt;/a&gt;新建博文&lt;/h2&gt;&lt;p&gt;鼠标右击「Hexo」文件夹，点击Git Bash，依次输入下面的命令：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;hexo new &amp;quot;文章题目&amp;quot;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;命令执行完后，就会发现在 Hexo\source_posts 目录中多了一个文件博文名.md，这就是我们刚才新建的博文。或者直接进入 Hexo\source_posts 目录中，右键新建一个文本文档，将名字改为博文名.md,这样也新建了一篇博文。建议使用命令去创建博文。&lt;/p&gt;
-&lt;h2 id=&quot;新建页面&quot;&gt;&lt;a href=&quot;#新建页面&quot; class=&quot;headerlink&quot; title=&quot;新建页面&quot;&gt;&lt;/a&gt;新建页面&lt;/h2&gt;&lt;p&gt;上面新建的博文是显示在单个文章界面，这里新建的页面是作为单个页面显示的，比如下图的分类、标签、归档和关于我，你点击后都是显示为单个页面。 &lt;/p&gt;
-&lt;p&gt;&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/vmIRWP7.png&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;你只需要记住新建博文是用上面的方法，新建页面是用这里的方法就行了，这里也采用命令新建页面：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;hexo new page &amp;quot;页面名称&amp;quot;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;命令执行完后，就会发现在在 Hexo\source 目录中多了一个文件夹，里面还有一个index.md,这就代表我们新建了一个页面。&lt;/p&gt;
-&lt;h2 id=&quot;写博文&quot;&gt;&lt;a href=&quot;#写博文&quot; class=&quot;headerlink&quot; title=&quot;写博文&quot;&gt;&lt;/a&gt;写博文&lt;/h2&gt;&lt;p&gt;用文本编辑器打开上面新建的博文，如下图所示。 &lt;/p&gt;
-&lt;p&gt;&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/52V2yDF.png&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;新建的页面略有不同，没有categories标签，自己可以加上去，也可以不加。tags也没有内容，自己也可以加一些内容。&lt;br&gt;三个”-“后面就是博文的正文内容，接下来就是撰写博文了。可以下载对应操作系统上的Markdown编辑器，使用Markdown语法写博文。具体Markdown语法请看这里的Markdown教程：&lt;a href=&quot;http://www.markdown.cn/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Markdown中文网&lt;/a&gt;。&lt;/p&gt;
-&lt;h2 id=&quot;发博文&quot;&gt;&lt;a href=&quot;#发博文&quot; class=&quot;headerlink&quot; title=&quot;发博文&quot;&gt;&lt;/a&gt;发博文&lt;/h2&gt;&lt;p&gt;鼠标右击「Hexo」文件夹，点击Git Bash，执行下面几条命令，将博客发表到Github上：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;hexo clean&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;hexo generate&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;hexo deploy&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;h1 id=&quot;购买并绑定域名&quot;&gt;&lt;a href=&quot;#购买并绑定域名&quot; class=&quot;headerlink&quot; title=&quot;购买并绑定域名&quot;&gt;&lt;/a&gt;购买并绑定域名&lt;/h1&gt;&lt;p&gt;GitHub 提供的二级域名[username.github.io]，平常自己写写博客也够用了。当然愿意花钱购买个性化的域名，也可以绑定到个人博客上。&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h1 id=&quot;什么是Git-Github-Github-Pages&quot;&gt;&lt;a href=&quot;#什么是Git-Github-Github-Pages&quot; class=&quot;headerlink&quot; title=&quot;什么是Git, Github, Github Pages?&quot;&gt;&lt;/a&gt;什么是Git, Github, Github Pages?&lt;/h1&gt;&lt;p&gt;1.Git是一个开源的分布式版本控制系统，用以有效、高速的处理从很小到非常大的项目版本管理。&lt;br&gt;2.GitHub是一个具有版本管理功能的代码仓库，每个项目都有一个主页，列出项目的源文件。许多重要的项目都托管在上面。&lt;br&gt;3.GitHub Pages免费的静态站点，三个特点：免费托管、自带主题、支持自制页面和Jekyll。Github Pages 是面向用户、组织和项目开放的公共静态页面搭建托管服务，站点可以被免费托管在 Github 上，你可以选择使用 Github Pages 默认提供的域名 github.io 或者自定义域名来发布站点。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="搭建博客" scheme="http://yoursite.com/categories/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/"/>
-    
-    
-      <category term="Build a blog" scheme="http://yoursite.com/tags/Build-a-blog/"/>
     
   </entry>
   
