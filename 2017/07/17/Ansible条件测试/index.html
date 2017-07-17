@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="rpm," />
+  <meta name="keywords" content="Ansible 运维自动化," />
 
 
 
@@ -104,17 +104,19 @@
 
 
 
-<meta name="description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。">
-<meta name="keywords" content="rpm">
+<meta name="description" content="Ansible条件测试在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。 when语句在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如： tasks: - name: &amp;quot;shutdown Debian flavored systems&amp;quot;   comman">
+<meta name="keywords" content="Ansible 运维自动化">
 <meta property="og:type" content="article">
-<meta property="og:title" content="速成RPM包制作">
-<meta property="og:url" content="http://yoursite.com/2017/04/21/速成RPM包制作/index.html">
+<meta property="og:title" content="Ansible条件测试">
+<meta property="og:url" content="http://yoursite.com/2017/07/17/Ansible条件测试/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
-<meta property="og:description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。">
-<meta property="og:updated_time" content="2017-04-21T09:43:10.000Z">
+<meta property="og:description" content="Ansible条件测试在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。 when语句在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如： tasks: - name: &amp;quot;shutdown Debian flavored systems&amp;quot;   comman">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png">
+<meta property="og:updated_time" content="2017-07-17T06:05:47.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="速成RPM包制作">
-<meta name="twitter:description" content="FPM由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。">
+<meta name="twitter:title" content="Ansible条件测试">
+<meta name="twitter:description" content="Ansible条件测试在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。 when语句在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如： tasks: - name: &amp;quot;shutdown Debian flavored systems&amp;quot;   comman">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png">
 
 
 
@@ -132,7 +134,7 @@
   };
 </script>
 
-  <title> 速成RPM包制作 | jkzhao's blog </title>
+  <title> Ansible条件测试 | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -322,7 +324,7 @@
             
             
               
-                速成RPM包制作
+                Ansible条件测试
               
             
           </h1>
@@ -334,11 +336,30 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-04-21T14:38:46+08:00" content="2017-04-21">
-              2017-04-21
+            <time itemprop="dateCreated" datetime="2017-07-17T13:39:32+08:00" content="2017-07-17">
+              2017-07-17
             </time>
           </span>
 
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
+                    <span itemprop="name">运维自动化</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
           
 
           
@@ -349,7 +370,7 @@
 
           
           
-             <span id="/2017/04/21/速成RPM包制作/" class="leancloud_visitors" data-flag-title="速成RPM包制作">
+             <span id="/2017/07/17/Ansible条件测试/" class="leancloud_visitors" data-flag-title="Ansible条件测试">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -371,55 +392,24 @@
       
 
       
-        <h1 id="FPM"><a href="#FPM" class="headerlink" title="FPM"></a>FPM</h1><p>由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。<br>通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。<br>FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。<br><a id="more"></a><br><strong>支持的源类型包：</strong></p>
-<ol>
-<li>dir 将目录打包成所需要的类型，可以用于源码编译安装的软件包</li>
-<li>rpm 对rpm进行转换</li>
-<li>gem 对rubygem包进行转换</li>
-<li>python 将python模块打包成相应的类型</li>
-</ol>
-<p><strong>支持的目标类型包：</strong></p>
-<ol>
-<li>rpm 转换成rpm包</li>
-<li>deb 转换成deb包</li>
-<li>solaris 转换成solaris包</li>
-<li>puppet 转换成puppet模块</li>
-</ol>
-<h1 id="安装FPM"><a href="#安装FPM" class="headerlink" title="安装FPM"></a>安装FPM</h1><ol>
-<li><p>安装依赖包</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># yum -y install ruby rubygems ruby-devel</div></pre></td></tr></table></figure>
-</li>
-<li><p>添加仓库</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># gem sources -a http://gems.ruby-china.org/</div></pre></td></tr></table></figure>
-</li>
-<li><p>移除原有的仓库</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># gem sources --remove https://rubygems.org/</div></pre></td></tr></table></figure>
-</li>
-<li><p>查看仓库是不是只有自己添加的那个仓库地址</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># gem sources -l </div><div class="line">https://gems.ruby-china.org</div></pre></td></tr></table></figure>
-</li>
-<li><p>安装fpm</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># gem install fpm</div></pre></td></tr></table></figure>
-</li>
-<li><p>如何查看fpm帮助</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># fpm --help</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p><strong>常用参数：</strong><br>-s 指定源类型<br>-t 指定目标类型<br>-n 指定包的名字<br>-v 指定包的版本号<br>-C 指定打包的相对路径 change directory to here before searching for files<br>-d 指定依赖于哪些包<br>-f 第二次打包时目录下如果有同名安装包存在，则覆盖它<br>-p 输出的安装包的目录，不想放在当前目录下就需要指定<br>–post-install 软件包安装完成之后所要运行的脚本，同–after-install<br>–pre-install 软件包安装完成之前所要运行的脚本，同–before-install<br>–post-uninstall 软件包卸载之后所要运行的脚本，同–after-install<br>–pre-uninstall 软件包卸载之前所要运行的脚本，同–before-install</p>
-<h1 id="打包示例"><a href="#打包示例" class="headerlink" title="打包示例"></a>打包示例</h1><ol>
-<li>打包MySQL<br>事先安装好MySQL，MySQL安装过程这里不在详述。命令行终端输入以下命令，然后等待rpm包制作完成。<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># fpm -s dir -t rpm -n mysql -v 5.6.27 --description &apos;author: jkzhao&apos; -d &apos;libaio&apos; -d &apos;libaio-devel&apos; --pre-install /usr/local/mysql/mysql_pre_init.sh --post-install /usr/local/mysql/mysql_post_init.sh  /usr/local/mysql /usr/local/mysql-5.6.27-linux-glibc2.5-x86_64 /data</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p><strong>注意</strong>：默认打好的包是在当前目录下。<br><strong>命令说明：</strong><br>    -s dir：指定源文件是目录的形式<br>    -t rpm：指定打包的格式<br>    -n：指定打包后名称<br>    -v：版本号<br>   –description：描述信息<br>    -d：指定需要依赖的包。安装MySQL前需要在系统上安装libaio、libaio-devel。当你安装fpm打包成的rpm包时，它会先去检测系统上是否安装了这两个包，如果没有安装会给出提示，并终止rpm的安装。<br>    –pre-install：安装rpm包前需要执行的脚本<br>    –post-install：安装rpm包后需要执行的脚本 <br><br>其中，mysql_pre_init.sh的内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">user=mysql</div><div class="line">group=mysql</div><div class="line"></div><div class="line"># create group if not exists.</div><div class="line">egrep &quot;^$group&quot; /etc/group &gt;&amp; /dev/null</div><div class="line">if [ $? -ne 0 ]</div><div class="line">then</div><div class="line">    groupadd -r -g 300 $group</div><div class="line">fi</div><div class="line"></div><div class="line"># create user if not exists.  </div><div class="line">egrep &quot;^$user&quot; /etc/passwd &gt;&amp; /dev/null</div><div class="line">if [ $? -ne 0 ]</div><div class="line">then</div><div class="line">    useradd -g $group -r -s /sbin/nologin -u 300 $user</div><div class="line">fi</div></pre></td></tr></table></figure></p>
-<p>mysql_post_init.sh的内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line"># cp my.cnf force.</div><div class="line">\cp /usr/local/mysql/my.cnf /etc/</div><div class="line"></div><div class="line"># start/stop/restart script.</div><div class="line">\cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld</div><div class="line">chkconfig --add mysqld</div><div class="line"></div><div class="line"># MySQL Client PATH.</div><div class="line">\cp /usr/local/mysql/mysql.sh /etc/profile.d/</div><div class="line"></div><div class="line">cd /usr/local/mysql</div><div class="line">chown -R root.mysql .</div><div class="line">chown -R mysql.mysql /data</div></pre></td></tr></table></figure></p>
-<p>打包完成后正常安装，如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># rpm -ivh mysql-5.6.27-1.x86_64.rpm</div></pre></td></tr></table></figure></p>
-<ol>
-<li>打包openresty<br>事先安装好openresty。命令行终端输入以下命令，然后等待rpm包制作完成。<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># fpm -s dir -t rpm -n openresty -v 1.9.7.3 --description &apos;author: jkzhao&apos; -d &apos;openssl-devel&apos; -d &apos;readline-devel&apos; -d &apos;pcre-devel&apos; -d &apos;gcc&apos; --post-install /usr/local/openresty/openresty_init.sh  /usr/local/openresty</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>其中，openresty_init.sh的内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">mv /usr/local/openresty/nginx.service /etc/systemd/system/</div><div class="line">systemctl enable nginx.service</div></pre></td></tr></table></figure></p>
-<h1 id="如何卸载FPM打包好的rpm包"><a href="#如何卸载FPM打包好的rpm包" class="headerlink" title="如何卸载FPM打包好的rpm包"></a>如何卸载FPM打包好的rpm包</h1><p>如果重新安装rpm，必须先卸载rpm包，然后删除相应的目录及文件，否则再次安装时会报错。<br><strong>注意：</strong>卸载不要直接删除目录和文件，否则你再次安装这个包时会说已安装，冲突了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># rpm -e --nodeps  mysql-5.6.27-1.x86_64.rpm</div></pre></td></tr></table></figure></p>
-<p>然后再去删除各个目录和配置文件。</p>
+        <h2 id="Ansible条件测试"><a href="#Ansible条件测试" class="headerlink" title="Ansible条件测试"></a>Ansible条件测试</h2><p>在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。</p>
+<h3 id="when语句"><a href="#when语句" class="headerlink" title="when语句"></a>when语句</h3><p>在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如：</p>
+<pre><code>tasks:
+- name: &quot;shutdown Debian flavored systems&quot;
+  command: /sbin/shutdown -h now
+  when: ansible_os_family == &quot;Debian&quot;
+</code></pre><p>when语句还可以使用Jinja2的大多“filter”，例如要忽略此前某语句额错误并基于其结果（failed或success）运行后面指定的语句，可使用类似如下形式：</p>
+<pre><code>tasks:
+- command: /bin/false
+  register: result
+  ignore_errors: True
+- command: /bin/sonmething
+  when: result|failed
+- command: /bin/something_else
+  when: result|success
+- command: /bin/still/something_else
+  when: result|skipped
+</code></pre><p>此外，when语句还可以使用facts或playbook中定义的变量。facts就是主机报告上来的变量。比如：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png" alt=""></p>
 
       
     </div>
@@ -441,7 +431,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/rpm/" rel="tag">#rpm</a>
+            <a href="/tags/Ansible-运维自动化/" rel="tag">#Ansible 运维自动化</a>
           
         </div>
       
@@ -450,16 +440,12 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/05/10/zabbix安装配置/" rel="next" title="zabbix安装配置">
-                <i class="fa fa-chevron-left"></i> zabbix安装配置
-              </a>
-            
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/09/06/vpn简介及openvpn搭建/" rel="prev" title="vpn简介及openvpn搭建">
-                vpn简介及openvpn搭建 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/07/15/ansible-playbook基础组件介绍/" rel="prev" title="ansible playbook基础组件介绍">
+                ansible playbook基础组件介绍 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -626,7 +612,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#FPM"><span class="nav-number">1.</span> <span class="nav-text">FPM</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装FPM"><span class="nav-number">2.</span> <span class="nav-text">安装FPM</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#打包示例"><span class="nav-number">3.</span> <span class="nav-text">打包示例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何卸载FPM打包好的rpm包"><span class="nav-number">4.</span> <span class="nav-text">如何卸载FPM打包好的rpm包</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Ansible条件测试"><span class="nav-number">1.</span> <span class="nav-text">Ansible条件测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#when语句"><span class="nav-number">1.1.</span> <span class="nav-text">when语句</span></a></li></ol></li></ol></div>
             
           </div>
         </section>

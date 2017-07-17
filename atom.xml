@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-07-17T04:14:39.000Z</updated>
+  <updated>2017-07-17T06:05:47.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,46 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Ansible条件测试</title>
+    <link href="http://yoursite.com/2017/07/17/Ansible%E6%9D%A1%E4%BB%B6%E6%B5%8B%E8%AF%95/"/>
+    <id>http://yoursite.com/2017/07/17/Ansible条件测试/</id>
+    <published>2017-07-17T05:39:32.000Z</published>
+    <updated>2017-07-17T06:05:47.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Ansible条件测试&quot;&gt;&lt;a href=&quot;#Ansible条件测试&quot; class=&quot;headerlink&quot; title=&quot;Ansible条件测试&quot;&gt;&lt;/a&gt;Ansible条件测试&lt;/h2&gt;&lt;p&gt;在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。&lt;/p&gt;
+&lt;h3 id=&quot;when语句&quot;&gt;&lt;a href=&quot;#when语句&quot; class=&quot;headerlink&quot; title=&quot;when语句&quot;&gt;&lt;/a&gt;when语句&lt;/h3&gt;&lt;p&gt;在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;tasks:
+- name: &amp;quot;shutdown Debian flavored systems&amp;quot;
+  command: /sbin/shutdown -h now
+  when: ansible_os_family == &amp;quot;Debian&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;when语句还可以使用Jinja2的大多“filter”，例如要忽略此前某语句额错误并基于其结果（failed或success）运行后面指定的语句，可使用类似如下形式：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;tasks:
+- command: /bin/false
+  register: result
+  ignore_errors: True
+- command: /bin/sonmething
+  when: result|failed
+- command: /bin/something_else
+  when: result|success
+- command: /bin/still/something_else
+  when: result|skipped
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;此外，when语句还可以使用facts或playbook中定义的变量。facts就是主机报告上来的变量。比如：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Ansible条件测试&quot;&gt;&lt;a href=&quot;#Ansible条件测试&quot; class=&quot;headerlink&quot; title=&quot;Ansible条件测试&quot;&gt;&lt;/a&gt;Ansible条件测试&lt;/h2&gt;&lt;p&gt;在ansible中还可以进行条件测试。如果需要根据变量、facts或
+    
+    </summary>
+    
+      <category term="运维自动化" scheme="http://yoursite.com/categories/%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
+    
+    
+      <category term="Ansible 运维自动化" scheme="http://yoursite.com/tags/Ansible-%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
+    
+  </entry>
   
   <entry>
     <title>ansible playbook基础组件介绍</title>
@@ -3064,227 +3104,6 @@ Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf
     
       &lt;p&gt;关于Apache Hadoop的介绍以本地模式、伪分布式安装部署请参见上篇博文，本篇博文主要记录完全分布式部署，并实现NameNode高可用和ResourceManager高可用。&lt;/p&gt;
 &lt;h1 id=&quot;环境规划&quot;&gt;&lt;a href=&quot;#环境规划&quot; class=&quot;headerlink&quot; title=&quot;环境规划&quot;&gt;&lt;/a&gt;环境规划&lt;/h1&gt;
-    
-    </summary>
-    
-      <category term="Hadoop" scheme="http://yoursite.com/categories/Hadoop/"/>
-    
-    
-      <category term="大数据，Hadoop" scheme="http://yoursite.com/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%EF%BC%8CHadoop/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>安装部署Apache Hadoop (本地模式和伪分布式)</title>
-    <link href="http://yoursite.com/2016/08/04/%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2Apache%20Hadoop%20(%E6%9C%AC%E5%9C%B0%E6%A8%A1%E5%BC%8F%E5%92%8C%E4%BC%AA%E5%88%86%E5%B8%83%E5%BC%8F)/"/>
-    <id>http://yoursite.com/2016/08/04/安装部署Apache Hadoop (本地模式和伪分布式)/</id>
-    <published>2016-08-04T00:48:36.000Z</published>
-    <updated>2017-06-12T07:51:39.000Z</updated>
-    
-    <content type="html">&lt;h1 id=&quot;Hadoop版本&quot;&gt;&lt;a href=&quot;#Hadoop版本&quot; class=&quot;headerlink&quot; title=&quot;Hadoop版本&quot;&gt;&lt;/a&gt;Hadoop版本&lt;/h1&gt;&lt;h2 id=&quot;Hadoop版本种类&quot;&gt;&lt;a href=&quot;#Hadoop版本种类&quot; class=&quot;headerlink&quot; title=&quot;Hadoop版本种类&quot;&gt;&lt;/a&gt;Hadoop版本种类&lt;/h2&gt;&lt;p&gt;目前Hadoop发行版非常多，有华为发行版、Intel发行版、Cloudera发行版（CDH）等，所有这些发行版均是基于Apache Hadoop衍生出来的，之所以有这么多的版本，完全是由&lt;a href=&quot;http://www.apache.org/licenses/LICENSE-2.0&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Apache Hadoop的开源协议&lt;/a&gt;决定的：任何人可以对其进行修改，并作为开源或商业产品发布/销售。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;国内绝大多数公司发行版是收费的，比如Intel发行版、华为发行版等，尽管这些发行版增加了很多开源版本没有的新feature，但绝大多数公司选择Hadoop版本时会将把是否收费作为重要指标，不收费的Hadoop版本主要有三个（均是国外厂商），分别是：Cloudera版本(Cloudera’s Distribution Including Apache Hadoop，简称“CDH”)、Apache基金会hadoop、Hortonworks版本(Hortonworks Data Platform，简称“HDP”)。按顺序代表了，在国内的使用率，CDH和HDP虽然是收费版本，但是他们是开源的，只是收取服务费用。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Apache社区版本：&lt;/strong&gt;&lt;br&gt;完全开源，免费，非商业。apache社区的hadoop版本分枝较多，而且部分hadoop存在bug。在选择hadoop，hbase，hive等时，需要考虑兼容性。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Cloudera版本：&lt;/strong&gt;&lt;br&gt;开源，免费，有商业和非商业版本。是在apache社区版本的hadoop基础上，选择相对稳定版本的hadoop，并在此基础上，进行bug修改和维护。使用者不必考虑hadoop，hbase，hive等在使用过程中，版本兼容性。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Hortonworks版本：&lt;/strong&gt;&lt;br&gt;开源，免费，有商业和非商业版本。是在Apache基础上修改，具有apache的特色。&lt;/p&gt;
-&lt;h2 id=&quot;Apache-Hadoop版本衍化&quot;&gt;&lt;a href=&quot;#Apache-Hadoop版本衍化&quot; class=&quot;headerlink&quot; title=&quot;Apache Hadoop版本衍化&quot;&gt;&lt;/a&gt;Apache Hadoop版本衍化&lt;/h2&gt;&lt;p&gt;Apache Hadoop版本分为两代，我们将第一代Hadoop称为Hadoop 1.0，第二代Hadoop称为Hadoop 2.0。第一代Hadoop包含三个大版本，分别是0.20.x，0.21.x和0.22.x，其中，0.20.x最后演化成1.0.x，变成了稳定版，而0.21.x和0.22.x则NameNode HA等新的重大特性。第二代Hadoop包含两个版本，分别是0.23.x和2.x，它们完全不同于Hadoop 1.0，是一套全新的架构，均包含HDFS Federation和YARN两个系统，相比于0.23.x，2.x增加了NameNode HA和Wire-compatibility两个重大特性。经过上面的大体解释，大家可能明白了Hadoop以重大特性区分各个版本的，总结起来，用于区分Hadoop版本的特性有以下几个：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Append 支持文件追加功能，如果想使用HBase，需要这个特性。&lt;/li&gt;
-&lt;li&gt;RAID 在保证数据可靠的前提下，通过引入校验码较少数据块数目.&lt;/li&gt;
-&lt;li&gt;Symlink支持HDFS文件链接&lt;/li&gt;
-&lt;li&gt;Security Hadoop安全。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;需要注意的是，Hadoop 2.0主要由Yahoo独立出来的hortonworks公司主持开发。&lt;/p&gt;
-&lt;p&gt;2013年10月，Hadoop 2.0发布。关键特性包括：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;YARN&lt;br&gt;YARN是“Yet Another Resource Negotiator”的简称，它是Hadoop 2.0引入的一个全新的通用资源管理系统，可在其之上运行各种应用程序和框架，比如MapReduce、Tez、Storm等，它的引入使得各种应用运行在一个集群中成为可能。YARN是在MRv1基础上衍化而来的，是MapReduce发展到一定程度的必然产物，它的出现使得Hadoop计算类应用进入平台化时代，博客中包含大量介绍YARN的文章，有兴趣的读者可阅读：&lt;a href=&quot;http://dongxicheng.org/category/mapreduce-nextgen/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://dongxicheng.org/category/mapreduce-nextgen/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;HDFS单点故障得以解决&lt;br&gt;Hadoop 2.2.0同时解决了NameNode单点故障问题和内存受限问题，其中，单点故障是通过主备NameNode切换实现的，这是一种古老的解决服务单点故障的方案，主备NameNode之间通过一个共享存储同步元数据信息，因此共享存储系统的选择称为关键，而Hadoop则提供了NFS、QJM和Bookeeper三种可选的共享存储系统，具体可阅读我的这篇文章：Hadoop 2.0单点故障问题方案总结。&lt;/li&gt;
-&lt;li&gt;HDFS Federation&lt;br&gt;前面提到HDFS 的NameNode存在内存受限问题，该问题也在2.2.0版本中得到了解决。这是通过HDFS Federation实现的，它允许一个HDFS集群中存在多个NameNode，每个NameNode分管一部分目录，而不同NameNode之间彼此独立，共享所有DataNode的存储资源，注意，NameNode Federation中的每个NameNode仍存在单点问题，需为每个NameNode提供一个backup以解决单点故障问题。&lt;/li&gt;
-&lt;li&gt;HDFS快照&lt;br&gt;HDFS快照是指HDFS文件系统（或者子系统）在某一时刻的只读镜像，它的出现使得管理员可定时为重要文件或目录做快照，以防止数据误删、丢失等。具体可阅读：Snapshots for HDFS（使用说明），Support for RW/RO snapshots in HDFS。&lt;br&gt;通过NFSv3访问HDFS&lt;br&gt;NFS允许用户像访问本地文件系统一样访问远程文件系统，而将NFS引入HDFS后，用户可像读写本地文件一样读写HDFS上的文件，大大简化了HDFS使用，这是通过引入一个NFS gateway服务实现的，该服务能将NFS协议转换为HDFS访问协议，具体如下图所示。有兴趣的读者可阅读：Support NFSv3 interface to HDFS，以及相关设计文档：HDFS NFS Gateway。&lt;/li&gt;
-&lt;li&gt;支持Windows操作系统&lt;br&gt;在2.2.0版本之前，Hadoop仅支持Linux操作系统，而Windows仅作为实验平台使用。从2.2.0开始，Hadoop开始支持Windows操作系统，具体可阅读我之前写的一篇文章：Hadoop For Windows。&lt;/li&gt;
-&lt;li&gt;兼容1.x上运行的MapReduce应用程序与Hadoop生态系统其他系统进行了充分的集成测试&lt;br&gt;除了HDFS、MapReduce和YARN这三个核心系统外，Hadoop生态系统还包括Hbase、Hive、Pig等系统，这些系统底层依赖于Hadoop内核，而相比于Hadoop 1.0，Hadoop 2.0的最大变化出现在内核（HDFS、MapReduce和YARN），但与生态系统中其他系统进行集成测试是必需的。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;除了以上特性外，Apache官方还给出了两个特殊说明：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;HDFS变化：HDFS的symlinks（类似于Linux中的软连接）被将移到了2.3.0版本中&lt;/li&gt;
-&lt;li&gt;YARN/MapReduce注意事项：管理员在NodeManager上设置ShuffleHandler service时，要采用“mapreduce_shuffle”，而非之前的“mapreduce.shuffle”作为属性值。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;新版本不仅增强了核心平台的大量功能，同时还修复了大量bug。新版本对HDFS做了两个非常重要的增强：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;支持异构的存储层次；&lt;/li&gt;
-&lt;li&gt;通过数据节点为存储在HDFS中的数据提供了内存缓存功能。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;借助于HDFS对异构存储层次的支持，我们将能够在同一个Hadoop集群上使用不同的存储类型。此外我们还可以使用不同的存储媒介——例如商业磁盘、企业级磁盘、SSD或者内存等——更好地权衡成本和收益。如果你想更详细地了解与该增强相关的信息，那么可以访问这里。类似地，在新版本中我们还能使用Hadoop集群中的可用内存集中地缓存并管理数据节点内存中的数据集。MapReduce、Hive、Pig等类似的应用程序将能够申请内存进行缓存，然后直接从数据节点的地址空间中读取内容，通过完全避免磁盘操作极大地提高扫描效率。Hive现在正在为ORC文件实现一个非常有效的零复制读取路径，该功能就使用了这项新技术。&lt;br&gt;在YARN方面，令我们非常兴奋的事情是资源管理器自动故障转移功能已经进入尾声，虽然在2.3.0这个版本中该功能还没有被发布，但是极有可能会包含在Hadoop-2.4中。此外，2.3.0版本还对YARN做了一些关键的运维方面的增强，例如更好的日志、错误处理和诊断等。&lt;br&gt;MapReduce的一个关键增强MAPREDUCE-4421。借助于该功能我们已经不再需要在每一台机器上安装MapReduce二进制程序，仅仅需要通过YARN分布式缓存将一个MapReduce包复制到HDFS中就可以了。当然，新版本还包含大量的bug修复以及其他方面的增强。例如：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;YarnClientImpl类中的异步轮询操作引入了超时；&lt;/li&gt;
-&lt;li&gt;修复了RMFatalEventDispatcher没有记录事件原因的问题；&lt;/li&gt;
-&lt;li&gt;HA配置不会影响节点管理器的RPC地址；&lt;/li&gt;
-&lt;li&gt;RM Web UI和REST API统一使用YarnApplicationState；&lt;/li&gt;
-&lt;li&gt;在RpcResponseHeader中包含RPC错误信息，而不是将其分开发送；&lt;/li&gt;
-&lt;li&gt;向jetty/httpserver中添加了请求日志；&lt;/li&gt;
-&lt;li&gt;修复了将dfs.checksum.type定义为NULL之后写文件和hflush会抛出java.lang.ArrayIndexOutOfBoundsException的问题。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;2014年4月，Hadoop 2.4.0发布。关键特性包括：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;HDFS支持访问控制列表（ACLs,Access Control Lists）；&lt;/li&gt;
-&lt;li&gt;原生支持HDFS滚动升级；&lt;/li&gt;
-&lt;li&gt;HDFS FSImage用到了 protocol-buffers，从而可以平滑地升级；&lt;/li&gt;
-&lt;li&gt;HDFS完全支持HTTPS；&lt;/li&gt;
-&lt;li&gt;YARN ResourceManager支持自动故障转移，解决了YARN ResourceManager的单点故障；&lt;/li&gt;
-&lt;li&gt;对YARN的Application History Server和 pplication Timeline Server上的新应用加强了支持；&lt;/li&gt;
-&lt;li&gt;通过抢占使得YARN Capacity Scheduler支持强SLAs协议；&lt;br&gt;安全对于Hadoop来说至关重要，所以在Hadoop 2.4.0版本中对HDFS的所有访问（包括WebHDFS, HsFTP甚至是web-interfaces）都支持了HTTPS。在Hadoop 2.4.0解决了ResourceManager的单点故障。这样会在集群中存在两个ResourceManager，其中一个处于Active；另一个处于　　standby。当Active的出现故障，这样Hadoop可以自动平滑地切换到另外一个ResourceManager，这个新的ResourceManager将会自动的重启那些提交的applications。在下一阶段，Hadoop将会增加一个热standby（add a hot standby），这个standby可以继续从故障点运行的应用程序，以保存任何已经完成的工作。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;2014年8月，Hadoop 2.5.0发布。关键特性包括：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Common&lt;ul&gt;
-&lt;li&gt;使用HTTP代理服务器时认证改进。当通过代理服务器使用WebHDFS时这是非常有用的。&lt;/li&gt;
-&lt;li&gt;增加了一个新的Hadoop指标监控sink，允许直接写到Graphite。&lt;/li&gt;
-&lt;li&gt;Hadoop文件系统兼容相关的规范工作。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;HDFS&lt;ul&gt;
-&lt;li&gt;支持 POSIX风格的扩展文件系统。更多细节查看Extended Attributes in HDFS文档。&lt;/li&gt;
-&lt;li&gt;支持离线image浏览，客户端现在可以通过WebHDFS的API浏览一个fsimage。&lt;/li&gt;
-&lt;li&gt;NFS网关得到大量可支持性的改进和bug修复。Hadoop portmapper不在需要运行网关，网关现在可以拒绝没有权限的端口的连接。&lt;/li&gt;
-&lt;li&gt;SecondaryNameNode, JournalNode, and DataNode 的web UI已经使用HTML5和JS美化。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;YARN&lt;ul&gt;
-&lt;li&gt;YARN的REST API现在支持写/修改操作。用户可以用REST API提交和杀死应用程序。&lt;/li&gt;
-&lt;li&gt;时间线存储到YARN，用来存储一个应用通用的和特殊的信息，支持Kerberos认证。&lt;/li&gt;
-&lt;li&gt;公平调度器支持动态分层用户队列，运行时，用户队列在任一指定的父队列中被动态的创建。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;2014年11月，Hadoop 2.6.0发布。关键特性包括：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Common&lt;br&gt;Hadoop Key Management Server（KMS）是一个基于HadoopKeyProvider API编写的密钥管理服务器。他提供了一个client和一个server组件，client和server之间基于HTTP协议使用REST API通信。Client是一个KeyProvider的实现，使用KMS HTTP REST API与KMS交互。KMS和它的client有内置的安全机制，支持HTTP SPNEGO Kerberos认证和HTTPS安全传输。KMS是一个Java Web应用程序，运行在与Hadoop发行版绑定在一起的预先配置好的Tomcat服务器上。&lt;/li&gt;
-&lt;li&gt;Tracing&lt;br&gt;HDFS-5274增加了追踪通过HDFS的请求的功能，此功能使用了开源的库，HTrace。大家可以看一下HTrace，功能很强大，Cloudera开源出来的。&lt;/li&gt;
-&lt;li&gt;HDFS&lt;ul&gt;
-&lt;li&gt;Transparent Encryption，HDFS实现了一个透明的，端到端的加密方式。一旦配置了加密，从HDFS读出数据解密和写入数据加密的过程对用户应用程序代码带来说都是透明的。加密过程是端到端的，这意味着数据只能在客户端被加密解密。HDFS从来不存储，也不访问未加密的数据和数据加密密钥。这样满足了加密过程的两个典型的需求：at-rest encryption（静态加密，也就是说，数据持久化在像硬盘这样的媒介上），in-transit encryption（在途加密，例如，当数据在网络中传输的时候）。&lt;/li&gt;
-&lt;li&gt;Storage SSD &amp;amp;&amp;amp; Memory。ArchivalStorage（档案存储器）是将计算能力与不断增长的存储能力分离。拥有高密度低成本的存储但是计算能力较低的节点将变得可用，可以在集群中做冷存储。增加更多的节点作为冷存储可以提高集群的存储能力，跟集群的计算能力无关。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;MapReduce&lt;br&gt;这一部分主要是一些bug的修复和改进。增加了两个新的新特，在2.5.2里已经有所描述了。这里在简单看一下。&lt;ul&gt;
-&lt;li&gt;ResourceManger Restart&lt;/li&gt;
-&lt;li&gt;允许AM发送历史事件信息到timeline server。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;YARN&lt;ul&gt;
-&lt;li&gt;NodeManager Restart：这个特性可以使NodeManager在不丢失运行在节点中的活动的container的情况下重新启动。&lt;/li&gt;
-&lt;li&gt;Docker Container Executor：DockerContainer Executor（DCE）允许YARN NodeManager在Docker container中启动YARN container。用户可以指定他们想用来运行YARN container的Docker的镜像。这些container提供了一个可以自定义的软件环境，用户的代码可以运行在其中，与NodeManager运行的环境隔离。这些运行用户代码的container可以包含应用程序需要的特定的库，它们可以拥有与NodeManager不同版本的Perl，Python甚至是Java。事实上，这些container可以运行与NodeManager所在的OS不同版本的Linux。尽管YARN container必须定义运行Job所需的所有的环境和库，但是NodeManager中的所有的东西都不会共享。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Docer为YARN提供了一致和隔离两种模式，一致模式下，所有的YARN container将拥有相同的软件环境，在隔离模式下，不管物理机器安装了什么都不干扰。&lt;/p&gt;
-&lt;p&gt;2015年7月，Hadoop 2.7.0发布。关键特性包括：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Common&lt;br&gt;支持Windows Azure Storage，BLOB作为Hadoop中的文件系统。&lt;br&gt;Hadoop HDFS&lt;ul&gt;
-&lt;li&gt;支持文件截断（file truncate）；&lt;/li&gt;
-&lt;li&gt;支持每个存储类型配额(Support for quotas per storage type);&lt;/li&gt;
-&lt;li&gt;支持可变长度的块文件&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;YARN —— YARN安全模块可插拔&lt;ul&gt;
-&lt;li&gt;YARN的本地化资源可以自动共享，全局缓存（测试版）&lt;br&gt;Hadoop MapReduce&lt;/li&gt;
-&lt;li&gt;能够限制运行的Map/Reduce作业的任务&lt;/li&gt;
-&lt;li&gt;为非常的大Job（有许多输出文件）加快了FileOutputCommitter。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;HDFS&lt;ul&gt;
-&lt;li&gt;支持文件截断（file truncate）；&lt;/li&gt;
-&lt;li&gt;支持每个存储类型配额(Support for quotas per storage type);&lt;/li&gt;
-&lt;li&gt;支持可变长度的块文件&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;MAPREDUCE&lt;ul&gt;
-&lt;li&gt;能够限制运行的Map/Reduce作业的任务&lt;/li&gt;
-&lt;li&gt;为非常的大Job（有许多输出文件）加快了FileOutputCommitter。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;2015年7月，Hadoop 2.7.1发布。关键特性包括：&lt;br&gt;本版本属于稳定版本，是自Hadoop 2.6.0以来又一个稳定版，同时也是Hadoop 2.7.x版本线的第一个稳定版本，也是 2.7版本线的维护版本，变化不大，主要是修复了一些比较严重的Bug（其中修复了131个Bugs和patches）&lt;/p&gt;
-&lt;h1 id=&quot;安装部署Hadoop&quot;&gt;&lt;a href=&quot;#安装部署Hadoop&quot; class=&quot;headerlink&quot; title=&quot;安装部署Hadoop&quot;&gt;&lt;/a&gt;安装部署Hadoop&lt;/h1&gt;&lt;p&gt;Hadoop 有两个主要版本，Hadoop 1.x.y 和 Hadoop 2.x.y 系列，比较老的教材上用的可能是 0.20 这样的版本。Hadoop 2.x 版本在不断更新。&lt;br&gt;&lt;br&gt;Hadoop安装部署模式有3种：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Local (Standalone) Mode  本地模式&lt;/li&gt;
-&lt;li&gt;Pseudo-Distributed Mode  伪分布式模式&lt;/li&gt;
-&lt;li&gt;Fully-Distributed Mode  完全分布式模式(即为多节点安装Hadoop)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;安装部署本地模式Hadoop&quot;&gt;&lt;a href=&quot;#安装部署本地模式Hadoop&quot; class=&quot;headerlink&quot; title=&quot;安装部署本地模式Hadoop&quot;&gt;&lt;/a&gt;安装部署本地模式Hadoop&lt;/h2&gt;&lt;p&gt;本次实验使用的版本是hadoop-2.7.2，实验环境如下：&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;主机名&lt;/th&gt;
-&lt;th&gt;IP地址&lt;/th&gt;
-&lt;th&gt;操作系统版本&lt;/th&gt;
-&lt;th&gt;安装软件&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;node3&lt;/td&gt;
-&lt;td&gt;172.16.7.153&lt;/td&gt;
-&lt;td&gt;CentOS 7.1&lt;/td&gt;
-&lt;td&gt;hadoop-2.7.2&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id=&quot;安装JDK1-7&quot;&gt;&lt;a href=&quot;#安装JDK1-7&quot; class=&quot;headerlink&quot; title=&quot;安装JDK1.7&quot;&gt;&lt;/a&gt;安装JDK1.7&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;Hadoop Java Versions&lt;/strong&gt; &lt;br&gt;&lt;br&gt;Version 2.7 and later of Apache Hadoop requires Java 7. It is built and tested on both OpenJDK and Oracle (HotSpot)’s JDK/JRE. &lt;br&gt;&lt;br&gt;Earlier versions (2.6 and earlier) support Java 6.&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@node3 ~]# mkdir /usr/java&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@node3 ~]# tar zxf /usr/local/jdk-7u80-linux-x64.gz -C /usr/java/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@node3 ~]# vim /etc/profile&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;export JAVA_HOME=/usr/java/jdk1.7.0_80&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;export PATH=$JAVA_HOME/bin:$PATH&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@node3 ~]# source /etc/profile&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;h3 id=&quot;安装依赖包ssh和rsync&quot;&gt;&lt;a href=&quot;#安装依赖包ssh和rsync&quot; class=&quot;headerlink&quot; title=&quot;安装依赖包ssh和rsync&quot;&gt;&lt;/a&gt;安装依赖包ssh和rsync&lt;/h3&gt;&lt;p&gt;对于Redhat/CentOS系列的，安装系统时一般都会默认安装openssh软件，里面包含了ssh客户端和ssh服务端，所以先检查下这个软件包是否安装了：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# yum list all openssh&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;如果没有安装，安装：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# yum install -y openssh&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;在检查rsync软件包是否安装：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# yum list all rsync&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;h3 id=&quot;添加Hadoop运行用户&quot;&gt;&lt;a href=&quot;#添加Hadoop运行用户&quot; class=&quot;headerlink&quot; title=&quot;添加Hadoop运行用户&quot;&gt;&lt;/a&gt;添加Hadoop运行用户&lt;/h3&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# groupadd -g 1000 hadoop&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# useradd -g 1000 -u 1000 hadoop&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# echo &amp;quot;wisedu&amp;quot; | passwd --stdin hadoop &amp;amp;&amp;gt; /dev/null&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;h3 id=&quot;配置主节点登录自己和其他节点不需要输入密码&quot;&gt;&lt;a href=&quot;#配置主节点登录自己和其他节点不需要输入密码&quot; class=&quot;headerlink&quot; title=&quot;配置主节点登录自己和其他节点不需要输入密码&quot;&gt;&lt;/a&gt;配置主节点登录自己和其他节点不需要输入密码&lt;/h3&gt;&lt;p&gt;hadoop用户登录主机，配置其ssh连接localhost不需要输入密码：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;$ ssh-keygen -t rsa -P &amp;apos;&amp;apos;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;$ ssh-copy-id -i ~/.ssh/id_rsa.pub hadoop@localhost&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;此时再用 ssh localhost，无需输入密码就可以直接登陆了，如下图所示：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;$ ssh localhost&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/3.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;解压hadoop&quot;&gt;&lt;a href=&quot;#解压hadoop&quot; class=&quot;headerlink&quot; title=&quot;解压hadoop&quot;&gt;&lt;/a&gt;解压hadoop&lt;/h3&gt;&lt;p&gt;root用户登录shell：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@node3 ~]# cd /usr/local/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@node3 local]# tar zxf hadoop-2.7.2.tar.gz&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@node3 local]# ln -sv hadoop-2.7.2 hadoop&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;‘hadoop’ -&amp;gt; ‘hadoop-2.7.2’&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;h3 id=&quot;配置hadoop环境变量&quot;&gt;&lt;a href=&quot;#配置hadoop环境变量&quot; class=&quot;headerlink&quot; title=&quot;配置hadoop环境变量&quot;&gt;&lt;/a&gt;配置hadoop环境变量&lt;/h3&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@node3 ~]# vim /etc/profile&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# Hadoop&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;HADOOP_HOME=/usr/local/hadoop&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;PATH=$HADOOP_HOME/bin:$PATH&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;export HADOOP_HOME PATH&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@node3 ~]# source /etc/profile&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@node3 ~]# hadoop version&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;修改/usr/local/hadoop的属主和属组为hadoop：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@node3 local]# chown -R hadoop.hadoop /usr/local/hadoop/&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;h3 id=&quot;配置本地模式并测试&quot;&gt;&lt;a href=&quot;#配置本地模式并测试&quot; class=&quot;headerlink&quot; title=&quot;配置本地模式并测试&quot;&gt;&lt;/a&gt;配置本地模式并测试&lt;/h3&gt;&lt;p&gt;Hadoop 默认模式为非分布式模式，无需进行其他配置即可运行。非分布式即单 Java 进程，方便进行调试。不使用集群文件系统的，只是个调试查看模式，不会启动什么DataNode这类的进程。&lt;br&gt;&lt;br&gt;可以执行例子来感受下 Hadoop 的运行。Hadoop 附带了丰富的例子（运行 ./bin/hadoop jar ./share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0.jar 可以看到所有例子），包括 wordcount、terasort、join、grep 等。&lt;br&gt;&lt;br&gt;在此选择运行 grep 例子，我们将 input 文件夹中的所有文件作为输入，筛选当中符合正则表达式 dfs[a-z.]+ 的单词并统计出现的次数，最后输出结果到 output 文件夹中。&lt;/p&gt;
-&lt;p&gt;hadoop用户登录shell：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 ~]$ cd /usr/local/hadoop&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ mkdir input&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ cp etc/hadoop/*.xml input     # 将配置文件作为输入文件&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ cat output/*    # 查看运行结果&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;执行成功后如下所示，输出了作业的相关信息，输出的结果是符合正则的单词 dfsadmin 出现了1次：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;注意:&lt;/strong&gt;Hadoop 默认不会覆盖结果文件，因此再次运行上面实例会提示出错，需要先将 ./output 删除。&lt;/p&gt;
-&lt;h2 id=&quot;安装部署伪分布式Hadoop&quot;&gt;&lt;a href=&quot;#安装部署伪分布式Hadoop&quot; class=&quot;headerlink&quot; title=&quot;安装部署伪分布式Hadoop&quot;&gt;&lt;/a&gt;安装部署伪分布式Hadoop&lt;/h2&gt;&lt;p&gt;Hadoop 可以在单节点上以伪分布式的方式运行，Hadoop 进程以分离的 Java 进程来运行，节点既作为 NameNode 也作为 DataNode，同时，读取的是 HDFS 中的文件。&lt;/p&gt;
-&lt;h3 id=&quot;Hadoop配置文件说明&quot;&gt;&lt;a href=&quot;#Hadoop配置文件说明&quot; class=&quot;headerlink&quot; title=&quot;Hadoop配置文件说明&quot;&gt;&lt;/a&gt;Hadoop配置文件说明&lt;/h3&gt;&lt;p&gt;Hadoop 的配置文件位于 /usr/local/hadoop/etc/hadoop/ 中，伪分布式需要修改2个配置文件 core-site.xml 和 hdfs-site.xml 。Hadoop的配置文件是 xml 格式，每个配置以声明 property 的 name 和 value 的方式来实现。&lt;br&gt;&lt;br&gt;Hadoop 的运行方式是由配置文件决定的（运行 Hadoop 时会读取配置文件），因此如果需要从伪分布式模式切换回非分布式模式，需要删除 core-site.xml 中的配置项。&lt;br&gt;&lt;br&gt;此外，伪分布式虽然只需要配置 fs.defaultFS 和 dfs.replication 就可以运行（官方教程如此），不过若没有配置 hadoop.tmp.dir 参数，则默认使用的临时目录为 /tmp/hadoo-hadoop，而这个目录在重启时有可能被系统清理掉，导致必须重新执行 format 才行。所以我们进行了设置，同时也指定 dfs.namenode.name.dir 和 dfs.datanode.data.dir，否则在接下来的步骤中可能会出错。&lt;/p&gt;
-&lt;h3 id=&quot;修改配置文件-core-site-xml，配置Hadoop的核心属性&quot;&gt;&lt;a href=&quot;#修改配置文件-core-site-xml，配置Hadoop的核心属性&quot; class=&quot;headerlink&quot; title=&quot;修改配置文件 core-site.xml，配置Hadoop的核心属性&quot;&gt;&lt;/a&gt;修改配置文件 core-site.xml，配置Hadoop的核心属性&lt;/h3&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ vim etc/hadoop/core-site.xml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;configuration&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;lt;property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;name&amp;gt;hadoop.tmp.dir&amp;lt;/name&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;value&amp;gt;file:/usr/local/hadoop/tmp&amp;lt;/value&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;description&amp;gt;Abase for other temporary directories.&amp;lt;/description&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;lt;/property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;lt;property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;name&amp;gt;fs.defaultFS&amp;lt;/name&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;value&amp;gt;hdfs://localhost:9000&amp;lt;/value&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;lt;/property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;/configuration&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;h3 id=&quot;修改配置文件-hdfs-site-xml，定义hdfs的属性&quot;&gt;&lt;a href=&quot;#修改配置文件-hdfs-site-xml，定义hdfs的属性&quot; class=&quot;headerlink&quot; title=&quot;修改配置文件 hdfs-site.xml，定义hdfs的属性&quot;&gt;&lt;/a&gt;修改配置文件 hdfs-site.xml，定义hdfs的属性&lt;/h3&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ vim etc/hadoop/hdfs-site.xml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;configuration&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;lt;property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;name&amp;gt;dfs.replication&amp;lt;/name&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;value&amp;gt;1&amp;lt;/value&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;lt;/property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;lt;property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;name&amp;gt;dfs.namenode.name.dir&amp;lt;/name&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;value&amp;gt;file:/usr/local/hadoop/tmp/dfs/name&amp;lt;/value&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;lt;/property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;lt;property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;name&amp;gt;dfs.datanode.data.dir&amp;lt;/name&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;value&amp;gt;file:/usr/local/hadoop/tmp/dfs/data&amp;lt;/value&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;lt;/property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;/configuration&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;&lt;strong&gt;注意:&lt;/strong&gt;如果需要其它用户对hdfs有写入权限，还需要在hdfs-site.xml添加一项属性定义。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;     &amp;lt;name&amp;gt;dfs.permissions&amp;lt;/name&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;     &amp;lt;value&amp;gt;false&amp;lt;/value&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;/property&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;HDFS进程有许多属性可以定义其工作路径，如dfs.namenode.name.dir属性定义的HDFS元数据持久存储路径，默认为${hadoop.tmp.dir}/dfs/name。&lt;br&gt;&lt;br&gt;dfs.datanode.data.dir属性定义DataNode用于存储数据块的目录路径，默认为${hadoop.tmp.dir}/dfs/data。&lt;br&gt;&lt;br&gt;fs.checkpoint.dir属性定义的SecondaryNameNode用于存储检查点文件的目录，默认为${hadoop.tmp.dir}/dfs/namesecondary。&lt;br&gt;&lt;br&gt;为了数据可用性及冗余的目的，HDFS会在多个节点上保存同一个数据块的多个副本，其默认为3个。而只有一个节点的伪分布式环境中其仅用保存一个副本，这可以通过dfs.replication属性进行定义。&lt;/p&gt;
-&lt;h3 id=&quot;配置完成后，执行-NameNode-的格式化&quot;&gt;&lt;a href=&quot;#配置完成后，执行-NameNode-的格式化&quot; class=&quot;headerlink&quot; title=&quot;配置完成后，执行 NameNode 的格式化&quot;&gt;&lt;/a&gt;配置完成后，执行 NameNode 的格式化&lt;/h3&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ bin/hdfs namenode -format&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;成功的话，会看到 “successfully formatted” 和 “Exitting with status 0” 的提示，若为 “Exitting with status 1” 则是出错。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/9.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;开启-NameNode-和-DataNode-守护进程&quot;&gt;&lt;a href=&quot;#开启-NameNode-和-DataNode-守护进程&quot; class=&quot;headerlink&quot; title=&quot;开启 NameNode 和 DataNode 守护进程&quot;&gt;&lt;/a&gt;开启 NameNode 和 DataNode 守护进程&lt;/h3&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ sbin/start-dfs.sh&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Error: JAVA_HOME is not set and could not be found.&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/10.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;解决：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ vim etc/hadoop/hadoop-env.sh&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/11.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/12.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;再次启动：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ sbin/start-dfs.sh&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;启动完成后，可以通过命令 jps 来判断是否成功启动，若成功启动则会列出如下进程: “NameNode”、”DataNode” 和 “SecondaryNameNode”（如果 SecondaryNameNode 没有启动，请运行 sbin/stop-dfs.sh 关闭进程，然后再次尝试启动尝试）。如果没有 NameNode 或 DataNode ，那就是配置不成功，请仔细检查之前步骤，或通过查看启动日志排查原因。The hadoop daemon log output is written to the $HADOOP_LOG_DIR directory (defaults to $HADOOP_HOME/logs)。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/14.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;查看NameNode-信息&quot;&gt;&lt;a href=&quot;#查看NameNode-信息&quot; class=&quot;headerlink&quot; title=&quot;查看NameNode 信息&quot;&gt;&lt;/a&gt;查看NameNode 信息&lt;/h3&gt;&lt;p&gt;成功启动后，可以访问 Web 界面 &lt;a href=&quot;http://172.16.7.153:50070&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.153:50070&lt;/a&gt; 查看 NameNode 和 Datanode 信息，还可以在线查看 HDFS 中的文件。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/15.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;测试hadoop&quot;&gt;&lt;a href=&quot;#测试hadoop&quot; class=&quot;headerlink&quot; title=&quot;测试hadoop&quot;&gt;&lt;/a&gt;测试hadoop&lt;/h3&gt;&lt;p&gt;上面本地模式的例子，grep读取的是本地文件系统上的数据，本地模式是不使用集群文件系统HDFS的。&lt;br&gt;&lt;br&gt;伪分布式读取的则是 HDFS 上的数据。要使用 HDFS，首先需要在 HDFS 中创建用户目录。&lt;br&gt;1.在HDFS中创建目录&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 ~]$ cd /usr/local/hadoop&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ bin/hdfs dfs -mkdir -p /user/hadoop&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;2.接着将 ./etc/hadoop 中的 xml 文件作为输入文件复制到分布式文件系统中，即将 /usr/local/hadoop/etc/hadoop 复制到分布式文件系统中的 /user/root/input 中。我们使用的是hadoop用户，并且已创建相应的用户目录 /user/hadoop ，因此在命令中就可以使用相对路径如 input，其对应的绝对路径就是 /user/hadoop/input:&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ bin/hdfs dfs -mkdir input&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ bin/hdfs dfs -put ./etc/hadoop/*.xml input&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;3.复制完成后，可以通过如下命令查看文件列表：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ bin/hdfs dfs -ls input&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/16.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;4.伪分布式运行 MapReduce 作业的方式跟单机模式相同，区别在于伪分布式读取的是HDFS中的文件（可以将单机步骤中创建的本地 input 文件夹，输出结果 output 文件夹都删掉来验证这一点）。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ bin/hadoop jar ./share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar grep input output &amp;apos;dfs[a-z.]+&amp;apos;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/17.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;5.查看运行结果的命令（查看的是位于 HDFS 中的输出结果）：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ bin/hdfs dfs -cat output/*&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;结果如下，注意到刚才我们已经更改了配置文件，所以运行结果不同。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/18.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/19.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;6.我们也可以将运行结果取回到本地&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ rm -r ./output    # 先删除本地的 output 文件夹（如果存在）&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ bin/hdfs dfs -get output ./output    # 将HDFS 上的 output 文件夹拷贝到本机&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/20.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ cat ./output/*&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/21.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;7.Hadoop 运行程序时，输出目录不能存在，否则会提示错误 “org.apache.hadoop.mapred.FileAlreadyExistsException: Output directory hdfs://localhost:9000/user/hadoop/output already exists” ，因此若要再次执行，需要执行如下命令删除 output 文件夹：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ bin/hdfs dfs -rm -r output&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16/06/27 23:37:30 INFO fs.TrashPolicyDefault: Namenode trash configuration: Deletion interval = 0 minutes, Emptier interval = 0 minutes.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Deleted output&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;注意:&lt;/strong&gt;运行 Hadoop 程序时，为了防止覆盖结果，程序指定的输出目录（如 output）不能存在，否则会提示错误，因此运行前需要先删除输出目录。在实际开发应用程序时，可考虑在程序中加上如下代码，能在每次运行时自动删除输出目录，避免繁琐的命令行操作：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;Configuration conf = new Configuration();&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Job job = new Job(conf);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Path outputPath = new Path(args[1]);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;outputPath.getFileSystem(conf).delete(outputPath, true);&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;8.若要关闭 Hadoop，则运行&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ sbin/stop-dfs.sh&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;注意：&lt;/strong&gt;下次启动 hadoop 时，无需进行 NameNode 的初始化，只需要运行 sbin/start-dfs.sh 就可以了。&lt;/p&gt;
-&lt;h3 id=&quot;启动YARN&quot;&gt;&lt;a href=&quot;#启动YARN&quot; class=&quot;headerlink&quot; title=&quot;启动YARN&quot;&gt;&lt;/a&gt;启动YARN&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;注意：&lt;/strong&gt;伪分布式不启动 YARN 也可以，一般不会影响程序执行。&lt;br&gt;&lt;br&gt;玩过Hadoop V1版本的可能会疑惑，启动 Hadoop 后，见不到所说的 JobTracker 和 TaskTracker进程，这是因为新版的 Hadoop 使用了新的 MapReduce 框架（MapReduce V2，也称为 YARN，Yet Another Resource Negotiator）。&lt;br&gt;&lt;br&gt;YARN 是从 MapReduce 中分离出来的，负责资源管理与任务调度。YARN 运行于 MapReduce 之上，提供了高可用性、高扩展性。&lt;br&gt;&lt;br&gt;上述通过 sbin/start-dfs.sh 启动 Hadoop，仅仅是启动了 MapReduce 环境，我们可以启动 YARN ，让 YARN 来负责资源管理与任务调度。&lt;br&gt;&lt;br&gt;1.首先修改配置文件 mapred-site.xml&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 ~]$ cd /usr/local/hadoop&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ mv ./etc/hadoop/mapred-site.xml.template ./etc/hadoop/mapred-site.xml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ vim mapred-site.xml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;configuration&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;lt;property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;name&amp;gt;mapreduce.framework.name&amp;lt;/name&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;value&amp;gt;yarn&amp;lt;/value&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;lt;/property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;/configuration&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;2.修改配置文件 yarn-site.xml&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ vim yarn-site.xml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;configuration&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;lt;property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;name&amp;gt;yarn.nodemanager.aux-services&amp;lt;/name&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;             &amp;lt;value&amp;gt;mapreduce_shuffle&amp;lt;/value&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            &amp;lt;/property&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;/configuration&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;3.启动 YARN 了（需要先执行过 ./sbin/start-dfs.sh）&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ sbin/start-yarn.sh                       # 启动YARN&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/24.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/25.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ sbin/mr-jobhistory-daemon.sh start historyserver  # 开启历史服务器，才能在Web中查看任务运行情况&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/26.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/27.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;启动 YARN 之后，运行实例的方法还是一样的，仅仅是资源管理方式、任务调度不同。观察日志信息可以发现，不启用 YARN 时，是 “mapred.LocalJobRunner” 在跑任务，启用 YARN 之后，是 “mapred.YARNRunner” 在跑任务。启动 YARN 有个好处是可以通过 Web 界面查看任务的运行情况：&lt;a href=&quot;http://localhost:8088/cluster，如下图所示。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://localhost:8088/cluster，如下图所示。&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/28.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;在执行下上面的任务：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ bin/hadoop jar ./share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar grep input output &amp;apos;dfs[a-z.]+&amp;apos;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/29.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/hadoop/30.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;但 YARN 主要是为集群提供更好的资源管理与任务调度，然而这在单机上体现不出价值，反而会使程序跑得稍慢些。因此在单机上是否开启 YARN 就看实际情况了。&lt;/p&gt;
-&lt;p&gt;4.关闭 YARN 的脚本如下&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ sbin/stop-yarn.sh&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[hadoop@node3 hadoop]$ sbin/mr-jobhistory-daemon.sh stop historyserver&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;注意：&lt;/strong&gt;不启动 YARN 需重命名 mapred-site.xml。如果不想启动 YARN，务必把配置文件 mapred-site.xml 重命名，改成 mapred-site.xml.template，需要用时改回来就行。否则在该配置文件存在，而未开启 YARN 的情况下，运行程序会提示 “Retrying connect to server: 0.0.0.0/0.0.0.0:8032” 的错误，这也是为何该配置文件初始文件名为 mapred-site.xml.template。&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h1 id=&quot;Hadoop版本&quot;&gt;&lt;a href=&quot;#Hadoop版本&quot; class=&quot;headerlink&quot; title=&quot;Hadoop版本&quot;&gt;&lt;/a&gt;Hadoop版本&lt;/h1&gt;&lt;h2 id=&quot;Hadoop版本种类&quot;&gt;&lt;a href=&quot;#Hadoop版本种类&quot; class=&quot;headerlink&quot; title=&quot;Hadoop版本种类&quot;&gt;&lt;/a&gt;Hadoop版本种类&lt;/h2&gt;&lt;p&gt;目前Hadoop发行版非常多，有华为发行版、Intel发行版、Cloudera发行版（CDH）等，所有这些发行版均是基于Apache Hadoop衍生出来的，之所以有这么多的版本，完全是由&lt;a href=&quot;http://www.apache.org/licenses/LICENSE-2.0&quot;&gt;Apache Hadoop的开源协议&lt;/a&gt;决定的：任何人可以对其进行修改，并作为开源或商业产品发布/销售。&lt;br&gt;
     
     </summary>
     
