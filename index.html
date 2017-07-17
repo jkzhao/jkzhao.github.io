@@ -391,27 +391,13 @@
 
       
         
-          
-            <h2 id="Ansible条件测试"><a href="#Ansible条件测试" class="headerlink" title="Ansible条件测试"></a>Ansible条件测试</h2><p>在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。</p>
-<h3 id="when语句"><a href="#when语句" class="headerlink" title="when语句"></a>when语句</h3><p>在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如：</p>
-<pre><code>tasks:
-- name: &quot;shutdown Debian flavored systems&quot;
-  command: /sbin/shutdown -h now
-  when: ansible_os_family == &quot;Debian&quot;
-</code></pre><p>when语句还可以使用Jinja2的大多“filter”，例如要忽略此前某语句额错误并基于其结果（failed或success）运行后面指定的语句，可使用类似如下形式：</p>
-<pre><code>tasks:
-- command: /bin/false
-  register: result
-  ignore_errors: True
-- command: /bin/sonmething
-  when: result|failed
-- command: /bin/something_else
-  when: result|success
-- command: /bin/still/something_else
-  when: result|skipped
-</code></pre><p>此外，when语句还可以使用facts或playbook中定义的变量。facts就是主机报告上来的变量。比如：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png" alt=""></p>
-
-          
+          <h2 id="Ansible条件测试"><a href="#Ansible条件测试" class="headerlink" title="Ansible条件测试"></a>Ansible条件测试</h2><p>在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。</p>
+<h3 id="when语句"><a href="#when语句" class="headerlink" title="when语句"></a>when语句</h3><p>在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如：<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/07/17/Ansible条件测试/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
