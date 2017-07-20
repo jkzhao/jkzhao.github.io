@@ -119,7 +119,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/36.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/38.png">
-<meta property="og:updated_time" content="2017-07-17T04:14:39.000Z">
+<meta property="og:updated_time" content="2017-07-20T08:18:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ansible playbook基础组件介绍">
 <meta name="twitter:description" content="ansible playbook介绍playbook是由一个或多个“play”组成的列表(剧本是由多出戏组成的)。play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联同起来按事先编排的机制同唱一台大戏。下面是一个简单示例。">
@@ -519,7 +519,7 @@ handlers:
 <h2 id="playbook中使用变量"><a href="#playbook中使用变量" class="headerlink" title="playbook中使用变量"></a>playbook中使用变量</h2><pre><code>- hosts: mysql
   remote_user: root
   vars:
-  - package: nginx
+  - package: httpd
   tasks:
   - name: install httpd package
     yum: name={{ package }} state=latest                                                                                                      
@@ -648,7 +648,7 @@ handlers:
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">24</span>
+              <span class="site-state-item-count">25</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Ansible 运维自动化," />
 
 
 
@@ -104,12 +104,22 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="jkzhao's blog">
-<meta property="og:url" content="http://yoursite.com/archives/2016/09/index.html">
+<meta name="description" content="迭代当有需要重复性执行的任务时，可以使用迭代机制。其使用格式为将需要迭代的内容定义为item变量引用，并通过with_items语句来指明迭代的元素列表即可。例如： - name: add several users   user: name={{ item }} state=present groups=wheel   with_items:         - testuser1">
+<meta name="keywords" content="Ansible 运维自动化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible之迭代、模板">
+<meta property="og:url" content="http://yoursite.com/2017/07/20/Ansible之迭代、模板/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
+<meta property="og:description" content="迭代当有需要重复性执行的任务时，可以使用迭代机制。其使用格式为将需要迭代的内容定义为item变量引用，并通过with_items语句来指明迭代的元素列表即可。例如： - name: add several users   user: name={{ item }} state=present groups=wheel   with_items:         - testuser1">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/39.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/40.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/41.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/42.png">
+<meta property="og:updated_time" content="2017-07-20T09:11:26.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="jkzhao's blog">
+<meta name="twitter:title" content="Ansible之迭代、模板">
+<meta name="twitter:description" content="迭代当有需要重复性执行的任务时，可以使用迭代机制。其使用格式为将需要迭代的内容定义为item变量引用，并通过with_items语句来指明迭代的元素列表即可。例如： - name: add several users   user: name={{ item }} state=present groups=wheel   with_items:         - testuser1">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/39.png">
 
 
 
@@ -127,7 +137,7 @@
   };
 </script>
 
-  <title> 归档 | jkzhao's blog </title>
+  <title> Ansible之迭代、模板 | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -158,7 +168,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  page-archive  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -296,66 +306,226 @@
           <div id="content" class="content">
             
 
-  <section id="posts" class="posts-collapse">
-    <span class="archive-move-on"></span>
-
-    <span class="archive-page-counter">
-      
-      
-      
-        
-      
-      嗯..! 目前共计 25 篇日志。 继续努力。
-    </span>
-
+  <div id="posts" class="posts-expand">
     
 
-      
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Ansible之迭代、模板
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-07-20T15:05:29+08:00" content="2017-07-20">
+              2017-07-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
+                    <span itemprop="name">运维自动化</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/07/20/Ansible之迭代、模板/" class="leancloud_visitors" data-flag-title="Ansible之迭代、模板">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
       
       
 
       
+        <h2 id="迭代"><a href="#迭代" class="headerlink" title="迭代"></a>迭代</h2><p>当有需要重复性执行的任务时，可以使用迭代机制。其使用格式为将需要迭代的内容定义为item变量引用，并通过with_items语句来指明迭代的元素列表即可。例如：</p>
+<pre><code>- name: add several users
+  user: name={{ item }} state=present groups=wheel
+  with_items:
+        - testuser1
+        - testuser2
+</code></pre><p>上面语句的功能等同于下面的语句：</p>
+<pre><code>- name: add user testuser1
+  user: name=testuser1 state=present groups=wheel
+- name: add user testuser2
+  user: name=testuser2 state=present groups=wheel
+</code></pre><p>另外，with_items中使用的元素还可以是hashes，例如：</p>
+<pre><code>- name: add several users
+  user: name={{ item.name }} state=present groups={{ item.groups }}
+  with_items:
+        - { name: &apos;testuser1&apos;, groups: &apos;wheel&apos;}
+        - { name: &apos;testuser2&apos;, groups: &apos;root&apos;}
+</code></pre><p><strong>【注意】：item是固定变量名。</strong></p>
+<h2 id="模板-JInjia2相关"><a href="#模板-JInjia2相关" class="headerlink" title="模板(JInjia2相关)"></a>模板(JInjia2相关)</h2><p>假如为两台webserver安装httpd，而他们的配置文件，172.16.7.152上的httpd需要监听80端口，172.16.7.153需要监听8080端口，ServerName也是不一样的，所以我们就需要两个配置文件，这管理起来极为不便。<br>在这种情况下，我们可以考虑在配置文件中使用变量来定义。</p>
+<pre><code>[root@node1 ~]# mkdir templates
+[root@node1 ~]# cp conf/httpd.conf templates/
+[root@node1 ~]# mv templates/httpd.conf templates/httpd.conf.j2
+</code></pre><p>后缀为j2表明是Jinja2模板。编辑这个模板：</p>
+<pre><code>[root@node1 ~]# vim templates/httpd.conf.j2
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/39.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/40.png" alt=""><br><strong>这个模板复制到每台主机上时都应该将这文件里的变量换成对应的值。这个模板就是Jinjia2模板。</strong><br>设置每台主机使用的变量值：</p>
+<pre><code>[root@node1 ~]# vim /etc/ansible/hosts
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/41.png" alt=""><br>当然这http_port和maxClients也可以在playbook中定义。但是那样我们没法区别每台主机使用不同的值了。因此我们要想让每个主机变量名相同但值不同时只能使用主机变量来定义。下面定义playbook：</p>
+<pre><code>[root@node1 ~]# vim apache.yml 
+- hosts: nginx
+  remote_user: root
+  vars:
+  - package: apache
+  tasks:
+  - name: install httpd package
+    yum: name={{ package }} state=latest
+  - name: install configuration file for httpd
+    template: src=/root/conf/httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf                                                                    
+    notify:
+    - restart httpd
+  - name: start httpd service 
+    service: enabled=true name=httpd state=started
+  handlers:
+  - name: restart httpd
+    service: name=httpd state=restarted
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/42.png" alt=""></p>
+<pre><code>[root@node1 ~]# ansible-playbook apache.yml 
+</code></pre><p>执行完成后，去查看两个节点的配置文件，发生变量都被替换了。</p>
+<h2 id="Jinja2相关"><a href="#Jinja2相关" class="headerlink" title="Jinja2相关"></a>Jinja2相关</h2><h3 id="字面量"><a href="#字面量" class="headerlink" title="字面量"></a>字面量</h3><p>表达式最简单的形式就是字面量。字面量表示诸如字符串和数值的Python对象。下面的字面量是可用的：<br>1.字符串：“Hello World”<br>双引号或单引号中间的一切都是字符串，无论何时你需要在模板中使用一个字符串（比如函数引用、过滤器或只是包含或继承一个模板的参数），它们都是有用的。</p>
+<p>2.整数和浮点数：42 / 42.23<br>直接写下数值就可以创建整数和浮点数。如果有小数点，则为浮点数，否则为整数。在Python里，42和42.0是不一样的。</p>
+<p>3.列表：[‘list’, ‘of’, ‘object’]<br>一对中括号括起来的东西是一个列表。列表用于存储和迭代序列化的数据。例如你可以容易地在for循环中用列表和元组创建一个链接的列表：</p>
+<pre><code>&lt;ul&gt;
+{% for href, caption in [('index.html', 'Index'), ('about.html', 'About'), ('download.html', 'Downloads')] %}
+            <li><a href="{{ href }}">{{ caption }}</a></li>
+        {% end for %}
+/ul&gt;
+</code></pre><p>4.元组：(‘tuple’, ‘of’, ‘values’)<br>元组和列表类似，只是不能修改里面的元素。如果元组中只有一项，你需要使用逗号结尾它。元组通常用于表示两个或更多元素的项。</p>
+<p>5.字典：{‘dict’: ‘of’, ‘key’: ‘and’, ‘value’: ‘pairs’}<br>Python中的字典是一种关联键和值的结构。键必须是唯一的，并且键必须只有一个值。</p>
+<p>6.Boolen：true / false</p>
+<h3 id="算术运算"><a href="#算术运算" class="headerlink" title="算术运算"></a>算术运算</h3><p>Jinja2允许你用计算值。这在模板中很少使用，但为了完整性允许其存在，支持下面的运算符：</p>
+<pre><code>+ 把两个对象加到一起，通常对象是整数或浮点数，但是如果两者是字符串或列表，你可以用这种方式来连接它们。无论如何这不是首选的连接字符串的方式。{{ 1 + 1 }}等于2。
+
+- 用第一个数减去第二个数，{{ 3 - 2 }}等于1.
+
+/ 对两个数做除法，返回值会是一个浮点数。{{ 1 / 2 }}等于{{ 0.5 }}。
+
+// 对两个手做除法，返回整数商，{{ 20 / 7 }}等于2。
+
+% 计算整数除法的余数。{{  11 % 7 }}等于4。
+
+* 用右边的数乘左边的操作数。{{ 2 * 2 }}会返回4，也可以用于重复一个字符串多次，{{ '=' * 80 }}会打印80个等号的横条。
+
+** 取左操作数的右操作数次幂，{{ 2**3 }}会返回8。
+</code></pre><h3 id="比较操作符"><a href="#比较操作符" class="headerlink" title="比较操作符"></a>比较操作符</h3><pre><code>== 比较两个对象是否相等。
+!= 比较两个对象是否不等。
+&gt; 如果左边大于右边，返回true。
+&lt; 如果左边小于右边，返回true。
+&gt;= 如果左边大于等于右边，返回true。
+&lt;= 如果左边小于等于右边，返回true。
+</code></pre>
+      
+    </div>
+
+    <div>
+      
         
-        <div class="collection-title">
-          <h2 class="archive-year motion-element" id="archive-year-2016">2016</h2>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Ansible-运维自动化/" rel="tag">#Ansible 运维自动化</a>
+          
         </div>
       
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/17/Ansible条件测试/" rel="prev" title="Ansible条件测试">
+                Ansible条件测试 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
       
 
       
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016/09/06/vpn简介及openvpn搭建/" itemprop="url">
-              
-                <span itemprop="name">vpn简介及openvpn搭建</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-09-06T11:33:59+08:00"
-              content="2016-09-06" >
-          09-06
-        </time>
-      </div>
-
-    </header>
+      
+    </footer>
   </article>
 
 
 
-    
-
-  </section>
-
-  
-
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -363,6 +533,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
       <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
 
@@ -384,8 +558,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -485,6 +668,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#迭代"><span class="nav-number">1.</span> <span class="nav-text">迭代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模板-JInjia2相关"><span class="nav-number">2.</span> <span class="nav-text">模板(JInjia2相关)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jinja2相关"><span class="nav-number">3.</span> <span class="nav-text">Jinja2相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#字面量"><span class="nav-number">3.1.</span> <span class="nav-text">字面量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算术运算"><span class="nav-number">3.2.</span> <span class="nav-text">算术运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#比较操作符"><span class="nav-number">3.3.</span> <span class="nav-text">比较操作符</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -588,11 +782,9 @@
 
 
   
-  
-    <script type="text/javascript" id="motion.page.archive">
-      $('.archive-year').velocity('transition.slideLeftIn');
-    </script>
-  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
 
 
   
