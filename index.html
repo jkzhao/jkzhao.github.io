@@ -391,87 +391,18 @@
 
       
         
-          
-            <h2 id="迭代"><a href="#迭代" class="headerlink" title="迭代"></a>迭代</h2><p>当有需要重复性执行的任务时，可以使用迭代机制。其使用格式为将需要迭代的内容定义为item变量引用，并通过with_items语句来指明迭代的元素列表即可。例如：</p>
+          <h2 id="迭代"><a href="#迭代" class="headerlink" title="迭代"></a>迭代</h2><p>当有需要重复性执行的任务时，可以使用迭代机制。其使用格式为将需要迭代的内容定义为item变量引用，并通过with_items语句来指明迭代的元素列表即可。例如：</p>
 <pre><code>- name: add several users
   user: name={{ item }} state=present groups=wheel
   with_items:
         - testuser1
         - testuser2
-</code></pre><p>上面语句的功能等同于下面的语句：</p>
-<pre><code>- name: add user testuser1
-  user: name=testuser1 state=present groups=wheel
-- name: add user testuser2
-  user: name=testuser2 state=present groups=wheel
-</code></pre><p>另外，with_items中使用的元素还可以是hashes，例如：</p>
-<pre><code>- name: add several users
-  user: name={{ item.name }} state=present groups={{ item.groups }}
-  with_items:
-        - { name: &apos;testuser1&apos;, groups: &apos;wheel&apos;}
-        - { name: &apos;testuser2&apos;, groups: &apos;root&apos;}
-</code></pre><p><strong>【注意】：item是固定变量名。</strong></p>
-<h2 id="模板-JInjia2相关"><a href="#模板-JInjia2相关" class="headerlink" title="模板(JInjia2相关)"></a>模板(JInjia2相关)</h2><p>假如为两台webserver安装httpd，而他们的配置文件，172.16.7.152上的httpd需要监听80端口，172.16.7.153需要监听8080端口，ServerName也是不一样的，所以我们就需要两个配置文件，这管理起来极为不便。<br>在这种情况下，我们可以考虑在配置文件中使用变量来定义。</p>
-<pre><code>[root@node1 ~]# mkdir templates
-[root@node1 ~]# cp conf/httpd.conf templates/
-[root@node1 ~]# mv templates/httpd.conf templates/httpd.conf.j2
-</code></pre><p>后缀为j2表明是Jinja2模板。编辑这个模板：</p>
-<pre><code>[root@node1 ~]# vim templates/httpd.conf.j2
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/39.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/40.png" alt=""><br><strong>这个模板复制到每台主机上时都应该将这文件里的变量换成对应的值。这个模板就是Jinjia2模板。</strong><br>设置每台主机使用的变量值：</p>
-<pre><code>[root@node1 ~]# vim /etc/ansible/hosts
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/41.png" alt=""><br>当然这http_port和maxClients也可以在playbook中定义。但是那样我们没法区别每台主机使用不同的值了。因此我们要想让每个主机变量名相同但值不同时只能使用主机变量来定义。下面定义playbook：</p>
-<pre><code>[root@node1 ~]# vim apache.yml 
-- hosts: nginx
-  remote_user: root
-  vars:
-  - package: apache
-  tasks:
-  - name: install httpd package
-    yum: name={{ package }} state=latest
-  - name: install configuration file for httpd
-    template: src=/root/conf/httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf                                                                    
-    notify:
-    - restart httpd
-  - name: start httpd service 
-    service: enabled=true name=httpd state=started
-  handlers:
-  - name: restart httpd
-    service: name=httpd state=restarted
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/42.png" alt=""></p>
-<pre><code>[root@node1 ~]# ansible-playbook apache.yml 
-</code></pre><p>执行完成后，去查看两个节点的配置文件，发生变量都被替换了。</p>
-<h2 id="Jinja2相关"><a href="#Jinja2相关" class="headerlink" title="Jinja2相关"></a>Jinja2相关</h2><h3 id="字面量"><a href="#字面量" class="headerlink" title="字面量"></a>字面量</h3><p>表达式最简单的形式就是字面量。字面量表示诸如字符串和数值的Python对象。下面的字面量是可用的：<br>1.字符串：“Hello World”<br>双引号或单引号中间的一切都是字符串，无论何时你需要在模板中使用一个字符串（比如函数引用、过滤器或只是包含或继承一个模板的参数），它们都是有用的。</p>
-<p>2.整数和浮点数：42 / 42.23<br>直接写下数值就可以创建整数和浮点数。如果有小数点，则为浮点数，否则为整数。在Python里，42和42.0是不一样的。</p>
-<p>3.列表：[‘list’, ‘of’, ‘object’]<br>一对中括号括起来的东西是一个列表。列表用于存储和迭代序列化的数据。例如你可以容易地在for循环中用列表和元组创建一个链接的列表：</p>
-<pre><code>&lt;ul&gt;
-{% for href, caption in [('index.html', 'Index'), ('about.html', 'About'), ('download.html', 'Downloads')] %}
-            <li><a href="{{ href }}">{{ caption }}</a></li>
-        {% end for %}
-/ul&gt;
-</code></pre><p>4.元组：(‘tuple’, ‘of’, ‘values’)<br>元组和列表类似，只是不能修改里面的元素。如果元组中只有一项，你需要使用逗号结尾它。元组通常用于表示两个或更多元素的项。</p>
-<p>5.字典：{‘dict’: ‘of’, ‘key’: ‘and’, ‘value’: ‘pairs’}<br>Python中的字典是一种关联键和值的结构。键必须是唯一的，并且键必须只有一个值。</p>
-<p>6.Boolen：true / false</p>
-<h3 id="算术运算"><a href="#算术运算" class="headerlink" title="算术运算"></a>算术运算</h3><p>Jinja2允许你用计算值。这在模板中很少使用，但为了完整性允许其存在，支持下面的运算符：</p>
-<pre><code>+ 把两个对象加到一起，通常对象是整数或浮点数，但是如果两者是字符串或列表，你可以用这种方式来连接它们。无论如何这不是首选的连接字符串的方式。{{ 1 + 1 }}等于2。
-
-- 用第一个数减去第二个数，{{ 3 - 2 }}等于1.
-
-/ 对两个数做除法，返回值会是一个浮点数。{{ 1 / 2 }}等于{{ 0.5 }}。
-
-// 对两个手做除法，返回整数商，{{ 20 / 7 }}等于2。
-
-% 计算整数除法的余数。{{  11 % 7 }}等于4。
-
-* 用右边的数乘左边的操作数。{{ 2 * 2 }}会返回4，也可以用于重复一个字符串多次，{{ '=' * 80 }}会打印80个等号的横条。
-
-** 取左操作数的右操作数次幂，{{ 2**3 }}会返回8。
-</code></pre><h3 id="比较操作符"><a href="#比较操作符" class="headerlink" title="比较操作符"></a>比较操作符</h3><pre><code>== 比较两个对象是否相等。
-!= 比较两个对象是否不等。
-&gt; 如果左边大于右边，返回true。
-&lt; 如果左边小于右边，返回true。
-&gt;= 如果左边大于等于右边，返回true。
-&lt;= 如果左边小于等于右边，返回true。
 </code></pre>
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/07/20/Ansible之迭代、模板/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>

@@ -115,7 +115,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/40.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/41.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/42.png">
-<meta property="og:updated_time" content="2017-07-20T09:11:26.000Z">
+<meta property="og:updated_time" content="2017-07-20T09:13:27.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Ansible之迭代、模板">
 <meta name="twitter:description" content="迭代当有需要重复性执行的任务时，可以使用迭代机制。其使用格式为将需要迭代的内容定义为item变量引用，并通过with_items语句来指明迭代的元素列表即可。例如： - name: add several users   user: name={{ item }} state=present groups=wheel   with_items:         - testuser1">
@@ -401,7 +401,8 @@
   with_items:
         - testuser1
         - testuser2
-</code></pre><p>上面语句的功能等同于下面的语句：</p>
+</code></pre><a id="more"></a>
+<p>上面语句的功能等同于下面的语句：</p>
 <pre><code>- name: add user testuser1
   user: name=testuser1 state=present groups=wheel
 - name: add user testuser2
