@@ -126,7 +126,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/13.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/14.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/15.png">
-<meta property="og:updated_time" content="2017-06-29T05:32:18.000Z">
+<meta property="og:updated_time" content="2017-07-23T04:31:52.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Elasticsearch介绍及安装部署">
 <meta name="twitter:description" content="Elasticsearch介绍Elasticsearch是一个分布式搜索服务，提供Restful API，底层基于Lucene，采用多shard的方式保证数据安全，并且提供自动resharding的功能，加之github等大型的站点也采用 Elasticsearch作为其搜索服务。">
@@ -437,7 +437,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="安装JDK1-8"><a href="#安装JDK1-8" class="headerlink" title="安装JDK1.8"></a>安装JDK1.8</h3><p>版本是Elasticsearch 2.2.3，官方建议jdk是1.8。<br><strong>3台机器都需要安装jdk1.7，添加新用户es。</strong></p>
+<h3 id="安装JDK1-8"><a href="#安装JDK1-8" class="headerlink" title="安装JDK1.8"></a>安装JDK1.8</h3><p>版本是Elasticsearch 2.2.3，官方建议jdk是1.8。<br><strong>3台机器都需要安装jdk1.8，添加新用户es。</strong></p>
 <pre><code>[root@log1 local]# mkdir /usr/java
 [root@log1 local]# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
 </code></pre><h3 id="添加用户"><a href="#添加用户" class="headerlink" title="添加用户"></a>添加用户</h3><p>Elasticsearch不能使用root用户去启动。</p>
@@ -681,7 +681,7 @@ curl -XPOST http:// 114.55.29.86:9200/index/fulltext/4 -d&apos;
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">25</span>
+              <span class="site-state-item-count">26</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

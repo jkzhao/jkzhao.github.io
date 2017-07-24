@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Ansible 运维自动化," />
 
 
 
@@ -104,12 +104,19 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="jkzhao's blog">
-<meta property="og:url" content="http://yoursite.com/categories/Zabbix/index.html">
+<meta name="description" content="tags介绍我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个t">
+<meta name="keywords" content="Ansible 运维自动化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible之tags介绍">
+<meta property="og:url" content="http://yoursite.com/2017/07/22/Ansible之tags介绍/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
+<meta property="og:description" content="tags介绍我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个t">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/43.png">
+<meta property="og:updated_time" content="2017-07-24T00:56:24.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="jkzhao's blog">
+<meta name="twitter:title" content="Ansible之tags介绍">
+<meta name="twitter:description" content="tags介绍我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个t">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/43.png">
 
 
 
@@ -127,7 +134,7 @@
   };
 </script>
 
-  <title> 分类: Zabbix | jkzhao's blog </title>
+  <title> Ansible之tags介绍 | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -158,7 +165,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -296,159 +303,171 @@
           <div id="content" class="content">
             
 
-  <section id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        Zabbix
-        <small>分类</small>
-      </h2>
-    </div>
-
+  <div id="posts" class="posts-expand">
     
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/24/zabbix的通知功能以及自定义脚本告警/" itemprop="url">
-              
-                <span itemprop="name">zabbix的通知功能以及自定义脚本告警</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-24T09:35:41+08:00"
-              content="2017-05-24" >
-          05-24
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/23/zabbix监控websphere和weblogic/" itemprop="url">
-              
-                <span itemprop="name">zabbix监控websphere和weblogic</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-23T21:25:25+08:00"
-              content="2017-05-23" >
-          05-23
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/16/zabbix监控Nginx/" itemprop="url">
-              
-                <span itemprop="name">zabbix监控Nginx</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-16T11:04:58+08:00"
-              content="2017-05-16" >
-          05-16
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/14/zabbix监控实例/" itemprop="url">
-              
-                <span itemprop="name">zabbix监控实例</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-14T21:44:33+08:00"
-              content="2017-05-14" >
-          05-14
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/10/zabbix安装配置/" itemprop="url">
-              
-                <span itemprop="name">zabbix安装配置</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-10T10:53:23+08:00"
-              content="2017-05-10" >
-          05-10
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-  </section>
 
   
+  
 
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Ansible之tags介绍
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-07-22T20:37:16+08:00" content="2017-07-22">
+              2017-07-22
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
+                    <span itemprop="name">运维自动化</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/07/22/Ansible之tags介绍/" class="leancloud_visitors" data-flag-title="Ansible之tags介绍">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="tags介绍"><a href="#tags介绍" class="headerlink" title="tags介绍"></a>tags介绍</h2><p>我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。<br>如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个task，你可以给这个task定义一个tags，例如：</p>
+<pre><code>[root@node1 ~]# vim apache.yml 
+- hosts: nginx
+  remote_user: root
+  vars:
+  - package: apache
+  tasks:
+  - name: install httpd package
+    yum: name={{ package }} state=latest
+  - name: install configuration file for httpd
+    template: src=/root/conf/httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf
+    tags:
+    - conf                                                                    
+    notify:
+    - restart httpd
+  - name: start httpd service 
+    service: enabled=true name=httpd state=started
+  handlers:
+  - name: restart httpd
+    service: name=httpd state=restarted
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/43.png" alt=""><br>运行：</p>
+<pre><code>[root@node1 ~]# ansible-playbook apache.yml --tags=&quot;conf&quot;
+</code></pre><p>如果一个playbook中有多个tags，但是有个tag你不想跑，可以使用–skip-tags。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Ansible-运维自动化/" rel="tag">#Ansible 运维自动化</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/20/Ansible之迭代、模板/" rel="prev" title="Ansible之迭代、模板">
+                Ansible之迭代、模板 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -456,6 +475,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
       <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
 
@@ -477,8 +500,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -578,6 +610,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#tags介绍"><span class="nav-number">1.</span> <span class="nav-text">tags介绍</span></a></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -681,6 +724,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 
