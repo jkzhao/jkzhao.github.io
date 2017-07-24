@@ -391,7 +391,7 @@
 
       
         
-          <h2 id="什么场景下会用roles？"><a href="#什么场景下会用roles？" class="headerlink" title="什么场景下会用roles？"></a>什么场景下会用roles？</h2><p>假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？<br>第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不利于多次调。比如说后来又加进来一个主机，这个第4个主机既是httpd服务器，又是php服务器，我们只能写第4个play，上面写上安装httpd和php。这样playbook中的代码就重复了。<br>为了避免代码重复，roles能够实现代码重复被调用。定义一个角色叫websrvs，第二个角色叫phpappsrvs，第三个角色叫dbsrvs。那么调用时如下来调用：<br>
+          <h2 id="什么场景下会用roles？"><a href="#什么场景下会用roles？" class="headerlink" title="什么场景下会用roles？"></a>什么场景下会用roles？</h2><p>假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？<br>第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不利于多次调。比如说后来又加进来一个主机，这个第4个主机既是httpd服务器，又是php服务器，我们只能写第4个play，上面写上安装httpd和php。这样playbook中的代码就重复了。<br>
           <div class="post-more-link text-center">
             <a class="btn" href="/2017/07/24/Ansible之roles介绍/#more" rel="contents">
               阅读全文 &raquo;
