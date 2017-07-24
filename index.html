@@ -391,32 +391,12 @@
 
       
         
-          
-            <h2 id="tags介绍"><a href="#tags介绍" class="headerlink" title="tags介绍"></a>tags介绍</h2><p>我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。<br>如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个task，你可以给这个task定义一个tags，例如：</p>
-<pre><code>[root@node1 ~]# vim apache.yml 
-- hosts: nginx
-  remote_user: root
-  vars:
-  - package: apache
-  tasks:
-  - name: install httpd package
-    yum: name={{ package }} state=latest
-  - name: install configuration file for httpd
-    template: src=/root/conf/httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf
-    tags:
-    - conf                                                                    
-    notify:
-    - restart httpd
-  - name: start httpd service 
-    service: enabled=true name=httpd state=started
-  handlers:
-  - name: restart httpd
-    service: name=httpd state=restarted
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/43.png" alt=""><br>运行：</p>
-<pre><code>[root@node1 ~]# ansible-playbook apache.yml --tags=&quot;conf&quot;
-</code></pre><p>如果一个playbook中有多个tags，但是有个tag你不想跑，可以使用–skip-tags。</p>
-
-          
+          <h2 id="tags介绍"><a href="#tags介绍" class="headerlink" title="tags介绍"></a>tags介绍</h2><p>我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。<br>如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个task，你可以给这个task定义一个tags，例如：<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/07/22/Ansible之tags介绍/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>

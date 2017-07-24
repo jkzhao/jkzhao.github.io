@@ -112,7 +112,7 @@
 <meta property="og:site_name" content="jkzhao's blog">
 <meta property="og:description" content="tags介绍我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个t">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/43.png">
-<meta property="og:updated_time" content="2017-07-24T00:56:24.000Z">
+<meta property="og:updated_time" content="2017-07-24T01:01:28.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Ansible之tags介绍">
 <meta name="twitter:description" content="tags介绍我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个t">
@@ -392,7 +392,7 @@
       
 
       
-        <h2 id="tags介绍"><a href="#tags介绍" class="headerlink" title="tags介绍"></a>tags介绍</h2><p>我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。<br>如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个task，你可以给这个task定义一个tags，例如：</p>
+        <h2 id="tags介绍"><a href="#tags介绍" class="headerlink" title="tags介绍"></a>tags介绍</h2><p>我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。<br>如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个task，你可以给这个task定义一个tags，例如：<br><a id="more"></a></p>
 <pre><code>[root@node1 ~]# vim apache.yml 
 - hosts: nginx
   remote_user: root
