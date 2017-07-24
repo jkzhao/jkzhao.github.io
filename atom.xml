@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-07-24T01:01:28.000Z</updated>
+  <updated>2017-07-24T02:48:02.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,115 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Ansible之roles介绍</title>
+    <link href="http://yoursite.com/2017/07/24/Ansible%E4%B9%8Broles%E4%BB%8B%E7%BB%8D/"/>
+    <id>http://yoursite.com/2017/07/24/Ansible之roles介绍/</id>
+    <published>2017-07-24T01:09:22.000Z</published>
+    <updated>2017-07-24T02:48:02.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;什么场景下会用roles？&quot;&gt;&lt;a href=&quot;#什么场景下会用roles？&quot; class=&quot;headerlink&quot; title=&quot;什么场景下会用roles？&quot;&gt;&lt;/a&gt;什么场景下会用roles？&lt;/h2&gt;&lt;p&gt;假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？&lt;br&gt;第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不利于多次调。比如说后来又加进来一个主机，这个第4个主机既是httpd服务器，又是php服务器，我们只能写第4个play，上面写上安装httpd和php。这样playbook中的代码就重复了。&lt;br&gt;为了避免代码重复，roles能够实现代码重复被调用。定义一个角色叫websrvs，第二个角色叫phpappsrvs，第三个角色叫dbsrvs。那么调用时如下来调用：&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;hosts: host1
+role:
+- websrvs
+
+hosts: host2
+role:
+- phpappsrvs
+
+hosts: host3
+role:
+- dbsrvs
+
+hosts: host4
+role:
+- websrvs
+- phpappsrvs
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这样代码就可以重复利用了,每个角色可以被独立重复调用。下面举例说明使用方式。&lt;/p&gt;
+&lt;h2 id=&quot;roles示例&quot;&gt;&lt;a href=&quot;#roles示例&quot; class=&quot;headerlink&quot; title=&quot;roles示例&quot;&gt;&lt;/a&gt;roles示例&lt;/h2&gt;&lt;p&gt;假设有3台主机，172.16.7.151主机上安装MySQL，172.16.7.152上安装httpd，172.16.7.153上安装MySQL和httpd。我们建立两个角色websrvs和dbsrvs，然后应用到这几个主机上。&lt;/p&gt;
+&lt;h3 id=&quot;创建roles的必需目录&quot;&gt;&lt;a href=&quot;#创建roles的必需目录&quot; class=&quot;headerlink&quot; title=&quot;创建roles的必需目录&quot;&gt;&lt;/a&gt;创建roles的必需目录&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 opt]# mkdir -pv ansible_playbooks/roles/{websrvs,dbsrvs}/{tasks,files,templates,meta,handlers,vars}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/44.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/45.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;每个role下面有个目录叫meta，在里面可以新建文件main.yml，在文件中可以设置该role和其它role之前的关联关系。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/46.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;配置角色&quot;&gt;&lt;a href=&quot;#配置角色&quot; class=&quot;headerlink&quot; title=&quot;配置角色&quot;&gt;&lt;/a&gt;配置角色&lt;/h3&gt;&lt;h4 id=&quot;配置角色websrvs&quot;&gt;&lt;a href=&quot;#配置角色websrvs&quot; class=&quot;headerlink&quot; title=&quot;配置角色websrvs&quot;&gt;&lt;/a&gt;配置角色websrvs&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 opt]# cd ansible_playbooks/roles/
+[root@node1 roles]# cd websrvs/
+[root@node1 websrvs]# ls
+files  handlers  meta  tasks  templates  vars
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;1.将httpd配置文件上传到files目录下，我这里假设httpd.conf每台主机都是一样的，实际上应该用模板，先用一样的配置文件举例&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 websrvs]# cp /etc/httpd/conf/httpd.conf files/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;直接复制的静态文件都放在files目录下。打算用模板文件的都放在templates目录下。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;2.编写任务列表tasks&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 websrvs]# vim tasks/main.yml
+- name: install httpd package
+  yum: name=httpd
+- name: install configuration file
+  copy: src=httpd.conf dest=/etc/httpd/conf
+  tags:
+  - conf
+  notify:
+  - restart httpd
+- name: start httpd
+  service: name=httpd state=started
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/47.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;3.由于上面的tasks中定义了notify，所以要定义handlers&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 websrvs]# vim handlers/main.yml
+- name: restart httpd
+  service: name=httpd state=restarted
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果需要定义变量，则在vars目录下创建main.yml文件，在文件中写入变量，以key:value的形式定义，比如：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;http_port: 8080
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;配置角色dbsrvs&quot;&gt;&lt;a href=&quot;#配置角色dbsrvs&quot; class=&quot;headerlink&quot; title=&quot;配置角色dbsrvs&quot;&gt;&lt;/a&gt;配置角色dbsrvs&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 roles]# cd dbsrvs/
+[root@node1 dbsrvs]# ls
+files  handlers  meta  tasks  templates  vars
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;1.将MySQL配置文件上传到files目录下。&lt;br&gt;2.编写任务列表tasks&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 dbsrvs]# vim tasks/main.yml
+- name: install mysql-server package
+  yum: name=mysql-server state=latest
+- name: install configuration file
+  copy: src=my.cnf dest/etc/my.cnf
+  tags:
+  - conf
+  notify:
+  - restart mysqld
+- name:
+  service: name=mysqld enabled=true state=started
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.定义handlers&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 dbsrvs]# vim handlers/main.yml
+- name: restart mysqld
+  service: name=mysqld state=restarted
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;定义playbook&quot;&gt;&lt;a href=&quot;#定义playbook&quot; class=&quot;headerlink&quot; title=&quot;定义playbook&quot;&gt;&lt;/a&gt;定义playbook&lt;/h4&gt;&lt;p&gt;【注意】：要在roles目录同级创建playbook。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim web.yml
+- hosts: 172.16.7.152
+  roles:
+  - websrvs 
+
+[root@node1 ansible_playbooks]# vim db.yml
+- hosts: 172.16.7.151
+  roles:
+  - dbsrvs 
+
+[root@node1 ansible_playbooks]# vim site.yml
+- hosts: 172.16.7.153
+  roles:
+  - websrvs
+  - dbsrvs 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# ansible-playbook web.yml
+[root@node1 ansible_playbooks]# ansible-playbook db.yml
+[root@node1 ansible_playbooks]# ansible-playbook site.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;当然也可以把这些内容写入同一个playbook中。playbook的名字可以自定义。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;什么场景下会用roles？&quot;&gt;&lt;a href=&quot;#什么场景下会用roles？&quot; class=&quot;headerlink&quot; title=&quot;什么场景下会用roles？&quot;&gt;&lt;/a&gt;什么场景下会用roles？&lt;/h2&gt;&lt;p&gt;假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？&lt;br&gt;第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不利于多次调。比如说后来又加进来一个主机，这个第4个主机既是httpd服务器，又是php服务器，我们只能写第4个play，上面写上安装httpd和php。这样playbook中的代码就重复了。&lt;br&gt;为了避免代码重复，roles能够实现代码重复被调用。定义一个角色叫websrvs，第二个角色叫phpappsrvs，第三个角色叫dbsrvs。那么调用时如下来调用：&lt;br&gt;
+    
+    </summary>
+    
+      <category term="运维自动化" scheme="http://yoursite.com/categories/%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
+    
+    
+      <category term="Ansible 运维自动化" scheme="http://yoursite.com/tags/Ansible-%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
+    
+  </entry>
   
   <entry>
     <title>Ansible之tags介绍</title>
@@ -2842,75 +2951,6 @@ Include=/usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/*.conf
     
     
       <category term="监控 zabbix" scheme="http://yoursite.com/tags/%E7%9B%91%E6%8E%A7-zabbix/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>速成RPM包制作</title>
-    <link href="http://yoursite.com/2017/04/21/%E9%80%9F%E6%88%90RPM%E5%8C%85%E5%88%B6%E4%BD%9C/"/>
-    <id>http://yoursite.com/2017/04/21/速成RPM包制作/</id>
-    <published>2017-04-21T06:38:46.000Z</published>
-    <updated>2017-04-21T09:43:10.000Z</updated>
-    
-    <content type="html">&lt;h1 id=&quot;FPM&quot;&gt;&lt;a href=&quot;#FPM&quot; class=&quot;headerlink&quot; title=&quot;FPM&quot;&gt;&lt;/a&gt;FPM&lt;/h1&gt;&lt;p&gt;由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。&lt;br&gt;通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。&lt;br&gt;FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;&lt;strong&gt;支持的源类型包：&lt;/strong&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;dir 将目录打包成所需要的类型，可以用于源码编译安装的软件包&lt;/li&gt;
-&lt;li&gt;rpm 对rpm进行转换&lt;/li&gt;
-&lt;li&gt;gem 对rubygem包进行转换&lt;/li&gt;
-&lt;li&gt;python 将python模块打包成相应的类型&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;strong&gt;支持的目标类型包：&lt;/strong&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;rpm 转换成rpm包&lt;/li&gt;
-&lt;li&gt;deb 转换成deb包&lt;/li&gt;
-&lt;li&gt;solaris 转换成solaris包&lt;/li&gt;
-&lt;li&gt;puppet 转换成puppet模块&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h1 id=&quot;安装FPM&quot;&gt;&lt;a href=&quot;#安装FPM&quot; class=&quot;headerlink&quot; title=&quot;安装FPM&quot;&gt;&lt;/a&gt;安装FPM&lt;/h1&gt;&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;安装依赖包&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# yum -y install ruby rubygems ruby-devel&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;添加仓库&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# gem sources -a http://gems.ruby-china.org/&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;移除原有的仓库&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# gem sources --remove https://rubygems.org/&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;查看仓库是不是只有自己添加的那个仓库地址&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# gem sources -l &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;https://gems.ruby-china.org&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;安装fpm&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# gem install fpm&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;如何查看fpm帮助&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# fpm --help&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;strong&gt;常用参数：&lt;/strong&gt;&lt;br&gt;-s 指定源类型&lt;br&gt;-t 指定目标类型&lt;br&gt;-n 指定包的名字&lt;br&gt;-v 指定包的版本号&lt;br&gt;-C 指定打包的相对路径 change directory to here before searching for files&lt;br&gt;-d 指定依赖于哪些包&lt;br&gt;-f 第二次打包时目录下如果有同名安装包存在，则覆盖它&lt;br&gt;-p 输出的安装包的目录，不想放在当前目录下就需要指定&lt;br&gt;–post-install 软件包安装完成之后所要运行的脚本，同–after-install&lt;br&gt;–pre-install 软件包安装完成之前所要运行的脚本，同–before-install&lt;br&gt;–post-uninstall 软件包卸载之后所要运行的脚本，同–after-install&lt;br&gt;–pre-uninstall 软件包卸载之前所要运行的脚本，同–before-install&lt;/p&gt;
-&lt;h1 id=&quot;打包示例&quot;&gt;&lt;a href=&quot;#打包示例&quot; class=&quot;headerlink&quot; title=&quot;打包示例&quot;&gt;&lt;/a&gt;打包示例&lt;/h1&gt;&lt;ol&gt;
-&lt;li&gt;打包MySQL&lt;br&gt;事先安装好MySQL，MySQL安装过程这里不在详述。命令行终端输入以下命令，然后等待rpm包制作完成。&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# fpm -s dir -t rpm -n mysql -v 5.6.27 --description &amp;apos;author: jkzhao&amp;apos; -d &amp;apos;libaio&amp;apos; -d &amp;apos;libaio-devel&amp;apos; --pre-install /usr/local/mysql/mysql_pre_init.sh --post-install /usr/local/mysql/mysql_post_init.sh  /usr/local/mysql /usr/local/mysql-5.6.27-linux-glibc2.5-x86_64 /data&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;：默认打好的包是在当前目录下。&lt;br&gt;&lt;strong&gt;命令说明：&lt;/strong&gt;&lt;br&gt;    -s dir：指定源文件是目录的形式&lt;br&gt;    -t rpm：指定打包的格式&lt;br&gt;    -n：指定打包后名称&lt;br&gt;    -v：版本号&lt;br&gt;   –description：描述信息&lt;br&gt;    -d：指定需要依赖的包。安装MySQL前需要在系统上安装libaio、libaio-devel。当你安装fpm打包成的rpm包时，它会先去检测系统上是否安装了这两个包，如果没有安装会给出提示，并终止rpm的安装。&lt;br&gt;    –pre-install：安装rpm包前需要执行的脚本&lt;br&gt;    –post-install：安装rpm包后需要执行的脚本 &lt;br&gt;&lt;br&gt;其中，mysql_pre_init.sh的内容如下：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;#!/bin/bash&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;user=mysql&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;group=mysql&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# create group if not exists.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;egrep &amp;quot;^$group&amp;quot; /etc/group &amp;gt;&amp;amp; /dev/null&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;if [ $? -ne 0 ]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;then&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    groupadd -r -g 300 $group&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;fi&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# create user if not exists.  &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;egrep &amp;quot;^$user&amp;quot; /etc/passwd &amp;gt;&amp;amp; /dev/null&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;if [ $? -ne 0 ]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;then&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    useradd -g $group -r -s /sbin/nologin -u 300 $user&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;fi&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;mysql_post_init.sh的内容如下：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;#!/bin/bash&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# cp my.cnf force.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;\cp /usr/local/mysql/my.cnf /etc/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# start/stop/restart script.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;\cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;chkconfig --add mysqld&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# MySQL Client PATH.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;\cp /usr/local/mysql/mysql.sh /etc/profile.d/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;cd /usr/local/mysql&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;chown -R root.mysql .&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;chown -R mysql.mysql /data&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;打包完成后正常安装，如：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# rpm -ivh mysql-5.6.27-1.x86_64.rpm&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;打包openresty&lt;br&gt;事先安装好openresty。命令行终端输入以下命令，然后等待rpm包制作完成。&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# fpm -s dir -t rpm -n openresty -v 1.9.7.3 --description &amp;apos;author: jkzhao&amp;apos; -d &amp;apos;openssl-devel&amp;apos; -d &amp;apos;readline-devel&amp;apos; -d &amp;apos;pcre-devel&amp;apos; -d &amp;apos;gcc&amp;apos; --post-install /usr/local/openresty/openresty_init.sh  /usr/local/openresty&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;其中，openresty_init.sh的内容如下：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;#!/bin/bash&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;mv /usr/local/openresty/nginx.service /etc/systemd/system/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;systemctl enable nginx.service&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;h1 id=&quot;如何卸载FPM打包好的rpm包&quot;&gt;&lt;a href=&quot;#如何卸载FPM打包好的rpm包&quot; class=&quot;headerlink&quot; title=&quot;如何卸载FPM打包好的rpm包&quot;&gt;&lt;/a&gt;如何卸载FPM打包好的rpm包&lt;/h1&gt;&lt;p&gt;如果重新安装rpm，必须先卸载rpm包，然后删除相应的目录及文件，否则再次安装时会报错。&lt;br&gt;&lt;strong&gt;注意：&lt;/strong&gt;卸载不要直接删除目录和文件，否则你再次安装这个包时会说已安装，冲突了。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# rpm -e --nodeps  mysql-5.6.27-1.x86_64.rpm&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;然后再去删除各个目录和配置文件。&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h1 id=&quot;FPM&quot;&gt;&lt;a href=&quot;#FPM&quot; class=&quot;headerlink&quot; title=&quot;FPM&quot;&gt;&lt;/a&gt;FPM&lt;/h1&gt;&lt;p&gt;由于很多软件在安装时需要编译，这会浪费不少的时间，为了提升部署效率，于是就想到制作rpm包。&lt;br&gt;通常rpm包的制作是使用rpmbuild命令来制作，但是你需要知道它的语法，比较繁琐。这就用到了FPM。&lt;br&gt;FPM功能简单说就是将一种类型的包转换成另一种类型。FPM是Ruby模块，其实打包时也是调用rpmbuild命令。&lt;br&gt;
-    
-    </summary>
-    
-    
-      <category term="rpm" scheme="http://yoursite.com/tags/rpm/"/>
     
   </entry>
   

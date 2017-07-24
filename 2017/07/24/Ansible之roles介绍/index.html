@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Ansible 运维自动化," />
 
 
 
@@ -104,12 +104,22 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="jkzhao's blog">
-<meta property="og:url" content="http://yoursite.com/tags/大数据，Hadoop/index.html">
+<meta name="description" content="什么场景下会用roles？假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不">
+<meta name="keywords" content="Ansible 运维自动化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible之roles介绍">
+<meta property="og:url" content="http://yoursite.com/2017/07/24/Ansible之roles介绍/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
+<meta property="og:description" content="什么场景下会用roles？假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/44.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/45.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/46.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/47.png">
+<meta property="og:updated_time" content="2017-07-24T02:48:02.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="jkzhao's blog">
+<meta name="twitter:title" content="Ansible之roles介绍">
+<meta name="twitter:description" content="什么场景下会用roles？假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/44.png">
 
 
 
@@ -127,7 +137,7 @@
   };
 </script>
 
-  <title> 标签: 大数据，Hadoop | jkzhao's blog </title>
+  <title> Ansible之roles介绍 | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -158,7 +168,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -296,74 +306,235 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        大数据，Hadoop
-        <small>标签</small>
-      </h2>
-    </div>
-
+  <div id="posts" class="posts-expand">
     
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016/08/07/安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)/" itemprop="url">
-              
-                <span itemprop="name">安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-08-07T16:51:08+08:00"
-              content="2016-08-07" >
-          08-07
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016/08/04/安装部署Apache Hadoop (本地模式和伪分布式)/" itemprop="url">
-              
-                <span itemprop="name">安装部署Apache Hadoop (本地模式和伪分布式)</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-08-04T08:48:36+08:00"
-              content="2016-08-04" >
-          08-04
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-  </div>
 
   
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Ansible之roles介绍
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-07-24T09:09:22+08:00" content="2017-07-24">
+              2017-07-24
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
+                    <span itemprop="name">运维自动化</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/07/24/Ansible之roles介绍/" class="leancloud_visitors" data-flag-title="Ansible之roles介绍">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="什么场景下会用roles？"><a href="#什么场景下会用roles？" class="headerlink" title="什么场景下会用roles？"></a>什么场景下会用roles？</h2><p>假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？<br>第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不利于多次调。比如说后来又加进来一个主机，这个第4个主机既是httpd服务器，又是php服务器，我们只能写第4个play，上面写上安装httpd和php。这样playbook中的代码就重复了。<br>为了避免代码重复，roles能够实现代码重复被调用。定义一个角色叫websrvs，第二个角色叫phpappsrvs，第三个角色叫dbsrvs。那么调用时如下来调用：<br><a id="more"></a></p>
+<pre><code>hosts: host1
+role:
+- websrvs
+
+hosts: host2
+role:
+- phpappsrvs
+
+hosts: host3
+role:
+- dbsrvs
+
+hosts: host4
+role:
+- websrvs
+- phpappsrvs
+</code></pre><p>这样代码就可以重复利用了,每个角色可以被独立重复调用。下面举例说明使用方式。</p>
+<h2 id="roles示例"><a href="#roles示例" class="headerlink" title="roles示例"></a>roles示例</h2><p>假设有3台主机，172.16.7.151主机上安装MySQL，172.16.7.152上安装httpd，172.16.7.153上安装MySQL和httpd。我们建立两个角色websrvs和dbsrvs，然后应用到这几个主机上。</p>
+<h3 id="创建roles的必需目录"><a href="#创建roles的必需目录" class="headerlink" title="创建roles的必需目录"></a>创建roles的必需目录</h3><pre><code>[root@node1 opt]# mkdir -pv ansible_playbooks/roles/{websrvs,dbsrvs}/{tasks,files,templates,meta,handlers,vars}
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/44.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/45.png" alt=""><br>每个role下面有个目录叫meta，在里面可以新建文件main.yml，在文件中可以设置该role和其它role之前的关联关系。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/46.png" alt=""></p>
+<h3 id="配置角色"><a href="#配置角色" class="headerlink" title="配置角色"></a>配置角色</h3><h4 id="配置角色websrvs"><a href="#配置角色websrvs" class="headerlink" title="配置角色websrvs"></a>配置角色websrvs</h4><pre><code>[root@node1 opt]# cd ansible_playbooks/roles/
+[root@node1 roles]# cd websrvs/
+[root@node1 websrvs]# ls
+files  handlers  meta  tasks  templates  vars
+</code></pre><p>1.将httpd配置文件上传到files目录下，我这里假设httpd.conf每台主机都是一样的，实际上应该用模板，先用一样的配置文件举例</p>
+<pre><code>[root@node1 websrvs]# cp /etc/httpd/conf/httpd.conf files/
+</code></pre><p><strong>直接复制的静态文件都放在files目录下。打算用模板文件的都放在templates目录下。</strong></p>
+<p>2.编写任务列表tasks</p>
+<pre><code>[root@node1 websrvs]# vim tasks/main.yml
+- name: install httpd package
+  yum: name=httpd
+- name: install configuration file
+  copy: src=httpd.conf dest=/etc/httpd/conf
+  tags:
+  - conf
+  notify:
+  - restart httpd
+- name: start httpd
+  service: name=httpd state=started
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/47.png" alt=""></p>
+<p>3.由于上面的tasks中定义了notify，所以要定义handlers</p>
+<pre><code>[root@node1 websrvs]# vim handlers/main.yml
+- name: restart httpd
+  service: name=httpd state=restarted
+</code></pre><p>如果需要定义变量，则在vars目录下创建main.yml文件，在文件中写入变量，以key:value的形式定义，比如：</p>
+<pre><code>http_port: 8080
+</code></pre><h4 id="配置角色dbsrvs"><a href="#配置角色dbsrvs" class="headerlink" title="配置角色dbsrvs"></a>配置角色dbsrvs</h4><pre><code>[root@node1 roles]# cd dbsrvs/
+[root@node1 dbsrvs]# ls
+files  handlers  meta  tasks  templates  vars
+</code></pre><p>1.将MySQL配置文件上传到files目录下。<br>2.编写任务列表tasks</p>
+<pre><code>[root@node1 dbsrvs]# vim tasks/main.yml
+- name: install mysql-server package
+  yum: name=mysql-server state=latest
+- name: install configuration file
+  copy: src=my.cnf dest/etc/my.cnf
+  tags:
+  - conf
+  notify:
+  - restart mysqld
+- name:
+  service: name=mysqld enabled=true state=started
+</code></pre><p>3.定义handlers</p>
+<pre><code>[root@node1 dbsrvs]# vim handlers/main.yml
+- name: restart mysqld
+  service: name=mysqld state=restarted
+</code></pre><h4 id="定义playbook"><a href="#定义playbook" class="headerlink" title="定义playbook"></a>定义playbook</h4><p>【注意】：要在roles目录同级创建playbook。</p>
+<pre><code>[root@node1 ansible_playbooks]# vim web.yml
+- hosts: 172.16.7.152
+  roles:
+  - websrvs 
+
+[root@node1 ansible_playbooks]# vim db.yml
+- hosts: 172.16.7.151
+  roles:
+  - dbsrvs 
+
+[root@node1 ansible_playbooks]# vim site.yml
+- hosts: 172.16.7.153
+  roles:
+  - websrvs
+  - dbsrvs 
+</code></pre><p>运行：</p>
+<pre><code>[root@node1 ansible_playbooks]# ansible-playbook web.yml
+[root@node1 ansible_playbooks]# ansible-playbook db.yml
+[root@node1 ansible_playbooks]# ansible-playbook site.yml
+</code></pre><p>当然也可以把这些内容写入同一个playbook中。playbook的名字可以自定义。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Ansible-运维自动化/" rel="tag">#Ansible 运维自动化</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/22/Ansible之tags介绍/" rel="prev" title="Ansible之tags介绍">
+                Ansible之tags介绍 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -371,6 +542,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
       <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
 
@@ -392,8 +567,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -493,6 +677,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么场景下会用roles？"><span class="nav-number">1.</span> <span class="nav-text">什么场景下会用roles？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#roles示例"><span class="nav-number">2.</span> <span class="nav-text">roles示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建roles的必需目录"><span class="nav-number">2.1.</span> <span class="nav-text">创建roles的必需目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置角色"><span class="nav-number">2.2.</span> <span class="nav-text">配置角色</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置角色websrvs"><span class="nav-number">2.2.1.</span> <span class="nav-text">配置角色websrvs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置角色dbsrvs"><span class="nav-number">2.2.2.</span> <span class="nav-text">配置角色dbsrvs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#定义playbook"><span class="nav-number">2.2.3.</span> <span class="nav-text">定义playbook</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -596,6 +791,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 
