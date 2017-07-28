@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-07-28T08:51:02.000Z</updated>
+  <updated>2017-07-28T09:11:52.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,12 +20,12 @@
     <link href="http://yoursite.com/2017/07/27/Ansible%E5%AE%9E%E6%88%98%EF%BC%9A%E9%83%A8%E7%BD%B2%E5%88%86%E5%B8%83%E5%BC%8F%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/"/>
     <id>http://yoursite.com/2017/07/27/Ansible实战：部署分布式日志系统/</id>
     <published>2017-07-27T12:30:05.000Z</published>
-    <updated>2017-07-28T08:51:02.000Z</updated>
+    <updated>2017-07-28T09:11:52.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;分布式日志系统架构图&quot;&gt;&lt;a href=&quot;#分布式日志系统架构图&quot; class=&quot;headerlink&quot; title=&quot;分布式日志系统架构图&quot;&gt;&lt;/a&gt;分布式日志系统架构图&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/48.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h2 id=&quot;创建roles&quot;&gt;&lt;a href=&quot;#创建roles&quot; class=&quot;headerlink&quot; title=&quot;创建roles&quot;&gt;&lt;/a&gt;创建roles&lt;/h2&gt;&lt;p&gt;每一个软件或集群都创建一个单独的角色。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# mkdir -pv ansible_playbooks/roles/{db_server,web_server,redis_server,zk_server,kafka_server,es_server,tomcat_server,flume_agent,hadoop,spark,hbase,hive}/{tasks,files,templates,meta,handlers,vars} 
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# mkdir -pv ansible_playbooks/roles/{db_server,web_server,redis_server,zk_server,kafka_server,es_server,tomcat_server,flume_agent,hadoop,spark,hbase,hive,jdk7,jdk8}/{tasks,files,templates,meta,handlers,vars} 
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/49.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h3 id=&quot;JDK7-role&quot;&gt;&lt;a href=&quot;#JDK7-role&quot; class=&quot;headerlink&quot; title=&quot;JDK7 role&quot;&gt;&lt;/a&gt;JDK7 role&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 jdk7]# pwd
 /root/ansible_playbooks/roles/jdk7
@@ -114,7 +114,7 @@ files  handlers  meta  tasks  templates  vars
   - start
 &lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates&quot;&gt;&lt;a href=&quot;#编写templates&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;p&gt;将zookeeper-3.4.6.tar.gz包中的默认配置文件重命名为zoo.cfg.j2，并修改其中的内容。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim roles/zk_server/templates/zoo.cfg.j2
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;配置文件内容过多，具体见github。配置文件内容也不在解释，在前面博客中的文章中都已写明。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;配置文件内容过多，具体见github，地址是&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。配置文件内容也不在解释，在前面博客中的文章中都已写明。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。配置文件内容也不在解释，在前面博客中的文章中都已写明。&lt;/a&gt;&lt;/p&gt;
 &lt;h4 id=&quot;编写vars-2&quot;&gt;&lt;a href=&quot;#编写vars-2&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 zk_server]# vim vars/main.yml 
 server1_hostname: hadoop27                                                                                                                    
 server2_hostname: hadoop28
@@ -168,7 +168,7 @@ files  handlers  meta  tasks  templates  vars
   tags:                                        
   - kafkaManagerStart
 &lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates-1&quot;&gt;&lt;a href=&quot;#编写templates-1&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 kafka_server]# vim templates/server.properties.j2 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;配置文件内容过多，具体见github。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;配置文件内容过多，具体见github，地址是&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/a&gt;&lt;/p&gt;
 &lt;h4 id=&quot;编写vars-3&quot;&gt;&lt;a href=&quot;#编写vars-3&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 kafka_server]# vim vars/main.yml
 zk_cluster: 172.16.7.151:2181,172.16.7.152:2181,172.16.7.153:2181
 kafka_manager_ip: 172.16.7.151 
@@ -231,7 +231,7 @@ files  handlers  meta  tasks  templates  vars
   tags:
   - start
 &lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates-2&quot;&gt;&lt;a href=&quot;#编写templates-2&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;p&gt;将模板elasticsearch.in.sh.j2和elasticsearch.yml.j2放入templates目录下&lt;br&gt;&lt;strong&gt;注意模板里的变量名中间不能用。比如：这样的变量名是不合法的。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;配置文件内容过多，具体见github。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/p&gt;
+&lt;p&gt;配置文件内容过多，具体见github，地址是&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/a&gt;&lt;/p&gt;
 &lt;h4 id=&quot;编写vars-4&quot;&gt;&lt;a href=&quot;#编写vars-4&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 es_server]# vim vars/main.yml
 ES_MEM: 2g
 cluster_name: wisedu
@@ -320,7 +320,7 @@ files  handlers  meta  tasks  templates  vars
   tags:
   - start
 &lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates-3&quot;&gt;&lt;a href=&quot;#编写templates-3&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;p&gt;将模板nginx.conf.j2放入templates目录下&lt;/p&gt;
-&lt;p&gt;配置文件内容过多，具体见github。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/p&gt;
+&lt;p&gt;配置文件内容过多，具体见github，地址是&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/a&gt;&lt;/p&gt;
 &lt;h4 id=&quot;编写vars-5&quot;&gt;&lt;a href=&quot;#编写vars-5&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 web_server]# vim vars/main.yml 
 elasticsearch_cluster: server 172.16.7.151:9200;server 172.16.7.152:9200;server 172.16.7.153:9200;
 kafka_server1: 172.16.7.151
@@ -492,7 +492,7 @@ files  handlers  meta  tasks  templates  vars
   become_user: hadoop
   when: namenode_standby == &amp;quot;true&amp;quot; 
 &lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates-4&quot;&gt;&lt;a href=&quot;#编写templates-4&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;p&gt;将模板core-site.xml.j2、hadoop-daemon.sh.j2、hadoop-env.sh.j2、hdfs-site.xml.j2、mapred-site.xml.j2、slaves.j2、yarn-daemon.sh.j2、yarn-site.xml.j2放入templates目录下。&lt;/p&gt;
-&lt;p&gt;配置文件内容过多，具体见github。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/p&gt;
+&lt;p&gt;配置文件内容过多，具体见github，地址是&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/a&gt;&lt;/p&gt;
 &lt;h4 id=&quot;编写vars-6&quot;&gt;&lt;a href=&quot;#编写vars-6&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 hadoop]# vim vars/main.yml 
 env_file: /etc/profile
 # hadoop-env.sh.j2 file variables.
@@ -568,7 +568,7 @@ files  handlers  meta  tasks  templates  vars
   tags:
   - start
 &lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates-5&quot;&gt;&lt;a href=&quot;#编写templates-5&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;p&gt;将模板slaves.j2和spark-env.sh.j2放到/root/ansible_playbooks/roles/spark/templates/目录下。&lt;/p&gt;
-&lt;p&gt;配置文件内容过多，具体见github。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/p&gt;
+&lt;p&gt;配置文件内容过多，具体见github，地址是&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/a&gt;&lt;/p&gt;
 &lt;h4 id=&quot;编写vars-7&quot;&gt;&lt;a href=&quot;#编写vars-7&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 spark]# vim vars/main.yml
 env_file: /etc/profile
 # spark-env.sh.j2 file variables
@@ -597,7 +597,7 @@ SLAVE2_HOSTNAME: node3
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行playbook安装spark集群：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# ansible-playbook spark.yml 
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;使用spark role需要根据实际环境修改vars/main.yml里的变量以及/etc/ansible/hosts文件里定义的主机。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;所有的文件都在github上。&lt;/p&gt;
+&lt;p&gt;所有的文件都在github上，&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。&lt;/a&gt;&lt;/p&gt;
 </content>
     
     <summary type="html">
