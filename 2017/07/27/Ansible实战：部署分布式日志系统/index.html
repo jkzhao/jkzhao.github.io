@@ -104,19 +104,19 @@
 
 
 
-<meta name="description" content="背景产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。 分布式日志系统架构图 创建roles每一个软件或集群都创建一个单独的角色。 [root@node1 ~]# mkdir -pv ansible_playbooks/roles/{db_server,web_se">
+<meta name="description" content="背景产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。">
 <meta name="keywords" content="Ansible 运维自动化">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Ansible实战：部署分布式日志系统">
 <meta property="og:url" content="http://yoursite.com/2017/07/27/Ansible实战：部署分布式日志系统/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
-<meta property="og:description" content="背景产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。 分布式日志系统架构图 创建roles每一个软件或集群都创建一个单独的角色。 [root@node1 ~]# mkdir -pv ansible_playbooks/roles/{db_server,web_se">
+<meta property="og:description" content="背景产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/48.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/49.png">
-<meta property="og:updated_time" content="2017-07-28T08:16:08.000Z">
+<meta property="og:updated_time" content="2017-07-28T08:51:02.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Ansible实战：部署分布式日志系统">
-<meta name="twitter:description" content="背景产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。 分布式日志系统架构图 创建roles每一个软件或集群都创建一个单独的角色。 [root@node1 ~]# mkdir -pv ansible_playbooks/roles/{db_server,web_se">
+<meta name="twitter:description" content="背景产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/48.png">
 
 
@@ -393,7 +393,7 @@
       
 
       
-        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。</p>
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。<br><a id="more"></a></p>
 <h2 id="分布式日志系统架构图"><a href="#分布式日志系统架构图" class="headerlink" title="分布式日志系统架构图"></a>分布式日志系统架构图</h2><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/48.png" alt=""></p>
 <h2 id="创建roles"><a href="#创建roles" class="headerlink" title="创建roles"></a>创建roles</h2><p>每一个软件或集群都创建一个单独的角色。</p>
 <pre><code>[root@node1 ~]# mkdir -pv ansible_playbooks/roles/{db_server,web_server,redis_server,zk_server,kafka_server,es_server,tomcat_server,flume_agent,hadoop,spark,hbase,hive}/{tasks,files,templates,meta,handlers,vars} 
