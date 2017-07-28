@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Ansible 运维自动化," />
 
 
 
@@ -104,12 +104,20 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="jkzhao's blog">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="背景产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。 分布式日志系统架构图 创建roles每一个软件或集群都创建一个单独的角色。 [root@node1 ~]# mkdir -pv ansible_playbooks/roles/{db_server,web_se">
+<meta name="keywords" content="Ansible 运维自动化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible实战：部署分布式日志系统">
+<meta property="og:url" content="http://yoursite.com/2017/07/27/Ansible实战：部署分布式日志系统/index.html">
 <meta property="og:site_name" content="jkzhao's blog">
+<meta property="og:description" content="背景产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。 分布式日志系统架构图 创建roles每一个软件或集群都创建一个单独的角色。 [root@node1 ~]# mkdir -pv ansible_playbooks/roles/{db_server,web_se">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/48.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/49.png">
+<meta property="og:updated_time" content="2017-07-28T08:16:08.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="jkzhao's blog">
+<meta name="twitter:title" content="Ansible实战：部署分布式日志系统">
+<meta name="twitter:description" content="背景产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。 分布式日志系统架构图 创建roles每一个软件或集群都创建一个单独的角色。 [root@node1 ~]# mkdir -pv ansible_playbooks/roles/{db_server,web_se">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/48.png">
 
 
 
@@ -127,7 +135,7 @@
   };
 </script>
 
-  <title> jkzhao's blog </title>
+  <title> Ansible实战：部署分布式日志系统 | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -158,9 +166,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left 
-   page-home 
- ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -297,9 +303,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
   
@@ -319,10 +325,7 @@
             
             
               
-                
-                <a class="post-title-link" href="/2017/07/27/Ansible实战：部署分布式日志系统/" itemprop="url">
-                  Ansible实战：部署分布式日志系统
-                </a>
+                Ansible实战：部署分布式日志系统
               
             
           </h1>
@@ -390,9 +393,7 @@
       
 
       
-        
-          
-            <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。</p>
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。</p>
 <h2 id="分布式日志系统架构图"><a href="#分布式日志系统架构图" class="headerlink" title="分布式日志系统架构图"></a>分布式日志系统架构图</h2><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/48.png" alt=""></p>
 <h2 id="创建roles"><a href="#创建roles" class="headerlink" title="创建roles"></a>创建roles</h2><p>每一个软件或集群都创建一个单独的角色。</p>
 <pre><code>[root@node1 ~]# mkdir -pv ansible_playbooks/roles/{db_server,web_server,redis_server,zk_server,kafka_server,es_server,tomcat_server,flume_agent,hadoop,spark,hbase,hive}/{tasks,files,templates,meta,handlers,vars} 
@@ -969,1172 +970,58 @@ SLAVE2_HOSTNAME: node3
 </code></pre><p><strong>使用spark role需要根据实际环境修改vars/main.yml里的变量以及/etc/ansible/hosts文件里定义的主机。</strong></p>
 <p>所有的文件都在github上。</p>
 
-          
+      
+    </div>
+
+    <div>
+      
         
       
     </div>
 
     <div>
       
-    </div>
+        
 
-    <div>
       
     </div>
 
     <footer class="post-footer">
       
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/24/Ansible之roles介绍/" itemprop="url">
-                  Ansible之roles介绍
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-24T09:09:22+08:00" content="2017-07-24">
-              2017-07-24
-            </time>
-          </span>
-
+        <div class="post-tags">
           
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-             <span id="/2017/07/24/Ansible之roles介绍/" class="leancloud_visitors" data-flag-title="Ansible之roles介绍">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
+            <a href="/tags/Ansible-运维自动化/" rel="tag">#Ansible 运维自动化</a>
           
         </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          <h2 id="什么场景下会用roles？"><a href="#什么场景下会用roles？" class="headerlink" title="什么场景下会用roles？"></a>什么场景下会用roles？</h2><p>假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？<br>第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不利于多次调。比如说后来又加进来一个主机，这个第4个主机既是httpd服务器，又是php服务器，我们只能写第4个play，上面写上安装httpd和php。这样playbook中的代码就重复了。<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/07/24/Ansible之roles介绍/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
           </div>
-        
-      
-    </div>
 
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
+          <div class="post-nav-prev post-nav-item">
             
+              <a href="/2017/07/24/Ansible之roles介绍/" rel="prev" title="Ansible之roles介绍">
+                Ansible之roles介绍 <i class="fa fa-chevron-right"></i>
+              </a>
             
-              
-                
-                <a class="post-title-link" href="/2017/07/22/Ansible之tags介绍/" itemprop="url">
-                  Ansible之tags介绍
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-22T20:37:16+08:00" content="2017-07-22">
-              2017-07-22
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-             <span id="/2017/07/22/Ansible之tags介绍/" class="leancloud_visitors" data-flag-title="Ansible之tags介绍">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-          
+          </div>
         </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          <h2 id="tags介绍"><a href="#tags介绍" class="headerlink" title="tags介绍"></a>tags介绍</h2><p>我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。<br>如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个task，你可以给这个task定义一个tags，例如：<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/07/22/Ansible之tags介绍/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </article>
 
 
-    
-      
 
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/20/Ansible之迭代、模板/" itemprop="url">
-                  Ansible之迭代、模板
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-20T15:05:29+08:00" content="2017-07-20">
-              2017-07-20
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-             <span id="/2017/07/20/Ansible之迭代、模板/" class="leancloud_visitors" data-flag-title="Ansible之迭代、模板">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="迭代"><a href="#迭代" class="headerlink" title="迭代"></a>迭代</h2><p>当有需要重复性执行的任务时，可以使用迭代机制。其使用格式为将需要迭代的内容定义为item变量引用，并通过with_items语句来指明迭代的元素列表即可。例如：</p>
-<pre><code>- name: add several users
-  user: name={{ item }} state=present groups=wheel
-  with_items:
-        - testuser1
-        - testuser2
-</code></pre>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/07/20/Ansible之迭代、模板/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
+    <div class="post-spread">
       
     </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/17/Ansible条件测试/" itemprop="url">
-                  Ansible条件测试
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-17T13:39:32+08:00" content="2017-07-17">
-              2017-07-17
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-             <span id="/2017/07/17/Ansible条件测试/" class="leancloud_visitors" data-flag-title="Ansible条件测试">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="Ansible条件测试"><a href="#Ansible条件测试" class="headerlink" title="Ansible条件测试"></a>Ansible条件测试</h2><p>在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。</p>
-<h3 id="when语句"><a href="#when语句" class="headerlink" title="when语句"></a>when语句</h3><p>在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如：<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/07/17/Ansible条件测试/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/15/ansible-playbook基础组件介绍/" itemprop="url">
-                  ansible playbook基础组件介绍
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-15T15:24:31+08:00" content="2017-07-15">
-              2017-07-15
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-             <span id="/2017/07/15/ansible-playbook基础组件介绍/" class="leancloud_visitors" data-flag-title="ansible playbook基础组件介绍">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="ansible-playbook介绍"><a href="#ansible-playbook介绍" class="headerlink" title="ansible playbook介绍"></a>ansible playbook介绍</h2><p>playbook是由一个或多个“play”组成的列表(剧本是由多出戏组成的)。play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联同起来按事先编排的机制同唱一台大戏。下面是一个简单示例。<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/07/15/ansible-playbook基础组件介绍/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/11/Ansible的基础元素和YAML介绍/" itemprop="url">
-                  Ansible的基础元素和YAML介绍
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-11T18:37:28+08:00" content="2017-07-11">
-              2017-07-11
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-             <span id="/2017/07/11/Ansible的基础元素和YAML介绍/" class="leancloud_visitors" data-flag-title="Ansible的基础元素和YAML介绍">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="YAML"><a href="#YAML" class="headerlink" title="YAML"></a>YAML</h2><h3 id="YAML介绍"><a href="#YAML介绍" class="headerlink" title="YAML介绍"></a>YAML介绍</h3><p>YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。<br>YAML Ain’t Markup Language，即YAML不是XML。不过，在开发的这种语言时，YAML的意思其实是：”Yet Another Markup Language”（仍是一种标记语言）。其特性：<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/07/11/Ansible的基础元素和YAML介绍/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/07/Ansible常见模块介绍/" itemprop="url">
-                  Ansible常见模块介绍
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-07T08:48:26+08:00" content="2017-07-07">
-              2017-07-07
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-             <span id="/2017/07/07/Ansible常见模块介绍/" class="leancloud_visitors" data-flag-title="Ansible常见模块介绍">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="ansible命令基础"><a href="#ansible命令基础" class="headerlink" title="ansible命令基础"></a>ansible命令基础</h2><p>语法：ansible <host-pattern> [-f forks] [-m module_name] [-a args] [options] </p>
-<ul>
-<li>host-pattern：这次的命令对哪些主机生效；</li>
-<li>-f forks：启动的并发线程数，就是一次并行处理多少主机；</li>
-<li>-m module_name：要使用的模块；</li>
-<li>-a args：模块特有的参数。
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/07/07/Ansible常见模块介绍/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/05/Ansible介绍及安装部署/" itemprop="url">
-                  Ansible介绍及安装部署
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-05T15:33:54+08:00" content="2017-07-05">
-              2017-07-05
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-             <span id="/2017/07/05/Ansible介绍及安装部署/" class="leancloud_visitors" data-flag-title="Ansible介绍及安装部署">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="运维工具"><a href="#运维工具" class="headerlink" title="运维工具"></a>运维工具</h2><p>作为一个Linux运维人员，需要了解大量的运维工具，并熟知这些工具的差异，能够熟练运用这些工具去解决一些手动重复的劳动，一方面是避免人工操作失误，另一方面也可以提高工作效率。同时还能将自己从这些重复的工作中解放出来，以便研究更新和更深的技术。<br>运维工具大体上可以分为3类：</p>
-<ul>
-<li>OS Provisioning：提供操作系统安装的。PXE，Cobbler(repository,distritution,profile)。</li>
-<li>OS Config：cfengine、puppet、saltstack、chef、func、Task Excute工具(fabric、func、saltstack)</li>
-<li>Deployment：capistranoc、fabric<br>而Ansible是一款较新的工具，可以实现OS Config、Task Excute和Deployment。
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/07/05/Ansible介绍及安装部署/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/01/FlumeNG介绍及安装部署/" itemprop="url">
-                  FlumeNG介绍及安装部署
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-01T20:53:40+08:00" content="2017-07-01">
-              2017-07-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/数据采集/" itemprop="url" rel="index">
-                    <span itemprop="name">数据采集</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-             <span id="/2017/07/01/FlumeNG介绍及安装部署/" class="leancloud_visitors" data-flag-title="FlumeNG介绍及安装部署">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="Flume简介"><a href="#Flume简介" class="headerlink" title="Flume简介"></a>Flume简介</h2><p>Flume是一个分布式、可靠、高可用的海量日志聚合系统，支持在系统中定制各类数据发送方，用于收集数据；同时，Flume提供对数据的简单处理，并写到各种数据接收方的能力。<br>Flume在0.9.x和1.x之间有较大的架构调整，1.x版本之后的改称为Flume NG。0.9.x的称为Flume OG。<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/07/01/FlumeNG介绍及安装部署/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-  </section>
-
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
-  </nav>
-
+  </div>
 
 
           </div>
@@ -2142,6 +1029,10 @@ SLAVE2_HOSTNAME: node3
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
       <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
 
@@ -2163,8 +1054,17 @@ SLAVE2_HOSTNAME: node3
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -2264,6 +1164,17 @@ SLAVE2_HOSTNAME: node3
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式日志系统架构图"><span class="nav-number">2.</span> <span class="nav-text">分布式日志系统架构图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建roles"><span class="nav-number">3.</span> <span class="nav-text">创建roles</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JDK7-role"><span class="nav-number">3.1.</span> <span class="nav-text">JDK7 role</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#上传安装包"><span class="nav-number">3.1.1.</span> <span class="nav-text">上传安装包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写tasks"><span class="nav-number">3.1.2.</span> <span class="nav-text">编写tasks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写vars"><span class="nav-number">3.1.3.</span> <span class="nav-text">编写vars</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用角色"><span class="nav-number">3.1.4.</span> <span class="nav-text">使用角色</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JDK8-role"><span class="nav-number">3.2.</span> <span class="nav-text">JDK8 role</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#上传安装包-1"><span class="nav-number">3.2.1.</span> <span class="nav-text">上传安装包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写tasks-1"><span class="nav-number">3.2.2.</span> <span class="nav-text">编写tasks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写vars-1"><span class="nav-number">3.2.3.</span> <span class="nav-text">编写vars</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用角色-1"><span class="nav-number">3.2.4.</span> <span class="nav-text">使用角色</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Zookeeper-role"><span class="nav-number">3.3.</span> <span class="nav-text">Zookeeper role</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#上传安装包-2"><span class="nav-number">3.3.1.</span> <span class="nav-text">上传安装包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写tasks-2"><span class="nav-number">3.3.2.</span> <span class="nav-text">编写tasks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写templates"><span class="nav-number">3.3.3.</span> <span class="nav-text">编写templates</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写vars-2"><span class="nav-number">3.3.4.</span> <span class="nav-text">编写vars</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置主机组"><span class="nav-number">3.3.5.</span> <span class="nav-text">设置主机组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用角色-2"><span class="nav-number">3.3.6.</span> <span class="nav-text">使用角色</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka-role"><span class="nav-number">3.4.</span> <span class="nav-text">Kafka role</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#上传安装包-3"><span class="nav-number">3.4.1.</span> <span class="nav-text">上传安装包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写tasks-3"><span class="nav-number">3.4.2.</span> <span class="nav-text">编写tasks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写templates-1"><span class="nav-number">3.4.3.</span> <span class="nav-text">编写templates</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写vars-3"><span class="nav-number">3.4.4.</span> <span class="nav-text">编写vars</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置主机组-1"><span class="nav-number">3.4.5.</span> <span class="nav-text">设置主机组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用角色-3"><span class="nav-number">3.4.6.</span> <span class="nav-text">使用角色</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Elasticsearch-role"><span class="nav-number">3.5.</span> <span class="nav-text">Elasticsearch role</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#上传安装包-4"><span class="nav-number">3.5.1.</span> <span class="nav-text">上传安装包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写tasks-4"><span class="nav-number">3.5.2.</span> <span class="nav-text">编写tasks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写templates-2"><span class="nav-number">3.5.3.</span> <span class="nav-text">编写templates</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写vars-4"><span class="nav-number">3.5.4.</span> <span class="nav-text">编写vars</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置主机组-2"><span class="nav-number">3.5.5.</span> <span class="nav-text">设置主机组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用角色-4"><span class="nav-number">3.5.6.</span> <span class="nav-text">使用角色</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL-role"><span class="nav-number">3.6.</span> <span class="nav-text">MySQL role</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#上传安装包-5"><span class="nav-number">3.6.1.</span> <span class="nav-text">上传安装包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写tasks-5"><span class="nav-number">3.6.2.</span> <span class="nav-text">编写tasks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置主机组-3"><span class="nav-number">3.6.3.</span> <span class="nav-text">设置主机组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用角色-5"><span class="nav-number">3.6.4.</span> <span class="nav-text">使用角色</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx-role"><span class="nav-number">3.7.</span> <span class="nav-text">Nginx role</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#上传安装包-6"><span class="nav-number">3.7.1.</span> <span class="nav-text">上传安装包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写tasks-6"><span class="nav-number">3.7.2.</span> <span class="nav-text">编写tasks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写templates-3"><span class="nav-number">3.7.3.</span> <span class="nav-text">编写templates</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写vars-5"><span class="nav-number">3.7.4.</span> <span class="nav-text">编写vars</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置主机组-4"><span class="nav-number">3.7.5.</span> <span class="nav-text">设置主机组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用角色-6"><span class="nav-number">3.7.6.</span> <span class="nav-text">使用角色</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-role"><span class="nav-number">3.8.</span> <span class="nav-text">Redis role</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#上传安装包-7"><span class="nav-number">3.8.1.</span> <span class="nav-text">上传安装包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写tasks-7"><span class="nav-number">3.8.2.</span> <span class="nav-text">编写tasks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置主机组-5"><span class="nav-number">3.8.3.</span> <span class="nav-text">设置主机组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用角色-7"><span class="nav-number">3.8.4.</span> <span class="nav-text">使用角色</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hadoop-role"><span class="nav-number">3.9.</span> <span class="nav-text">Hadoop role</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#上传安装包-8"><span class="nav-number">3.9.1.</span> <span class="nav-text">上传安装包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写tasks-8"><span class="nav-number">3.9.2.</span> <span class="nav-text">编写tasks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写templates-4"><span class="nav-number">3.9.3.</span> <span class="nav-text">编写templates</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写vars-6"><span class="nav-number">3.9.4.</span> <span class="nav-text">编写vars</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置主机组-6"><span class="nav-number">3.9.5.</span> <span class="nav-text">设置主机组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用角色-8"><span class="nav-number">3.9.6.</span> <span class="nav-text">使用角色</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Spark-role"><span class="nav-number">3.10.</span> <span class="nav-text">Spark role</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#上传安装包-9"><span class="nav-number">3.10.1.</span> <span class="nav-text">上传安装包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写tasks-9"><span class="nav-number">3.10.2.</span> <span class="nav-text">编写tasks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写templates-5"><span class="nav-number">3.10.3.</span> <span class="nav-text">编写templates</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写vars-7"><span class="nav-number">3.10.4.</span> <span class="nav-text">编写vars</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置主机组-7"><span class="nav-number">3.10.5.</span> <span class="nav-text">设置主机组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用角色-9"><span class="nav-number">3.10.6.</span> <span class="nav-text">使用角色</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -2367,6 +1278,10 @@ SLAVE2_HOSTNAME: node3
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 
