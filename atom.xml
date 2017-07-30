@@ -1337,7 +1337,7 @@ echo &amp;quot;hello world&amp;quot; &amp;gt;/tmp/nba.txt
     
     <summary type="html">
     
-      &lt;h2 id=&quot;ansible命令基础&quot;&gt;&lt;a href=&quot;#ansible命令基础&quot; class=&quot;headerlink&quot; title=&quot;ansible命令基础&quot;&gt;&lt;/a&gt;ansible命令基础&lt;/h2&gt;&lt;p&gt;语法：ansible &lt;host-pattern&gt; [-f forks] [-m module_name] [-a args] [options] &lt;/p&gt;
+      &lt;h2 id=&quot;ansible命令基础&quot;&gt;&lt;a href=&quot;#ansible命令基础&quot; class=&quot;headerlink&quot; title=&quot;ansible命令基础&quot;&gt;&lt;/a&gt;ansible命令基础&lt;/h2&gt;&lt;p&gt;语法：ansible &lt;host-pattern&gt; [-f forks] [-m module_name] [-a args] [options] &lt;/host-pattern&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;host-pattern：这次的命令对哪些主机生效；&lt;/li&gt;
 &lt;li&gt;-f forks：启动的并发线程数，就是一次并行处理多少主机；&lt;/li&gt;
@@ -3025,7 +3025,7 @@ UserParameter=Nginx.requests[*], /usr/bin/curl -s &amp;quot;http://$1:$2/status&
     
     <summary type="html">
     
-      &lt;p&gt;&lt;a href=&quot;https://nginx.org/en/docs/http/ngx_http_stub_status_module.html&quot;&gt;https://nginx.org/en/docs/http/ngx_http_stub_status_module.html&lt;/a&gt;&lt;br&gt;在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。&lt;br&gt;Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。&lt;br&gt;
+      &lt;p&gt;&lt;a href=&quot;https://nginx.org/en/docs/http/ngx_http_stub_status_module.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://nginx.org/en/docs/http/ngx_http_stub_status_module.html&lt;/a&gt;&lt;br&gt;在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。&lt;br&gt;Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。&lt;br&gt;
     
     </summary>
     
