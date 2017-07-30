@@ -120,7 +120,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/7.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/8.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/9.png">
-<meta property="og:updated_time" content="2017-06-12T04:36:51.000Z">
+<meta property="og:updated_time" content="2017-07-29T13:39:00.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Storm介绍及安装部署">
 <meta name="twitter:description" content="Apache Storm是什么Apache Storm是自由开源的分布式实时计算系统，擅长处理海量数据，适用于数据实时处理而非批处理。批处理使用的大多是鼎鼎大名的hadoop或者hive，作为一个批处理系统，hadoop以其吞吐量大、自动容错等优点，在海量数据处理上得到了广泛的使用。但是，hadoop不擅长实时计算，因为它天然就是为批处理而生的，这也是业界一致的共识。否则最近几年也不会有s4,st">
@@ -347,6 +347,14 @@
             <time itemprop="dateCreated" datetime="2017-06-10T10:39:13+08:00" content="2017-06-10">
               2017-06-10
             </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2017-07-29T21:39:00+08:00" content="2017-07-29">
+              2017-07-29
+              </time>
+              </span>
+            
           </span>
 
           
@@ -454,7 +462,7 @@
 </code></pre><p>2.配置storm</p>
 <pre><code>[root@log1 ~]# cd /usr/local/apache-storm-1.0.0/
 [root@log1 apache-storm-1.0.0]# vim conf/storm.yaml
-</code></pre><p>(1)配置Zookeeper地址<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/4.png" alt=""><br><strong>注意: 如果Zookeeper集群使用的不是默认端口，那么还需要配置storm.zookeeper.port。</strong></p>
+</code></pre><p>(1)配置Zookeeper地址（配置Zookeeper的主机名）<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/4.png" alt=""><br><strong>注意: 如果Zookeeper集群使用的不是默认端口，那么还需要配置storm.zookeeper.port。</strong></p>
 <p>(2)storm.local.dir: The Nimbus and Supervisor daemons require a directory on the local disk to store small amounts of state (like jars, confs, and things like that).<br>添加一行：</p>
 <pre><code>storm.local.dir: &quot;/usr/local/apache-storm-1.0.0/status&quot;
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/5.png" alt=""><br>这个status目录在storm启动的时候会自动创建，当然也可以提前创建好。</p>
@@ -465,7 +473,10 @@
 - 6702
 - 6703
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/7.png" alt=""><br>配置工作节点上的进程端口。你配置一个端口，意味着工作节点上启动一个worker，在实际的生产环境中，我们需要根据实际的物理配置以及每个节点上的负载情况来配置这个端口的数量。在这里每个节点我象征性的配置4个端口。<br><strong>注意:以上配置，凡是有冒号的地方，冒号后都要有个空格。</strong></p>
-<p>log2和log3主机也是同样的配置。拷贝这台机器的storm包到log2和log2主机：<br>[root@log1 local]# scp -pr apache-storm-1.0.0 root@114.55.29.241:/usr/local/<br>[root@log1 local]# scp -pr apache-storm-1.0.0 root@114.55.253.15:/usr/local/<br>(5)对于两台supervisor node，我们额外开启JMX支持，在配置文件中加入如下配置：</p>
+<p>log2和log3主机也是同样的配置。拷贝这台机器的storm包到log2和log3主机：</p>
+<pre><code>[root@log1 local]# scp -pr apache-storm-1.0.0 root@114.55.29.241:/usr/local/
+[root@log1 local]# scp -pr apache-storm-1.0.0 root@114.55.253.15:/usr/local/
+</code></pre><p>(5)对于两台supervisor node，我们额外开启JMX支持，在配置文件中加入如下配置：</p>
 <pre><code>supervisor.childopts: -verbose:gc -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=9998
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/8.png" alt=""><br>9998就是用于通过JMX收集supervisior JVM指标的端口。</p>
 <p>3.配置storm环境变量</p>
@@ -479,7 +490,7 @@ export PATH=$STORM_HOME/bin:$PATH
 </code></pre><p>log2和log3主机启动Supervisor节点：</p>
 <pre><code>[root@log2 ~]# nohup storm supervisor &gt;/dev/null 2&gt;&amp;1 &amp;
 [root@log3 ~]# nohup storm supervisor &gt;/dev/null 2&gt;&amp;1 &amp;
-</code></pre><p>访问ui页面：<br><a href="http://114.55.29.86:8080/" target="_blank" rel="external">http://114.55.29.86:8080/</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/9.png" alt=""><br>界面介绍：<br>Used slots：使用的worker数。<br>Free slots：空闲的worker数。<br>Executors：每个worker的物理线程数。</p>
+</code></pre><p>访问ui页面：<br><a href="http://114.55.29.86:8080/" target="_blank" rel="external">http://114.55.29.86:8080/</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/9.png" alt=""><br>界面简单介绍：<br>Used slots：使用的worker数。<br>Free slots：空闲的worker数。<br>Executors：每个worker的物理线程数。</p>
 
       
     </div>

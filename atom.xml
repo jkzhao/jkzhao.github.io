@@ -2011,7 +2011,7 @@ curl -XPOST http:// 114.55.29.86:9200/index/fulltext/4 -d&amp;apos;
     <link href="http://yoursite.com/2017/06/10/Storm%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2017/06/10/Storm介绍及安装部署/</id>
     <published>2017-06-10T02:39:13.000Z</published>
-    <updated>2017-06-12T04:36:51.000Z</updated>
+    <updated>2017-07-29T13:39:00.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Apache-Storm是什么&quot;&gt;&lt;a href=&quot;#Apache-Storm是什么&quot; class=&quot;headerlink&quot; title=&quot;Apache Storm是什么&quot;&gt;&lt;/a&gt;Apache Storm是什么&lt;/h2&gt;&lt;p&gt;Apache Storm是自由开源的分布式实时计算系统，擅长处理海量数据，适用于数据实时处理而非批处理。&lt;br&gt;批处理使用的大多是鼎鼎大名的hadoop或者hive，作为一个批处理系统，hadoop以其吞吐量大、自动容错等优点，在海量数据处理上得到了广泛的使用。但是，hadoop不擅长实时计算，因为它天然就是为批处理而生的，这也是业界一致的共识。否则最近几年也不会有s4,storm,puma这些实时计算系统如雨后春笋般冒出来啦。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;举个搜索场景中的例子，当一个卖家发布了一条宝贝信息时，他希望的当然是这个宝贝马上就可以被卖家搜索出来、点击、购买啦，相反，如果这个宝贝要等到第二天或者更久才可以被搜出来，估计就会有不少损失了。&lt;br&gt;再举一个推荐的例子，如果用户昨天在淘宝上买了一双袜子，今天想买一副泳镜去游泳，但是却发现系统在不遗余力地给他推荐袜子、鞋子，根本对他今天寻找泳镜的行为视而不见，这样商家的利益就有所损失。这是因为后台系统做的是每天一次的全量处理，而且大多是在夜深人静之时做的，那么客户今天白天做的事情要到明天才能反映出来。这也就是为什么需要实时处理的原因。&lt;/p&gt;
 &lt;h2 id=&quot;Apache-Storm核心概念&quot;&gt;&lt;a href=&quot;#Apache-Storm核心概念&quot; class=&quot;headerlink&quot; title=&quot;Apache Storm核心概念&quot;&gt;&lt;/a&gt;Apache Storm核心概念&lt;/h2&gt;&lt;ul&gt;
@@ -2067,7 +2067,7 @@ curl -XPOST http:// 114.55.29.86:9200/index/fulltext/4 -d&amp;apos;
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.配置storm&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@log1 ~]# cd /usr/local/apache-storm-1.0.0/
 [root@log1 apache-storm-1.0.0]# vim conf/storm.yaml
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(1)配置Zookeeper地址&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;注意: 如果Zookeeper集群使用的不是默认端口，那么还需要配置storm.zookeeper.port。&lt;/strong&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(1)配置Zookeeper地址（配置Zookeeper的主机名）&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;注意: 如果Zookeeper集群使用的不是默认端口，那么还需要配置storm.zookeeper.port。&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;(2)storm.local.dir: The Nimbus and Supervisor daemons require a directory on the local disk to store small amounts of state (like jars, confs, and things like that).&lt;br&gt;添加一行：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;storm.local.dir: &amp;quot;/usr/local/apache-storm-1.0.0/status&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这个status目录在storm启动的时候会自动创建，当然也可以提前创建好。&lt;/p&gt;
@@ -2078,7 +2078,10 @@ curl -XPOST http:// 114.55.29.86:9200/index/fulltext/4 -d&amp;apos;
 - 6702
 - 6703
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;配置工作节点上的进程端口。你配置一个端口，意味着工作节点上启动一个worker，在实际的生产环境中，我们需要根据实际的物理配置以及每个节点上的负载情况来配置这个端口的数量。在这里每个节点我象征性的配置4个端口。&lt;br&gt;&lt;strong&gt;注意:以上配置，凡是有冒号的地方，冒号后都要有个空格。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;log2和log3主机也是同样的配置。拷贝这台机器的storm包到log2和log2主机：&lt;br&gt;[root@log1 local]# scp -pr apache-storm-1.0.0 root@114.55.29.241:/usr/local/&lt;br&gt;[root@log1 local]# scp -pr apache-storm-1.0.0 root@114.55.253.15:/usr/local/&lt;br&gt;(5)对于两台supervisor node，我们额外开启JMX支持，在配置文件中加入如下配置：&lt;/p&gt;
+&lt;p&gt;log2和log3主机也是同样的配置。拷贝这台机器的storm包到log2和log3主机：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# scp -pr apache-storm-1.0.0 root@114.55.29.241:/usr/local/
+[root@log1 local]# scp -pr apache-storm-1.0.0 root@114.55.253.15:/usr/local/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(5)对于两台supervisor node，我们额外开启JMX支持，在配置文件中加入如下配置：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;supervisor.childopts: -verbose:gc -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=9998
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/8.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;9998就是用于通过JMX收集supervisior JVM指标的端口。&lt;/p&gt;
 &lt;p&gt;3.配置storm环境变量&lt;/p&gt;
@@ -2092,7 +2095,7 @@ export PATH=$STORM_HOME/bin:$PATH
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;log2和log3主机启动Supervisor节点：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@log2 ~]# nohup storm supervisor &amp;gt;/dev/null 2&amp;gt;&amp;amp;1 &amp;amp;
 [root@log3 ~]# nohup storm supervisor &amp;gt;/dev/null 2&amp;gt;&amp;amp;1 &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;访问ui页面：&lt;br&gt;&lt;a href=&quot;http://114.55.29.86:8080/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://114.55.29.86:8080/&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/9.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;界面介绍：&lt;br&gt;Used slots：使用的worker数。&lt;br&gt;Free slots：空闲的worker数。&lt;br&gt;Executors：每个worker的物理线程数。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;访问ui页面：&lt;br&gt;&lt;a href=&quot;http://114.55.29.86:8080/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://114.55.29.86:8080/&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/9.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;界面简单介绍：&lt;br&gt;Used slots：使用的worker数。&lt;br&gt;Free slots：空闲的worker数。&lt;br&gt;Executors：每个worker的物理线程数。&lt;/p&gt;
 </content>
     
     <summary type="html">
