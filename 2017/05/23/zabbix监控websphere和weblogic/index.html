@@ -114,6 +114,8 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/80.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/81.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/115.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/116.jpg">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/82.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/83.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/84.png">
@@ -122,7 +124,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/87.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/88.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/89.png">
-<meta property="og:updated_time" content="2017-06-12T07:56:20.000Z">
+<meta property="og:updated_time" content="2017-08-01T04:39:38.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zabbix监控websphere和weblogic">
 <meta name="twitter:description" content="zabbix java gatewayzabbix通过JMX监控应用服务器。JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架。JMX可以跨越一系列异构操作系统平台、系统体系结构和网络传输协议，灵活的开发无缝集成的系统、网络和服务管理应用。">
@@ -352,8 +354,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-06-12T15:56:20+08:00" content="2017-06-12">
-              2017-06-12
+              <time itemprop="dateUpdated" datetime="2017-08-01T12:39:38+08:00" content="2017-08-01">
+              2017-08-01
               </time>
               </span>
             
@@ -439,7 +441,7 @@ $ vim setDomainEnv.sh
 </code></pre><p>然后在去启动weblogic。</p>
 <p>2.如果是监控受管服务器：<br>进入weblogic控制台-&gt;环境-&gt;服务器-&gt;”你新增的服务器”-&gt;配置-&gt;服务器启动。在“参数”的输入框内输入：</p>
 <pre><code>-Dcom.sun.management.jmxremote.port=JMX_PORT -Djava.rmi.server.hostname=JMX_HOST -Dcom.sun.management.jmxremote.authenticate=false  -Dcom.sun.management.jmxremote.ssl=false -Djavax.management.builder.initial=weblogic.management.jmx.mbeanserver.WLSMBeanServerBuilder
-</code></pre><p>然后控制台启动受管服务器。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/82.png" alt=""></p>
+</code></pre><p>最后，进入weblogic控制台-&gt;域——&gt;配置-&gt;一般信息-&gt;高级，启用 “启用平台 MBean 服务器” 和 “已使用平台 MBean 服务器”。（最后这步非常重要，很多人发现JMX端口配置了不生效就是没有做这一步）<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/115.jpg" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/116.jpg" alt=""><br>然后重启AdminServer和受管服务器。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/82.png" alt=""></p>
 <h2 id="zabbix-server添加监控weblogic主机"><a href="#zabbix-server添加监控weblogic主机" class="headerlink" title="zabbix server添加监控weblogic主机"></a>zabbix server添加监控weblogic主机</h2><p>点击配置—&gt;主机—&gt;创建主机。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/83.png" alt=""><br>输入主机信息，主要注意JMX的端口，点击添加。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/84.png" alt=""><br>选择JMX模板。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/85.png" alt=""></p>
 <h1 id="监控websphere"><a href="#监控websphere" class="headerlink" title="监控websphere"></a>监控websphere</h1><h2 id="websphere配置"><a href="#websphere配置" class="headerlink" title="websphere配置"></a>websphere配置</h2><p>访问websphere控制台，点击 Server Types → WebSphere application servers → WAS_SERVER_NAME → Java and Process Management → Process definition → Java Virtual Machine.</p>
 <p>在“Generic JVM arguments”增加下面环境变量：</p>
