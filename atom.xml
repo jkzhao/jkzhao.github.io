@@ -1464,7 +1464,7 @@ echo &amp;quot;hello world&amp;quot; &amp;gt;/tmp/nba.txt
     <link href="http://yoursite.com/2017/07/01/FlumeNG%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2017/07/01/FlumeNG介绍及安装部署/</id>
     <published>2017-07-01T12:53:40.000Z</published>
-    <updated>2017-07-02T03:58:56.000Z</updated>
+    <updated>2017-08-03T12:50:06.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Flume简介&quot;&gt;&lt;a href=&quot;#Flume简介&quot; class=&quot;headerlink&quot; title=&quot;Flume简介&quot;&gt;&lt;/a&gt;Flume简介&lt;/h2&gt;&lt;p&gt;Flume是一个分布式、可靠、高可用的海量日志聚合系统，支持在系统中定制各类数据发送方，用于收集数据；同时，Flume提供对数据的简单处理，并写到各种数据接收方的能力。&lt;br&gt;Flume在0.9.x和1.x之间有较大的架构调整，1.x版本之后的改称为Flume NG。0.9.x的称为Flume OG。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;Flume OG体系架构如下，Flume OG已经不再进行版本更新：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;Flume NG体系架构如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;最新的Flume NG是1.7.0，运行最新版本的Flume NG时，机器必须安装JDK7.0或以上的版本，并且，Flume目前在只有在Linux系统的启动脚本，没有Windows环境的启动脚本。&lt;/p&gt;
 &lt;h2 id=&quot;Flume-NG核心组件&quot;&gt;&lt;a href=&quot;#Flume-NG核心组件&quot; class=&quot;headerlink&quot; title=&quot;Flume NG核心组件&quot;&gt;&lt;/a&gt;Flume NG核心组件&lt;/h2&gt;&lt;p&gt;Flume NG主要由3个重要的组件构成：&lt;/p&gt;
@@ -1487,9 +1487,9 @@ echo &amp;quot;hello world&amp;quot; &amp;gt;/tmp/nba.txt
 &lt;li&gt;MemoryRecoverChannel&lt;br&gt;官方文档建议使用FileChannel来替换。&lt;/li&gt;
 &lt;li&gt;FileChannel&lt;br&gt;保证数据的完整性和一致性。在具体配置不现的FileChannel时，建议FileChannel设置的目录和程序日志文件保存的目录设成不同的磁盘，以便提高效率。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&quot;Flume部署种类&quot;&gt;&lt;a href=&quot;#Flume部署种类&quot; class=&quot;headerlink&quot; title=&quot;Flume部署种类&quot;&gt;&lt;/a&gt;Flume部署种类&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.单一代理流程&lt;/strong&gt;&lt;br&gt;就是只有一个agent在客户端采集。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;2.多代理流程&lt;/strong&gt;&lt;br&gt;就是一个agent通过中转的Avro传到下一个agent。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;3.流合并&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;4.多路复用流&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/5.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;Flume单机安装&quot;&gt;&lt;a href=&quot;#Flume单机安装&quot; class=&quot;headerlink&quot; title=&quot;Flume单机安装&quot;&gt;&lt;/a&gt;Flume单机安装&lt;/h2&gt;&lt;h3 id=&quot;安装JDK1-6&quot;&gt;&lt;a href=&quot;#安装JDK1-6&quot; class=&quot;headerlink&quot; title=&quot;安装JDK1.6&quot;&gt;&lt;/a&gt;安装JDK1.6&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@log1 local]# mkdir /usr/java
+&lt;h2 id=&quot;Flume部署种类&quot;&gt;&lt;a href=&quot;#Flume部署种类&quot; class=&quot;headerlink&quot; title=&quot;Flume部署种类&quot;&gt;&lt;/a&gt;Flume部署种类&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.单一代理流程&lt;/strong&gt;&lt;br&gt;指只有一个agent在客户端采集。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2.多代理流程&lt;/strong&gt;&lt;br&gt;指一个agent通过中转的Avro传到下一个agent。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;3.流合并&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;4.多路复用流&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/5.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;Flume单机安装&quot;&gt;&lt;a href=&quot;#Flume单机安装&quot; class=&quot;headerlink&quot; title=&quot;Flume单机安装&quot;&gt;&lt;/a&gt;Flume单机安装&lt;/h2&gt;&lt;h3 id=&quot;安装JDK1-7&quot;&gt;&lt;a href=&quot;#安装JDK1-7&quot; class=&quot;headerlink&quot; title=&quot;安装JDK1.7&quot;&gt;&lt;/a&gt;安装JDK1.7&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@log1 local]# mkdir /usr/java
 [root@log1 local]# tar zxf jdk-7u80-linux-x64.gz -C /usr/java/
 [root@log1 local]# vim /etc/profile
 export JAVA_HOME=/usr/java/jdk1.7.0_80
@@ -1523,7 +1523,7 @@ a1.channels.c1.transactionCapacity = 100
 # Bind the source and sink to the channel
 a1.sources.r1.channels = c1
 a1.sinks.k1.channel = c1
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个配置文件定义了一个单agent名字叫a1。a1有一个source在端口44444监听数据，a1的channel是Memory channel，sink是直接输送到终端上，&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个配置文件定义了一个单agent名字叫a1。a1有一个source在端口44444监听数据，a1的channel是Memory channel，sink是直接输送到终端上。&lt;/p&gt;
 &lt;p&gt;启动Flume NG：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@db apache-flume-1.7.0-bin]# bin/flume-ng agent --conf conf --conf-file conf/example.conf --name a1 -Dflume.root.logger=INFO,console
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/6.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;

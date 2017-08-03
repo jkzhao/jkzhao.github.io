@@ -120,7 +120,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/6.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/7.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/8.png">
-<meta property="og:updated_time" content="2017-07-02T03:58:56.000Z">
+<meta property="og:updated_time" content="2017-08-03T12:50:06.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="FlumeNG介绍及安装部署">
 <meta name="twitter:description" content="Flume简介Flume是一个分布式、可靠、高可用的海量日志聚合系统，支持在系统中定制各类数据发送方，用于收集数据；同时，Flume提供对数据的简单处理，并写到各种数据接收方的能力。Flume在0.9.x和1.x之间有较大的架构调整，1.x版本之后的改称为Flume NG。0.9.x的称为Flume OG。">
@@ -350,8 +350,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-07-02T11:58:56+08:00" content="2017-07-02">
-              2017-07-02
+              <time itemprop="dateUpdated" datetime="2017-08-03T20:50:06+08:00" content="2017-08-03">
+              2017-08-03
               </time>
               </span>
             
@@ -431,9 +431,9 @@
 <li>MemoryRecoverChannel<br>官方文档建议使用FileChannel来替换。</li>
 <li>FileChannel<br>保证数据的完整性和一致性。在具体配置不现的FileChannel时，建议FileChannel设置的目录和程序日志文件保存的目录设成不同的磁盘，以便提高效率。</li>
 </ul>
-<h2 id="Flume部署种类"><a href="#Flume部署种类" class="headerlink" title="Flume部署种类"></a>Flume部署种类</h2><p><strong>1.单一代理流程</strong><br>就是只有一个agent在客户端采集。</p>
-<p><strong>2.多代理流程</strong><br>就是一个agent通过中转的Avro传到下一个agent。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/3.png" alt=""><br><strong>3.流合并</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/4.png" alt=""><br><strong>4.多路复用流</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/5.png" alt=""></p>
-<h2 id="Flume单机安装"><a href="#Flume单机安装" class="headerlink" title="Flume单机安装"></a>Flume单机安装</h2><h3 id="安装JDK1-6"><a href="#安装JDK1-6" class="headerlink" title="安装JDK1.6"></a>安装JDK1.6</h3><pre><code>[root@log1 local]# mkdir /usr/java
+<h2 id="Flume部署种类"><a href="#Flume部署种类" class="headerlink" title="Flume部署种类"></a>Flume部署种类</h2><p><strong>1.单一代理流程</strong><br>指只有一个agent在客户端采集。</p>
+<p><strong>2.多代理流程</strong><br>指一个agent通过中转的Avro传到下一个agent。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/3.png" alt=""><br><strong>3.流合并</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/4.png" alt=""><br><strong>4.多路复用流</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/5.png" alt=""></p>
+<h2 id="Flume单机安装"><a href="#Flume单机安装" class="headerlink" title="Flume单机安装"></a>Flume单机安装</h2><h3 id="安装JDK1-7"><a href="#安装JDK1-7" class="headerlink" title="安装JDK1.7"></a>安装JDK1.7</h3><pre><code>[root@log1 local]# mkdir /usr/java
 [root@log1 local]# tar zxf jdk-7u80-linux-x64.gz -C /usr/java/
 [root@log1 local]# vim /etc/profile
 export JAVA_HOME=/usr/java/jdk1.7.0_80
@@ -467,7 +467,7 @@ a1.channels.c1.transactionCapacity = 100
 # Bind the source and sink to the channel
 a1.sources.r1.channels = c1
 a1.sinks.k1.channel = c1
-</code></pre><p>这个配置文件定义了一个单agent名字叫a1。a1有一个source在端口44444监听数据，a1的channel是Memory channel，sink是直接输送到终端上，</p>
+</code></pre><p>这个配置文件定义了一个单agent名字叫a1。a1有一个source在端口44444监听数据，a1的channel是Memory channel，sink是直接输送到终端上。</p>
 <p>启动Flume NG：</p>
 <pre><code>[root@db apache-flume-1.7.0-bin]# bin/flume-ng agent --conf conf --conf-file conf/example.conf --name a1 -Dflume.root.logger=INFO,console
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Flume/6.png" alt=""></p>
@@ -671,7 +671,7 @@ a1.sinks.k1.channel = c1
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Flume简介"><span class="nav-number">1.</span> <span class="nav-text">Flume简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flume-NG核心组件"><span class="nav-number">2.</span> <span class="nav-text">Flume NG核心组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Source"><span class="nav-number">2.1.</span> <span class="nav-text">Source</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sink"><span class="nav-number">2.2.</span> <span class="nav-text">Sink</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel"><span class="nav-number">2.3.</span> <span class="nav-text">Channel</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flume部署种类"><span class="nav-number">3.</span> <span class="nav-text">Flume部署种类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flume单机安装"><span class="nav-number">4.</span> <span class="nav-text">Flume单机安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装JDK1-6"><span class="nav-number">4.1.</span> <span class="nav-text">安装JDK1.6</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Flume-NG"><span class="nav-number">4.2.</span> <span class="nav-text">安装Flume NG</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一个简单的例子"><span class="nav-number">4.3.</span> <span class="nav-text">一个简单的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试"><span class="nav-number">4.4.</span> <span class="nav-text">测试</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Flume简介"><span class="nav-number">1.</span> <span class="nav-text">Flume简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flume-NG核心组件"><span class="nav-number">2.</span> <span class="nav-text">Flume NG核心组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Source"><span class="nav-number">2.1.</span> <span class="nav-text">Source</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sink"><span class="nav-number">2.2.</span> <span class="nav-text">Sink</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel"><span class="nav-number">2.3.</span> <span class="nav-text">Channel</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flume部署种类"><span class="nav-number">3.</span> <span class="nav-text">Flume部署种类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flume单机安装"><span class="nav-number">4.</span> <span class="nav-text">Flume单机安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装JDK1-7"><span class="nav-number">4.1.</span> <span class="nav-text">安装JDK1.7</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Flume-NG"><span class="nav-number">4.2.</span> <span class="nav-text">安装Flume NG</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一个简单的例子"><span class="nav-number">4.3.</span> <span class="nav-text">一个简单的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试"><span class="nav-number">4.4.</span> <span class="nav-text">测试</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
