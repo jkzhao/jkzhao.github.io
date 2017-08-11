@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-07-28T09:11:52.000Z</updated>
+  <updated>2017-08-11T00:58:34.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,255 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Spark介绍及安装部署</title>
+    <link href="http://yoursite.com/2017/08/11/Spark%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
+    <id>http://yoursite.com/2017/08/11/Spark介绍及安装部署/</id>
+    <published>2017-08-11T00:11:26.000Z</published>
+    <updated>2017-08-11T00:58:34.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Spark介绍&quot;&gt;&lt;a href=&quot;#Spark介绍&quot; class=&quot;headerlink&quot; title=&quot;Spark介绍&quot;&gt;&lt;/a&gt;Spark介绍&lt;/h2&gt;&lt;h3 id=&quot;Apache-Spark&quot;&gt;&lt;a href=&quot;#Apache-Spark&quot; class=&quot;headerlink&quot; title=&quot;Apache Spark&quot;&gt;&lt;/a&gt;Apache Spark&lt;/h3&gt;&lt;p&gt;Apache Spark是一个围绕速度、易用性和复杂分析构建的大数据处理框架(没有数据存储)。最初在2009年由加州大学伯克利分校的AMPLab开发，并于2010年成为Apache的开源项目之一。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;Hadoop和Spark&quot;&gt;&lt;a href=&quot;#Hadoop和Spark&quot; class=&quot;headerlink&quot; title=&quot;Hadoop和Spark&quot;&gt;&lt;/a&gt;Hadoop和Spark&lt;/h3&gt;&lt;p&gt;Hadoop常用于解决高吞吐、批量处理的业务场景，例如离线计算结果用于浏览量统计。如果需要实时查看浏览量统计信息，Hadoop显然不符合这样的要求。Spark通过内存计算能力极大地提高了大数据处理速度，满足了以上场景的需要。&lt;br&gt;与Hadoop和Storm等其他大数据和MapReduce技术相比，Spark有以下特点：&lt;br&gt;&lt;strong&gt;1.快速处理能力&lt;/strong&gt;&lt;br&gt;随着实时大数据应用越来越多，Hadoop作为离线的高吞吐、低响应框架已不能满足这类需求。Hadoop MapReduce的Job将中间输出和结果存储在HDFS中，读写HDFS造成磁盘I/O称为瓶颈。Spark允许将中间输出和结果存储在内存中，避免了大量的磁盘I/O。同时Spark自身的DAG执行引擎也支持数据在内存中的计算。Spark官网声称性能比Hadoop快100倍，如图所示。即便是内存不足，需要磁盘I/O，其速度也是Hadoop的10倍以上。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2.易于使用&lt;/strong&gt;&lt;br&gt;Spark现在支持Java、Scala、Python和R等语言编写应用程序，大大降低了使用者的门槛。自带了80多个高等级操作符，允许在Scala、Python、R的shell中进行交互式查询。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3.通用性&lt;/strong&gt;&lt;br&gt;Spark支持SQL及Hive SQL对数据查询，支持流式计算、支持机器学习和图计算。而且除了Spark core以外，建立在其上的这些功能都是一些库，安装好Spark后，这些库就可以使用了。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/2.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;4.可用性高&lt;/strong&gt;&lt;br&gt;Spark自身实现了Standalone部署模式，还可以跑在Hadoop、Mesos、或者云上。此外，Spark还有丰富的数据源支持。Spark除了可以访问操作系统自身的文件系统和HDFS，还可以访问Cassandra、HBase、Hive、Tachyon以及任何Hadoop的数据源。&lt;/p&gt;
+&lt;h3 id=&quot;Spark中的概念&quot;&gt;&lt;a href=&quot;#Spark中的概念&quot; class=&quot;headerlink&quot; title=&quot;Spark中的概念&quot;&gt;&lt;/a&gt;Spark中的概念&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;RDD：&lt;/strong&gt;弹性分布式数据集。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Task：&lt;/strong&gt;具体执行任务。Task分为ShuffleMapTask和ResultTask两种。ShuffleMapTask和ResultTask分别类似于Hadoop中的Map和Reduce。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Job：&lt;/strong&gt;用户提交的作业。一个Job可能由一到多个Task组成。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Stage：&lt;/strong&gt;Job分成的阶段。一个Job可能被划分为一到多个Stage。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Partition：&lt;/strong&gt;数据分区。即一个RDD的数据可以划分为多少个分区。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;NarrowDependency：&lt;/strong&gt;窄依赖，即子RDD依赖于父RDD中固定的Partition。NarrowDependency分为OneToOneDependency和RangeDependency两种。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ShuffleDependency：&lt;/strong&gt;shuffle依赖，也称为宽依赖，即子RDD对父RDD中的所有Partition都有依赖。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DAG：&lt;/strong&gt;有向无环图。用于反映各RDD之间的依赖关系。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;Spark生态系统&quot;&gt;&lt;a href=&quot;#Spark生态系统&quot; class=&quot;headerlink&quot; title=&quot;Spark生态系统&quot;&gt;&lt;/a&gt;Spark生态系统&lt;/h3&gt;&lt;p&gt;整个Spark主要由以下模块组成：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Spark Core：&lt;/strong&gt;Spark的核心功能实现，包括：SparkContext的初始化(Driver Application通过SparkContext提交)、部署模式、存储体系、任务提交与执行、计算引擎等。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Spark SQL：&lt;/strong&gt;提供SQL处理能力，便于熟悉关系型数据库操作的工程师进行交互查询。此外，还为熟悉Hadoop的用户提供Hive SQL处理能力。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Spark Streaming：&lt;/strong&gt;提供流式计算处理能力，目前支持Kafka、Flume、Twitter、MQTT、ZeroMQ、Kinesis和简单的TCP套接字等数据源。此外，还提供窗口操作。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GraphX：&lt;/strong&gt;提供图计算处理能力，支持分布式。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;MLlib：&lt;/strong&gt;提供机器学习相关的统计、分类、回归等领域的多种算法实现。其一致的API接口大大降低了用户的学习成本。&lt;br&gt;Spark SQL、Spark Streaming、GraphX、MLlib的能力都是建立在核心引擎之上。如下图所示。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/2.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;Spark核心功能&quot;&gt;&lt;a href=&quot;#Spark核心功能&quot; class=&quot;headerlink&quot; title=&quot;Spark核心功能&quot;&gt;&lt;/a&gt;Spark核心功能&lt;/h4&gt;&lt;p&gt;Spark Core提供Spark最基础与最核心的功能，主要包括以下功能：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;SparkContext：&lt;/strong&gt;通常而言，Driver Application的执行和输出都是通过SparkContent来完成的，在正式提交Application之前，首先需要初始化SparkContent。SparkContent隐藏了网络通信、分布式部署、消息通信、存储能力、计算能力、缓存、测量系统、文件服务、Web服务等内容，应用程序开发者只需要使用SparkContent提供的API完成功能开发。SparkContent内置的DAGScheduler负责创建Job，将DAG中的RDD划分到不同的Stage，提交Stage等功能。内置的TaskScheduler负责资源的申请、任务的提交及请求集群对任务的调度等工作。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;存储体系：&lt;/strong&gt;Spark优先考虑使用各节点的内存作为存储，当内存不足时才会考虑使用磁盘，这极大地减少了磁盘I/O，提升了任务执行效率，使得Spark适用于实时计算、流式计算等场景。此外，Spark还提供了以内存为中心的高容错的分布式文件系统Tachyon供用户进行选择。Tachyon能够为Spark提供可靠的内存级的文件共享服务。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;计算引擎：&lt;/strong&gt;计算引擎由SparkContent中的DAGScheduler、RDD以及具体节点上的Executor负责执行的Map和Reduce任务组成。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;部署模式：&lt;/strong&gt;由于单节点不足以提供足够的存储和计算能力，所以作为大数据处理的Spark在SparkContext的TaskScheduler组件中提供了对Standalone部署模式的实现和Yarn、Mesos等分布式资源管理系统的支持。通过使用Standallone、Yarn、Mesos等部署模式为Task分配计算资源，提高任务的并发执行效率。除了可用于实际生产环境的Standalone、Yarn、Mesos等部署模式外，Spark还提供了Local模式和local-cluster模式便于开发和调试。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;Spark扩展功能&quot;&gt;&lt;a href=&quot;#Spark扩展功能&quot; class=&quot;headerlink&quot; title=&quot;Spark扩展功能&quot;&gt;&lt;/a&gt;Spark扩展功能&lt;/h4&gt;&lt;p&gt;Spark SQL&lt;br&gt;Spark Streaming&lt;br&gt;GraphX&lt;br&gt;MLlib&lt;/p&gt;
+&lt;h3 id=&quot;Spark部署架构&quot;&gt;&lt;a href=&quot;#Spark部署架构&quot; class=&quot;headerlink&quot; title=&quot;Spark部署架构&quot;&gt;&lt;/a&gt;Spark部署架构&lt;/h3&gt;&lt;h4 id=&quot;集群架构&quot;&gt;&lt;a href=&quot;#集群架构&quot; class=&quot;headerlink&quot; title=&quot;集群架构&quot;&gt;&lt;/a&gt;集群架构&lt;/h4&gt;&lt;p&gt;从集群部署的角度看，Spark集群由以下部分组成：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Cluster Manager：&lt;/strong&gt;Spark的集群管理器，主要负责资源的分配与管理。集群管理器分配的资源属于一级分配，它将各个Worker上内存、CPU等资源分配给应用程序，但是并不负责对Executor的资源分配。目前Standalone、YARN、Mesos、EC2等都可以作为Spark的集群管理器。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Worker：&lt;/strong&gt;Spark的工作节点。对Spark应用程序来说，由集群管理器分配得到资源的Worker节点主要负责以下工作：创建Executor，将资源和任务进一步分配给Executor，同步资源信息给Cluster Manager。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Executor：&lt;/strong&gt;执行计算任务的一线进程。主要负责任务的执行以及与Worker、Driver App的信息同步。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Driver App：&lt;/strong&gt;客户端驱动程序，也可以理解问客户端应用程序，用于将任务程序转换为RDD和DAG，并与Cluster Manager进行通信与调度。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/3.jpg&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;Spark部署模式&quot;&gt;&lt;a href=&quot;#Spark部署模式&quot; class=&quot;headerlink&quot; title=&quot;Spark部署模式&quot;&gt;&lt;/a&gt;Spark部署模式&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;1.一些概念&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Driver：&lt;/strong&gt;应用驱动程序，可以理解为是老板的客户。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Master：&lt;/strong&gt;Spark的主控节点，可以理解为集群的老板。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Worker：&lt;/strong&gt;Spark的工作节点，可以理解为集群的各个主管。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Executor：&lt;/strong&gt;Spark的工作进程，由Worker监管，负责具体任务的执行。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;2.Spark目前支持的部署方式&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;本地部署模式：&lt;/strong&gt;local、local[N]或者local[N, maxRetries]。主要用于代码调试和跟踪。不具备容错能力，所以不适用于生产环境。local部署模式只有Driver，没有Master和Worker，执行任务的Executor与Driver在同一个JVM进程内。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;本地集群部署模式：&lt;/strong&gt;local-cluster[N, cores, memory]。也主要用于代码调试，是源码学习常用的模式。不具备容错能力，不能用于生产环境。local-cluster模式是一种伪分布式集群部署模式，Driver、Master和Worker在同一个JVM内，可以存在多个Worker，每个Worker会有多个Executor，但这些Executor都独自存在于一个JVM进程内。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Standalone部署模式：&lt;/strong&gt;spark://。具备容错能力并且支持分布式部署，所以可用于实际的生产。Driver在集群之外，可以是任意的客户端应用程序。Master部署于单独的进程，甚至应该在单独的机器节点上。Master有多个，但同时最多有只有一个处于激活状态。Worker部署于单独的进程，也推荐在单独的节点上部署。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;第三方部署模式：&lt;/strong&gt;yarn-standalone、yarn-cluster、mesos://、zk://、simr://等。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;安装部署spark&quot;&gt;&lt;a href=&quot;#安装部署spark&quot; class=&quot;headerlink&quot; title=&quot;安装部署spark&quot;&gt;&lt;/a&gt;安装部署spark&lt;/h2&gt;&lt;p&gt;Spark runs on Java 7+, Python 2.6+ and R 3.1+. For the Scala API, Spark 1.6.2 uses Scala 2.10. You will need to use a compatible Scala version (2.10.x).&lt;/p&gt;
+&lt;h3 id=&quot;本地部署模式&quot;&gt;&lt;a href=&quot;#本地部署模式&quot; class=&quot;headerlink&quot; title=&quot;本地部署模式&quot;&gt;&lt;/a&gt;本地部署模式&lt;/h3&gt;&lt;h4 id=&quot;下载安装JDK8&quot;&gt;&lt;a href=&quot;#下载安装JDK8&quot; class=&quot;headerlink&quot; title=&quot;下载安装JDK8&quot;&gt;&lt;/a&gt;下载安装JDK8&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# mkdir /usr/java
+# tar zxf /usr/local/jdk-8u73-linux-x64.gz -C /usr/java/
+# vim /etc/profile
+export JAVA_HOME=/usr/java/jdk1.8.0_73
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+# source /etc/profile
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;下载安装scala-2-10-6&quot;&gt;&lt;a href=&quot;#下载安装scala-2-10-6&quot; class=&quot;headerlink&quot; title=&quot;下载安装scala-2.10.6&quot;&gt;&lt;/a&gt;下载安装scala-2.10.6&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@care ~]# cd /usr/local/
+[root@care local]# tar zxf scala-2.10.6.tgz
+[root@care local]# vim /etc/profile
+# Scala environment
+export SCALA_HOME=/usr/local/scala-2.10.6
+export PATH=$SCALA_HOME/bin:$PATH
+[root@care local]# source /etc/profile
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看是否成功：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@care local]# scala -version
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;配置登录自己不需要输入密码&quot;&gt;&lt;a href=&quot;#配置登录自己不需要输入密码&quot; class=&quot;headerlink&quot; title=&quot;配置登录自己不需要输入密码&quot;&gt;&lt;/a&gt;配置登录自己不需要输入密码&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@care ~]# ssh-keygen -t rsa -P &amp;apos;&amp;apos;
+[root@care ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@localhost
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;下载安装spark&quot;&gt;&lt;a href=&quot;#下载安装spark&quot; class=&quot;headerlink&quot; title=&quot;下载安装spark&quot;&gt;&lt;/a&gt;下载安装spark&lt;/h4&gt;&lt;p&gt;&lt;a href=&quot;http://spark.apache.org/downloads.html，我这里选择编译好的二进制版本1.6.1&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://spark.apache.org/downloads.html，我这里选择编译好的二进制版本1.6.1&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/4.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@care local]# tar zxf spark-1.6.1-bin-hadoop2.6.tgz
+[root@care local]# mv spark-1.6.1-bin-hadoop2.6 spark-1.6.1
+[root@care local]# vim /etc/profile
+# Spark environment
+export SPARK_HOME=/usr/local/spark-1.6.1
+export PATH=$SPARK_HOME/bin:$PATH
+[root@care local]# source /etc/profile
+
+[root@care local]# cd spark-1.6.1/conf/
+[root@care conf]# cp spark-env.sh.template spark-env.sh
+[root@care conf]# vim spark-env.sh
+export JAVA_HOME=/usr/java/jdk1.8.0_73
+export SCALA_HOME=/usr/local/scala-2.10.6
+export SPARK_MASTER_IP=172.16.7.119
+export SPARK_WORKER_MEMORY=4G
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果要选择源码编译安装，Build方法网址：&lt;br&gt;&lt;a href=&quot;http://spark.apache.org/docs/latest/building-spark.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://spark.apache.org/docs/latest/building-spark.html&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&quot;启动spark&quot;&gt;&lt;a href=&quot;#启动spark&quot; class=&quot;headerlink&quot; title=&quot;启动spark&quot;&gt;&lt;/a&gt;启动spark&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@care ~]# /usr/local/spark-1.6.1/sbin/start-all.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看启动的进程：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@care ~]# jps
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;查看Web-UI&quot;&gt;&lt;a href=&quot;#查看Web-UI&quot; class=&quot;headerlink&quot; title=&quot;查看Web UI&quot;&gt;&lt;/a&gt;查看Web UI&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;Master UI：&lt;/strong&gt;&lt;a href=&quot;http://172.16.7.119:8080/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.119:8080/&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;Worker UI：&lt;/strong&gt;&lt;a href=&quot;http://172.16.7.119:8081/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.119:8081/&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/6.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h4 id=&quot;停止spark&quot;&gt;&lt;a href=&quot;#停止spark&quot; class=&quot;headerlink&quot; title=&quot;停止spark&quot;&gt;&lt;/a&gt;停止spark&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@care ~]# /usr/local/spark-1.6.1/sbin/stop-all.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;Standalone模式部署spark-无HA&quot;&gt;&lt;a href=&quot;#Standalone模式部署spark-无HA&quot; class=&quot;headerlink&quot; title=&quot;Standalone模式部署spark (无HA)&quot;&gt;&lt;/a&gt;Standalone模式部署spark (无HA)&lt;/h3&gt;&lt;p&gt;Spark Standalone采用了Master/Slaves架构的集群模式，因此，存在着Master单点故障。&lt;br&gt;Spark提供了两种单点故障的解决方案：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;基于文件系统的单点恢复&lt;/li&gt;
+&lt;li&gt;基于ZooKeeper的Standby Masters&lt;br&gt;此模式主要用来做开发，因为开发时应用运行频率高，而且对Master故障的影响不大，最主要的是出现故障重新运行便可，不需要恢复。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;安装软件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;spark17&lt;/td&gt;
+&lt;td&gt;172.16.206.17&lt;/td&gt;
+&lt;td&gt;CentOS 7.1&lt;/td&gt;
+&lt;td&gt;JDK8、scala-2.10.6、spark-1.6.1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;spark31&lt;/td&gt;
+&lt;td&gt;172.16.206.31&lt;/td&gt;
+&lt;td&gt;CentOS 7.1&lt;/td&gt;
+&lt;td&gt;JDK8、scala-2.10.6、spark-1.6.1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;spark132&lt;/td&gt;
+&lt;td&gt;172.16.206.32&lt;/td&gt;
+&lt;td&gt;CentOS 7.1&lt;/td&gt;
+&lt;td&gt;JDK8、scala-2.10.6、spark-1.6.1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;spark17作为Mater节点，其他两台作为Worker节点。&lt;/p&gt;
+&lt;h4 id=&quot;节点时间同步&quot;&gt;&lt;a href=&quot;#节点时间同步&quot; class=&quot;headerlink&quot; title=&quot;节点时间同步&quot;&gt;&lt;/a&gt;节点时间同步&lt;/h4&gt;&lt;p&gt;采用NTP(Network Time Protocol)方式来实现, 选择一台机器, 作为集群的时间同步服务器, 然后分别配置服务端和集群其他机器。我这里以spark17机器(Hadoop集群机器)时间为准，其他机器同这台机器时间做同步。&lt;/p&gt;
+&lt;h5 id=&quot;NTP服务端&quot;&gt;&lt;a href=&quot;#NTP服务端&quot; class=&quot;headerlink&quot; title=&quot;NTP服务端&quot;&gt;&lt;/a&gt;NTP服务端&lt;/h5&gt;&lt;p&gt;1.安装ntp服务&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# yum install ntp -y
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.配置/etc/ntp.conf，这边采用本地机器作为时间的原点&lt;br&gt;注释server列表：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;server 0.centos.pool.ntp.org iburst
+server 1.centos.pool.ntp.org iburst
+server 2.centos.pool.ntp.org iburst
+server 3.centos.pool.ntp.org iburst
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;添加如下内容：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;server 127.127.1.0 prefer
+fudge 127.127.1.0 stratum 8
+logfile /var/log/ntp.log
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.启动ntpd服务&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# systemctl start ntpd
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.查看ntp服务状态&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# systemctl status ntpd
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.加入开机启动&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# systemctl enable ntpd
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&quot;NTP客户端&quot;&gt;&lt;a href=&quot;#NTP客户端&quot; class=&quot;headerlink&quot; title=&quot;NTP客户端&quot;&gt;&lt;/a&gt;NTP客户端&lt;/h5&gt;&lt;p&gt;1.安装ntp&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# yum install ntpdate -y
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.配置crontab任务主动同步&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# crontab -e
+*/10 * * * * /usr/sbin/ntpdate 172.16.206.17;hwclock -w
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;各节点配置hosts文件&quot;&gt;&lt;a href=&quot;#各节点配置hosts文件&quot; class=&quot;headerlink&quot; title=&quot;各节点配置hosts文件&quot;&gt;&lt;/a&gt;各节点配置hosts文件&lt;/h4&gt;&lt;p&gt;集群各主机都要配置：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# vim /etc/hosts
+172.16.206.17 spark17
+172.16.206.31 spark31
+172.16.206.32 spark32
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;下载安装JDK8-1&quot;&gt;&lt;a href=&quot;#下载安装JDK8-1&quot; class=&quot;headerlink&quot; title=&quot;下载安装JDK8&quot;&gt;&lt;/a&gt;下载安装JDK8&lt;/h4&gt;&lt;p&gt;集群每台机器都要安装JDK8。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# mkdir /usr/java
+# tar zxf /usr/local/jdk-8u73-linux-x64.gz -C /usr/java/
+# vim /etc/profile
+export JAVA_HOME=/usr/java/jdk1.8.0_73
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+# source /etc/profile
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;下载安装scala-2-10-6-1&quot;&gt;&lt;a href=&quot;#下载安装scala-2-10-6-1&quot; class=&quot;headerlink&quot; title=&quot;下载安装scala-2.10.6&quot;&gt;&lt;/a&gt;下载安装scala-2.10.6&lt;/h4&gt;&lt;p&gt;集群每个节点都需要安装scala。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /usr/local/
+# tar zxf scala-2.10.6.tgz
+# vim /etc/profile
+# Scala environment
+export SCALA_HOME=/usr/local/scala-2.10.6
+export PATH=$SCALA_HOME/bin:$PATH
+# source /etc/profile
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看是否成功：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# scala -version
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;配置主节点登录自己和其他节点不需要输入密码&quot;&gt;&lt;a href=&quot;#配置主节点登录自己和其他节点不需要输入密码&quot; class=&quot;headerlink&quot; title=&quot;配置主节点登录自己和其他节点不需要输入密码&quot;&gt;&lt;/a&gt;配置主节点登录自己和其他节点不需要输入密码&lt;/h4&gt;&lt;p&gt;生成一对密钥：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark17 ~]# ssh-keygen -t rsa -P &amp;apos;&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;拷贝公钥到自己和其他节点：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark17 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@spark17
+[root@spark17 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@spark31
+[root@spark17 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@spark32
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;安装配置spark&quot;&gt;&lt;a href=&quot;#安装配置spark&quot; class=&quot;headerlink&quot; title=&quot;安装配置spark&quot;&gt;&lt;/a&gt;安装配置spark&lt;/h4&gt;&lt;p&gt;我这里下载的是Spark的编译版本spark-1.6.1-bin-hadoop2.6.tgz，否则需要自己事先自行编译。&lt;br&gt;&lt;strong&gt;先在master机器上(172.16.206.17)安装spark：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark17 ~]# cd /usr/local/
+[root@spark17 local]# tar zxf spark-1.6.1-bin-hadoop2.6.tgz
+[root@spark17 local]# mv spark-1.6.1-bin-hadoop2.6 spark-1.6.1
+[root@spark17 local]# vim /etc/profile
+# Spark environment
+export SPARK_HOME=/usr/local/spark-1.6.1
+export PATH=$SPARK_HOME/bin:$PATH
+[root@spark17 local]# source /etc/profile
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;配置spark：&lt;/strong&gt;&lt;br&gt;&lt;strong&gt;修改spark-env.sh文件：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark17 local]# cd spark-1.6.1/conf/
+[root@ spark17 conf]# cp spark-env.sh.template spark-env.sh
+[root@ spark17 conf]# vim spark-env.sh
+export JAVA_HOME=/usr/java/jdk1.8.0_73
+export SCALA_HOME=/usr/local/scala-2.10.6
+export SPARK_MASTER_IP=spark17
+export SPARK_MASTER_PORT=7077
+export SPARK_WORKER_CORES=1
+export SPARK_WORDER_INSTANCES=1
+export SPARK_WORKER_MEMORY=4G
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;修改slave文件：&lt;/strong&gt;只需要在slave文件中写入各节点的主机名即可，包括master的主机名。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark17 conf]# cp slaves.template slaves
+[root@spark17 conf]# vim slaves
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/7.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;一旦创建好文件， 你就可以使用下面的shell脚本启动或者停止你的集群了。 这些脚本基于Hadoop的发布脚本， 可以在SPARK_HOME/bin找到:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;sbin/start-master.sh：在脚本执行的机器上启动master.&lt;/li&gt;
+&lt;li&gt;sbin/start-slaves.sh：启动conf/slaves 文件中配置的所有的slave.&lt;/li&gt;
+&lt;li&gt;sbin/start-all.sh：启动上面描述的master和salve.&lt;/li&gt;
+&lt;li&gt;sbin/stop-master.sh：停止bin/start-master.sh 脚本启动的master.&lt;/li&gt;
+&lt;li&gt;sbin/stop-slaves.sh：停止conf/slaves 文件中配置的slave.&lt;/li&gt;
+&lt;li&gt;sbin/stop-all.sh：停止上面描述的master和slave.&lt;br&gt;&lt;strong&gt;【注意】:这些脚本必须在你想运行的master机器上执行，而不是你的本地机。&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;将master上配置好的spark通过scp复制到其他各个节点上（注意其他节点上的profile文件也要一致）&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark17 ~]# scp -r /usr/local/spark-1.6.1 root@spark31:/usr/local/
+[root@spark17 ~]# scp -r /usr/local/spark-1.6.1 root@spark32:/usr/local/
+[root@spark31 local]# vim /etc/profile
+# Spark environment
+export SPARK_HOME=/usr/local/spark-1.6.1
+export PATH=$SPARK_HOME/bin:$PATH
+[root@spark31 local]# source /etc/profile
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;启动spark-1&quot;&gt;&lt;a href=&quot;#启动spark-1&quot; class=&quot;headerlink&quot; title=&quot;启动spark&quot;&gt;&lt;/a&gt;启动spark&lt;/h4&gt;&lt;p&gt;在master上一次性启动集群：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark17 ~]# cd /usr/local/spark-1.6.1/sbin/
+[root@spark17 sbin]# ./start-all.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;停止spark-1&quot;&gt;&lt;a href=&quot;#停止spark-1&quot; class=&quot;headerlink&quot; title=&quot;停止spark&quot;&gt;&lt;/a&gt;停止spark&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@spark17 ~]# cd /usr/local/spark-1.6.1/sbin/
+[root@spark17 sbin]# ./stop-all.sh
+&lt;/code&gt;&lt;/pre&gt;</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Spark介绍&quot;&gt;&lt;a href=&quot;#Spark介绍&quot; class=&quot;headerlink&quot; title=&quot;Spark介绍&quot;&gt;&lt;/a&gt;Spark介绍&lt;/h2&gt;&lt;h3 id=&quot;Apache-Spark&quot;&gt;&lt;a href=&quot;#Apache-Spark&quot; class=&quot;headerlink&quot; title=&quot;Apache Spark&quot;&gt;&lt;/a&gt;Apache Spark&lt;/h3&gt;&lt;p&gt;Apache Spark是一个围绕速度、易用性和复杂分析构建的大数据处理框架(没有数据存储)。最初在2009年由加州大学伯克利分校的AMPLab开发，并于2010年成为Apache的开源项目之一。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="实时处理" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E5%A4%84%E7%90%86/"/>
+    
+    
+      <category term="大数据 实时处理 Spark" scheme="http://yoursite.com/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE-%E5%AE%9E%E6%97%B6%E5%A4%84%E7%90%86-Spark/"/>
+    
+  </entry>
   
   <entry>
     <title>Ansible实战：部署分布式日志系统</title>
@@ -3026,85 +3275,6 @@ UserParameter=Nginx.requests[*], /usr/bin/curl -s &amp;quot;http://$1:$2/status&
     <summary type="html">
     
       &lt;p&gt;&lt;a href=&quot;https://nginx.org/en/docs/http/ngx_http_stub_status_module.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://nginx.org/en/docs/http/ngx_http_stub_status_module.html&lt;/a&gt;&lt;br&gt;在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。&lt;br&gt;Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="Zabbix" scheme="http://yoursite.com/categories/Zabbix/"/>
-    
-    
-      <category term="监控 zabbix" scheme="http://yoursite.com/tags/%E7%9B%91%E6%8E%A7-zabbix/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>zabbix监控实例</title>
-    <link href="http://yoursite.com/2017/05/14/zabbix%E7%9B%91%E6%8E%A7%E5%AE%9E%E4%BE%8B/"/>
-    <id>http://yoursite.com/2017/05/14/zabbix监控实例/</id>
-    <published>2017-05-14T13:44:33.000Z</published>
-    <updated>2017-06-12T07:56:29.000Z</updated>
-    
-    <content type="html">&lt;h1 id=&quot;zabbix-web添加主机&quot;&gt;&lt;a href=&quot;#zabbix-web添加主机&quot; class=&quot;headerlink&quot; title=&quot;zabbix web添加主机&quot;&gt;&lt;/a&gt;zabbix web添加主机&lt;/h1&gt;&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;进入zabbix web界面，点击配置—&amp;gt;主机—&amp;gt;创建主机。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/28.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;填入下图中的信息，点击添加。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/29.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/30.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/31.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h1 id=&quot;定义Items&quot;&gt;&lt;a href=&quot;#定义Items&quot; class=&quot;headerlink&quot; title=&quot;定义Items&quot;&gt;&lt;/a&gt;定义Items&lt;/h1&gt;&lt;p&gt;要真正实现数据采集，需要定义监控项(Items)。多个Items可以归为一个组，称为Applications。定义好Items之后，还应该为Items定义Triggers(触发器)。我这里演示下创建监控网卡进入和出去的流量。&lt;/p&gt;
-&lt;h2 id=&quot;创建item监控网卡出去流量&quot;&gt;&lt;a href=&quot;#创建item监控网卡出去流量&quot; class=&quot;headerlink&quot; title=&quot;创建item监控网卡出去流量&quot;&gt;&lt;/a&gt;创建item监控网卡出去流量&lt;/h2&gt;&lt;p&gt;登录zabbix web管控台，点击配置—&amp;gt;主机—&amp;gt;监控项。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/32.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击右上角的“创建监控项”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/33.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;在如下的界面填入以下内容：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/34.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;其中，在key那一栏，点击select按钮，选择key值。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/35.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/36.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;回到hosts，你会发现已经有application和item了。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/37.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;每创建一个Item，会自动帮你创建图形的。点击监控—&amp;gt;最新的数据，输入要查的主机，点击select，就可以看到为刚才我们创建的item所创建的图形。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/38.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击图形。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/39.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;注意:数据量从右往左走的。&lt;/strong&gt;&lt;/p&gt;
-&lt;h2 id=&quot;创建item监控进入网卡流量&quot;&gt;&lt;a href=&quot;#创建item监控进入网卡流量&quot; class=&quot;headerlink&quot; title=&quot;创建item监控进入网卡流量&quot;&gt;&lt;/a&gt;创建item监控进入网卡流量&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/40.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;注意:&lt;/strong&gt;有时候，不是一创建完item，graph那边就有数据了，你可以主要通过浏览器去访问监听在这个网卡的某个端口上的服务，然后graph就会有数据了。&lt;/p&gt;
-&lt;h1 id=&quot;创建graph&quot;&gt;&lt;a href=&quot;#创建graph&quot; class=&quot;headerlink&quot; title=&quot;创建graph&quot;&gt;&lt;/a&gt;创建graph&lt;/h1&gt;&lt;p&gt;为什么要创建graph？拿上节中的网卡进出流量来举例，进和出此时都不在一张图上，这就需要Graphs自定义图像。将多个指标放在一起。&lt;/p&gt;
-&lt;p&gt;点击配置—&amp;gt;主机，点击Graphs。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/41.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击右上角的创建图形。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/42.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;输入Name，点击图中倒数第二个add。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/43.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;选择监控项。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/44.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;最后点击添加。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/45.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击监控—&amp;gt;图形，在右上角输入主机组，主机和图形。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/46.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;创建模板&quot;&gt;&lt;a href=&quot;#创建模板&quot; class=&quot;headerlink&quot; title=&quot;创建模板&quot;&gt;&lt;/a&gt;创建模板&lt;/h1&gt;&lt;p&gt;如果我们在加一个主机进来，假如说我们每一次都想监控某几个同样的指标，每台主机都要这么去定义的话，就太痛苦了。这就要使用到模板。&lt;/p&gt;
-&lt;h2 id=&quot;创建模板-1&quot;&gt;&lt;a href=&quot;#创建模板-1&quot; class=&quot;headerlink&quot; title=&quot;创建模板&quot;&gt;&lt;/a&gt;创建模板&lt;/h2&gt;&lt;p&gt;点击配置—&amp;gt;模板，点击创建模板。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/47.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/48.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;创建Item&quot;&gt;&lt;a href=&quot;#创建Item&quot; class=&quot;headerlink&quot; title=&quot;创建Item&quot;&gt;&lt;/a&gt;创建Item&lt;/h2&gt;&lt;p&gt;创建完模板后，其上是没有任何Item和trigger等。所以我们需要创建这一系列监控项。但是由于这里我是要监控Elasticsearch状态，而zabbix是没有内置的key来监控elasticsearch的，所以需要自定义监控项来监控。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/49.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;在elasticsearch主机定义zabbix agent的UserParameter&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 ~]# cd /usr/local/zabbix-3.0.1/etc/
-[root@log1 etc]# vim zabbix_agentd.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;输入内容：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;UserParameter=Elasticsearch.status[*],/usr/bin/curl -s &amp;apos;http://$1:$2/_cluster/health?pretty=true&amp;apos; | awk -F&amp;apos;&amp;quot;&amp;apos; &amp;apos;/status/{print $$4}&amp;apos;
-&lt;/code&gt;&lt;/pre&gt;&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;重启zabbix agent&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 ~] # killall -9 zabbix_agentd
-[root@log1 ~]# /usr/local/zabbix-3.0.1/sbin/zabbix_agentd
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;在zabbix server端使用zabbix_get模拟获取数据&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console ~]# /usr/local/zabbix-3.0.1/bin/zabbix_get -s 114.55.29.86 -k &amp;quot;Elasticsearch.status[114.55.29.86,9200]&amp;quot;
-green
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;创建模板的Item&lt;br&gt;(1)找到刚才新建的模板，点击Item。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/50.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(2)点击右上角的Create Item&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/51.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(3)输入如下的信息&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/52.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/53.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&quot;为模板上的Item创建触发器&quot;&gt;&lt;a href=&quot;#为模板上的Item创建触发器&quot; class=&quot;headerlink&quot; title=&quot;为模板上的Item创建触发器&quot;&gt;&lt;/a&gt;为模板上的Item创建触发器&lt;/h2&gt;&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;点击触发器。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/54.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;点击右上角的创建触发器&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/55.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;定义触发器名字，然后点击Add。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/56.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;点击Select，选择对哪个Item做Trigger。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/57.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/58.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&quot;将模板应用到主机上&quot;&gt;&lt;a href=&quot;#将模板应用到主机上&quot; class=&quot;headerlink&quot; title=&quot;将模板应用到主机上&quot;&gt;&lt;/a&gt;将模板应用到主机上&lt;/h2&gt;&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;点击配置—&amp;gt;主机，点击log1主机。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/59.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;点击模板，点击选择。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/60.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;选择我们需要的模板，点击选择。然后在点击Add。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/61.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;这是Add后显示页面，再点击Update。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/62.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这样你就可以看到这边log1主机有应用的模板的。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/63.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&quot;查看监控数据&quot;&gt;&lt;a href=&quot;#查看监控数据&quot; class=&quot;headerlink&quot; title=&quot;查看监控数据&quot;&gt;&lt;/a&gt;查看监控数据&lt;/h2&gt;&lt;p&gt;点击监控—&amp;gt;最新数据，找到Elasticsearch status这个监控项，点击后面的History。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/64.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/65.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h1 id=&quot;zabbix-web添加主机&quot;&gt;&lt;a href=&quot;#zabbix-web添加主机&quot; class=&quot;headerlink&quot; title=&quot;zabbix web添加主机&quot;&gt;&lt;/a&gt;zabbix web添加主机&lt;/h1&gt;&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;进入zabbix web界面，点击配置—&amp;gt;主机—&amp;gt;创建主机。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/28.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
     
     </summary>
     
