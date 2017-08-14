@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Ansible 运维自动化," />
+  <meta name="keywords" content="容器 Docker," />
 
 
 
@@ -104,23 +104,26 @@
 
 
 
-<meta name="description" content="什么场景下会用roles？假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不">
-<meta name="keywords" content="Ansible 运维自动化">
+<meta name="description" content="Docker的诞生dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。">
+<meta name="keywords" content="容器 Docker">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Ansible之roles介绍">
-<meta property="og:url" content="http://yoursite.com/2017/07/24/Ansible之roles介绍/index.html">
+<meta property="og:title" content="Docker介绍">
+<meta property="og:url" content="http://yoursite.com/2017/08/14/Docker介绍/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="什么场景下会用roles？假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不">
+<meta property="og:description" content="Docker的诞生dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/44.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/45.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/46.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/47.png">
-<meta property="og:updated_time" content="2017-07-24T02:52:44.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/6.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/7.png">
+<meta property="og:updated_time" content="2017-08-14T03:35:03.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Ansible之roles介绍">
-<meta name="twitter:description" content="什么场景下会用roles？假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/44.png">
+<meta name="twitter:title" content="Docker介绍">
+<meta name="twitter:description" content="Docker的诞生dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/1.png">
 
 
 
@@ -138,7 +141,7 @@
   };
 </script>
 
-  <title> Ansible之roles介绍 | jkzhao's blog </title>
+  <title> Docker介绍 | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -328,7 +331,7 @@
             
             
               
-                Ansible之roles介绍
+                Docker介绍
               
             
           </h1>
@@ -340,14 +343,14 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-24T09:09:22+08:00" content="2017-07-24">
-              2017-07-24
+            <time itemprop="dateCreated" datetime="2017-08-14T09:17:58+08:00" content="2017-08-14">
+              2017-08-14
             </time>
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-07-24T10:52:44+08:00" content="2017-07-24">
-              2017-07-24
+              <time itemprop="dateUpdated" datetime="2017-08-14T11:35:03+08:00" content="2017-08-14">
+              2017-08-14
               </time>
               </span>
             
@@ -362,8 +365,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
+                  <a href="/categories/Docker/" itemprop="url" rel="index">
+                    <span itemprop="name">Docker</span>
                   </a>
                 </span>
 
@@ -382,7 +385,7 @@
 
           
           
-             <span id="/2017/07/24/Ansible之roles介绍/" class="leancloud_visitors" data-flag-title="Ansible之roles介绍">
+             <span id="/2017/08/14/Docker介绍/" class="leancloud_visitors" data-flag-title="Docker介绍">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -406,93 +409,38 @@
       
 
       
-        <h2 id="什么场景下会用roles？"><a href="#什么场景下会用roles？" class="headerlink" title="什么场景下会用roles？"></a>什么场景下会用roles？</h2><p>假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？<br>第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不利于多次调。比如说后来又加进来一个主机，这个第4个主机既是httpd服务器，又是php服务器，我们只能写第4个play，上面写上安装httpd和php。这样playbook中的代码就重复了。<br><a id="more"></a><br>为了避免代码重复，roles能够实现代码重复被调用。定义一个角色叫websrvs，第二个角色叫phpappsrvs，第三个角色叫dbsrvs。那么调用时如下来调用：</p>
-<pre><code>hosts: host1
-role:
-- websrvs
-
-hosts: host2
-role:
-- phpappsrvs
-
-hosts: host3
-role:
-- dbsrvs
-
-hosts: host4
-role:
-- websrvs
-- phpappsrvs
-</code></pre><p>这样代码就可以重复利用了,每个角色可以被独立重复调用。下面举例说明使用方式。</p>
-<h2 id="roles示例"><a href="#roles示例" class="headerlink" title="roles示例"></a>roles示例</h2><p>假设有3台主机，172.16.7.151主机上安装MySQL，172.16.7.152上安装httpd，172.16.7.153上安装MySQL和httpd。我们建立两个角色websrvs和dbsrvs，然后应用到这几个主机上。</p>
-<h3 id="创建roles的必需目录"><a href="#创建roles的必需目录" class="headerlink" title="创建roles的必需目录"></a>创建roles的必需目录</h3><pre><code>[root@node1 opt]# mkdir -pv ansible_playbooks/roles/{websrvs,dbsrvs}/{tasks,files,templates,meta,handlers,vars}
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/44.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/45.png" alt=""><br>每个role下面有个目录叫meta，在里面可以新建文件main.yml，在文件中可以设置该role和其它role之前的关联关系。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/46.png" alt=""></p>
-<h3 id="配置角色"><a href="#配置角色" class="headerlink" title="配置角色"></a>配置角色</h3><h4 id="配置角色websrvs"><a href="#配置角色websrvs" class="headerlink" title="配置角色websrvs"></a>配置角色websrvs</h4><pre><code>[root@node1 opt]# cd ansible_playbooks/roles/
-[root@node1 roles]# cd websrvs/
-[root@node1 websrvs]# ls
-files  handlers  meta  tasks  templates  vars
-</code></pre><p>1.将httpd配置文件上传到files目录下，我这里假设httpd.conf每台主机都是一样的，实际上应该用模板，先用一样的配置文件举例</p>
-<pre><code>[root@node1 websrvs]# cp /etc/httpd/conf/httpd.conf files/
-</code></pre><p><strong>直接复制的静态文件都放在files目录下。打算用模板文件的都放在templates目录下。</strong></p>
-<p>2.编写任务列表tasks</p>
-<pre><code>[root@node1 websrvs]# vim tasks/main.yml
-- name: install httpd package
-  yum: name=httpd
-- name: install configuration file
-  copy: src=httpd.conf dest=/etc/httpd/conf
-  tags:
-  - conf
-  notify:
-  - restart httpd
-- name: start httpd
-  service: name=httpd state=started
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/47.png" alt=""></p>
-<p>3.由于上面的tasks中定义了notify，所以要定义handlers</p>
-<pre><code>[root@node1 websrvs]# vim handlers/main.yml
-- name: restart httpd
-  service: name=httpd state=restarted
-</code></pre><p>如果需要定义变量，则在vars目录下创建main.yml文件，在文件中写入变量，以key:value的形式定义，比如：</p>
-<pre><code>http_port: 8080
-</code></pre><h4 id="配置角色dbsrvs"><a href="#配置角色dbsrvs" class="headerlink" title="配置角色dbsrvs"></a>配置角色dbsrvs</h4><pre><code>[root@node1 roles]# cd dbsrvs/
-[root@node1 dbsrvs]# ls
-files  handlers  meta  tasks  templates  vars
-</code></pre><p>1.将MySQL配置文件上传到files目录下。<br>2.编写任务列表tasks</p>
-<pre><code>[root@node1 dbsrvs]# vim tasks/main.yml
-- name: install mysql-server package
-  yum: name=mysql-server state=latest
-- name: install configuration file
-  copy: src=my.cnf dest/etc/my.cnf
-  tags:
-  - conf
-  notify:
-  - restart mysqld
-- name:
-  service: name=mysqld enabled=true state=started
-</code></pre><p>3.定义handlers</p>
-<pre><code>[root@node1 dbsrvs]# vim handlers/main.yml
-- name: restart mysqld
-  service: name=mysqld state=restarted
-</code></pre><h4 id="定义playbook"><a href="#定义playbook" class="headerlink" title="定义playbook"></a>定义playbook</h4><p>【注意】：要在roles目录同级创建playbook。</p>
-<pre><code>[root@node1 ansible_playbooks]# vim web.yml
-- hosts: 172.16.7.152
-  roles:
-  - websrvs 
-
-[root@node1 ansible_playbooks]# vim db.yml
-- hosts: 172.16.7.151
-  roles:
-  - dbsrvs 
-
-[root@node1 ansible_playbooks]# vim site.yml
-- hosts: 172.16.7.153
-  roles:
-  - websrvs
-  - dbsrvs 
-</code></pre><p>运行：</p>
-<pre><code>[root@node1 ansible_playbooks]# ansible-playbook web.yml
-[root@node1 ansible_playbooks]# ansible-playbook db.yml
-[root@node1 ansible_playbooks]# ansible-playbook site.yml
-</code></pre><p>当然也可以把这些内容写入同一个playbook中。playbook的名字可以自定义。</p>
+        <h2 id="Docker的诞生"><a href="#Docker的诞生" class="headerlink" title="Docker的诞生"></a>Docker的诞生</h2><p>dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。<br>Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。<br><a id="more"></a></p>
+<h2 id="Hypervisor与Docker"><a href="#Hypervisor与Docker" class="headerlink" title="Hypervisor与Docker"></a>Hypervisor与Docker</h2><h3 id="Hypervisor"><a href="#Hypervisor" class="headerlink" title="Hypervisor"></a>Hypervisor</h3><p>Hypervisor是一种运行在物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享一套基础物理硬件，因此也可以看作是虚拟环境中的“元”操作系统，它可以协调访问服务器上的所有物理设备和虚拟机，也叫虚拟机监视器（Virtual Machine Monitor）。Hypervisor是所有虚拟化技术的核心。<br>Hypervisor是一种运行在基础物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享硬件。也可叫做VMM（ virtual machine monitor ），即虚拟机监视器。 Hypervisors是一种在虚拟环境中的“元”操作系统。他们可以访问服务器上包括磁盘和内存在内的所有物理设备。Hypervisors不但协调着这些硬件资源的访问，也同时在各个虚拟机之间施加防护。当服务器启动并执行Hypervisor时，它会加载所有虚拟机客户端的操作系统同时会分配给每一台虚拟机适量的内存，CPU，网络和磁盘。</p>
+<h3 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h3><p>Docker也是虚拟化的一种，是通过内核虚拟化技术(namespaces和cgroups等)来提供容器的资源隔离与安全保障等。由于Docker通过操作系统层虚拟化实现隔离，所以Docker容器在运行时，不需要类似虚拟机(VM)额外的操作系统开销，提高资源利用率。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/1.png" alt=""></p>
+<h2 id="Docker要解决的问题"><a href="#Docker要解决的问题" class="headerlink" title="Docker要解决的问题"></a>Docker要解决的问题</h2><ul>
+<li>消除环境的不一致</li>
+<li>隔离运行环境</li>
+<li>应用的打包和分发</li>
+<li>简单便捷的操作（统一的API）<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/2.png" alt=""></li>
+</ul>
+<h2 id="Docker配合运维的优势"><a href="#Docker配合运维的优势" class="headerlink" title="Docker配合运维的优势"></a>Docker配合运维的优势</h2><ul>
+<li>环境一致性——减少环境切换带来的问题</li>
+<li>交付标准化——统一的交付件规格便于管理</li>
+<li>自动化运维——提高运维效率，Docker提供了API</li>
+<li>资源利用率——降低基础设施成本</li>
+</ul>
+<h2 id="Docker配合运维的劣势"><a href="#Docker配合运维的劣势" class="headerlink" title="Docker配合运维的劣势"></a>Docker配合运维的劣势</h2><ul>
+<li>操作习惯的变化——ssh/cronjob等变动</li>
+<li>监控方式的变化——系统指标/日志等方面</li>
+<li>网络/存储的变化——学习成本</li>
+<li>周边系统的变化——架构成本</li>
+</ul>
+<h2 id="Docker的架构及工作流"><a href="#Docker的架构及工作流" class="headerlink" title="Docker的架构及工作流"></a>Docker的架构及工作流</h2><p>Docker的基本组成：</p>
+<ul>
+<li>Docker Client 客户端</li>
+<li>Docker Daemon 守护进程</li>
+<li>Docker Image 镜像</li>
+<li>Docker Container 容器</li>
+<li>Docker Registry 仓库<br>docker是C/S架构的程序。客户端对服务器端的访问既可以是在本地，也可以通过远程来访问。<br>我们通过docker客户端来执行各种命令，docker客户端会将这些命令发送给守护进程，从而操作docker的容器，而容器是通过镜像来创建，而镜像是保存在仓库中。守护进程执行的结果还会传回给客户端。这样我们就可以通过客户端来查看命令运行的结果。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/3.png" alt=""></li>
+</ul>
+<h3 id="Docker-Image镜像"><a href="#Docker-Image镜像" class="headerlink" title="Docker Image镜像"></a>Docker Image镜像</h3><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/4.png" alt=""><br>镜像是docker容器的基石，容器基于镜像启动和运行。镜像就好比容器的源代码，保存了用于启动容器的各种条件。<br>深层次的理解镜像：docker的镜像是个层叠的只读文件系统，它的最底端是个引导文件系统，即bootfs。这很像典型的Linux文件系统，docker用户几乎永远不可能和底层引导文件系统有交互。实际上，当一个容器启动后，它将会被移到内存中，而引导文件系统则会被卸载。<br>docker镜像的第二层是root文件系统，即rootfs。root文件系统可以是一种或多种的文件系统，比如Ubuntu或者CentOS等。在传统的linux引导过程中，root文件系统会最先以只读的方式加载，但引导结束并完成了完整性检查后，它才会切换为读写模式。但是在docker里，root文件系统永远只能是只读的。并且docker利用联合加载技术又会在root文件系统之上加载更多的只读文件系统。联合加载：一次加载多个文件系统，但是在外面看起来只能看见一个文件系统。联合加载会将各层文件系统叠加到一起。docker将这样的文件系统称为镜像。一个镜像可以放到另一个镜像的顶部，位于下面的镜像称为父镜像，以此类推，最底部的镜像称为基础镜像。也就是图中的root文件系统。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/5.png" alt=""><br>bootfs (boot file system) 主要包含 bootloader 和 kernel, bootloader主要是引导加载kernel, 当boot成功后 kernel 被加载到内存中后 bootfs就被umount了. rootfs (root file system) 包含的就是典型 Linux 系统中的 /dev, /proc,/bin, /etc 等标准目录和文件。<br>对于不同的linux发行版, bootfs基本是一致的, 但rootfs会有差别, 因此不同的发行版可以公用bootfs 如下图:<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/6.png" alt=""><br>【补充】:BusyBox就是一个工具，使用它可以对linux进行定制，可以制作非常小的系统。BusyBox生成的系统映像可以独立安装在硬盘上。</p>
+<h3 id="Docker-Container容器"><a href="#Docker-Container容器" class="headerlink" title="Docker Container容器"></a>Docker Container容器</h3><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/7.png" alt=""><br>容器通过镜像来启动，docker的容器是docker的执行单元，容器中可以运行客户的一个或多个进程。如果说镜像是docker生命周期中的构建和打包阶段，那么容器则是启动和执行阶段。<br>那么容器是怎样通过镜像来启动的呢？当一个容器启动时，会在该镜像的最顶层加载一个读写文件系统，也就是一个可写的文件层。我们在docker中运行的程序就是在这层中运行的。当docker第一次启动一个容器时，初始的读写层是空的，当文件系统发生变化时，这些变化都会应用到这一层上，比如如果想修改一个文件，这个文件首先会从该读写层下面的只读层复制到该读写层，该文件的只读版本依然存在，但是已经被读写层中的文件副本所隐藏。这就是docker中的一个重要技术，“写时复制”。每个只读镜像层都是只读的，并且以后永远不会变化。<br>当创建一个新容器时，docker会构建一个镜像站，就像右图所示。在站的最顶层添加可写层，这个读写层加上下面的镜像层以及一些配置数据就构成了一个容器。</p>
+<h3 id="Docker-Registry仓库"><a href="#Docker-Registry仓库" class="headerlink" title="Docker Registry仓库"></a>Docker Registry仓库</h3><p>docker用仓库保存用户构建的镜像。仓库分为公有和私有两种。docker公司自己提供了一个公有的仓库，叫Docker Hub。我们可以在docker hub上注册账号，分享并保存自己的镜像。目前docker上已经有了非常丰富的镜像。所以我们也可以通过docker hub来查找我们需要的镜像。当然我们也可以架设自己私有的仓库。</p>
 
       
     </div>
@@ -514,7 +462,7 @@ files  handlers  meta  tasks  templates  vars
       
         <div class="post-tags">
           
-            <a href="/tags/Ansible-运维自动化/" rel="tag"><i class="fa fa-tag"></i>Ansible 运维自动化</a>
+            <a href="/tags/容器-Docker/" rel="tag"><i class="fa fa-tag"></i>容器 Docker</a>
           
         </div>
       
@@ -523,17 +471,13 @@ files  handlers  meta  tasks  templates  vars
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/07/22/Ansible之tags介绍/" rel="next" title="Ansible之tags介绍">
-                <i class="fa fa-chevron-left"></i> Ansible之tags介绍
+              <a href="/2017/08/11/Spark介绍及安装部署/" rel="next" title="Spark介绍及安装部署">
+                <i class="fa fa-chevron-left"></i> Spark介绍及安装部署
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/07/27/Ansible实战：部署分布式日志系统/" rel="prev" title="Ansible实战：部署分布式日志系统">
-                Ansible实战：部署分布式日志系统 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -690,7 +634,7 @@ files  handlers  meta  tasks  templates  vars
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么场景下会用roles？"><span class="nav-number">1.</span> <span class="nav-text">什么场景下会用roles？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#roles示例"><span class="nav-number">2.</span> <span class="nav-text">roles示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建roles的必需目录"><span class="nav-number">2.1.</span> <span class="nav-text">创建roles的必需目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置角色"><span class="nav-number">2.2.</span> <span class="nav-text">配置角色</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置角色websrvs"><span class="nav-number">2.2.1.</span> <span class="nav-text">配置角色websrvs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置角色dbsrvs"><span class="nav-number">2.2.2.</span> <span class="nav-text">配置角色dbsrvs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#定义playbook"><span class="nav-number">2.2.3.</span> <span class="nav-text">定义playbook</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker的诞生"><span class="nav-number">1.</span> <span class="nav-text">Docker的诞生</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hypervisor与Docker"><span class="nav-number">2.</span> <span class="nav-text">Hypervisor与Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hypervisor"><span class="nav-number">2.1.</span> <span class="nav-text">Hypervisor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker"><span class="nav-number">2.2.</span> <span class="nav-text">Docker</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker要解决的问题"><span class="nav-number">3.</span> <span class="nav-text">Docker要解决的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker配合运维的优势"><span class="nav-number">4.</span> <span class="nav-text">Docker配合运维的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker配合运维的劣势"><span class="nav-number">5.</span> <span class="nav-text">Docker配合运维的劣势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker的架构及工作流"><span class="nav-number">6.</span> <span class="nav-text">Docker的架构及工作流</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-Image镜像"><span class="nav-number">6.1.</span> <span class="nav-text">Docker Image镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-Container容器"><span class="nav-number">6.2.</span> <span class="nav-text">Docker Container容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-Registry仓库"><span class="nav-number">6.3.</span> <span class="nav-text">Docker Registry仓库</span></a></li></ol></li></ol></div>
             
           </div>
         </section>

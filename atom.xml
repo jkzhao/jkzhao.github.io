@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-08-11T00:58:34.000Z</updated>
+  <updated>2017-08-14T03:35:03.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,60 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Docker介绍</title>
+    <link href="http://yoursite.com/2017/08/14/Docker%E4%BB%8B%E7%BB%8D/"/>
+    <id>http://yoursite.com/2017/08/14/Docker介绍/</id>
+    <published>2017-08-14T01:17:58.000Z</published>
+    <updated>2017-08-14T03:35:03.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Docker的诞生&quot;&gt;&lt;a href=&quot;#Docker的诞生&quot; class=&quot;headerlink&quot; title=&quot;Docker的诞生&quot;&gt;&lt;/a&gt;Docker的诞生&lt;/h2&gt;&lt;p&gt;dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。&lt;br&gt;Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;Hypervisor与Docker&quot;&gt;&lt;a href=&quot;#Hypervisor与Docker&quot; class=&quot;headerlink&quot; title=&quot;Hypervisor与Docker&quot;&gt;&lt;/a&gt;Hypervisor与Docker&lt;/h2&gt;&lt;h3 id=&quot;Hypervisor&quot;&gt;&lt;a href=&quot;#Hypervisor&quot; class=&quot;headerlink&quot; title=&quot;Hypervisor&quot;&gt;&lt;/a&gt;Hypervisor&lt;/h3&gt;&lt;p&gt;Hypervisor是一种运行在物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享一套基础物理硬件，因此也可以看作是虚拟环境中的“元”操作系统，它可以协调访问服务器上的所有物理设备和虚拟机，也叫虚拟机监视器（Virtual Machine Monitor）。Hypervisor是所有虚拟化技术的核心。&lt;br&gt;Hypervisor是一种运行在基础物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享硬件。也可叫做VMM（ virtual machine monitor ），即虚拟机监视器。 Hypervisors是一种在虚拟环境中的“元”操作系统。他们可以访问服务器上包括磁盘和内存在内的所有物理设备。Hypervisors不但协调着这些硬件资源的访问，也同时在各个虚拟机之间施加防护。当服务器启动并执行Hypervisor时，它会加载所有虚拟机客户端的操作系统同时会分配给每一台虚拟机适量的内存，CPU，网络和磁盘。&lt;/p&gt;
+&lt;h3 id=&quot;Docker&quot;&gt;&lt;a href=&quot;#Docker&quot; class=&quot;headerlink&quot; title=&quot;Docker&quot;&gt;&lt;/a&gt;Docker&lt;/h3&gt;&lt;p&gt;Docker也是虚拟化的一种，是通过内核虚拟化技术(namespaces和cgroups等)来提供容器的资源隔离与安全保障等。由于Docker通过操作系统层虚拟化实现隔离，所以Docker容器在运行时，不需要类似虚拟机(VM)额外的操作系统开销，提高资源利用率。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;Docker要解决的问题&quot;&gt;&lt;a href=&quot;#Docker要解决的问题&quot; class=&quot;headerlink&quot; title=&quot;Docker要解决的问题&quot;&gt;&lt;/a&gt;Docker要解决的问题&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;消除环境的不一致&lt;/li&gt;
+&lt;li&gt;隔离运行环境&lt;/li&gt;
+&lt;li&gt;应用的打包和分发&lt;/li&gt;
+&lt;li&gt;简单便捷的操作（统一的API）&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/2.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;Docker配合运维的优势&quot;&gt;&lt;a href=&quot;#Docker配合运维的优势&quot; class=&quot;headerlink&quot; title=&quot;Docker配合运维的优势&quot;&gt;&lt;/a&gt;Docker配合运维的优势&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;环境一致性——减少环境切换带来的问题&lt;/li&gt;
+&lt;li&gt;交付标准化——统一的交付件规格便于管理&lt;/li&gt;
+&lt;li&gt;自动化运维——提高运维效率，Docker提供了API&lt;/li&gt;
+&lt;li&gt;资源利用率——降低基础设施成本&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;Docker配合运维的劣势&quot;&gt;&lt;a href=&quot;#Docker配合运维的劣势&quot; class=&quot;headerlink&quot; title=&quot;Docker配合运维的劣势&quot;&gt;&lt;/a&gt;Docker配合运维的劣势&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;操作习惯的变化——ssh/cronjob等变动&lt;/li&gt;
+&lt;li&gt;监控方式的变化——系统指标/日志等方面&lt;/li&gt;
+&lt;li&gt;网络/存储的变化——学习成本&lt;/li&gt;
+&lt;li&gt;周边系统的变化——架构成本&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;Docker的架构及工作流&quot;&gt;&lt;a href=&quot;#Docker的架构及工作流&quot; class=&quot;headerlink&quot; title=&quot;Docker的架构及工作流&quot;&gt;&lt;/a&gt;Docker的架构及工作流&lt;/h2&gt;&lt;p&gt;Docker的基本组成：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Docker Client 客户端&lt;/li&gt;
+&lt;li&gt;Docker Daemon 守护进程&lt;/li&gt;
+&lt;li&gt;Docker Image 镜像&lt;/li&gt;
+&lt;li&gt;Docker Container 容器&lt;/li&gt;
+&lt;li&gt;Docker Registry 仓库&lt;br&gt;docker是C/S架构的程序。客户端对服务器端的访问既可以是在本地，也可以通过远程来访问。&lt;br&gt;我们通过docker客户端来执行各种命令，docker客户端会将这些命令发送给守护进程，从而操作docker的容器，而容器是通过镜像来创建，而镜像是保存在仓库中。守护进程执行的结果还会传回给客户端。这样我们就可以通过客户端来查看命令运行的结果。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/3.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;Docker-Image镜像&quot;&gt;&lt;a href=&quot;#Docker-Image镜像&quot; class=&quot;headerlink&quot; title=&quot;Docker Image镜像&quot;&gt;&lt;/a&gt;Docker Image镜像&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;镜像是docker容器的基石，容器基于镜像启动和运行。镜像就好比容器的源代码，保存了用于启动容器的各种条件。&lt;br&gt;深层次的理解镜像：docker的镜像是个层叠的只读文件系统，它的最底端是个引导文件系统，即bootfs。这很像典型的Linux文件系统，docker用户几乎永远不可能和底层引导文件系统有交互。实际上，当一个容器启动后，它将会被移到内存中，而引导文件系统则会被卸载。&lt;br&gt;docker镜像的第二层是root文件系统，即rootfs。root文件系统可以是一种或多种的文件系统，比如Ubuntu或者CentOS等。在传统的linux引导过程中，root文件系统会最先以只读的方式加载，但引导结束并完成了完整性检查后，它才会切换为读写模式。但是在docker里，root文件系统永远只能是只读的。并且docker利用联合加载技术又会在root文件系统之上加载更多的只读文件系统。联合加载：一次加载多个文件系统，但是在外面看起来只能看见一个文件系统。联合加载会将各层文件系统叠加到一起。docker将这样的文件系统称为镜像。一个镜像可以放到另一个镜像的顶部，位于下面的镜像称为父镜像，以此类推，最底部的镜像称为基础镜像。也就是图中的root文件系统。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;bootfs (boot file system) 主要包含 bootloader 和 kernel, bootloader主要是引导加载kernel, 当boot成功后 kernel 被加载到内存中后 bootfs就被umount了. rootfs (root file system) 包含的就是典型 Linux 系统中的 /dev, /proc,/bin, /etc 等标准目录和文件。&lt;br&gt;对于不同的linux发行版, bootfs基本是一致的, 但rootfs会有差别, 因此不同的发行版可以公用bootfs 如下图:&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;【补充】:BusyBox就是一个工具，使用它可以对linux进行定制，可以制作非常小的系统。BusyBox生成的系统映像可以独立安装在硬盘上。&lt;/p&gt;
+&lt;h3 id=&quot;Docker-Container容器&quot;&gt;&lt;a href=&quot;#Docker-Container容器&quot; class=&quot;headerlink&quot; title=&quot;Docker Container容器&quot;&gt;&lt;/a&gt;Docker Container容器&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;容器通过镜像来启动，docker的容器是docker的执行单元，容器中可以运行客户的一个或多个进程。如果说镜像是docker生命周期中的构建和打包阶段，那么容器则是启动和执行阶段。&lt;br&gt;那么容器是怎样通过镜像来启动的呢？当一个容器启动时，会在该镜像的最顶层加载一个读写文件系统，也就是一个可写的文件层。我们在docker中运行的程序就是在这层中运行的。当docker第一次启动一个容器时，初始的读写层是空的，当文件系统发生变化时，这些变化都会应用到这一层上，比如如果想修改一个文件，这个文件首先会从该读写层下面的只读层复制到该读写层，该文件的只读版本依然存在，但是已经被读写层中的文件副本所隐藏。这就是docker中的一个重要技术，“写时复制”。每个只读镜像层都是只读的，并且以后永远不会变化。&lt;br&gt;当创建一个新容器时，docker会构建一个镜像站，就像右图所示。在站的最顶层添加可写层，这个读写层加上下面的镜像层以及一些配置数据就构成了一个容器。&lt;/p&gt;
+&lt;h3 id=&quot;Docker-Registry仓库&quot;&gt;&lt;a href=&quot;#Docker-Registry仓库&quot; class=&quot;headerlink&quot; title=&quot;Docker Registry仓库&quot;&gt;&lt;/a&gt;Docker Registry仓库&lt;/h3&gt;&lt;p&gt;docker用仓库保存用户构建的镜像。仓库分为公有和私有两种。docker公司自己提供了一个公有的仓库，叫Docker Hub。我们可以在docker hub上注册账号，分享并保存自己的镜像。目前docker上已经有了非常丰富的镜像。所以我们也可以通过docker hub来查找我们需要的镜像。当然我们也可以架设自己私有的仓库。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Docker的诞生&quot;&gt;&lt;a href=&quot;#Docker的诞生&quot; class=&quot;headerlink&quot; title=&quot;Docker的诞生&quot;&gt;&lt;/a&gt;Docker的诞生&lt;/h2&gt;&lt;p&gt;dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。&lt;br&gt;Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+    
+    
+      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
+    
+  </entry>
   
   <entry>
     <title>Spark介绍及安装部署</title>
@@ -3210,71 +3264,6 @@ Value: false
     <summary type="html">
     
       &lt;h1 id=&quot;zabbix-java-gateway&quot;&gt;&lt;a href=&quot;#zabbix-java-gateway&quot; class=&quot;headerlink&quot; title=&quot;zabbix java gateway&quot;&gt;&lt;/a&gt;zabbix java gateway&lt;/h1&gt;&lt;p&gt;zabbix通过JMX监控应用服务器。JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架。JMX可以跨越一系列异构操作系统平台、系统体系结构和网络传输协议，灵活的开发无缝集成的系统、网络和服务管理应用。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="Zabbix" scheme="http://yoursite.com/categories/Zabbix/"/>
-    
-    
-      <category term="监控 zabbix" scheme="http://yoursite.com/tags/%E7%9B%91%E6%8E%A7-zabbix/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>zabbix监控Nginx</title>
-    <link href="http://yoursite.com/2017/05/16/zabbix%E7%9B%91%E6%8E%A7Nginx/"/>
-    <id>http://yoursite.com/2017/05/16/zabbix监控Nginx/</id>
-    <published>2017-05-16T03:04:58.000Z</published>
-    <updated>2017-06-12T07:56:15.000Z</updated>
-    
-    <content type="html">&lt;p&gt;&lt;a href=&quot;https://nginx.org/en/docs/http/ngx_http_stub_status_module.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://nginx.org/en/docs/http/ngx_http_stub_status_module.html&lt;/a&gt;&lt;br&gt;在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。&lt;br&gt;Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h1 id=&quot;启用nginx-status配置&quot;&gt;&lt;a href=&quot;#启用nginx-status配置&quot; class=&quot;headerlink&quot; title=&quot;启用nginx status配置&quot;&gt;&lt;/a&gt;启用nginx status配置&lt;/h1&gt;&lt;p&gt;在http段加入如下配置：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;server {
-        listen  80;
-        server_name localhost;
-        location /status {
-            stub_status;
-            access_log off;
-            allow 114.55.29.246;
-            deny all;
-        }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重载Nginx。&lt;/p&gt;
-&lt;h1 id=&quot;zabbix-agent端配置&quot;&gt;&lt;a href=&quot;#zabbix-agent端配置&quot; class=&quot;headerlink&quot; title=&quot;zabbix agent端配置&quot;&gt;&lt;/a&gt;zabbix agent端配置&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;# cd /usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/
-# vim nginx_userparams.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;把下面的内容贴进去：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;UserParameter=Nginx.active[*], /usr/bin/curl -s &amp;quot;http://$1:$2/status&amp;quot; | awk &amp;apos;/^Active/ {print $NF}&amp;apos;
-UserParameter=Nginx.reading[*], /usr/bin/curl -s &amp;quot;http://$1:$2/status&amp;quot; | grep &amp;apos;Reading&amp;apos; | cut -d&amp;quot; &amp;quot; -f2
-UserParameter=Nginx.writing[*], /usr/bin/curl -s &amp;quot;http://$1:$2/status&amp;quot; | grep &amp;apos;Writing&amp;apos; | cut -d&amp;quot; &amp;quot; -f4
-UserParameter=Nginx.waiting[*], /usr/bin/curl -s &amp;quot;http://$1:$2/status&amp;quot; | grep &amp;apos;Waiting&amp;apos; | cut -d&amp;quot; &amp;quot; -f6
-UserParameter=Nginx.accepted[*], /usr/bin/curl -s &amp;quot;http://$1:$2/status&amp;quot; | awk &amp;apos;/^[ \t]+[0-9]+[ \t]+[0-9]+[ \t]+[0-9]+/ {print $$1}&amp;apos;
-UserParameter=Nginx.handled[*], /usr/bin/curl -s &amp;quot;http://$1:$2/status&amp;quot; | awk &amp;apos;/^[ \t]+[0-9]+[ \t]+[0-9]+[ \t]+[0-9]+/ {print $$2}&amp;apos;
-UserParameter=Nginx.requests[*], /usr/bin/curl -s &amp;quot;http://$1:$2/status&amp;quot; | awk &amp;apos;/^[ \t]+[0-9]+[ \t]+[0-9]+[ \t]+[0-9]+/ {print $$3}&amp;apos;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重启zabbix agent：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# killall -9 zabbix_agentd
-# /usr/local/zabbix-3.0.1/sbin/zabbix_agentd
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;测试，在zabbix server上使用zabbix_get获取数据：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /usr/local/zabbix-3.0.1/bin/
-# ./zabbix_get -s 114.55.29.241 -k &amp;quot;Nginx.active[114.55.29.241,80]&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;h1 id=&quot;zabbix-web-gui配置监控项&quot;&gt;&lt;a href=&quot;#zabbix-web-gui配置监控项&quot; class=&quot;headerlink&quot; title=&quot;zabbix web gui配置监控项&quot;&gt;&lt;/a&gt;zabbix web gui配置监控项&lt;/h1&gt;&lt;h2 id=&quot;创建Nginx-Template&quot;&gt;&lt;a href=&quot;#创建Nginx-Template&quot; class=&quot;headerlink&quot; title=&quot;创建Nginx Template&quot;&gt;&lt;/a&gt;创建Nginx Template&lt;/h2&gt;&lt;p&gt;点击Configuration—&amp;gt;Templates，点击右上角的Create template。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/66.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;填写模板的信息，点击Add。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/67.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;创建Application&quot;&gt;&lt;a href=&quot;#创建Application&quot; class=&quot;headerlink&quot; title=&quot;创建Application&quot;&gt;&lt;/a&gt;创建Application&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;生产环境下只需要把我写好的模板文件import进去就可以了，不需要像下面那样再去创建模板，下面只是介绍下创建模板的过程。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;点击Configuration—&amp;gt;Templates，找到刚才创建的Nginx template，点击所在行的Applications列。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/68.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击右上角的Create application。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/69.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;输入application的名字Nginx running status，点击Add。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/70.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;创建Items&quot;&gt;&lt;a href=&quot;#创建Items&quot; class=&quot;headerlink&quot; title=&quot;创建Items&quot;&gt;&lt;/a&gt;创建Items&lt;/h2&gt;&lt;p&gt;点击Configuration—&amp;gt;Templates，找到刚才创建的Nginx template，点击所在行的Items列。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/71.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击右上角的Create item。分别创建8个监控项，如下图：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;当前 Nginx 正处理的活动连接数（包括等待着的连接数）&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/72.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;li&gt;Nginx一共处理了的连接数&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/73.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;li&gt;Nginx一共处理了的连接数(包括失败了的，因为某些限制会导致连接被拒绝，比如the worker_connections limit)&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/74.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;li&gt;Nginx一共处理了的请求的个数(连接和请求是两码事，一个长连接可能会处理多个请求)&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/75.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;li&gt;Nginx正在读取到客户端的Header信息数&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/76.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;li&gt;Nginx正在向客户端发送响应的个数&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/77.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;li&gt;开启keep-alive 的情况下，这个值等于active – (reading + writing)，意思就是 Nginx 已经处理完正在等候下一次请求指令的驻留连接&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/78.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;li&gt;Nginx服务可用性&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/79.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;/ol&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;a href=&quot;https://nginx.org/en/docs/http/ngx_http_stub_status_module.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://nginx.org/en/docs/http/ngx_http_stub_status_module.html&lt;/a&gt;&lt;br&gt;在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。&lt;br&gt;Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。&lt;br&gt;
     
     </summary>
     
