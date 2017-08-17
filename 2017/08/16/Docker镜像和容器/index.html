@@ -1,0 +1,1048 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="容器 Docker," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="安装DockerDocker 对 Linux 内核版本的最低要求是3.10，如果内核版本低于 3.10 会缺少一些运行 Docker 容器的功能。这些比较旧的内核，在一定条件下会导致数据丢失和频繁恐慌错误。CentOS 6：操作系统需要升级下内核，升级内核后安装Docker： # yum install -y docker-io CentOS 7： # yum install -y docker">
+<meta name="keywords" content="容器 Docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker镜像和容器">
+<meta property="og:url" content="http://yoursite.com/2017/08/16/Docker镜像和容器/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="安装DockerDocker 对 Linux 内核版本的最低要求是3.10，如果内核版本低于 3.10 会缺少一些运行 Docker 容器的功能。这些比较旧的内核，在一定条件下会导致数据丢失和频繁恐慌错误。CentOS 6：操作系统需要升级下内核，升级内核后安装Docker： # yum install -y docker-io CentOS 7： # yum install -y docker">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/8.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/9.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/10.png">
+<meta property="og:updated_time" content="2017-08-17T07:54:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker镜像和容器">
+<meta name="twitter:description" content="安装DockerDocker 对 Linux 内核版本的最低要求是3.10，如果内核版本低于 3.10 会缺少一些运行 Docker 容器的功能。这些比较旧的内核，在一定条件下会导致数据丢失和频繁恐慌错误。CentOS 6：操作系统需要升级下内核，升级内核后安装Docker： # yum install -y docker-io CentOS 7： # yum install -y docker">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/8.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Docker镜像和容器 | jkzhao's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Docker镜像和容器
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-08-16T09:03:56+08:00" content="2017-08-16">
+              2017-08-16
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2017-08-17T15:54:18+08:00" content="2017-08-17">
+              2017-08-17
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Docker/" itemprop="url" rel="index">
+                    <span itemprop="name">Docker</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/08/16/Docker镜像和容器/" class="leancloud_visitors" data-flag-title="Docker镜像和容器">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="安装Docker"><a href="#安装Docker" class="headerlink" title="安装Docker"></a>安装Docker</h2><p>Docker 对 Linux 内核版本的最低要求是3.10，如果内核版本低于 3.10 会缺少一些运行 Docker 容器的功能。这些比较旧的内核，在一定条件下会导致数据丢失和频繁恐慌错误。<br>CentOS 6：<br>操作系统需要升级下内核，升级内核后安装Docker：</p>
+<pre><code># yum install -y docker-io
+</code></pre><p>CentOS 7：</p>
+<pre><code># yum install -y docker
+</code></pre><p>我这里用的CentOS 7。启动docker：</p>
+<pre><code># systemctl start docker.service
+</code></pre><h2 id="镜像基本操作"><a href="#镜像基本操作" class="headerlink" title="镜像基本操作"></a>镜像基本操作</h2><ul>
+<li>搜索镜像 docker search</li>
+<li>获取镜像 docker pull</li>
+<li>查看镜像 docker images</li>
+<li>删除镜像 docker rmi</li>
+</ul>
+<p><strong>1.获取镜像</strong></p>
+<pre><code># docker pull centos
+</code></pre><p>默认是去 docker.io/library/centos 仓库中拉取centos镜像，镜像资源都在国外，所以在国内要获取docker镜像，速度有时会很慢。为了快速访问 Docker 官方镜像都会配置三方加速器，目前常用三方加速器有：网易、USTC、DaoCloud、阿里云。<br>现在 Docker 官方针对中国区推出了镜像加速服务。通过 Docker 官方镜像加速，国内用户能够以更快的下载速度和更强的稳定性访问最流行的 Docker 镜像。<br>Docker 中国官方镜像加速可通过 registry.docker-cn.com 访问。目前该镜像库只包含流行的公有镜像，而私有镜像仍需要从美国镜像库中拉取。<br>可以使用以下命令直接从该镜像加速地址进行拉取</p>
+<pre><code>$ docker pull registry.docker-cn.com/myname/myrepo:mytag
+</code></pre><p>例如:</p>
+<pre><code># docker pull registry.docker-cn.com/library/centos:latest
+</code></pre><p>注意: 除非修改了 Docker 守护进程的 –registry-mirror 参数 , 否则您将需要完整地指定官方镜像的名称。例如，library/ubuntu、library/redis、library/nginx。</p>
+<p><strong>给Docker守护进程配置加速器</strong><br>如果要配置 Docker 守护进程默认使用 Docker 官方镜像加速。您可以在 Docker 守护进程启动时配置 –registry-mirror参数。<br>（1）通过命令行启动Docker</p>
+<pre><code>$ docker --registry-mirror=https://registry.docker-cn.com daemon
+</code></pre><p>（2）通过配置文件启动Docker</p>
+<ul>
+<li><p>Docker版本在 1.12 或更高<br>修改 /etc/docker/daemon.json 文件并添加上 registry-mirrors 键值。</p>
+<pre><code>{
+  &quot;registry-mirror&quot;: [&quot;https://registry.docker-cn.com&quot;]
+}
+# systemctl restart docker.service
+</code></pre></li>
+<li><p>Docker版本在 1.8 与 1.11 之间<br>找到 Docker 配置文件，在配置文件中的 DOCKER_OPTS 加入。不同的 Linux 发行版的配置路径不同。</p>
+</li>
+</ul>
+<p><strong>2.查看镜像</strong></p>
+<pre><code># docker images
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/8.png" alt=""><br>REPOSITORY：镜像所属的仓库名。<br>TAG：镜像的标签名<br>IMAGE ID：镜像的唯一ID，实际上和磁盘上存储的镜像的文件名是对应的。这是文件名截断显示的结果。<br>CREATED：镜像建立的时间。<br>SIZE：镜像的大小。</p>
+<p>查看镜像的详细信息：</p>
+<pre><code># docker inspect 328edcd84f1b
+</code></pre><p><strong>3.镜像标签和仓库</strong></p>
+<ul>
+<li>REPOSITORY和REGISTRY<br>一系列镜像的集合。包含了一系列关联的镜像，比如上图中的Ubuntu，就是个大的仓库，下面的不同镜像就对应这个操作系统的不同版本。这和之前讲到的docker组件中的仓库有很大的区别。REGISTRY提供的是docker镜像的存储服务。所以在REGISTRY仓库中包含了很多REPOSITORY之类的仓库。而在REPOSITORY仓库中包含的是一个一个独立的镜像。</li>
+<li>TAG 镜像标签<br>在仓库中，不同的镜像是以标签来区分的。一个REPOSITORY仓库名和一个标签名就构成了一个完整的镜像名字。我们之前在演示的时候只是指定镜像名Ubuntu，并没有指定标签名。那么在docker中会默认使用latest标签所对应的镜像。</li>
+</ul>
+<p><strong>4.删除镜像</strong></p>
+<pre><code># docker rmi 328edcd84f1b
+</code></pre><p><strong>5.推送镜像</strong><br>pull镜像到本地后，我们在具体的业务场景中，可以会自己修改镜像，制作镜像，完成后可以把镜像push到<a href="https://registry.hub.docker.com" target="_blank" rel="external">Docker Hub</a>，或者自建的registry中。这个在后面的博客中会写到。</p>
+<p><strong>6.导出镜像</strong></p>
+<pre><code>[root@node1 ~]# docker images
+REPOSITORY                              TAG                 IMAGE ID            CREATED             SIZE
+registry.docker-cn.com/library/centos   latest              328edcd84f1b        13 days ago         192.5 MB
+[root@node1 ~]# docker save 328edcd84f1b &gt; /opt/centos.tar.gz
+</code></pre><p><strong>7.导入镜像</strong><br>比如有些镜像很难下载，别人下载好了，或者之前下载过了，可以导入。</p>
+<pre><code>[root@node1 ~]# docker load &lt; /opt/centos.tar.gz
+</code></pre><h2 id="容器基本操作"><a href="#容器基本操作" class="headerlink" title="容器基本操作"></a>容器基本操作</h2><ul>
+<li>启动容器 docker run </li>
+<li>停止容器 docker stop</li>
+<li>查看容器 docker ps</li>
+<li>进入容器 docker exec | docker attach</li>
+<li>删除容器 docker rm</li>
+</ul>
+<h3 id="启动容器"><a href="#启动容器" class="headerlink" title="启动容器"></a>启动容器</h3><p>docker run IMAGE [COMMOND] [ARG…]<br>   run 启动一个容器并在容器中执行命令<br>   IMAGE 启动容器所使用的操作系统镜像<br>当运行docker run这个命令的时候，docker会检测本地是否有相应名字的镜像，如果没有，会去公共的仓库下载。然后利用该镜像启动一个容器，包括分配文件系统，ip地址等等。</p>
+<pre><code>[root@node1 ~]# docker run centos echo &quot;Hello world&quot;
+Hello world
+</code></pre><p>但是在启动容器并完成命令后，实际上这个容器已经停止了。这只是执行单次命令的容器。这是docker中最基本的容器运行方式。</p>
+<p><strong>启动交互式容器</strong></p>
+<pre><code>docker run -i -t IMAGE /bin/bash
+    -i --interface=true|false 默认是false      ——告诉docker的守护进程为容器始终打开标准输入
+    -t --tty=true|false 默认是false   ——告诉docker要为创建的容器分配一个伪tty终端
+</code></pre><p>这样新创建的容器就可以提供一个交互式的shell。</p>
+<pre><code>[root@node1 ~]# docker run -i -t centos /bin/bash
+[root@fb316d4c0719 /]# exit;
+exit
+</code></pre><p>一退出，容器就停止了。</p>
+<p>重新启动已经停止的容器：<br>docker start [-i] 容器名</p>
+<ul>
+<li><p>-i 以交互的方式来重新启动停止的容器</p>
+<pre><code>[root@node1 ~]# docker start -i fb316d4c0719
+</code></pre></li>
+</ul>
+<h3 id="查看容器"><a href="#查看容器" class="headerlink" title="查看容器"></a>查看容器</h3><pre><code>docker ps [-a]
+    -a 列出所有的容器
+    不给参数，ps命令返回的是正在运行中的docker容器
+
+[root@node1 ~]# docker ps 
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+[root@node1 ~]# docker ps  -a
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS                      PORTS               NAMES
+fb316d4c0719        centos              &quot;/bin/bash&quot;            17 minutes ago      Exited (0) 17 minutes ago                       silly_bell
+762db863e04a        centos              &quot;echo &apos;Hello world&apos;&quot;   20 minutes ago      Exited (0) 20 minutes ago                       romantic_murdock
+</code></pre><p>CONTAINER ID：docker的守护进程在启动容器时为容器分配的唯一ID。<br>NAMES：docker守护进程为容器自动分配的名字。也可以在启动容器时手动指定，比如：</p>
+<pre><code>[root@node1 ~]# docker run -i -t --name test centos /bin/bash   
+[root@d985fe8622f7 /]# exit
+exit
+[root@node1 ~]# docker ps  -a
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS                      PORTS               NAMES
+d985fe8622f7        centos              &quot;/bin/bash&quot;            7 seconds ago       Exited (0) 4 seconds ago                        test
+</code></pre><p><strong>查看某个容器的详细信息，包括名称、网络配置等信息：</strong></p>
+<pre><code>[root@node1 ~]# docker inspect fb316d4c0719 
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/9.png" alt=""></p>
+<h3 id="停止容器"><a href="#停止容器" class="headerlink" title="停止容器"></a>停止容器</h3><p>docker stop 容器名<br>docker kill 容器名</p>
+<ul>
+<li>stop命令是发送一个信号给容器，等待容器的停止。</li>
+<li>kill命令会直接停止容器。<br>容器名可以是container id，也可以是names </li>
+</ul>
+<h3 id="删除停止的容器"><a href="#删除停止的容器" class="headerlink" title="删除停止的容器"></a>删除停止的容器</h3><p><strong>注意不能删除运行中的容器</strong><br>docker rm 容器名</p>
+<pre><code>[root@node1 ~]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS                         PORTS               NAMES
+d985fe8622f7        centos              &quot;/bin/bash&quot;            About an hour ago   Exited (0) About an hour ago                       test
+fb316d4c0719        centos              &quot;/bin/bash&quot;            2 hours ago         Exited (0) 2 hours ago                             silly_bell
+762db863e04a        centos              &quot;echo &apos;Hello world&apos;&quot;   2 hours ago         Exited (0) 2 hours ago                             romantic_murdock
+[root@node1 ~]# docker rm 762db863e04a
+762db863e04a
+</code></pre><h3 id="Docker守护式容器"><a href="#Docker守护式容器" class="headerlink" title="Docker守护式容器"></a>Docker守护式容器</h3><p>守护式容器：</p>
+<ul>
+<li>能够长期运行</li>
+<li>没有交互式会话</li>
+<li>适合运行应用程序和服务</li>
+</ul>
+<h4 id="方式一"><a href="#方式一" class="headerlink" title="方式一"></a>方式一</h4><pre><code># docker run -i -t IMAGE /bin/bash
+</code></pre><p>Ctrl+P Ctrl +Q退出交互式容器的bash，这样容器就会在后台运行</p>
+<h4 id="方式二"><a href="#方式二" class="headerlink" title="方式二"></a>方式二</h4><p>docker run -d 镜像名 [COMMAND] [ARG…]<br>     -d 启动容器时用后台的方式</p>
+<pre><code>[root@node1 ~]# docker run -d -i -t --name=test2 centos /bin/bash -c &quot;while true; do echo hello world; sleep 5; done&quot;
+6678e5462d023e2ecc90f5bac887326b0b10ed034e51884176028ddcee24d249
+[root@node1 ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+6678e5462d02        centos              &quot;/bin/bash -c &apos;while &quot;   5 seconds ago       Up 4 seconds                            test2
+</code></pre><h4 id="进入容器"><a href="#进入容器" class="headerlink" title="进入容器"></a>进入容器</h4><p>docker attach 容器名  </p>
+<pre><code>[root@node1 ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+6678e5462d02        centos              &quot;/bin/bash -c &apos;while &quot;   5 seconds ago       Up 4 seconds                            test2
+[root@node1 ~]# docker attach 6678e5462d02
+hello world
+hello world
+</code></pre><p>使用 attach 命令有时候并不方便。当多个窗口同时 attach 到同一个容器的时候，所有窗口都会同步显示，当某个窗口因命令阻塞时，其他窗口也无法执行操作了。nsenter  (namespace enter)，nsenter 可以访问进程的另外一个名字空间。建议使用nsenter。<br>【注意】:nsenter 要正常工作需要有 root 权限。而且nsenter 工具在 util-linux 包2.23版本后才包含。安装方式：yum install util-linux</p>
+<pre><code>[root@node1 ~]# docker start d985fe8622f7
+d985fe8622f7
+[root@node1 ~]# docker inspect --format &quot;{{.State.Pid}}&quot; d985fe8622f7
+14526
+[root@node1 ~]# nsenter -t 14526 -u -i -n -p
+[root@d985fe8622f7 ~]# exit
+logout
+[root@node1 ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+d985fe8622f7        centos              &quot;/bin/bash&quot;         3 hours ago         Up 4 minutes                            test
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/10.png" alt=""><br>可以把这个命令写成脚本，以后用起来也方便：</p>
+<pre><code># vim access_docker.sh
+#!/bin/bash
+Cname=$1
+Cpid=$(docker inspect --format &quot;{{.State.Pid}}&quot; $Cname)
+
+if ! ps ax | awk &apos;{print $1}&apos; | grep -e &quot;^${Cpid}$&quot; &amp;&gt; /dev/null; then
+        echo &quot;$Cname is not exist,you cant&apos;s enter it.!!!!!!!!!!!!!!!!!!!!!&quot;
+else
+        echo &quot;You will enter the docker containter:$Cname.&quot;
+        nsenter --target $Cpid --mount --uts --ipc --net --pid
+fi
+</code></pre><p>授予脚本执行权限：</p>
+<pre><code># chmod +x access_docker.sh
+</code></pre><p>如果需要进去docker的某个容器，直接/path/to/access_docker.sh 容器名称或是容器id：</p>
+<pre><code># ./access_docker.sh d985fe8622f7
+You will enter the docker containter: d985fe8622f7.
+[root@d985fe8622f7 /]#
+</code></pre><h3 id="查看容器日志"><a href="#查看容器日志" class="headerlink" title="查看容器日志"></a>查看容器日志</h3><p>docker logs [-f] [-t] [–tail] 容器名</p>
+<ul>
+<li>-f –follows=true|false  默认是false    一直跟踪日志的变化，并返回结果</li>
+<li>-t –timestamps=true|false  默认是false  在返回的结果上加上时间戳</li>
+<li><p>–tail=”all”  返回结尾处多少数量的日志<br>如果不指定，logs将会返回所有的日志</p>
+<pre><code>[root@node1 ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+d985fe8622f7        centos              &quot;/bin/bash&quot;         3 hours ago         Up 4 minutes                            test
+[root@node1 ~]# docker logs -tf d985fe8622f7
+2017-08-17T03:50:39.127155000Z [root@d985fe8622f7 /]# exit
+2017-08-17T03:50:39.127493000Z exit
+</code></pre></li>
+</ul>
+<h3 id="查看容器内的进程"><a href="#查看容器内的进程" class="headerlink" title="查看容器内的进程"></a>查看容器内的进程</h3><p>docker top 容器名</p>
+<pre><code>[root@node1 ~]# docker top d985fe8622f7
+UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD
+root                14526               14506               0                   03:12               pts/1               00:00:00            /bin/bash
+</code></pre><h3 id="在运行中的容器内启动新进程"><a href="#在运行中的容器内启动新进程" class="headerlink" title="在运行中的容器内启动新进程"></a>在运行中的容器内启动新进程</h3><p>虽然docker的理念是一个容器运行一个服务，我们仍就需要在docker中运行多个进程。比如需要对运行中的容器进行维护、监控，或者执行一些管理任务。</p>
+<pre><code># docker exec [-d] [-i] [-t] 容器名 [COMMAND] [ARG...]
+</code></pre><p>如果我们在学习时做实验，可能会启动很多容器，长期下来，残留的容器就会有很多，有个技巧，可以在启动的时候加一个参数，让在退出容器后，自动删除容器。</p>
+<pre><code>[root@node1 ~]# docker run --rm centos echo &quot;Hello world&quot;
+Hello world
+</code></pre>
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/容器-Docker/" rel="tag"><i class="fa fa-tag"></i>容器 Docker</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/14/Docker介绍/" rel="next" title="Docker介绍">
+                <i class="fa fa-chevron-left"></i> Docker介绍
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">31</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Docker"><span class="nav-number">1.</span> <span class="nav-text">安装Docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#镜像基本操作"><span class="nav-number">2.</span> <span class="nav-text">镜像基本操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#容器基本操作"><span class="nav-number">3.</span> <span class="nav-text">容器基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#启动容器"><span class="nav-number">3.1.</span> <span class="nav-text">启动容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看容器"><span class="nav-number">3.2.</span> <span class="nav-text">查看容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#停止容器"><span class="nav-number">3.3.</span> <span class="nav-text">停止容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除停止的容器"><span class="nav-number">3.4.</span> <span class="nav-text">删除停止的容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker守护式容器"><span class="nav-number">3.5.</span> <span class="nav-text">Docker守护式容器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#方式一"><span class="nav-number">3.5.1.</span> <span class="nav-text">方式一</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方式二"><span class="nav-number">3.5.2.</span> <span class="nav-text">方式二</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#进入容器"><span class="nav-number">3.5.3.</span> <span class="nav-text">进入容器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看容器日志"><span class="nav-number">3.6.</span> <span class="nav-text">查看容器日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看容器内的进程"><span class="nav-number">3.7.</span> <span class="nav-text">查看容器内的进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在运行中的容器内启动新进程"><span class="nav-number">3.8.</span> <span class="nav-text">在运行中的容器内启动新进程</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共71.1k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+    <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+</body>
+</html>
