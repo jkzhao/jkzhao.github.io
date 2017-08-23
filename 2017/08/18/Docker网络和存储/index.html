@@ -118,7 +118,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/14.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/15.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/16.png">
-<meta property="og:updated_time" content="2017-08-23T03:02:02.000Z">
+<meta property="og:updated_time" content="2017-08-23T03:07:06.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Docker网络和存储">
 <meta name="twitter:description" content="Docker网络访问docker自带的网络 docker network ls：列出当前docker中已有的网络 docker network inspect：查看网络详情，比如查看网络中有哪些容器 docker run –network=：指定运行容器时使用哪个网络">
@@ -348,7 +348,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-08-23T11:02:02+08:00" content="2017-08-23">
+              <time itemprop="dateUpdated" datetime="2017-08-23T11:07:06+08:00" content="2017-08-23">
               2017-08-23
               </time>
               </span>
@@ -420,7 +420,9 @@
 <h2 id="端口映射"><a href="#端口映射" class="headerlink" title="端口映射"></a>端口映射</h2><p>docker使用端口映射来让容器里面某一个端口对外。一种是随机映射，一种是指定端口映射。</p>
 <h3 id="随机映射"><a href="#随机映射" class="headerlink" title="随机映射"></a>随机映射</h3><p>docker run -P</p>
 <ul>
-<li><p>-P参数 随机映射端口。随机端口的好处是不会冲突。<br>举个例子：</p>
+<li>-P参数 随机映射端口。随机端口的好处是不会冲突。</li>
+</ul>
+<p>举个例子：</p>
 <pre><code>[root@node1 ~]# docker pull nginx
 [root@node1 ~]# docker run -d -P nginx
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/13.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/14.png" alt=""><br>可以访问Docker日志：</p>
@@ -428,15 +430,9 @@
 172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &quot;GET / HTTP/1.1&quot; 200 612 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&quot; &quot;-&quot;
 2017/08/22 09:20:25 [error] 5#5: *1 open() &quot;/usr/share/nginx/html/favicon.ico&quot; failed (2: No such file or directory), client: 172.16.4.81, server: localhost, request: &quot;GET /favicon.ico HTTP/1.1&quot;, host: &quot;172.16.7.151:32768&quot;, referrer: &quot;http://172.16.7.151:32768/&quot;
 172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &quot;GET /favicon.ico HTTP/1.1&quot; 404 571 &quot;http://172.16.7.151:32768/&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&quot; &quot;-&quot;
-</code></pre></li>
-</ul>
-<h3 id="指定端口映射"><a href="#指定端口映射" class="headerlink" title="指定端口映射"></a>指定端口映射</h3><p>docker run -p hostPort:containerPort<br>docker run -p ip:hostPort:containerPort<br>docker run -p ip::containerPort<br>docker run -p hostPort:containerPort:udp</p>
-<ul>
-<li><p>-p 指定端口映射，前面的是主机端口，后面的是容器端口。</p>
+</code></pre><h3 id="指定端口映射"><a href="#指定端口映射" class="headerlink" title="指定端口映射"></a>指定端口映射</h3><p>docker run -p hostPort:containerPort<br>docker run -p ip:hostPort:containerPort<br>docker run -p ip::containerPort<br>docker run -p hostPort:containerPort:udp<br>-p 指定端口映射，前面的是主机端口，后面的是容器端口。</p>
 <pre><code>[root@node1 ~]# docker run -d -p 81:80 nginx
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/15.png" alt=""></p>
-</li>
-</ul>
 <h2 id="数据管理"><a href="#数据管理" class="headerlink" title="数据管理"></a>数据管理</h2><p>两种方式：</p>
 <ul>
 <li>数据卷</li>
@@ -445,13 +441,13 @@
 <h3 id="数据卷"><a href="#数据卷" class="headerlink" title="数据卷"></a>数据卷</h3><p>启动一个容器，把宿主机的某个目录挂载到容器目录上。</p>
 <ul>
 <li>-v /data</li>
-<li><p>-v src:dst  指定一个目录挂载进容器。<br><strong>【示例1】:未指定宿主机目录挂载</strong></p>
+<li>-v src:dst  指定一个目录挂载进容器。</li>
+</ul>
+<p><strong>【示例1】:未指定宿主机目录挂载</strong></p>
 <pre><code>[root@node1 ~]# docker run -it --name volume-test1 -v /data centos    
 [root@5d485979254b /]# ls -l /data 
 total 0
-</code></pre></li>
-</ul>
-<p>这个容器里的/data 肯定在宿主机的某个位置。打开一个新的终端，查看这个位置：</p>
+</code></pre><p>这个容器里的/data 肯定在宿主机的某个位置。打开一个新的终端，查看这个位置：</p>
 <pre><code>[root@node1 ~]# docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                   NAMES
 5d485979254b        centos              &quot;/bin/bash&quot;              2 minutes ago       Up 2 minutes                                volume-test1                                 test
@@ -480,7 +476,8 @@ rw: 读写
 ro: 只读
 </code></pre><p>挂载单个文件到容器：</p>
 <pre><code>[root@node1 ~]# docker run -it -v ~/.bash_history:/.bash_history centos
-</code></pre><h3 id="数据卷容器"><a href="#数据卷容器" class="headerlink" title="数据卷容器"></a>数据卷容器</h3><p>–volumes-from  让一个容器访问另外一个容器的卷<br><strong>【示例3】:创建一个容器作为数据卷，启动其他容器访问这个容器的卷。</strong></p>
+</code></pre><h3 id="数据卷容器"><a href="#数据卷容器" class="headerlink" title="数据卷容器"></a>数据卷容器</h3><pre><code>--volumes-from  让一个容器访问另外一个容器的卷
+</code></pre><p><strong>【示例3】:创建一个容器作为数据卷，启动其他容器访问这个容器的卷。</strong></p>
 <pre><code>[root@node1 ~]# docker run -it --name nfs -v /data centos /bin/bash 
 [root@72bb5caa54db /]#
 </code></pre><p>Ctrl+P Ctrl +Q退出交互式容器的bash，这样容器就会在后台运行。</p>

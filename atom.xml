@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-08-23T03:02:02.000Z</updated>
+  <updated>2017-08-23T03:07:06.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/08/18/Docker%E7%BD%91%E7%BB%9C%E5%92%8C%E5%AD%98%E5%82%A8/"/>
     <id>http://yoursite.com/2017/08/18/Docker网络和存储/</id>
     <published>2017-08-18T09:17:19.000Z</published>
-    <updated>2017-08-23T03:02:02.000Z</updated>
+    <updated>2017-08-23T03:07:06.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Docker网络访问&quot;&gt;&lt;a href=&quot;#Docker网络访问&quot; class=&quot;headerlink&quot; title=&quot;Docker网络访问&quot;&gt;&lt;/a&gt;Docker网络访问&lt;/h2&gt;&lt;h3 id=&quot;docker自带的网络&quot;&gt;&lt;a href=&quot;#docker自带的网络&quot; class=&quot;headerlink&quot; title=&quot;docker自带的网络&quot;&gt;&lt;/a&gt;docker自带的网络&lt;/h3&gt;&lt;ul&gt;
 &lt;li&gt;docker network ls：列出当前docker中已有的网络&lt;/li&gt;
@@ -34,7 +34,9 @@
 &lt;h2 id=&quot;端口映射&quot;&gt;&lt;a href=&quot;#端口映射&quot; class=&quot;headerlink&quot; title=&quot;端口映射&quot;&gt;&lt;/a&gt;端口映射&lt;/h2&gt;&lt;p&gt;docker使用端口映射来让容器里面某一个端口对外。一种是随机映射，一种是指定端口映射。&lt;/p&gt;
 &lt;h3 id=&quot;随机映射&quot;&gt;&lt;a href=&quot;#随机映射&quot; class=&quot;headerlink&quot; title=&quot;随机映射&quot;&gt;&lt;/a&gt;随机映射&lt;/h3&gt;&lt;p&gt;docker run -P&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;-P参数 随机映射端口。随机端口的好处是不会冲突。&lt;br&gt;举个例子：&lt;/p&gt;
+&lt;li&gt;-P参数 随机映射端口。随机端口的好处是不会冲突。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;举个例子：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker pull nginx
 [root@node1 ~]# docker run -d -P nginx
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/14.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;可以访问Docker日志：&lt;/p&gt;
@@ -42,15 +44,9 @@
 172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &amp;quot;GET / HTTP/1.1&amp;quot; 200 612 &amp;quot;-&amp;quot; &amp;quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&amp;quot; &amp;quot;-&amp;quot;
 2017/08/22 09:20:25 [error] 5#5: *1 open() &amp;quot;/usr/share/nginx/html/favicon.ico&amp;quot; failed (2: No such file or directory), client: 172.16.4.81, server: localhost, request: &amp;quot;GET /favicon.ico HTTP/1.1&amp;quot;, host: &amp;quot;172.16.7.151:32768&amp;quot;, referrer: &amp;quot;http://172.16.7.151:32768/&amp;quot;
 172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &amp;quot;GET /favicon.ico HTTP/1.1&amp;quot; 404 571 &amp;quot;http://172.16.7.151:32768/&amp;quot; &amp;quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&amp;quot; &amp;quot;-&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;指定端口映射&quot;&gt;&lt;a href=&quot;#指定端口映射&quot; class=&quot;headerlink&quot; title=&quot;指定端口映射&quot;&gt;&lt;/a&gt;指定端口映射&lt;/h3&gt;&lt;p&gt;docker run -p hostPort:containerPort&lt;br&gt;docker run -p ip:hostPort:containerPort&lt;br&gt;docker run -p ip::containerPort&lt;br&gt;docker run -p hostPort:containerPort:udp&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;-p 指定端口映射，前面的是主机端口，后面的是容器端口。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;指定端口映射&quot;&gt;&lt;a href=&quot;#指定端口映射&quot; class=&quot;headerlink&quot; title=&quot;指定端口映射&quot;&gt;&lt;/a&gt;指定端口映射&lt;/h3&gt;&lt;p&gt;docker run -p hostPort:containerPort&lt;br&gt;docker run -p ip:hostPort:containerPort&lt;br&gt;docker run -p ip::containerPort&lt;br&gt;docker run -p hostPort:containerPort:udp&lt;br&gt;-p 指定端口映射，前面的是主机端口，后面的是容器端口。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -d -p 81:80 nginx
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/15.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
 &lt;h2 id=&quot;数据管理&quot;&gt;&lt;a href=&quot;#数据管理&quot; class=&quot;headerlink&quot; title=&quot;数据管理&quot;&gt;&lt;/a&gt;数据管理&lt;/h2&gt;&lt;p&gt;两种方式：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;数据卷&lt;/li&gt;
@@ -59,13 +55,13 @@
 &lt;h3 id=&quot;数据卷&quot;&gt;&lt;a href=&quot;#数据卷&quot; class=&quot;headerlink&quot; title=&quot;数据卷&quot;&gt;&lt;/a&gt;数据卷&lt;/h3&gt;&lt;p&gt;启动一个容器，把宿主机的某个目录挂载到容器目录上。&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;-v /data&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;-v src:dst  指定一个目录挂载进容器。&lt;br&gt;&lt;strong&gt;【示例1】:未指定宿主机目录挂载&lt;/strong&gt;&lt;/p&gt;
+&lt;li&gt;-v src:dst  指定一个目录挂载进容器。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;【示例1】:未指定宿主机目录挂载&lt;/strong&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it --name volume-test1 -v /data centos    
 [root@5d485979254b /]# ls -l /data 
 total 0
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;这个容器里的/data 肯定在宿主机的某个位置。打开一个新的终端，查看这个位置：&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个容器里的/data 肯定在宿主机的某个位置。打开一个新的终端，查看这个位置：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                   NAMES
 5d485979254b        centos              &amp;quot;/bin/bash&amp;quot;              2 minutes ago       Up 2 minutes                                volume-test1                                 test
@@ -94,7 +90,8 @@ rw: 读写
 ro: 只读
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;挂载单个文件到容器：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it -v ~/.bash_history:/.bash_history centos
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;数据卷容器&quot;&gt;&lt;a href=&quot;#数据卷容器&quot; class=&quot;headerlink&quot; title=&quot;数据卷容器&quot;&gt;&lt;/a&gt;数据卷容器&lt;/h3&gt;&lt;p&gt;–volumes-from  让一个容器访问另外一个容器的卷&lt;br&gt;&lt;strong&gt;【示例3】:创建一个容器作为数据卷，启动其他容器访问这个容器的卷。&lt;/strong&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;数据卷容器&quot;&gt;&lt;a href=&quot;#数据卷容器&quot; class=&quot;headerlink&quot; title=&quot;数据卷容器&quot;&gt;&lt;/a&gt;数据卷容器&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;--volumes-from  让一个容器访问另外一个容器的卷
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;【示例3】:创建一个容器作为数据卷，启动其他容器访问这个容器的卷。&lt;/strong&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it --name nfs -v /data centos /bin/bash 
 [root@72bb5caa54db /]#
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Ctrl+P Ctrl +Q退出交互式容器的bash，这样容器就会在后台运行。&lt;/p&gt;
