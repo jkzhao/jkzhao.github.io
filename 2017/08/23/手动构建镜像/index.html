@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="容器 Docker," />
 
 
 
@@ -104,13 +104,22 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="jkzhao&#39;s blog">
-<meta property="og:url" content="http://yoursite.com/tags/监控-zabbix/index.html">
+<meta name="description" content="创建docker镜像的方法 使用”docker commit”命令 使用”docker build”命令+”Dockerfile”文件不推荐使用docker commit命令，而应该使用更灵活、更强大的dockerfile来构建docker镜像。本篇文章先介绍docker commit来构建镜像。">
+<meta name="keywords" content="容器 Docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="手动构建镜像">
+<meta property="og:url" content="http://yoursite.com/2017/08/23/手动构建镜像/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="创建docker镜像的方法 使用”docker commit”命令 使用”docker build”命令+”Dockerfile”文件不推荐使用docker commit命令，而应该使用更灵活、更强大的dockerfile来构建docker镜像。本篇文章先介绍docker commit来构建镜像。">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/17.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/18.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/19.png">
+<meta property="og:updated_time" content="2017-08-23T06:18:30.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="jkzhao&#39;s blog">
+<meta name="twitter:title" content="手动构建镜像">
+<meta name="twitter:description" content="创建docker镜像的方法 使用”docker commit”命令 使用”docker build”命令+”Dockerfile”文件不推荐使用docker commit命令，而应该使用更灵活、更强大的dockerfile来构建docker镜像。本篇文章先介绍docker commit来构建镜像。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/17.png">
 
 
 
@@ -128,7 +137,7 @@
   };
 </script>
 
-  <title> 标签: 监控 zabbix | jkzhao's blog </title>
+  <title> 手动构建镜像 | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -159,7 +168,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -297,158 +306,188 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        监控 zabbix
-        <small>标签</small>
-      </h2>
-    </div>
-
+  <div id="posts" class="posts-expand">
     
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/24/zabbix的通知功能以及自定义脚本告警/" itemprop="url">
-              
-                <span itemprop="name">zabbix的通知功能以及自定义脚本告警</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-24T09:35:41+08:00"
-              content="2017-05-24" >
-          05-24
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/23/zabbix监控websphere和weblogic/" itemprop="url">
-              
-                <span itemprop="name">zabbix监控websphere和weblogic</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-23T21:25:25+08:00"
-              content="2017-05-23" >
-          05-23
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/16/zabbix监控Nginx/" itemprop="url">
-              
-                <span itemprop="name">zabbix监控Nginx</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-16T11:04:58+08:00"
-              content="2017-05-16" >
-          05-16
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/14/zabbix监控实例/" itemprop="url">
-              
-                <span itemprop="name">zabbix监控实例</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-14T21:44:33+08:00"
-              content="2017-05-14" >
-          05-14
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/10/zabbix安装配置/" itemprop="url">
-              
-                <span itemprop="name">zabbix安装配置</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-10T10:53:23+08:00"
-              content="2017-05-10" >
-          05-10
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-  </div>
 
   
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                手动构建镜像
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-08-23T11:15:08+08:00" content="2017-08-23">
+              2017-08-23
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2017-08-23T14:18:30+08:00" content="2017-08-23">
+              2017-08-23
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Docker/" itemprop="url" rel="index">
+                    <span itemprop="name">Docker</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/08/23/手动构建镜像/" class="leancloud_visitors" data-flag-title="手动构建镜像">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="创建docker镜像的方法"><a href="#创建docker镜像的方法" class="headerlink" title="创建docker镜像的方法"></a>创建docker镜像的方法</h2><ul>
+<li>使用”docker commit”命令</li>
+<li>使用”docker build”命令+”Dockerfile”文件<br>不推荐使用docker commit命令，而应该使用更灵活、更强大的dockerfile来构建docker镜像。<br>本篇文章先介绍docker commit来构建镜像。<a id="more"></a>
+</li>
+</ul>
+<h2 id="手动构建镜像"><a href="#手动构建镜像" class="headerlink" title="手动构建镜像"></a>手动构建镜像</h2><p>一般来说，我们并不是真正从0开始构建镜像，而是基于一个已经存在的镜像，比如centos，然后进行一些安装和配置，构建自己新的镜像。</p>
+<p><strong>【示例】:手动构建Nginx镜像。</strong></p>
+<pre><code>[root@node1 ~]# docker pull centos
+[root@node1 ~]# docker run -it --name mynginx centos 
+[root@eadfe0c0903d /]# rpm -ivh http://mirrors.aliyun.com/epel/epel-release-latest-7.noarch.rpm
+[root@eadfe0c0903d /]# yum install nginx -y
+</code></pre><p>安装完成后，我们需要将nginx程序设置为前台运行模式，这样容器启动后nginx进程会一直在前台运行而不会退出。因为如果启动容器时的进程退出，容器也就结束了。</p>
+<pre><code>[root@eadfe0c0903d /]# vi /etc/nginx/nginx.conf
+daemon off;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/17.png" alt=""><br>        [root@eadfe0c0903d /]# exit<br>        exit</p>
+<p>基于上面的容器制作一个镜像：</p>
+<pre><code>[root@node1 ~]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                     PORTS                NAMES
+eadfe0c0903d        centos              &quot;/bin/bash&quot;              12 minutes ago      Exited (0) 2 minutes ago                        mynginx
+[root@node1 ~]# docker commit -m &quot;nginx test mirror&quot; eadfe0c0903d jkzhao/mynginx:v1
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/18.png" alt=""></p>
+<p>基于这个镜像启动容器：</p>
+<pre><code>[root@node1 ~]# docker images
+REPOSITORY                              TAG                 IMAGE ID            CREATED             SIZE
+jkzhao/mynginx                          v1                  bdf7d4fda6fb        4 minutes ago       381.6 MB
+docker.io/centos                        latest              328edcd84f1b        2 weeks ago         192.5 MB
+registry.docker-cn.com/library/centos   latest              328edcd84f1b        2 weeks ago         192.5 MB
+docker.io/nginx                         latest              b8efb18f159b        3 weeks ago         107.5 MB
+[root@node1 ~]# docker run -d -p 82:80 jkzhao/mynginx:v1 nginx
+</code></pre><p>【注意】:<br>1.必须加tag v1，否则会去仓库中找latest标签的镜像；<br>2.最后 nginx 是命令，容器启动时运行的命令，我这里是yum安装，不是yum安装的要写绝对路径。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/19.png" alt=""></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/容器-Docker/" rel="tag"><i class="fa fa-tag"></i>容器 Docker</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/18/Docker网络和存储/" rel="next" title="Docker网络和存储">
+                <i class="fa fa-chevron-left"></i> Docker网络和存储
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -456,6 +495,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
       <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
 
@@ -477,8 +520,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -569,6 +621,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建docker镜像的方法"><span class="nav-number">1.</span> <span class="nav-text">创建docker镜像的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#手动构建镜像"><span class="nav-number">2.</span> <span class="nav-text">手动构建镜像</span></a></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -684,6 +747,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 
