@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-08-23T06:18:30.000Z</updated>
+  <updated>2017-08-23T06:22:18.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/08/23/%E6%89%8B%E5%8A%A8%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/"/>
     <id>http://yoursite.com/2017/08/23/手动构建镜像/</id>
     <published>2017-08-23T03:15:08.000Z</published>
-    <updated>2017-08-23T06:18:30.000Z</updated>
+    <updated>2017-08-23T06:22:18.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;创建docker镜像的方法&quot;&gt;&lt;a href=&quot;#创建docker镜像的方法&quot; class=&quot;headerlink&quot; title=&quot;创建docker镜像的方法&quot;&gt;&lt;/a&gt;创建docker镜像的方法&lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;使用”docker commit”命令&lt;/li&gt;
@@ -36,8 +36,10 @@
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;安装完成后，我们需要将nginx程序设置为前台运行模式，这样容器启动后nginx进程会一直在前台运行而不会退出。因为如果启动容器时的进程退出，容器也就结束了。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@eadfe0c0903d /]# vi /etc/nginx/nginx.conf
 daemon off;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/17.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;        [root@eadfe0c0903d /]# exit&lt;br&gt;        exit&lt;/p&gt;
-&lt;p&gt;基于上面的容器制作一个镜像：&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/17.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@eadfe0c0903d /]# exit
+exit
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;基于上面的容器制作一个镜像：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker ps -a
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                     PORTS                NAMES
 eadfe0c0903d        centos              &amp;quot;/bin/bash&amp;quot;              12 minutes ago      Exited (0) 2 minutes ago                        mynginx

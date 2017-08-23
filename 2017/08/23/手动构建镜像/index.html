@@ -115,7 +115,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/17.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/18.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/19.png">
-<meta property="og:updated_time" content="2017-08-23T06:18:30.000Z">
+<meta property="og:updated_time" content="2017-08-23T06:22:18.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="手动构建镜像">
 <meta name="twitter:description" content="创建docker镜像的方法 使用”docker commit”命令 使用”docker build”命令+”Dockerfile”文件不推荐使用docker commit命令，而应该使用更灵活、更强大的dockerfile来构建docker镜像。本篇文章先介绍docker commit来构建镜像。">
@@ -345,7 +345,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-08-23T14:18:30+08:00" content="2017-08-23">
+              <time itemprop="dateUpdated" datetime="2017-08-23T14:22:18+08:00" content="2017-08-23">
               2017-08-23
               </time>
               </span>
@@ -419,8 +419,10 @@
 </code></pre><p>安装完成后，我们需要将nginx程序设置为前台运行模式，这样容器启动后nginx进程会一直在前台运行而不会退出。因为如果启动容器时的进程退出，容器也就结束了。</p>
 <pre><code>[root@eadfe0c0903d /]# vi /etc/nginx/nginx.conf
 daemon off;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/17.png" alt=""><br>        [root@eadfe0c0903d /]# exit<br>        exit</p>
-<p>基于上面的容器制作一个镜像：</p>
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/17.png" alt=""></p>
+<pre><code>[root@eadfe0c0903d /]# exit
+exit
+</code></pre><p>基于上面的容器制作一个镜像：</p>
 <pre><code>[root@node1 ~]# docker ps -a
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                     PORTS                NAMES
 eadfe0c0903d        centos              &quot;/bin/bash&quot;              12 minutes ago      Exited (0) 2 minutes ago                        mynginx
