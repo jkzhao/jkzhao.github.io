@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-08-17T07:59:46.000Z</updated>
+  <updated>2017-08-23T03:02:02.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,124 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Docker网络和存储</title>
+    <link href="http://yoursite.com/2017/08/18/Docker%E7%BD%91%E7%BB%9C%E5%92%8C%E5%AD%98%E5%82%A8/"/>
+    <id>http://yoursite.com/2017/08/18/Docker网络和存储/</id>
+    <published>2017-08-18T09:17:19.000Z</published>
+    <updated>2017-08-23T03:02:02.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Docker网络访问&quot;&gt;&lt;a href=&quot;#Docker网络访问&quot; class=&quot;headerlink&quot; title=&quot;Docker网络访问&quot;&gt;&lt;/a&gt;Docker网络访问&lt;/h2&gt;&lt;h3 id=&quot;docker自带的网络&quot;&gt;&lt;a href=&quot;#docker自带的网络&quot; class=&quot;headerlink&quot; title=&quot;docker自带的网络&quot;&gt;&lt;/a&gt;docker自带的网络&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;docker network ls：列出当前docker中已有的网络&lt;/li&gt;
+&lt;li&gt;docker network inspect：查看网络详情，比如查看网络中有哪些容器&lt;/li&gt;
+&lt;li&gt;docker run –network=&lt;network&gt;：指定运行容器时使用哪个网络&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
+&lt;/network&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;host网络&quot;&gt;&lt;a href=&quot;#host网络&quot; class=&quot;headerlink&quot; title=&quot;host网络&quot;&gt;&lt;/a&gt;host网络&lt;/h3&gt;&lt;p&gt;容器的网络接口跟主机一样。&lt;/p&gt;
+&lt;h3 id=&quot;none网络&quot;&gt;&lt;a href=&quot;#none网络&quot; class=&quot;headerlink&quot; title=&quot;none网络&quot;&gt;&lt;/a&gt;none网络&lt;/h3&gt;&lt;p&gt;除了lo接口外，容器没有任何其他网络接口。&lt;/p&gt;
+&lt;h3 id=&quot;bridge网络&quot;&gt;&lt;a href=&quot;#bridge网络&quot; class=&quot;headerlink&quot; title=&quot;bridge网络&quot;&gt;&lt;/a&gt;bridge网络&lt;/h3&gt;&lt;p&gt;这是新建容器时默认使用的网络，也是使用得最多的网络。网络中的所有容器可以通过IP互相访问。&lt;br&gt;bridge网络通过网络接口docker0跟主机桥接，可以在主机上通过ifconfig docker0查看到该网络接口的信息。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/11.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;端口映射&quot;&gt;&lt;a href=&quot;#端口映射&quot; class=&quot;headerlink&quot; title=&quot;端口映射&quot;&gt;&lt;/a&gt;端口映射&lt;/h2&gt;&lt;p&gt;docker使用端口映射来让容器里面某一个端口对外。一种是随机映射，一种是指定端口映射。&lt;/p&gt;
+&lt;h3 id=&quot;随机映射&quot;&gt;&lt;a href=&quot;#随机映射&quot; class=&quot;headerlink&quot; title=&quot;随机映射&quot;&gt;&lt;/a&gt;随机映射&lt;/h3&gt;&lt;p&gt;docker run -P&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;-P参数 随机映射端口。随机端口的好处是不会冲突。&lt;br&gt;举个例子：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker pull nginx
+[root@node1 ~]# docker run -d -P nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/14.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;可以访问Docker日志：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker logs 1822a2ea3ff3
+172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &amp;quot;GET / HTTP/1.1&amp;quot; 200 612 &amp;quot;-&amp;quot; &amp;quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&amp;quot; &amp;quot;-&amp;quot;
+2017/08/22 09:20:25 [error] 5#5: *1 open() &amp;quot;/usr/share/nginx/html/favicon.ico&amp;quot; failed (2: No such file or directory), client: 172.16.4.81, server: localhost, request: &amp;quot;GET /favicon.ico HTTP/1.1&amp;quot;, host: &amp;quot;172.16.7.151:32768&amp;quot;, referrer: &amp;quot;http://172.16.7.151:32768/&amp;quot;
+172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &amp;quot;GET /favicon.ico HTTP/1.1&amp;quot; 404 571 &amp;quot;http://172.16.7.151:32768/&amp;quot; &amp;quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&amp;quot; &amp;quot;-&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;指定端口映射&quot;&gt;&lt;a href=&quot;#指定端口映射&quot; class=&quot;headerlink&quot; title=&quot;指定端口映射&quot;&gt;&lt;/a&gt;指定端口映射&lt;/h3&gt;&lt;p&gt;docker run -p hostPort:containerPort&lt;br&gt;docker run -p ip:hostPort:containerPort&lt;br&gt;docker run -p ip::containerPort&lt;br&gt;docker run -p hostPort:containerPort:udp&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;-p 指定端口映射，前面的是主机端口，后面的是容器端口。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -d -p 81:80 nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/15.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;数据管理&quot;&gt;&lt;a href=&quot;#数据管理&quot; class=&quot;headerlink&quot; title=&quot;数据管理&quot;&gt;&lt;/a&gt;数据管理&lt;/h2&gt;&lt;p&gt;两种方式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;数据卷&lt;/li&gt;
+&lt;li&gt;数据卷容器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;数据卷&quot;&gt;&lt;a href=&quot;#数据卷&quot; class=&quot;headerlink&quot; title=&quot;数据卷&quot;&gt;&lt;/a&gt;数据卷&lt;/h3&gt;&lt;p&gt;启动一个容器，把宿主机的某个目录挂载到容器目录上。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;-v /data&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;-v src:dst  指定一个目录挂载进容器。&lt;br&gt;&lt;strong&gt;【示例1】:未指定宿主机目录挂载&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it --name volume-test1 -v /data centos    
+[root@5d485979254b /]# ls -l /data 
+total 0
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这个容器里的/data 肯定在宿主机的某个位置。打开一个新的终端，查看这个位置：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                   NAMES
+5d485979254b        centos              &amp;quot;/bin/bash&amp;quot;              2 minutes ago       Up 2 minutes                                volume-test1                                 test
+[root@node1 ~]# docker inspect 5d485979254b
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/16.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;在宿主机上的目录中创建文件：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# cd /var/lib/docker/volumes/7f37e83849f079275545b7d1f3381903795e946d113e1c43ff24fc1a7717e00f/_data
+[root@node1 _data]# ls -l
+total 0
+[root@node1 _data]# touch test.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;回到容器中，查看/data目录下是否有刚才创建的文件：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@5d485979254b /]# ls -l /data 
+total 0
+-rw-r--r--. 1 root root 0 Aug 23 02:07 test.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;【示例2】:指定宿主机目录挂载&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it -v /opt:/opt centos
+[root@850031902bb7 /]# ls /opt/
+ansible_playbooks  rh
+[root@850031902bb7 /]# exit
+exit
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;宿主机的/opt:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ls /opt
+ansible_playbooks  rh
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;挂载的时候可以指定权限：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it -v /opt:/opt:rw centos
+rw: 读写
+ro: 只读
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;挂载单个文件到容器：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it -v ~/.bash_history:/.bash_history centos
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;数据卷容器&quot;&gt;&lt;a href=&quot;#数据卷容器&quot; class=&quot;headerlink&quot; title=&quot;数据卷容器&quot;&gt;&lt;/a&gt;数据卷容器&lt;/h3&gt;&lt;p&gt;–volumes-from  让一个容器访问另外一个容器的卷&lt;br&gt;&lt;strong&gt;【示例3】:创建一个容器作为数据卷，启动其他容器访问这个容器的卷。&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it --name nfs -v /data centos /bin/bash 
+[root@72bb5caa54db /]#
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Ctrl+P Ctrl +Q退出交互式容器的bash，这样容器就会在后台运行。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                NAMES
+72bb5caa54db        centos              &amp;quot;/bin/bash&amp;quot;              37 seconds ago      Up 36 seconds                            nfs
+[root@node1 ~]# docker inspect 72bb5caa54db
+[root@node1 ~]# cd /var/lib/docker/volumes/8f1e1da837d5d86f79ac14e5d57c0e47243e3c68d5ca822d4f7a498386c07a59/_data
+[root@node1 _data]# touch test2.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动其他容器，访问这个容器的卷：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 _data]# docker run -it --name test1 --volumes-from nfs centos
+[root@9097c1af8e86 /]# ls /data/
+test2.txt
+[root@9097c1af8e86 /]# 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个数据卷容器可以用来作收容器间数据共享，哪怕这个数据卷容器nfs停了，依然可以通过其在宿主机上真实的目录访问里面的数据。这个数据卷容器创建后可以什么都不干，直接关闭，其他容器挂载过来。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Docker网络访问&quot;&gt;&lt;a href=&quot;#Docker网络访问&quot; class=&quot;headerlink&quot; title=&quot;Docker网络访问&quot;&gt;&lt;/a&gt;Docker网络访问&lt;/h2&gt;&lt;h3 id=&quot;docker自带的网络&quot;&gt;&lt;a href=&quot;#docker自带的网络&quot; class=&quot;headerlink&quot; title=&quot;docker自带的网络&quot;&gt;&lt;/a&gt;docker自带的网络&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;docker network ls：列出当前docker中已有的网络&lt;/li&gt;
+&lt;li&gt;docker network inspect：查看网络详情，比如查看网络中有哪些容器&lt;/li&gt;
+&lt;li&gt;docker run –network=&lt;network&gt;：指定运行容器时使用哪个网络
+    
+    </summary>
+    
+      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+    
+    
+      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Docker镜像和容器</title>
     <link href="http://yoursite.com/2017/08/16/Docker%E9%95%9C%E5%83%8F%E5%92%8C%E5%AE%B9%E5%99%A8/"/>
     <id>http://yoursite.com/2017/08/16/Docker镜像和容器/</id>
     <published>2017-08-16T01:03:56.000Z</published>
-    <updated>2017-08-17T07:59:46.000Z</updated>
+    <updated>2017-08-17T08:20:02.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;安装Docker&quot;&gt;&lt;a href=&quot;#安装Docker&quot; class=&quot;headerlink&quot; title=&quot;安装Docker&quot;&gt;&lt;/a&gt;安装Docker&lt;/h2&gt;&lt;p&gt;Docker 对 Linux 内核版本的最低要求是3.10，如果内核版本低于 3.10 会缺少一些运行 Docker 容器的功能。这些比较旧的内核，在一定条件下会导致数据丢失和频繁恐慌错误。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;CentOS 6：&lt;br&gt;操作系统需要升级下内核，升级内核后安装Docker：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# yum install -y docker-io
@@ -3250,165 +3363,6 @@ ls -t $dataLogDir/log.* | tail -n +$[$COUNT+1] | xargs rm -f
     
     
       <category term="大数据 Zookeeper" scheme="http://yoursite.com/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE-Zookeeper/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>zabbix的通知功能以及自定义脚本告警</title>
-    <link href="http://yoursite.com/2017/05/24/zabbix%E7%9A%84%E9%80%9A%E7%9F%A5%E5%8A%9F%E8%83%BD%E4%BB%A5%E5%8F%8A%E8%87%AA%E5%AE%9A%E4%B9%89%E8%84%9A%E6%9C%AC%E5%91%8A%E8%AD%A6/"/>
-    <id>http://yoursite.com/2017/05/24/zabbix的通知功能以及自定义脚本告警/</id>
-    <published>2017-05-24T01:35:41.000Z</published>
-    <updated>2017-06-12T07:56:05.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;zabbix的通知功能&quot;&gt;&lt;a href=&quot;#zabbix的通知功能&quot; class=&quot;headerlink&quot; title=&quot;zabbix的通知功能&quot;&gt;&lt;/a&gt;zabbix的通知功能&lt;/h2&gt;&lt;p&gt;在配置好监控项和触发器之后，一旦正常工作中的某触发器状态发生改变，一般意味着有异常情况发生，此时通常需要采取一定的动作(action)，如告警或者执行远程命令。&lt;br&gt;实现zabbix的通知功能，一般需要两个步骤：定义所需的“媒介”和配置一个”动作”。&lt;br&gt;媒介类型有：E-mail，SMS，Jabber和自定义的通知脚本。我这里就使用E-mail了。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;定义媒介&quot;&gt;&lt;a href=&quot;#定义媒介&quot; class=&quot;headerlink&quot; title=&quot;定义媒介&quot;&gt;&lt;/a&gt;定义媒介&lt;/h2&gt;&lt;p&gt;登录zabbix web管理控制台，点击Administration—&amp;gt; Media types，可以看到有3个定义好了的媒介，不用这3个，点击右上角的”Create media type”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/90.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;填写信息：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/91.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;定义接收告警的用户&quot;&gt;&lt;a href=&quot;#定义接收告警的用户&quot; class=&quot;headerlink&quot; title=&quot;定义接收告警的用户&quot;&gt;&lt;/a&gt;定义接收告警的用户&lt;/h2&gt;&lt;h3 id=&quot;创建用户组&quot;&gt;&lt;a href=&quot;#创建用户组&quot; class=&quot;headerlink&quot; title=&quot;创建用户组&quot;&gt;&lt;/a&gt;创建用户组&lt;/h3&gt;&lt;p&gt;点击Administration—&amp;gt; User groups，点击右上角的Create user group。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/92.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;输入组名，点击Add。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/93.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;创建用户&quot;&gt;&lt;a href=&quot;#创建用户&quot; class=&quot;headerlink&quot; title=&quot;创建用户&quot;&gt;&lt;/a&gt;创建用户&lt;/h3&gt;&lt;p&gt;点击Administration—&amp;gt; Users，点击右上角的Create user。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/94.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;在User列填入个人信息：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/95.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击Media，点击Add，选择媒介和接收邮件的时间等信息：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/96.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/97.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击Permissions，根据这个新添的用户给予合适的权限&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/98.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;定义Action&quot;&gt;&lt;a href=&quot;#定义Action&quot; class=&quot;headerlink&quot; title=&quot;定义Action&quot;&gt;&lt;/a&gt;定义Action&lt;/h2&gt;&lt;p&gt;点击Configuration—&amp;gt; Actions，点击右上角的Create action：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/99.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Action配置：&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/100.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Conditions配置：&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/101.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/102.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/103.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Operations配置：&lt;/strong&gt;&lt;br&gt;在一个action中，可以定义多个Operation。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/104.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/105.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;上面的Operation type有两种：Send message和Remote command。&lt;/p&gt;
-&lt;h2 id=&quot;Zabbix自定义脚本发送报警邮件&quot;&gt;&lt;a href=&quot;#Zabbix自定义脚本发送报警邮件&quot; class=&quot;headerlink&quot; title=&quot;Zabbix自定义脚本发送报警邮件&quot;&gt;&lt;/a&gt;Zabbix自定义脚本发送报警邮件&lt;/h2&gt;&lt;p&gt;Zabbix发送报警邮件还可以采用自定义的脚本来发送。&lt;/p&gt;
-&lt;h3 id=&quot;Python脚本发邮件&quot;&gt;&lt;a href=&quot;#Python脚本发邮件&quot; class=&quot;headerlink&quot; title=&quot;Python脚本发邮件&quot;&gt;&lt;/a&gt;Python脚本发邮件&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1.定义Media types&lt;/strong&gt;&lt;br&gt;如下图，添加以下3个参数，分别对应sendEmail.sh脚本需要的3个参数：收件人地址、主题、详细内容&lt;br&gt;{ALERT.SENDTO}&lt;br&gt;{ALERT.SUBJECT}&lt;br&gt;{ALERT.MESSAGE}&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/106.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;【注意】: 很多人安装zabbix 3.0之后，写的脚本一直发信不成功,手动执行时可以的。那是因为zabbix3.0之后，可以自定义参数了。所以不写参数，它是不会传参数的。在2.x版本不存在这个问题，默认会传3个参数。脚本中可以使用$1, $2, $3来调用 action 中的 邮件的收件人, Default Subject, Default Message&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;2.定义Users的Media&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/107.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;3.python报警脚本&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /usr/local/zabbix-3.0.1/share/zabbix/alertscripts/
-# vim zabbix_sendmail.py
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;脚本内容如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;#!/usr/bin/python
-# coding:utf-8 
-
-import smtplib
-from email.mime.text import MIMEText
-import sys
-
-# 邮箱服务器地址
-mail_host = &amp;apos;smtp.exmail.qq.com&amp;apos;
-# 邮箱用户名
-mail_user = &amp;apos;01115009@wisedu.com&amp;apos;
-# 邮箱密码
-mail_pass = &amp;apos;123123123&amp;apos;
-mail_postfix = &amp;apos;wisedu.com&amp;apos;
-
- def send_mail(to_list,subject,content):
-     me = mail_user+&amp;quot;&amp;lt;&amp;quot;+mail_user+&amp;quot;@&amp;quot;+mail_postfix+&amp;quot;&amp;gt;&amp;quot;
-     msg = MIMEText(content)
-     msg[&amp;apos;Subject&amp;apos;] = subject
-     msg[&amp;apos;From&amp;apos;] = me
-     msg[&amp;apos;to&amp;apos;] = to_list
-
-try:
-    s = smtplib.SMTP()
-    s.connect(mail_host)
-    s.login(mail_user,mail_pass)
-    s.sendmail(me,to_list,msg.as_string())
-    s.close()
-    return True
-except Exception,e:
-    print str(e)
-    return False
-
-if __name__ == &amp;quot;__main__&amp;quot;:
-    send_mail(sys.argv[1], sys.argv[2], sys.argv[3])
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt; 修改脚本权限：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# chmod +x zabbix_sendmail.py
-# chown -R zabbix.zabbix zabbix_sendmail.py
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;4.修改zabbix_server配置&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# vim /usr/local/zabbix-3.0.1/etc/zabbix_server.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;添加如下配置：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;### Option: AlertScriptsPath
-AlertScriptsPath=/usr/local/zabbix-3.0.1/share/zabbix/alertscripts
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重启zabbix_server。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;5.配置Actions&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/108.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;【注意】:每触发一次Action，都会在Reports—&amp;gt;Action log看到记录：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/109.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;shell脚本发邮件&quot;&gt;&lt;a href=&quot;#shell脚本发邮件&quot; class=&quot;headerlink&quot; title=&quot;shell脚本发邮件&quot;&gt;&lt;/a&gt;shell脚本发邮件&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1.先安装sendEmail&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@care local]# tar zxf sendEmail-v1.56.tar.gz
-[root@care local]# cp sendEmail-v1.56/sendEmail /usr/local/bin
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;将写好的脚本上传到/usr/local/zabbix-3.0.1/share/zabbix/alertscripts。这里为了业务需求，需要定制化发送邮件的内容，脚本内容如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;#!/bin/bash
-###Description:This script is used to alarm.
-###Written by: jkzhao - jkzhao@wisedu.com  
-###History: 2016-08-10 Second release.
-###Modification: Please modify the variables host, user and passwd.
-
-# 获取默认的邮件接收者，邮件主题，邮件正文
-to=$1
-subject=$2
-bodyOrgin=$3
-
-# 获取eventid
-#eventid=grep &amp;quot;event ID&amp;quot; $bodyOrgin |awk &amp;apos;{print $4}&amp;apos;
-eventid=$(echo $bodyOrgin | grep &amp;quot;event ID&amp;quot; |awk &amp;apos;{print $NF}&amp;apos;)
-echo &amp;quot;eventid:$eventid&amp;quot; &amp;gt; /tmp/test.txt
-
-# shell调用存储过程，获取主键viewid，传入参数：eventid，输出：viewid
-host=172.16.9.112
-user=root
-passwd=zabbix
-database=zabbix
-
-viewid=$(mysql -u${user} -p${passwd} -h${host} -D${database} -e &amp;quot;call generateAlertView($eventid,@result)&amp;quot; 2&amp;gt;/dev/null | awk &amp;apos;NR&amp;gt;1&amp;apos;)
-echo &amp;quot;viewid:$viewid&amp;quot; &amp;gt;&amp;gt; /tmp/test.txt
-group=$(mysql -u${user} -p${passwd} -h${host} -D${database} -e &amp;quot;select alerts_view_group.group from alerts_view_group where viewid = $viewid&amp;quot; 2&amp;gt;/dev/null | awk &amp;apos;NR&amp;gt;1&amp;apos;)
-echo &amp;quot;group:$group&amp;quot; &amp;gt;&amp;gt; /tmp/test.txt
-body=$bodyOrgin&amp;quot;; 影响业务: &amp;quot;$group
-
-
-# 因为需要格式化发送邮件的内容，将拼接好的body信息写入文件中再做处理
-echo $body | awk -F&amp;apos;;&amp;apos; &amp;apos;{for(i=1;i&amp;lt;=NF;i++){print $i}}&amp;apos; &amp;gt; /tmp/messages.txt
-# 将文件中出现的^M删除掉
-sed -i &amp;apos;s/\x0D//g&amp;apos; /tmp/messages.txt
-# 删除以空格开头的行前面的空格
-sed -i &amp;apos;s/^\s*//g&amp;apos; /tmp/messages.txt
-
-# 由于zabbix无论是故障还是恢复都是要发邮件的，但是对于故障和恢复的邮件内容需要定制为不同的内容，因此需要先获取到是故障还是恢复
-state=$(echo $subject | awk -F: &amp;apos;{print $2}&amp;apos;)
-
-# 按照安心守护要求修改邮件正文内容
-if [ $state == &amp;quot;PROBLEM&amp;quot; ]; then
-    sed -i &amp;apos;s/Trigger:/异常对象:/&amp;apos; /tmp/messages.txt
-    sed -i &amp;apos;/Trigger severity:/{h;d};/Item values:/{G}&amp;apos; /tmp/messages.txt
-    sed -i &amp;apos;s/Trigger severity:/异常等级:/&amp;apos; /tmp/messages.txt 
-    sed -i &amp;apos;s/Item values:/异常原因:/&amp;apos; /tmp/messages.txt
-    sed -i &amp;apos;/Original event/d&amp;apos; /tmp/messages.txt
-    sed -i &amp;apos;/Trigger status:/d&amp;apos; /tmp/messages.txt
-    sed -i &amp;apos;$a发生时间: &amp;apos; /tmp/messages.txt
-    sed -i &amp;quot;s/发生时间: /发生时间: $(date &amp;quot;+%Y-%m-%d %H:%M:%S&amp;quot;)/&amp;quot; /tmp/messages.txt
-    # 把发生故障时的alertView插入alerts_view表
-    alertValue=$(grep &amp;quot;异常原因&amp;quot; /tmp/messages.txt | awk -F: &amp;apos;BEGIN{ORS=&amp;quot;&amp;quot;};{for(i=3;i&amp;lt;=NF;++i) {print $i}}&amp;apos;)
-    echo &amp;quot;alertValue:$alertValue&amp;quot; &amp;gt;&amp;gt; /tmp/test.txt
-    mysql -u${user} -p${passwd} -h${host} -D${database} -e &amp;quot;UPDATE alerts_view set alertValue=&amp;apos;${alertValue}&amp;apos; WHERE viewid = &amp;apos;${viewid}&amp;apos;&amp;quot; 2&amp;gt;/dev/null
-    sed -i &amp;apos;s/Warning/风险/&amp;apos; /tmp/messages.txt
-    sed -i &amp;apos;s/Disaster/宕机/&amp;apos; /tmp/messages.txt
-else
-    sed -i &amp;apos;s/Trigger:/恢复对象:/&amp;apos; /tmp/messages.txt
-    sed -i &amp;apos;s/Item values:/恢复内容:/&amp;apos; /tmp/messages.txt
-    sed -i &amp;apos;s/影响业务/恢复业务/&amp;apos; /tmp/messages.txt
-    sed -i &amp;apos;/Original event/d&amp;apos; /tmp/messages.txt
-    sed -i &amp;apos;/Trigger status:/d&amp;apos; /tmp/messages.txt
-    sed -i &amp;apos;/Trigger severity:/d&amp;apos; /tmp/messages.txt
-    sed -i &amp;apos;$a发生时间: &amp;apos; /tmp/messages.txt
-    sed -i &amp;quot;s/发生时间: /发生时间: $(date &amp;quot;+%Y-%m-%d %H:%M:%S&amp;quot;)/&amp;quot; /tmp/messages.txt
-fi
-
-
-/usr/local/bin/sendEmail -f monitor@wisedu.com -t &amp;quot;$to&amp;quot; -s smtp.exmail.qq.com -u &amp;quot;$subject&amp;quot; -o message-content-type=text -o message-charset=utf-8 -o message-file=/tmp/messages.txt -xu monitor@wisedu.com -xp 123456 2&amp;gt;&amp;gt;/tmp/22.log
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.添加Media types&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/110.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;3.给指定的用户添加Media&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/111.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;4.配置Actions，为了业务需求定制Default message&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/112.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;5.邮件展示&lt;/strong&gt;&lt;br&gt;故障邮件展示：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/113.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;故障恢复邮件展示：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/114.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;zabbix的通知功能&quot;&gt;&lt;a href=&quot;#zabbix的通知功能&quot; class=&quot;headerlink&quot; title=&quot;zabbix的通知功能&quot;&gt;&lt;/a&gt;zabbix的通知功能&lt;/h2&gt;&lt;p&gt;在配置好监控项和触发器之后，一旦正常工作中的某触发器状态发生改变，一般意味着有异常情况发生，此时通常需要采取一定的动作(action)，如告警或者执行远程命令。&lt;br&gt;实现zabbix的通知功能，一般需要两个步骤：定义所需的“媒介”和配置一个”动作”。&lt;br&gt;媒介类型有：E-mail，SMS，Jabber和自定义的通知脚本。我这里就使用E-mail了。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="Zabbix" scheme="http://yoursite.com/categories/Zabbix/"/>
-    
-    
-      <category term="监控 zabbix" scheme="http://yoursite.com/tags/%E7%9B%91%E6%8E%A7-zabbix/"/>
     
   </entry>
   

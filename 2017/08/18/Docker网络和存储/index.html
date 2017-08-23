@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Ansible 运维自动化," />
+  <meta name="keywords" content="容器 Docker," />
 
 
 
@@ -104,20 +104,25 @@
 
 
 
-<meta name="description" content="Ansible条件测试在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。 when语句在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如：">
-<meta name="keywords" content="Ansible 运维自动化">
+<meta name="description" content="Docker网络访问docker自带的网络 docker network ls：列出当前docker中已有的网络 docker network inspect：查看网络详情，比如查看网络中有哪些容器 docker run –network=：指定运行容器时使用哪个网络">
+<meta name="keywords" content="容器 Docker">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Ansible条件测试">
-<meta property="og:url" content="http://yoursite.com/2017/07/17/Ansible条件测试/index.html">
+<meta property="og:title" content="Docker网络和存储">
+<meta property="og:url" content="http://yoursite.com/2017/08/18/Docker网络和存储/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="Ansible条件测试在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。 when语句在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如：">
+<meta property="og:description" content="Docker网络访问docker自带的网络 docker network ls：列出当前docker中已有的网络 docker network inspect：查看网络详情，比如查看网络中有哪些容器 docker run –network=：指定运行容器时使用哪个网络">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png">
-<meta property="og:updated_time" content="2017-07-17T06:10:14.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/12.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/13.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/14.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/15.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/16.png">
+<meta property="og:updated_time" content="2017-08-23T03:02:02.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Ansible条件测试">
-<meta name="twitter:description" content="Ansible条件测试在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。 when语句在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如：">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png">
+<meta name="twitter:title" content="Docker网络和存储">
+<meta name="twitter:description" content="Docker网络访问docker自带的网络 docker network ls：列出当前docker中已有的网络 docker network inspect：查看网络详情，比如查看网络中有哪些容器 docker run –network=：指定运行容器时使用哪个网络">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/11.png">
 
 
 
@@ -135,7 +140,7 @@
   };
 </script>
 
-  <title> Ansible条件测试 | jkzhao's blog </title>
+  <title> Docker网络和存储 | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -325,7 +330,7 @@
             
             
               
-                Ansible条件测试
+                Docker网络和存储
               
             
           </h1>
@@ -337,14 +342,14 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-17T13:39:32+08:00" content="2017-07-17">
-              2017-07-17
+            <time itemprop="dateCreated" datetime="2017-08-18T17:17:19+08:00" content="2017-08-18">
+              2017-08-18
             </time>
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-07-17T14:10:14+08:00" content="2017-07-17">
-              2017-07-17
+              <time itemprop="dateUpdated" datetime="2017-08-23T11:02:02+08:00" content="2017-08-23">
+              2017-08-23
               </time>
               </span>
             
@@ -359,8 +364,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
+                  <a href="/categories/Docker/" itemprop="url" rel="index">
+                    <span itemprop="name">Docker</span>
                   </a>
                 </span>
 
@@ -379,7 +384,7 @@
 
           
           
-             <span id="/2017/07/17/Ansible条件测试/" class="leancloud_visitors" data-flag-title="Ansible条件测试">
+             <span id="/2017/08/18/Docker网络和存储/" class="leancloud_visitors" data-flag-title="Docker网络和存储">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -403,24 +408,94 @@
       
 
       
-        <h2 id="Ansible条件测试"><a href="#Ansible条件测试" class="headerlink" title="Ansible条件测试"></a>Ansible条件测试</h2><p>在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。</p>
-<h3 id="when语句"><a href="#when语句" class="headerlink" title="when语句"></a>when语句</h3><p>在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如：<br><a id="more"></a></p>
-<pre><code>tasks:
-- name: &quot;shutdown Debian flavored systems&quot;
-  command: /sbin/shutdown -h now
-  when: ansible_os_family == &quot;Debian&quot;
-</code></pre><p>when语句还可以使用Jinja2的大多“filter”，例如要忽略此前某语句额错误并基于其结果（failed或success）运行后面指定的语句，可使用类似如下形式：</p>
-<pre><code>tasks:
-- command: /bin/false
-  register: result
-  ignore_errors: True
-- command: /bin/sonmething
-  when: result|failed
-- command: /bin/something_else
-  when: result|success
-- command: /bin/still/something_else
-  when: result|skipped
-</code></pre><p>此外，when语句还可以使用facts或playbook中定义的变量。facts就是主机报告上来的变量。比如：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png" alt=""></p>
+        <h2 id="Docker网络访问"><a href="#Docker网络访问" class="headerlink" title="Docker网络访问"></a>Docker网络访问</h2><h3 id="docker自带的网络"><a href="#docker自带的网络" class="headerlink" title="docker自带的网络"></a>docker自带的网络</h3><ul>
+<li>docker network ls：列出当前docker中已有的网络</li>
+<li>docker network inspect：查看网络详情，比如查看网络中有哪些容器</li>
+<li>docker run –network=<network>：指定运行容器时使用哪个网络<a id="more"></a>
+</network></li>
+</ul>
+<h3 id="host网络"><a href="#host网络" class="headerlink" title="host网络"></a>host网络</h3><p>容器的网络接口跟主机一样。</p>
+<h3 id="none网络"><a href="#none网络" class="headerlink" title="none网络"></a>none网络</h3><p>除了lo接口外，容器没有任何其他网络接口。</p>
+<h3 id="bridge网络"><a href="#bridge网络" class="headerlink" title="bridge网络"></a>bridge网络</h3><p>这是新建容器时默认使用的网络，也是使用得最多的网络。网络中的所有容器可以通过IP互相访问。<br>bridge网络通过网络接口docker0跟主机桥接，可以在主机上通过ifconfig docker0查看到该网络接口的信息。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/11.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/12.png" alt=""></p>
+<h2 id="端口映射"><a href="#端口映射" class="headerlink" title="端口映射"></a>端口映射</h2><p>docker使用端口映射来让容器里面某一个端口对外。一种是随机映射，一种是指定端口映射。</p>
+<h3 id="随机映射"><a href="#随机映射" class="headerlink" title="随机映射"></a>随机映射</h3><p>docker run -P</p>
+<ul>
+<li><p>-P参数 随机映射端口。随机端口的好处是不会冲突。<br>举个例子：</p>
+<pre><code>[root@node1 ~]# docker pull nginx
+[root@node1 ~]# docker run -d -P nginx
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/13.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/14.png" alt=""><br>可以访问Docker日志：</p>
+<pre><code>[root@node1 ~]# docker logs 1822a2ea3ff3
+172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &quot;GET / HTTP/1.1&quot; 200 612 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&quot; &quot;-&quot;
+2017/08/22 09:20:25 [error] 5#5: *1 open() &quot;/usr/share/nginx/html/favicon.ico&quot; failed (2: No such file or directory), client: 172.16.4.81, server: localhost, request: &quot;GET /favicon.ico HTTP/1.1&quot;, host: &quot;172.16.7.151:32768&quot;, referrer: &quot;http://172.16.7.151:32768/&quot;
+172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &quot;GET /favicon.ico HTTP/1.1&quot; 404 571 &quot;http://172.16.7.151:32768/&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&quot; &quot;-&quot;
+</code></pre></li>
+</ul>
+<h3 id="指定端口映射"><a href="#指定端口映射" class="headerlink" title="指定端口映射"></a>指定端口映射</h3><p>docker run -p hostPort:containerPort<br>docker run -p ip:hostPort:containerPort<br>docker run -p ip::containerPort<br>docker run -p hostPort:containerPort:udp</p>
+<ul>
+<li><p>-p 指定端口映射，前面的是主机端口，后面的是容器端口。</p>
+<pre><code>[root@node1 ~]# docker run -d -p 81:80 nginx
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/15.png" alt=""></p>
+</li>
+</ul>
+<h2 id="数据管理"><a href="#数据管理" class="headerlink" title="数据管理"></a>数据管理</h2><p>两种方式：</p>
+<ul>
+<li>数据卷</li>
+<li>数据卷容器</li>
+</ul>
+<h3 id="数据卷"><a href="#数据卷" class="headerlink" title="数据卷"></a>数据卷</h3><p>启动一个容器，把宿主机的某个目录挂载到容器目录上。</p>
+<ul>
+<li>-v /data</li>
+<li><p>-v src:dst  指定一个目录挂载进容器。<br><strong>【示例1】:未指定宿主机目录挂载</strong></p>
+<pre><code>[root@node1 ~]# docker run -it --name volume-test1 -v /data centos    
+[root@5d485979254b /]# ls -l /data 
+total 0
+</code></pre></li>
+</ul>
+<p>这个容器里的/data 肯定在宿主机的某个位置。打开一个新的终端，查看这个位置：</p>
+<pre><code>[root@node1 ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                   NAMES
+5d485979254b        centos              &quot;/bin/bash&quot;              2 minutes ago       Up 2 minutes                                volume-test1                                 test
+[root@node1 ~]# docker inspect 5d485979254b
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/16.png" alt=""><br>在宿主机上的目录中创建文件：</p>
+<pre><code>[root@node1 ~]# cd /var/lib/docker/volumes/7f37e83849f079275545b7d1f3381903795e946d113e1c43ff24fc1a7717e00f/_data
+[root@node1 _data]# ls -l
+total 0
+[root@node1 _data]# touch test.txt
+</code></pre><p>回到容器中，查看/data目录下是否有刚才创建的文件：</p>
+<pre><code>[root@5d485979254b /]# ls -l /data 
+total 0
+-rw-r--r--. 1 root root 0 Aug 23 02:07 test.txt
+</code></pre><p><strong>【示例2】:指定宿主机目录挂载</strong></p>
+<pre><code>[root@node1 ~]# docker run -it -v /opt:/opt centos
+[root@850031902bb7 /]# ls /opt/
+ansible_playbooks  rh
+[root@850031902bb7 /]# exit
+exit
+</code></pre><p>宿主机的/opt:</p>
+<pre><code>[root@node1 ~]# ls /opt
+ansible_playbooks  rh
+</code></pre><p>挂载的时候可以指定权限：</p>
+<pre><code>[root@node1 ~]# docker run -it -v /opt:/opt:rw centos
+rw: 读写
+ro: 只读
+</code></pre><p>挂载单个文件到容器：</p>
+<pre><code>[root@node1 ~]# docker run -it -v ~/.bash_history:/.bash_history centos
+</code></pre><h3 id="数据卷容器"><a href="#数据卷容器" class="headerlink" title="数据卷容器"></a>数据卷容器</h3><p>–volumes-from  让一个容器访问另外一个容器的卷<br><strong>【示例3】:创建一个容器作为数据卷，启动其他容器访问这个容器的卷。</strong></p>
+<pre><code>[root@node1 ~]# docker run -it --name nfs -v /data centos /bin/bash 
+[root@72bb5caa54db /]#
+</code></pre><p>Ctrl+P Ctrl +Q退出交互式容器的bash，这样容器就会在后台运行。</p>
+<pre><code>[root@node1 ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                NAMES
+72bb5caa54db        centos              &quot;/bin/bash&quot;              37 seconds ago      Up 36 seconds                            nfs
+[root@node1 ~]# docker inspect 72bb5caa54db
+[root@node1 ~]# cd /var/lib/docker/volumes/8f1e1da837d5d86f79ac14e5d57c0e47243e3c68d5ca822d4f7a498386c07a59/_data
+[root@node1 _data]# touch test2.txt
+</code></pre><p>启动其他容器，访问这个容器的卷：</p>
+<pre><code>[root@node1 _data]# docker run -it --name test1 --volumes-from nfs centos
+[root@9097c1af8e86 /]# ls /data/
+test2.txt
+[root@9097c1af8e86 /]# 
+</code></pre><p>这个数据卷容器可以用来作收容器间数据共享，哪怕这个数据卷容器nfs停了，依然可以通过其在宿主机上真实的目录访问里面的数据。这个数据卷容器创建后可以什么都不干，直接关闭，其他容器挂载过来。</p>
 
       
     </div>
@@ -442,7 +517,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Ansible-运维自动化/" rel="tag"><i class="fa fa-tag"></i>Ansible 运维自动化</a>
+            <a href="/tags/容器-Docker/" rel="tag"><i class="fa fa-tag"></i>容器 Docker</a>
           
         </div>
       
@@ -451,17 +526,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/07/15/ansible-playbook基础组件介绍/" rel="next" title="ansible playbook基础组件介绍">
-                <i class="fa fa-chevron-left"></i> ansible playbook基础组件介绍
+              <a href="/2017/08/16/Docker镜像和容器/" rel="next" title="Docker镜像和容器">
+                <i class="fa fa-chevron-left"></i> Docker镜像和容器
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/07/20/Ansible之迭代、模板/" rel="prev" title="Ansible之迭代、模板">
-                Ansible之迭代、模板 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -618,7 +689,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Ansible条件测试"><span class="nav-number">1.</span> <span class="nav-text">Ansible条件测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#when语句"><span class="nav-number">1.1.</span> <span class="nav-text">when语句</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker网络访问"><span class="nav-number">1.</span> <span class="nav-text">Docker网络访问</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#docker自带的网络"><span class="nav-number">1.1.</span> <span class="nav-text">docker自带的网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#host网络"><span class="nav-number">1.2.</span> <span class="nav-text">host网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#none网络"><span class="nav-number">1.3.</span> <span class="nav-text">none网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bridge网络"><span class="nav-number">1.4.</span> <span class="nav-text">bridge网络</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#端口映射"><span class="nav-number">2.</span> <span class="nav-text">端口映射</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#随机映射"><span class="nav-number">2.1.</span> <span class="nav-text">随机映射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定端口映射"><span class="nav-number">2.2.</span> <span class="nav-text">指定端口映射</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据管理"><span class="nav-number">3.</span> <span class="nav-text">数据管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据卷"><span class="nav-number">3.1.</span> <span class="nav-text">数据卷</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据卷容器"><span class="nav-number">3.2.</span> <span class="nav-text">数据卷容器</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
