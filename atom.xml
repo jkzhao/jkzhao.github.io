@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-08-28T03:26:15.000Z</updated>
+  <updated>2017-08-28T03:31:10.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,9 +20,9 @@
     <link href="http://yoursite.com/2017/08/25/Dockerfile%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/"/>
     <id>http://yoursite.com/2017/08/25/Dockerfile构建镜像/</id>
     <published>2017-08-25T02:55:41.000Z</published>
-    <updated>2017-08-28T03:26:15.000Z</updated>
+    <updated>2017-08-28T03:31:10.000Z</updated>
     
-    <content type="html">&lt;h2 id=&quot;Dockerfile介绍&quot;&gt;&lt;a href=&quot;#Dockerfile介绍&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile介绍&quot;&gt;&lt;/a&gt;Dockerfile介绍&lt;/h2&gt;&lt;p&gt;dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。&lt;br&gt;若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：&lt;/p&gt;
+    <content type="html">&lt;h2 id=&quot;Dockerfile介绍&quot;&gt;&lt;a href=&quot;#Dockerfile介绍&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile介绍&quot;&gt;&lt;/a&gt;Dockerfile介绍&lt;/h2&gt;&lt;p&gt;dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。&lt;br&gt;若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;可重现&lt;/li&gt;
 &lt;li&gt;dockerfile可以加入版本控制，这样可以追踪文件的变化和回滚错误&lt;/li&gt;
@@ -177,7 +177,7 @@ CMD [ &amp;quot;irb&amp;quot; ]
     
     <summary type="html">
     
-      &lt;h2 id=&quot;Dockerfile介绍&quot;&gt;&lt;a href=&quot;#Dockerfile介绍&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile介绍&quot;&gt;&lt;/a&gt;Dockerfile介绍&lt;/h2&gt;&lt;p&gt;dockerfile是构建镜像的说明书。dockerfile
+      &lt;h2 id=&quot;Dockerfile介绍&quot;&gt;&lt;a href=&quot;#Dockerfile介绍&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile介绍&quot;&gt;&lt;/a&gt;Dockerfile介绍&lt;/h2&gt;&lt;p&gt;dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。&lt;br&gt;若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：&lt;br&gt;
     
     </summary>
     

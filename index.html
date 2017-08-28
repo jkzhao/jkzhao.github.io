@@ -341,7 +341,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-08-28T11:26:15+08:00" content="2017-08-28">
+              <time itemprop="dateUpdated" datetime="2017-08-28T11:31:10+08:00" content="2017-08-28">
               2017-08-28
               </time>
               </span>
@@ -402,160 +402,12 @@
 
       
         
-          
-            <h2 id="Dockerfile介绍"><a href="#Dockerfile介绍" class="headerlink" title="Dockerfile介绍"></a>Dockerfile介绍</h2><p>dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。<br>若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：</p>
-<ul>
-<li>可重现</li>
-<li>dockerfile可以加入版本控制，这样可以追踪文件的变化和回滚错误</li>
-<li>dockerfile很轻量，我们不需要copy几百M甚至上G的docker镜像<br>使用Dockerfile构建的流程：</li>
-<li>编写Dockerfile</li>
-<li>执行docker build命令</li>
-</ul>
-<h2 id="Dockerfile指令简单介绍"><a href="#Dockerfile指令简单介绍" class="headerlink" title="Dockerfile指令简单介绍"></a>Dockerfile指令简单介绍</h2><ul>
-<li>FROM：基础镜像。</li>
-<li>MAINTAINER：维护者信息。</li>
-<li>RUN：在需要执行的命令前加RUN。</li>
-<li>ADD：ADD的文件和Dockerfile必须在同一个路径下。</li>
-<li>ENV：设置环境变量。</li>
-<li>WORKDIR：相当于cd。</li>
-<li>VOLUME：目录挂载。</li>
-<li>EXPOSE：映射端口。</li>
-<li>ENTRYPOINT</li>
-<li>CMD</li>
-</ul>
-<h3 id="RUN指令"><a href="#RUN指令" class="headerlink" title="RUN指令"></a>RUN指令</h3><p>会在前一条命令创建的镜像的基础上启动一个容器，并在容器中运行指令的命令。在该命令结束后，会提交容器为新的镜像。新镜像会被dockerfile中的下一条指令所使用。<br>默认情况下，RUN指令会以shell的形式去执行命令。当然我们也可以使用exec格式的RUN指令。在exec方式中，我们使用一个数组来指定要运行的命令和传递给该命令的参数。exec中的参数会当成什么数组被docker解析，因此必须使用双引号，而不能使用单引号。<br><strong>shell形式</strong></p>
-<pre><code>RUN yum install -y nginx
-</code></pre><p><strong>exec形式</strong></p>
-<pre><code>RUN [&quot;yum&quot;, &quot;install&quot;, &quot;-y&quot;, &quot;nginx&quot;]
-</code></pre><h3 id="EXPOSE指令"><a href="#EXPOSE指令" class="headerlink" title="EXPOSE指令"></a>EXPOSE指令</h3><p>告诉docker该容器内的应用程序将会指定端口，但是这并不意味着我们可以自动访问该容器内服务的端口。出于安全的原因，docker并不会自动打开该端口。而是需要我们在使用docker run的时候通过-p参数指定需要打开哪些端口。我们可以使用多个EXPOSE指令向外部暴露多个端口。注意不可以在dockerfile中指定端口映射关系。比如EXPOSE 80，这条指令是对的，而EXPOSE 8080:80这条指令就是错的。<br>【注意】:这会影响docker的可移植性。我们应该在docker run命令中使用-p参数实现端口映射。</p>
-<h3 id="CMD指令"><a href="#CMD指令" class="headerlink" title="CMD指令"></a>CMD指令</h3><p>CMD 指令允许用户指定容器启动的默认执行的命令。此命令会在容器启动且 docker run 没有指定其他命令时运行。</p>
-<ul>
-<li>如果 docker run 指定了其他命令，CMD 指定的默认命令将被忽略。</li>
-<li><p>如果 Dockerfile 中有多个 CMD 指令，只有最后一个 CMD 有效。<br>CMD 有三种格式：</p>
-<pre><code>Exec 格式：CMD [&quot;executable&quot;,&quot;param1&quot;,&quot;param2&quot;] 这是 CMD 的推荐格式。
-CMD [&quot;param1&quot;,&quot;param2&quot;] 为 ENTRYPOINT 提供额外的参数，此时 ENTRYPOINT 必须使用 Exec 格式。
-Shell 格式：CMD command param1 param2
-</code></pre></li>
-</ul>
-<p>第一种格式：运行一个可执行的文件并提供参数。<br>第二种格式 CMD [“param1”,”param2”] 要与 Exec 格式 的 ENTRYPOINT 指令配合使用，其用途是为 ENTRYPOINT 设置默认的参数。<br>第三种格式：是以”/bin/sh -c”的方法执行的命令。</p>
-<p>下面看看 CMD 是如何工作的。Dockerfile 片段如下：</p>
-<pre><code>CMD echo &quot;Hello world&quot;
-</code></pre><p>运行容器 docker run -it [image] 将输出：</p>
-<pre><code>Hello world
-</code></pre><p>但当后面加上一个命令，比如 docker run -it [image] /bin/bash，CMD 会被忽略掉，命令 bash 将被执行：</p>
-<pre><code>[root@76a5fd777648 /]# 
-</code></pre><p>【注意】:使用CMD指令时，最好使用数组语法。</p>
-<h3 id="ENTRYPOIN指令"><a href="#ENTRYPOIN指令" class="headerlink" title="ENTRYPOIN指令"></a>ENTRYPOIN指令</h3><p>ENTRYPOINT 看上去与 CMD 很像，它们都可以指定要执行的命令及其参数。不同的地方在于 ENTRYPOINT 不会被忽略，一定会被执行，即使运行 docker run 时指定了其他命令。<br>实际上docker run命令行中指定的任何参数都会被当作参数再次传递给ENTRYPOINT指令中指定的命令。<br>ENTRYPOINT 有两种格式：</p>
-<pre><code>Exec 格式：ENTRYPOINT [&quot;executable&quot;, &quot;param1&quot;, &quot;param2&quot;] 这是 ENTRYPOINT 的推荐格式。
-Shell 格式：ENTRYPOINT command param1 param2
-</code></pre><p>在为 ENTRYPOINT 选择格式时必须小心，因为这两种格式的效果差别很大。</p>
-<pre><code>ENTRYPOINT [&quot;/usr/sbin/nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]
-</code></pre><h4 id="Exec-格式"><a href="#Exec-格式" class="headerlink" title="Exec 格式"></a>Exec 格式</h4><p>ENTRYPOINT 的 Exec 格式用于设置要执行的命令及其参数，同时可通过 CMD 提供额外的参数。<br>ENTRYPOINT 中的参数始终会被使用，而 CMD 的额外参数可以在容器启动时动态替换掉。<br>比如下面的 Dockerfile 片段：</p>
-<pre><code>ENTRYPOINT [&quot;/bin/echo&quot;, &quot;Hello&quot;]  
-CMD [&quot;world&quot;]
-</code></pre><p>当容器通过 docker run -it [image] 启动时，输出为：</p>
-<pre><code>Hello world
-</code></pre><p>而如果通过 docker run -it [image] CloudMan 启动，则输出为：</p>
-<pre><code>Hello CloudMan
-</code></pre><h4 id="Shell-格式"><a href="#Shell-格式" class="headerlink" title="Shell 格式"></a>Shell 格式</h4><p>ENTRYPOINT 的 Shell 格式会忽略任何 CMD 或 docker run 提供的参数。<br><strong>【注意】:使用CMD和ENTRYPOINT时，请务必使用数组语法。</strong></p>
-<p><strong>【总结】：</strong><br>1.使用 RUN 指令安装应用和软件包，构建镜像。<br>2.如果想为容器设置默认的启动命令，可使用 CMD 指令。用户可在 docker run 命令行中替换此默认命令。<br>3.如果 Docker 镜像的用途是运行应用程序或服务，比如运行一个 MySQL，应该优先使用 Exec 格式的 ENTRYPOINT 指令。CMD 可为 ENTRYPOINT 提供额外的默认参数，同时可利用 docker run 命令行替换默认参数。</p>
-<h2 id="示例1：构建Nginx镜像"><a href="#示例1：构建Nginx镜像" class="headerlink" title="示例1：构建Nginx镜像"></a>示例1：构建Nginx镜像</h2><p>创建一个目录单独存放各种Dockerfile：</p>
-<pre><code>[root@node1 ~]# mkdir /opt/docker-file
-</code></pre><p>创建Nginx目录存放Nginx Dockerfile和相关文件：</p>
-<pre><code>[root@node1 ~]# mkdir nginx
-[root@node1 ~]# cd nginx
-</code></pre><p>上传openresty-1.9.7.3.tar.gz到Nginx目录下，编写Dockerfile文件：</p>
-<pre><code>[root@node1 nginx]# vim Dockerfile
-</code></pre><p>该Dockerfile内容如下：</p>
-<pre><code># This dockerfile is for openresty
-# Version 1.0
-
-# Base images. 
-FROM centos:centos7
-
-# Author.
-MAINTAINER jkzhao &lt;01115004@wisedu.com&gt;
-
-# Add openresty software.
-ADD openresty-1.9.7.3.tar.gz /usr/local
-
-# Define working directory.
-WORKDIR /usr/local/openresty-1.9.7.3
-
-# Install epel repo
-RUN rpm -ivh http://mirrors.aliyun.com/epel/epel-release-latest-7.noarch.rpm
-
-# Install openresty.
-RUN yum install -y readline-devel pcre-devel openssl-devel gcc perl make 
-RUN ./configure &amp;&amp; gmake &amp;&amp; gmake install
-RUN sed -i &apos;1 i\daemon off;&apos; /usr/local/openresty/nginx/conf/nginx.conf
-RUN sed -i &apos;s@#error_log  logs\/error.log;@error_log logs\/error.log debug;@&apos; /usr/local/openresty/nginx/conf/nginx.conf
-
-# Define environment variables.
-ENV PATH /usr/local/openresty/nginx/sbin:$PATH
-
-# Define default command. 
-CMD [&quot;nginx&quot;]
-
-# Expose ports.
-EXPOSE 80
-</code></pre><p>利用该Dockerfile构建镜像：</p>
-<pre><code>[root@node1 nginx]# docker build -t jkzhao/mynginx:v2 /opt/docker-file/nginx/
-</code></pre><p>查看构建的镜像：</p>
-<pre><code>[root@node1 nginx]# docker images
-REPOSITORY                              TAG                 IMAGE ID            CREATED             SIZE
-jkzhao/mynginx                          v2                  f61afc8ce858        17 minutes ago      581.6 MB
-</code></pre><p>基于镜像启动容器：</p>
-<pre><code>[root@node1 nginx]# docker run -d -p 84:80 jkzhao/mynginx:v2   
-</code></pre><p>访问Nginx服务：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/20.png" alt=""></p>
-<p>如果dockerfile中某条指令执行失败了，没有正常结束，那么我们也将得到一个可以使用的镜像。这对调试非常有帮助，我们可以基于该镜像，运行一个具有交互功能的容器，使用最后创建的镜像对为什么我们的指令会失败进行调试。</p>
-<h2 id="示例2：基于CentOS7构建一个Ruby运行环境"><a href="#示例2：基于CentOS7构建一个Ruby运行环境" class="headerlink" title="示例2：基于CentOS7构建一个Ruby运行环境"></a>示例2：基于CentOS7构建一个Ruby运行环境</h2><p>创建Ruby目录存放Ruby Dockerfile和相关文件：</p>
-<pre><code>[root@node1 ~]# mkdir ruby
-[root@node1 ~]# cd ruby
-</code></pre><p>该Dockerfile内容如下：</p>
-<pre><code>FROM centos:7  
-
-MAINTAINER jkzhao &lt;01115004@wisedu.com&gt;
-
-# 为镜像添加备注信息
-LABEL version=&quot;2.2.2&quot; lang=&quot;ruby&quot;
-
-ENV RUBY_MAJOR 2.2
-ENV RUBY_VERSION 2.2.2
-
-RUN yum install -y wget tar gcc g++ make automake autoconf curl-devel openssl-devel zlib-devel httpd-devel apr-devel apr-util-devel sqlite-devel
-
-RUN cd /tmp \
-    &amp;&amp; wget http://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.2.tar.gz \
-    &amp;&amp; tar zxvf ruby-2.2.2.tar.gz \
-    &amp;&amp; cd ruby-2.2.2 \
-    &amp;&amp; autoconf \
-    &amp;&amp; ./configure --disable-install-doc \
-    &amp;&amp; make \
-    &amp;&amp; make install \
-    &amp;&amp; rm -rf /tmp/ruby-2.2.2*
-
-# skip installing gem documentation
-RUN echo -e &apos;install: --no-document\nupdate: --no-document&apos; &gt;&gt; &quot;$HOME/.gemrc&quot;
-
-ENV GEM_HOME /usr/local/bundle
-ENV PATH $GEM_HOME/bin:$PATH
-
-ENV BUNDLER_VERSION 1.10.6
-
-RUN gem install bundler --version &quot;$BUNDLER_VERSION&quot; \
- &amp;&amp; bundle config --global path &quot;$GEM_HOME&quot; \
- &amp;&amp; bundle config --global bin &quot;$GEM_HOME/bin&quot;
-
-# don&apos;t create &quot;.bundle&quot; in all our apps
-ENV BUNDLE_APP_CONFIG $GEM_HOME
-
-CMD [ &quot;irb&quot; ]
-</code></pre><h2 id="构建缓存"><a href="#构建缓存" class="headerlink" title="构建缓存"></a>构建缓存</h2><p>dockerfile构建镜像过程非常聪明，它会将每一步的构建结果提交为一个镜像，我们可以将之前指令创建的镜像层看做缓存，比如第5条指令由于命令书写错误而导致构建失败，当我们修改它之后，前面的4条指令不会再执行，而是直接使用之前构建过程中保存的缓存。这样速度会提高很多，大大减少了构建的时间。<br>然而有时候我们要确保构建过程中不会使用缓存，比如对yum update等操作，要想跳过缓存，</p>
-<pre><code>docker build no-cache
-</code></pre><p>缓存还有个好处，就是调试方便。比如第5条指令失败了，那么我们可以基于第4条指令创建的镜像启动一个新的容器。在容器里手工执行第5条指令所要的操作，调查指令失败的原因。</p>
-
-          
+          <h2 id="Dockerfile介绍"><a href="#Dockerfile介绍" class="headerlink" title="Dockerfile介绍"></a>Dockerfile介绍</h2><p>dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。<br>若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/08/25/Dockerfile构建镜像/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
