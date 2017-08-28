@@ -113,7 +113,7 @@
 <meta property="og:description" content="Dockerfile介绍dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/20.png">
-<meta property="og:updated_time" content="2017-08-28T03:31:10.000Z">
+<meta property="og:updated_time" content="2017-08-28T03:38:51.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dockerfile构建镜像">
 <meta name="twitter:description" content="Dockerfile介绍dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：">
@@ -343,7 +343,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-08-28T11:31:10+08:00" content="2017-08-28">
+              <time itemprop="dateUpdated" datetime="2017-08-28T11:38:51+08:00" content="2017-08-28">
               2017-08-28
               </time>
               </span>
@@ -509,7 +509,7 @@ jkzhao/mynginx                          v2                  f61afc8ce858        
 <pre><code>[root@node1 nginx]# docker run -d -p 84:80 jkzhao/mynginx:v2   
 </code></pre><p>访问Nginx服务：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/20.png" alt=""></p>
 <p>如果dockerfile中某条指令执行失败了，没有正常结束，那么我们也将得到一个可以使用的镜像。这对调试非常有帮助，我们可以基于该镜像，运行一个具有交互功能的容器，使用最后创建的镜像对为什么我们的指令会失败进行调试。</p>
-<h2 id="示例2：基于CentOS7构建一个Ruby运行环境"><a href="#示例2：基于CentOS7构建一个Ruby运行环境" class="headerlink" title="示例2：基于CentOS7构建一个Ruby运行环境"></a>示例2：基于CentOS7构建一个Ruby运行环境</h2><p>创建Ruby目录存放Ruby Dockerfile和相关文件：</p>
+<h2 id="示例2：构建一个Ruby运行环境"><a href="#示例2：构建一个Ruby运行环境" class="headerlink" title="示例2：构建一个Ruby运行环境"></a>示例2：构建一个Ruby运行环境</h2><p>创建Ruby目录存放Ruby Dockerfile和相关文件：</p>
 <pre><code>[root@node1 ~]# mkdir ruby
 [root@node1 ~]# cd ruby
 </code></pre><p>该Dockerfile内容如下：</p>
@@ -747,7 +747,7 @@ CMD [ &quot;irb&quot; ]
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Dockerfile介绍"><span class="nav-number">1.</span> <span class="nav-text">Dockerfile介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dockerfile指令简单介绍"><span class="nav-number">2.</span> <span class="nav-text">Dockerfile指令简单介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RUN指令"><span class="nav-number">2.1.</span> <span class="nav-text">RUN指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EXPOSE指令"><span class="nav-number">2.2.</span> <span class="nav-text">EXPOSE指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CMD指令"><span class="nav-number">2.3.</span> <span class="nav-text">CMD指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ENTRYPOIN指令"><span class="nav-number">2.4.</span> <span class="nav-text">ENTRYPOIN指令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Exec-格式"><span class="nav-number">2.4.1.</span> <span class="nav-text">Exec 格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Shell-格式"><span class="nav-number">2.4.2.</span> <span class="nav-text">Shell 格式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例1：构建Nginx镜像"><span class="nav-number">3.</span> <span class="nav-text">示例1：构建Nginx镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例2：基于CentOS7构建一个Ruby运行环境"><span class="nav-number">4.</span> <span class="nav-text">示例2：基于CentOS7构建一个Ruby运行环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构建缓存"><span class="nav-number">5.</span> <span class="nav-text">构建缓存</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Dockerfile介绍"><span class="nav-number">1.</span> <span class="nav-text">Dockerfile介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dockerfile指令简单介绍"><span class="nav-number">2.</span> <span class="nav-text">Dockerfile指令简单介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RUN指令"><span class="nav-number">2.1.</span> <span class="nav-text">RUN指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EXPOSE指令"><span class="nav-number">2.2.</span> <span class="nav-text">EXPOSE指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CMD指令"><span class="nav-number">2.3.</span> <span class="nav-text">CMD指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ENTRYPOIN指令"><span class="nav-number">2.4.</span> <span class="nav-text">ENTRYPOIN指令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Exec-格式"><span class="nav-number">2.4.1.</span> <span class="nav-text">Exec 格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Shell-格式"><span class="nav-number">2.4.2.</span> <span class="nav-text">Shell 格式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例1：构建Nginx镜像"><span class="nav-number">3.</span> <span class="nav-text">示例1：构建Nginx镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例2：构建一个Ruby运行环境"><span class="nav-number">4.</span> <span class="nav-text">示例2：构建一个Ruby运行环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构建缓存"><span class="nav-number">5.</span> <span class="nav-text">构建缓存</span></a></li></ol></div>
             
           </div>
         </section>
