@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-08-23T06:22:18.000Z</updated>
+  <updated>2017-08-28T03:26:15.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,179 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Dockerfile构建镜像</title>
+    <link href="http://yoursite.com/2017/08/25/Dockerfile%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/"/>
+    <id>http://yoursite.com/2017/08/25/Dockerfile构建镜像/</id>
+    <published>2017-08-25T02:55:41.000Z</published>
+    <updated>2017-08-28T03:26:15.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Dockerfile介绍&quot;&gt;&lt;a href=&quot;#Dockerfile介绍&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile介绍&quot;&gt;&lt;/a&gt;Dockerfile介绍&lt;/h2&gt;&lt;p&gt;dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。&lt;br&gt;若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;可重现&lt;/li&gt;
+&lt;li&gt;dockerfile可以加入版本控制，这样可以追踪文件的变化和回滚错误&lt;/li&gt;
+&lt;li&gt;dockerfile很轻量，我们不需要copy几百M甚至上G的docker镜像&lt;br&gt;使用Dockerfile构建的流程：&lt;/li&gt;
+&lt;li&gt;编写Dockerfile&lt;/li&gt;
+&lt;li&gt;执行docker build命令&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;Dockerfile指令简单介绍&quot;&gt;&lt;a href=&quot;#Dockerfile指令简单介绍&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile指令简单介绍&quot;&gt;&lt;/a&gt;Dockerfile指令简单介绍&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;FROM：基础镜像。&lt;/li&gt;
+&lt;li&gt;MAINTAINER：维护者信息。&lt;/li&gt;
+&lt;li&gt;RUN：在需要执行的命令前加RUN。&lt;/li&gt;
+&lt;li&gt;ADD：ADD的文件和Dockerfile必须在同一个路径下。&lt;/li&gt;
+&lt;li&gt;ENV：设置环境变量。&lt;/li&gt;
+&lt;li&gt;WORKDIR：相当于cd。&lt;/li&gt;
+&lt;li&gt;VOLUME：目录挂载。&lt;/li&gt;
+&lt;li&gt;EXPOSE：映射端口。&lt;/li&gt;
+&lt;li&gt;ENTRYPOINT&lt;/li&gt;
+&lt;li&gt;CMD&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;RUN指令&quot;&gt;&lt;a href=&quot;#RUN指令&quot; class=&quot;headerlink&quot; title=&quot;RUN指令&quot;&gt;&lt;/a&gt;RUN指令&lt;/h3&gt;&lt;p&gt;会在前一条命令创建的镜像的基础上启动一个容器，并在容器中运行指令的命令。在该命令结束后，会提交容器为新的镜像。新镜像会被dockerfile中的下一条指令所使用。&lt;br&gt;默认情况下，RUN指令会以shell的形式去执行命令。当然我们也可以使用exec格式的RUN指令。在exec方式中，我们使用一个数组来指定要运行的命令和传递给该命令的参数。exec中的参数会当成什么数组被docker解析，因此必须使用双引号，而不能使用单引号。&lt;br&gt;&lt;strong&gt;shell形式&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;RUN yum install -y nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;exec形式&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;RUN [&amp;quot;yum&amp;quot;, &amp;quot;install&amp;quot;, &amp;quot;-y&amp;quot;, &amp;quot;nginx&amp;quot;]
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;EXPOSE指令&quot;&gt;&lt;a href=&quot;#EXPOSE指令&quot; class=&quot;headerlink&quot; title=&quot;EXPOSE指令&quot;&gt;&lt;/a&gt;EXPOSE指令&lt;/h3&gt;&lt;p&gt;告诉docker该容器内的应用程序将会指定端口，但是这并不意味着我们可以自动访问该容器内服务的端口。出于安全的原因，docker并不会自动打开该端口。而是需要我们在使用docker run的时候通过-p参数指定需要打开哪些端口。我们可以使用多个EXPOSE指令向外部暴露多个端口。注意不可以在dockerfile中指定端口映射关系。比如EXPOSE 80，这条指令是对的，而EXPOSE 8080:80这条指令就是错的。&lt;br&gt;【注意】:这会影响docker的可移植性。我们应该在docker run命令中使用-p参数实现端口映射。&lt;/p&gt;
+&lt;h3 id=&quot;CMD指令&quot;&gt;&lt;a href=&quot;#CMD指令&quot; class=&quot;headerlink&quot; title=&quot;CMD指令&quot;&gt;&lt;/a&gt;CMD指令&lt;/h3&gt;&lt;p&gt;CMD 指令允许用户指定容器启动的默认执行的命令。此命令会在容器启动且 docker run 没有指定其他命令时运行。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果 docker run 指定了其他命令，CMD 指定的默认命令将被忽略。&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;如果 Dockerfile 中有多个 CMD 指令，只有最后一个 CMD 有效。&lt;br&gt;CMD 有三种格式：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Exec 格式：CMD [&amp;quot;executable&amp;quot;,&amp;quot;param1&amp;quot;,&amp;quot;param2&amp;quot;] 这是 CMD 的推荐格式。
+CMD [&amp;quot;param1&amp;quot;,&amp;quot;param2&amp;quot;] 为 ENTRYPOINT 提供额外的参数，此时 ENTRYPOINT 必须使用 Exec 格式。
+Shell 格式：CMD command param1 param2
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;第一种格式：运行一个可执行的文件并提供参数。&lt;br&gt;第二种格式 CMD [“param1”,”param2”] 要与 Exec 格式 的 ENTRYPOINT 指令配合使用，其用途是为 ENTRYPOINT 设置默认的参数。&lt;br&gt;第三种格式：是以”/bin/sh -c”的方法执行的命令。&lt;/p&gt;
+&lt;p&gt;下面看看 CMD 是如何工作的。Dockerfile 片段如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;CMD echo &amp;quot;Hello world&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行容器 docker run -it [image] 将输出：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Hello world
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;但当后面加上一个命令，比如 docker run -it [image] /bin/bash，CMD 会被忽略掉，命令 bash 将被执行：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@76a5fd777648 /]# 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】:使用CMD指令时，最好使用数组语法。&lt;/p&gt;
+&lt;h3 id=&quot;ENTRYPOIN指令&quot;&gt;&lt;a href=&quot;#ENTRYPOIN指令&quot; class=&quot;headerlink&quot; title=&quot;ENTRYPOIN指令&quot;&gt;&lt;/a&gt;ENTRYPOIN指令&lt;/h3&gt;&lt;p&gt;ENTRYPOINT 看上去与 CMD 很像，它们都可以指定要执行的命令及其参数。不同的地方在于 ENTRYPOINT 不会被忽略，一定会被执行，即使运行 docker run 时指定了其他命令。&lt;br&gt;实际上docker run命令行中指定的任何参数都会被当作参数再次传递给ENTRYPOINT指令中指定的命令。&lt;br&gt;ENTRYPOINT 有两种格式：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Exec 格式：ENTRYPOINT [&amp;quot;executable&amp;quot;, &amp;quot;param1&amp;quot;, &amp;quot;param2&amp;quot;] 这是 ENTRYPOINT 的推荐格式。
+Shell 格式：ENTRYPOINT command param1 param2
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在为 ENTRYPOINT 选择格式时必须小心，因为这两种格式的效果差别很大。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;ENTRYPOINT [&amp;quot;/usr/sbin/nginx&amp;quot;, &amp;quot;-g&amp;quot;, &amp;quot;daemon off;&amp;quot;]
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;Exec-格式&quot;&gt;&lt;a href=&quot;#Exec-格式&quot; class=&quot;headerlink&quot; title=&quot;Exec 格式&quot;&gt;&lt;/a&gt;Exec 格式&lt;/h4&gt;&lt;p&gt;ENTRYPOINT 的 Exec 格式用于设置要执行的命令及其参数，同时可通过 CMD 提供额外的参数。&lt;br&gt;ENTRYPOINT 中的参数始终会被使用，而 CMD 的额外参数可以在容器启动时动态替换掉。&lt;br&gt;比如下面的 Dockerfile 片段：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;ENTRYPOINT [&amp;quot;/bin/echo&amp;quot;, &amp;quot;Hello&amp;quot;]  
+CMD [&amp;quot;world&amp;quot;]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;当容器通过 docker run -it [image] 启动时，输出为：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Hello world
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;而如果通过 docker run -it [image] CloudMan 启动，则输出为：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Hello CloudMan
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;Shell-格式&quot;&gt;&lt;a href=&quot;#Shell-格式&quot; class=&quot;headerlink&quot; title=&quot;Shell 格式&quot;&gt;&lt;/a&gt;Shell 格式&lt;/h4&gt;&lt;p&gt;ENTRYPOINT 的 Shell 格式会忽略任何 CMD 或 docker run 提供的参数。&lt;br&gt;&lt;strong&gt;【注意】:使用CMD和ENTRYPOINT时，请务必使用数组语法。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;【总结】：&lt;/strong&gt;&lt;br&gt;1.使用 RUN 指令安装应用和软件包，构建镜像。&lt;br&gt;2.如果想为容器设置默认的启动命令，可使用 CMD 指令。用户可在 docker run 命令行中替换此默认命令。&lt;br&gt;3.如果 Docker 镜像的用途是运行应用程序或服务，比如运行一个 MySQL，应该优先使用 Exec 格式的 ENTRYPOINT 指令。CMD 可为 ENTRYPOINT 提供额外的默认参数，同时可利用 docker run 命令行替换默认参数。&lt;/p&gt;
+&lt;h2 id=&quot;示例1：构建Nginx镜像&quot;&gt;&lt;a href=&quot;#示例1：构建Nginx镜像&quot; class=&quot;headerlink&quot; title=&quot;示例1：构建Nginx镜像&quot;&gt;&lt;/a&gt;示例1：构建Nginx镜像&lt;/h2&gt;&lt;p&gt;创建一个目录单独存放各种Dockerfile：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# mkdir /opt/docker-file
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;创建Nginx目录存放Nginx Dockerfile和相关文件：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# mkdir nginx
+[root@node1 ~]# cd nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;上传openresty-1.9.7.3.tar.gz到Nginx目录下，编写Dockerfile文件：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 nginx]# vim Dockerfile
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;该Dockerfile内容如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# This dockerfile is for openresty
+# Version 1.0
+
+# Base images. 
+FROM centos:centos7
+
+# Author.
+MAINTAINER jkzhao &amp;lt;01115004@wisedu.com&amp;gt;
+
+# Add openresty software.
+ADD openresty-1.9.7.3.tar.gz /usr/local
+
+# Define working directory.
+WORKDIR /usr/local/openresty-1.9.7.3
+
+# Install epel repo
+RUN rpm -ivh http://mirrors.aliyun.com/epel/epel-release-latest-7.noarch.rpm
+
+# Install openresty.
+RUN yum install -y readline-devel pcre-devel openssl-devel gcc perl make 
+RUN ./configure &amp;amp;&amp;amp; gmake &amp;amp;&amp;amp; gmake install
+RUN sed -i &amp;apos;1 i\daemon off;&amp;apos; /usr/local/openresty/nginx/conf/nginx.conf
+RUN sed -i &amp;apos;s@#error_log  logs\/error.log;@error_log logs\/error.log debug;@&amp;apos; /usr/local/openresty/nginx/conf/nginx.conf
+
+# Define environment variables.
+ENV PATH /usr/local/openresty/nginx/sbin:$PATH
+
+# Define default command. 
+CMD [&amp;quot;nginx&amp;quot;]
+
+# Expose ports.
+EXPOSE 80
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;利用该Dockerfile构建镜像：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 nginx]# docker build -t jkzhao/mynginx:v2 /opt/docker-file/nginx/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看构建的镜像：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 nginx]# docker images
+REPOSITORY                              TAG                 IMAGE ID            CREATED             SIZE
+jkzhao/mynginx                          v2                  f61afc8ce858        17 minutes ago      581.6 MB
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;基于镜像启动容器：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 nginx]# docker run -d -p 84:80 jkzhao/mynginx:v2   
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;访问Nginx服务：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/20.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;如果dockerfile中某条指令执行失败了，没有正常结束，那么我们也将得到一个可以使用的镜像。这对调试非常有帮助，我们可以基于该镜像，运行一个具有交互功能的容器，使用最后创建的镜像对为什么我们的指令会失败进行调试。&lt;/p&gt;
+&lt;h2 id=&quot;示例2：基于CentOS7构建一个Ruby运行环境&quot;&gt;&lt;a href=&quot;#示例2：基于CentOS7构建一个Ruby运行环境&quot; class=&quot;headerlink&quot; title=&quot;示例2：基于CentOS7构建一个Ruby运行环境&quot;&gt;&lt;/a&gt;示例2：基于CentOS7构建一个Ruby运行环境&lt;/h2&gt;&lt;p&gt;创建Ruby目录存放Ruby Dockerfile和相关文件：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# mkdir ruby
+[root@node1 ~]# cd ruby
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;该Dockerfile内容如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;FROM centos:7  
+
+MAINTAINER jkzhao &amp;lt;01115004@wisedu.com&amp;gt;
+
+# 为镜像添加备注信息
+LABEL version=&amp;quot;2.2.2&amp;quot; lang=&amp;quot;ruby&amp;quot;
+
+ENV RUBY_MAJOR 2.2
+ENV RUBY_VERSION 2.2.2
+
+RUN yum install -y wget tar gcc g++ make automake autoconf curl-devel openssl-devel zlib-devel httpd-devel apr-devel apr-util-devel sqlite-devel
+
+RUN cd /tmp \
+    &amp;amp;&amp;amp; wget http://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.2.tar.gz \
+    &amp;amp;&amp;amp; tar zxvf ruby-2.2.2.tar.gz \
+    &amp;amp;&amp;amp; cd ruby-2.2.2 \
+    &amp;amp;&amp;amp; autoconf \
+    &amp;amp;&amp;amp; ./configure --disable-install-doc \
+    &amp;amp;&amp;amp; make \
+    &amp;amp;&amp;amp; make install \
+    &amp;amp;&amp;amp; rm -rf /tmp/ruby-2.2.2*
+
+# skip installing gem documentation
+RUN echo -e &amp;apos;install: --no-document\nupdate: --no-document&amp;apos; &amp;gt;&amp;gt; &amp;quot;$HOME/.gemrc&amp;quot;
+
+ENV GEM_HOME /usr/local/bundle
+ENV PATH $GEM_HOME/bin:$PATH
+
+ENV BUNDLER_VERSION 1.10.6
+
+RUN gem install bundler --version &amp;quot;$BUNDLER_VERSION&amp;quot; \
+ &amp;amp;&amp;amp; bundle config --global path &amp;quot;$GEM_HOME&amp;quot; \
+ &amp;amp;&amp;amp; bundle config --global bin &amp;quot;$GEM_HOME/bin&amp;quot;
+
+# don&amp;apos;t create &amp;quot;.bundle&amp;quot; in all our apps
+ENV BUNDLE_APP_CONFIG $GEM_HOME
+
+CMD [ &amp;quot;irb&amp;quot; ]
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;构建缓存&quot;&gt;&lt;a href=&quot;#构建缓存&quot; class=&quot;headerlink&quot; title=&quot;构建缓存&quot;&gt;&lt;/a&gt;构建缓存&lt;/h2&gt;&lt;p&gt;dockerfile构建镜像过程非常聪明，它会将每一步的构建结果提交为一个镜像，我们可以将之前指令创建的镜像层看做缓存，比如第5条指令由于命令书写错误而导致构建失败，当我们修改它之后，前面的4条指令不会再执行，而是直接使用之前构建过程中保存的缓存。这样速度会提高很多，大大减少了构建的时间。&lt;br&gt;然而有时候我们要确保构建过程中不会使用缓存，比如对yum update等操作，要想跳过缓存，&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;docker build no-cache
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;缓存还有个好处，就是调试方便。比如第5条指令失败了，那么我们可以基于第4条指令创建的镜像启动一个新的容器。在容器里手工执行第5条指令所要的操作，调查指令失败的原因。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Dockerfile介绍&quot;&gt;&lt;a href=&quot;#Dockerfile介绍&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile介绍&quot;&gt;&lt;/a&gt;Dockerfile介绍&lt;/h2&gt;&lt;p&gt;dockerfile是构建镜像的说明书。dockerfile
+    
+    </summary>
+    
+      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+    
+    
+      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
+    
+  </entry>
   
   <entry>
     <title>手动构建镜像</title>
@@ -2950,234 +3123,6 @@ Redirecting to /bin/systemctl start  haproxy.service
     
     
       <category term="消息队列" scheme="http://yoursite.com/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Kafka介绍及安装部署</title>
-    <link href="http://yoursite.com/2017/05/28/Kafka%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
-    <id>http://yoursite.com/2017/05/28/Kafka介绍及安装部署/</id>
-    <published>2017-05-28T11:46:22.000Z</published>
-    <updated>2017-07-15T02:11:35.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;消息中间件&quot;&gt;&lt;a href=&quot;#消息中间件&quot; class=&quot;headerlink&quot; title=&quot;消息中间件&quot;&gt;&lt;/a&gt;消息中间件&lt;/h2&gt;&lt;p&gt;消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;消息中间件特点&quot;&gt;&lt;a href=&quot;#消息中间件特点&quot; class=&quot;headerlink&quot; title=&quot;消息中间件特点&quot;&gt;&lt;/a&gt;消息中间件特点&lt;/h2&gt;&lt;p&gt;1.采用异步处理模式&lt;br&gt;消息发送者可以发送一个消息而无须等待响应。消息发送者将消息发送到一条虚拟的通道（主题或者队列）上，消息接收者则订阅或者监听该通道。一条消息可能最终转发给一个或多个消息接收者，这些接收者都无需对消息发送者做出同步回应。整个过程是异步的。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;比如用户信息注册。注册完成后过段时间发送邮件或者短信。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;2.应用程序和应用程序调用关系为松耦合关系&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;发送者和接收者不必要了解对方、只需要确认消息&lt;/li&gt;
-&lt;li&gt;发送者和接收者不必同时在线&lt;br&gt;比如在线交易系统为了保证数据的最终一致，在支付系统处理完成后会把支付结果放到信息中间件里通知订单系统修改订单支付状态。两个系统通过消息中间件解耦。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;消息中间件的传递模型&quot;&gt;&lt;a href=&quot;#消息中间件的传递模型&quot; class=&quot;headerlink&quot; title=&quot;消息中间件的传递模型&quot;&gt;&lt;/a&gt;消息中间件的传递模型&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.点对点模型(PTP)&lt;/strong&gt;&lt;br&gt;点对点模型用于消息生产者和消息消费者之间点对点的通信。消息生产者将消息发送到由某个名字标识的特定消费者。这个名字实际上对应于消费服务中的一个队列(Queue)，在消息传递给消费者之前它被存储在这个队列中。队列消息可以放在内存中也可以是持久的，以保证在消息服务出现故障时仍然能够传递消息。&lt;br&gt;点对点模型特性：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;每个消息只有一个消费者&lt;/li&gt;
-&lt;li&gt;发送者和接受者没有时间依赖&lt;/li&gt;
-&lt;li&gt;接受者确认消息接受和处理成功&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/1.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;2.发布—订阅模型(Pub/Sub)&lt;/strong&gt;&lt;br&gt;发布者/订阅者模型支持向一个特定的消息主题生产消息。0或多个订阅者可能对接收来自特定消息主题的消息感兴趣。在这种模型下，发布者和订阅者彼此不知道对方。这种模式好比是匿名公告板。这种模式被概括为：多个消费者可以获得消息。在发布者和订阅者之间存在时间依赖性。发布者需要建立一个订阅(subscription)，以便能够让消费者订阅。订阅者必须保持持续的活动状态以接收消息，除非订阅者建立了持久的订阅。在这种情况下，在订阅者未连接时发布的消息将在订阅者重新连接时重新发布。&lt;br&gt;其实消息中间件，像MySQL其实也可以作为消息中间件，只要你把消息中间件原理搞清楚，你会发现目前所有的存储，包括NoSQL，只要支持顺序性东西的，就可以作为一个消息中间件。就看你怎么去利用它了。就像redis里面那个队列list，就可以作为一个消息队列。&lt;br&gt;发布—订阅模型特性：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;每个消息可以有多个订阅者&lt;/li&gt;
-&lt;li&gt;客户端只有订阅后才能接收到消息&lt;/li&gt;
-&lt;li&gt;持久订阅和非持久订阅&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(1)发布者和订阅者有时间依赖&lt;br&gt;接收者和发布者只有建立订阅关系才能收到消息。&lt;br&gt;(2)持久订阅&lt;br&gt;订阅关系建立后，消息就不会消失，不管订阅者是否在线。&lt;br&gt;(3)非持久订阅&lt;br&gt;订阅者为了接收消息，必须一直在线&lt;br&gt;当只有一个订阅者时约等于点对点模式。&lt;br&gt;&lt;strong&gt;大部分情况下会使用持久订阅。常用的消息队列有Kafka、RabbitMQ、ActiveMQ、metaq等&lt;/strong&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;Kafka介绍&quot;&gt;&lt;a href=&quot;#Kafka介绍&quot; class=&quot;headerlink&quot; title=&quot;Kafka介绍&quot;&gt;&lt;/a&gt;Kafka介绍&lt;/h2&gt;&lt;p&gt;Kafka是一种分布式消息系统，由LinkedIn使用Scala编写，用作LinkedIn的活动流(Activity Stream)和运营数据处理管道(Pipeline)的基础，具有高水平扩展和高吞吐量。&lt;br&gt;目前越来越多的开源分布式处理系统如Apache flume、Apache Storm、Spark、Elasticsearch都支持与Kafka集成。&lt;/p&gt;
-&lt;h2 id=&quot;安装部署Kafka集群&quot;&gt;&lt;a href=&quot;#安装部署Kafka集群&quot; class=&quot;headerlink&quot; title=&quot;安装部署Kafka集群&quot;&gt;&lt;/a&gt;安装部署Kafka集群&lt;/h2&gt;&lt;h3 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h3&gt;&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;主机名&lt;/th&gt;
-&lt;th&gt;操作系统版本&lt;/th&gt;
-&lt;th&gt;IP地址&lt;/th&gt;
-&lt;th&gt;安装软件&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;log1&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;114.55.29.86&lt;/td&gt;
-&lt;td&gt;JDK1.7、kafka_2.11-0.9.0.1&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;log2&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;114.55.29.241&lt;/td&gt;
-&lt;td&gt;JDK1.7、kafka_2.11-0.9.0.1&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;log3&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;114.55.253.15&lt;/td&gt;
-&lt;td&gt;JDK1.7、kafka_2.11-0.9.0.1&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id=&quot;安装JDK1-7&quot;&gt;&lt;a href=&quot;#安装JDK1-7&quot; class=&quot;headerlink&quot; title=&quot;安装JDK1.7&quot;&gt;&lt;/a&gt;安装JDK1.7&lt;/h3&gt;&lt;p&gt;3台机器都需要安装JDK1.7。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 local]# mkdir /usr/java
-[root@log1 local]# tar zxf jdk-7u80-linux-x64.gz -C /usr/java/
-[root@log1 local]# vim /etc/profile
-export JAVA_HOME=/usr/java/jdk1.7.0_80
-export PATH=$JAVA_HOME/bin:$PATH
-export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-[root@log1 local]# source /etc/profile
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装集群&quot;&gt;&lt;a href=&quot;#安装集群&quot; class=&quot;headerlink&quot; title=&quot;安装集群&quot;&gt;&lt;/a&gt;安装集群&lt;/h3&gt;&lt;p&gt;需要先安装好Zookeeper集群，见之前的文章《Zookeeper介绍及安装部署》。&lt;br&gt;1.创建消息持久化目录&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 ~]# mkdir /kafkaLogs
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.下载解压kafka，版本是kafka_2.11-0.9.0.1&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 local]# wget http://mirrors.cnnic.cn/apache/kafka/0.9.0.1/kafka_2.11-0.9.0.1.tgz
-[root@log1 local]# tar zxf kafka_2.11-0.9.0.1.tgz
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.修改配置&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 local]# cd kafka_2.11-0.9.0.1/config/
-[root@log1 config]# vim server.properties
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(1)修改broker.id&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(2)修改kafka监听地址&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;注意: advertised.host.name参数用来配置返回的host.name值，把这个参数配置为IP地址。这样客户端在使用java.net.InetAddress.getCanonicalHostName()获取时拿到的就是ip地址而不是主机名。&lt;/strong&gt;&lt;br&gt;(3)修改消息持久化目录&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(4)修改zk地址&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(5)添加启用删除topic配置&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;(6)关闭自动创建topic&lt;br&gt;是否允许自动创建topic。如果设为true，那么produce，consume或者fetch metadata一个不存在的topic时，就会自动创建一个默认replication factor和partition number的topic。默认是true。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;auto.create.topics.enable=false
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/8.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;4.把log1的配置好的kafka拷贝到log2和log3上&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 local]# scp -rp kafka_2.11-0.9.0.1 root@114.55.29.241:/usr/local/
-[root@log1 local]# scp -rp kafka_2.11-0.9.0.1 root@114.55.253.15:/usr/local/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.log2和log3主机上创建消息持久化目录&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log2 ~]# mkdir /kafkaLogs
-[root@log3 ~]# mkdir /kafkaLogs
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;6.修改log2配置文件中的broker.id为1，log3主机的为2&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log2 config]# vim server.properties
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/9.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;启动集群&quot;&gt;&lt;a href=&quot;#启动集群&quot; class=&quot;headerlink&quot; title=&quot;启动集群&quot;&gt;&lt;/a&gt;启动集群&lt;/h3&gt;&lt;p&gt;log1主机启动kafka：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 ~]# cd /usr/local/kafka_2.11-0.9.0.1/
-[root@log1 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/10.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;log2主机启动kafka：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log2 ~]# cd /usr/local/kafka_2.11-0.9.0.1/
-[root@log2 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;log3主机启动kafka：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log3 ~]# cd /usr/local/kafka_2.11-0.9.0.1/
-[root@log3 kafka_2.11-0.9.0.1]# JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;脚本定期清理logs下的日志文件&quot;&gt;&lt;a href=&quot;#脚本定期清理logs下的日志文件&quot; class=&quot;headerlink&quot; title=&quot;脚本定期清理logs下的日志文件&quot;&gt;&lt;/a&gt;脚本定期清理logs下的日志文件&lt;/h3&gt;&lt;p&gt;默认kafka是按天切割日志的，而且不删除：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/11.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这里写一个简单的脚本来清理这些日志，主要是清理server.log和controller.log。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 ~]# cd /usr/local/kafka_2.11-0.9.0.1/
-[root@log1 kafka_2.11-0.9.0.1]# vim clean_kafkalog.sh
-#!/bin/bash
-###Description:This script is used to clear kafka logs, not message file.
-###Written by: jkzhao - jkzhao@wisedu.com  
-###History: 2016-04-18 First release.
-
-# log file dir.
-logDir=/usr/local/kafka_2.11-0.9.0.1/logs
-
-# Reserved 7 files.
-COUNT=7
-
-ls -t $logDir/server.log* | tail -n +$[$COUNT+1] | xargs rm -f
-ls -t $logDir/controller.log* | tail -n +$[$COUNT+1] | xargs rm -f
-ls -t $logDir/state-change.log* | tail -n +$[$COUNT+1] | xargs rm -f
-ls -t $logDir/log-cleaner.log* | tail -n +$[$COUNT+1] | xargs rm –f
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;赋予脚本执行权限：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 kafka_2.11-0.9.0.1]# chmod +x clean_kafkalog.sh
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;周期性任务策略：每周日的0点0分去执行这个脚本。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 logs]# crontab -e
-0 0 * * 0 /usr/local/kafka_2.11-0.9.0.1/clean_kafkalog.sh
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/12.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;把清理日志的脚本拷贝到第二台和第三台主机：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 kafka_2.11-0.9.0.1]# scp -p clean_kafkalog.sh root@114.55.29.241:/usr/local/kafka_2.11-0.9.0.1
-[root@log1 kafka_2.11-0.9.0.1]# scp -p clean_kafkalog.sh root@114.55.253.15:/usr/local/kafka_2.11-0.9.0.1
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;同样的需要配置周期性任务策略。&lt;/p&gt;
-&lt;h3 id=&quot;停止kafka命令&quot;&gt;&lt;a href=&quot;#停止kafka命令&quot; class=&quot;headerlink&quot; title=&quot;停止kafka命令&quot;&gt;&lt;/a&gt;停止kafka命令&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@log1 ~]# /usr/local/kafka_2.11-0.9.0.1/bin/kafka-server-stop.sh
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;测试集群&quot;&gt;&lt;a href=&quot;#测试集群&quot; class=&quot;headerlink&quot; title=&quot;测试集群&quot;&gt;&lt;/a&gt;测试集群&lt;/h3&gt;&lt;p&gt;1.log1主机上创建一个名为test的topic&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 kafka_2.11-0.9.0.1]# bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.log2和log3主机上利用命令行工具创建一个consumer程序&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log2 kafka_2.11-0.9.0.1]# bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic test --from-beginning
-[root@log2 kafka_2.11-0.9.0.1]# bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic test --from-beginning
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.log1主机上利用命令行工具创建一个producer程序&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 kafka_2.11-0.9.0.1]# bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;log1主机上终端输入message，然后到log2和log3主机的终端查看&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/14.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;创建生产环境topic&quot;&gt;&lt;a href=&quot;#创建生产环境topic&quot; class=&quot;headerlink&quot; title=&quot;创建生产环境topic&quot;&gt;&lt;/a&gt;创建生产环境topic&lt;/h3&gt;&lt;p&gt;如果kafka集群是3台，我们创建一个名为business的Topic，如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 2 --partitions 3 --topic business
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;注意:为Topic创建分区时，–partitions(分区数)最好是broker数量的整数倍，这样才能使一个Topic的分区均匀的分布在整个Kafka集群中。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;Kafka常用命令&quot;&gt;&lt;a href=&quot;#Kafka常用命令&quot; class=&quot;headerlink&quot; title=&quot;Kafka常用命令&quot;&gt;&lt;/a&gt;Kafka常用命令&lt;/h3&gt;&lt;p&gt;1.启动kafka&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;nohup bin/kafka-server-start.sh config/server.properties &amp;gt; /dev/null 2&amp;gt;&amp;amp;1 &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.查看topic&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;bin/kafka-topics.sh --list --zookeeper localhost:2181
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.控制台消费&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic middleware --from-beginning
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.删除topic&lt;br&gt;(1)删除kafka存储目录（server.properties文件log.dirs配置，默认为”/tmp/kafka-logs”）相关topic目录&lt;br&gt;(2)如果配置了delete.topic.enable=true直接通过命令删除，如果命令删除不掉，直接通过zookeeper-client 删除掉”/brokers/topics/“目录下相关topic节点。&lt;br&gt;&lt;strong&gt;注意: 如果你要删除一个topic并且重建，那么必须重新启动kafka，否则新建的topic在zookeeper的/brokers/topics/test-topic/目录下没有partitions这个目录，也就是没有分区信息。&lt;/strong&gt;&lt;/p&gt;
-&lt;h2 id=&quot;安装Yahoo-kafka-manager&quot;&gt;&lt;a href=&quot;#安装Yahoo-kafka-manager&quot; class=&quot;headerlink&quot; title=&quot;安装Yahoo kafka manager&quot;&gt;&lt;/a&gt;安装Yahoo kafka manager&lt;/h2&gt;&lt;h3 id=&quot;Yahoo-kafka-manager介绍&quot;&gt;&lt;a href=&quot;#Yahoo-kafka-manager介绍&quot; class=&quot;headerlink&quot; title=&quot;Yahoo kafka manager介绍&quot;&gt;&lt;/a&gt;Yahoo kafka manager介绍&lt;/h3&gt;&lt;p&gt;项目地址：&lt;a href=&quot;https://github.com/yahoo/kafka-manager&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/yahoo/kafka-manager&lt;/a&gt;&lt;br&gt;Requirements：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Kafka 0.8.1.1 or 0.8.2.*&lt;/li&gt;
-&lt;li&gt;sbt 0.13.x&lt;/li&gt;
-&lt;li&gt;Java 8+&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Kafka Manager是一个管控台，这款工具主要支持以下几个功能：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;管理多个不同的集群；&lt;/li&gt;
-&lt;li&gt;很容易地检查集群的状态(topics, brokers, 副本的分布, 分区的分布)；&lt;/li&gt;
-&lt;li&gt;选择副本；&lt;/li&gt;
-&lt;li&gt;产生分区分配(Generate partition assignments)基于集群的当前状态；&lt;/li&gt;
-&lt;li&gt;重新分配分区。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;环境信息-1&quot;&gt;&lt;a href=&quot;#环境信息-1&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h3&gt;&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;主机名&lt;/th&gt;
-&lt;th&gt;操作系统版本&lt;/th&gt;
-&lt;th&gt;IP地址&lt;/th&gt;
-&lt;th&gt;安装软件&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;console&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;114.55.29.246&lt;/td&gt;
-&lt;td&gt;JDK1.8、kafka-manager-1.3.0.6.zip&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;Kafka Manager可以装在任何一台机器上，我这里部署在一台单独的机器上。&lt;/p&gt;
-&lt;h3 id=&quot;安装jdk1-8&quot;&gt;&lt;a href=&quot;#安装jdk1-8&quot; class=&quot;headerlink&quot; title=&quot;安装jdk1.8&quot;&gt;&lt;/a&gt;安装jdk1.8&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@console local]# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;配置PATH环境变量:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console ~]# vim /etc/profile
-export JAVA_HOME=/usr/java/jdk1.8.0_73
-export PATH=$JAVA_HOME/bin:$PATH
-export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装sbt0-13-9&quot;&gt;&lt;a href=&quot;#安装sbt0-13-9&quot; class=&quot;headerlink&quot; title=&quot;安装sbt0.13.9&quot;&gt;&lt;/a&gt;安装sbt0.13.9&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@console ~]# curl https://bintray.com/sbt/rpm/rpm | sudo tee /etc/yum.repos.d/bintray-sbt-rpm.repo
-[root@console ~]# yum install -y sbt
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;构建kafka-manager包&quot;&gt;&lt;a href=&quot;#构建kafka-manager包&quot; class=&quot;headerlink&quot; title=&quot;构建kafka manager包&quot;&gt;&lt;/a&gt;构建kafka manager包&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@console ~]# git clone https://github.com/yahoo/kafka-manager.git
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/15.png&quot; alt=&quot;&quot;&gt;    &lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console ~]# unzip -oq kafka-manager-upgrade-to-90.zip
-[root@console ~]# mv kafka-manager-upgrade-to-90 kafka-manager
-[root@console ~]# cd kafka-manager
-[root@console kafka-manager]# sbt clean dist
-The command below will create a zip file which can be used to deploy the application. 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;使用sbt编译打包的时候时间可能会比较长。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/16.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这个需要翻墙才能完成。配置代理：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console ~]# vim /usr/share/sbt-launcher-packaging/conf/sbtconfig.txt
--Dhttp.proxyHost=proxy
--Dhttp.proxyPort=8080
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;再次运行这个命令，依然需要等待较长的时间，有可能还会失败。如果失败就多次尝试打包：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console kafka-manager]# sbt clean dist
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/17.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/18.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;打包完成后会创建一个zip压缩包，而这个压缩包可以用来部署该应用。生成的包会在kafka-manager/target/universal 下面。生成的包只需要java环境就可以运行了，在以后部署到其他机器上不需要安装sbt进行打包构建了。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/19.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;安装kafka-manager&quot;&gt;&lt;a href=&quot;#安装kafka-manager&quot; class=&quot;headerlink&quot; title=&quot;安装kafka manager&quot;&gt;&lt;/a&gt;安装kafka manager&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@console kafka-manager]# cp target/universal/kafka-manager-1.3.0.6.zip ~/
-[root@console kafka-manager]# cd
-[root@console ~]# unzip -oq kafka-manager-1.3.0.6.zip
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置kafka-manager&quot;&gt;&lt;a href=&quot;#配置kafka-manager&quot; class=&quot;headerlink&quot; title=&quot;配置kafka-manager&quot;&gt;&lt;/a&gt;配置kafka-manager&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@console ~]# cd kafka-manager-1.3.0.6/
-[root@console kafka-manager-1.3.0.6]# vim conf/application.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;设置zkhosts：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;kafka-manager.zkhosts=&amp;quot;114.55.29.246:2181,114.55.29.86:2181,114.55.29.241:2181&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/20.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;启动kafka-manager&quot;&gt;&lt;a href=&quot;#启动kafka-manager&quot; class=&quot;headerlink&quot; title=&quot;启动kafka-manager&quot;&gt;&lt;/a&gt;启动kafka-manager&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@console kafka-manager-1.3.0.6]# bin/kafka-manager
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/21.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;默认监听的端口是9000。你也可以在启动时指定配置文件和监听端口：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# bin/kafka-manager -Dconfig.file=/path/to/application.conf -Dhttp.port=8080
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动并置于后台运行：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[kmanager@console kafka-manager-1.3.0.6]$ nohup bin/kafka-manager &amp;gt; /dev/null 2&amp;gt;&amp;amp;1 &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;kafka-manager添加kafka-cluster&quot;&gt;&lt;a href=&quot;#kafka-manager添加kafka-cluster&quot; class=&quot;headerlink&quot; title=&quot;kafka-manager添加kafka cluster&quot;&gt;&lt;/a&gt;kafka-manager添加kafka cluster&lt;/h2&gt;&lt;p&gt;浏览器输入地址访问：&lt;a href=&quot;http://114.55.29.246:9000/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://114.55.29.246:9000/&lt;/a&gt;&lt;br&gt;&lt;strong&gt;注意:安装完成后需要手动添加Cluster。添加Cluster是指添加一个已有的Kafka集群进入监控列表，而非通过Kafka Manager部署一个新的Kafka Cluster，这一点与Cloudera Manager不同。&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/22.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/23.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/24.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/25.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kafka/26.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;消息中间件&quot;&gt;&lt;a href=&quot;#消息中间件&quot; class=&quot;headerlink&quot; title=&quot;消息中间件&quot;&gt;&lt;/a&gt;消息中间件&lt;/h2&gt;&lt;p&gt;消息中间件是在消息的传输过程中保存消息的容器。消息中间件在将消息从消息生产者到消费者时充当中间人的作用。队列的主要目的是提供路由并保证消息的传送；如果发送消息时接收者不可用，消息对列会保留消息，直到可以成功地传递它为止，当然，消息队列保存消息也是有期限的。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="消息队列" scheme="http://yoursite.com/categories/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/"/>
-    
-    
-      <category term="消息队列 Kafka 大数据" scheme="http://yoursite.com/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97-Kafka-%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
     
   </entry>
   
