@@ -112,7 +112,7 @@
 <meta property="og:site_name" content="jkzhao&#39;s blog">
 <meta property="og:description" content="背景在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-29T01:50:34.000Z">
+<meta property="og:updated_time" content="2017-08-29T02:08:52.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CentOS安装Docker CE">
 <meta name="twitter:description" content="背景在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how">
@@ -341,7 +341,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-08-29T09:50:34+08:00" content="2017-08-29">
+              <time itemprop="dateUpdated" datetime="2017-08-29T10:08:52+08:00" content="2017-08-29">
               2017-08-29
               </time>
               </span>
@@ -403,7 +403,29 @@
       
         <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how registries are handled.”，并且建议我尝试较新的版本。在2017年4月份的DockerCon会议上，Docker公司直接将 Github 上原隶属于 Docker 组织的 Docker 项目，直接 transfer 到了一个新的、名叫 Moby 的组织下，并将其重命名为 Moby 项目。由此先来了解下这个Moby项目。<br><a id="more"></a></p>
 <h2 id="Moby项目"><a href="#Moby项目" class="headerlink" title="Moby项目"></a>Moby项目</h2><p>为什么会产生Moby这个项目呢？可以看到最近几年里面，在2015年之后的Docker 1.17版本之后，引入了很多的新特性，比如Network、runC等，Docker的组件越来越多，提供支持的场景也越来越复杂，比如微服务、机器学习、物联网等，所以Docker镜像的下载量也呈现指数型上升，最终Docker运行的环境，也是越来越复杂，越来越多，比如在Linux，Windows，还有在嵌入式设备上。<br>所以Docker原本的发行版本已经不能适配于这些越来越复杂的场景了，举个例子，其实在IoT里面，树莓派的性能是比较好的，但是它去运行Docker的话，Docker就会占整个性能的一大部分，这样它上面就已经无法运行其他的一些自己的应用了，那用户要怎么去解决这些事情，难道自己去再写一个Docker容器引擎吗？这个成本是很高的，需要自己去造轮子。所以为了提供更加开放的生态，Docker公司把Docker项目中现在的一些组件抽象成Moby项目，这样系统构建者就可以通过Moby项目把现有的组件去进行组装，然后组装成自己所需要的一个容器引擎。<br>Moby项目现在有80多个组件，通过这些组件，用户可以避免重复地去造轮子。用户可以按照自己的需要去组装组件，做出自己的一个容器系统。这些组件有一个标准化的调用方式，他们之间通过gRPC通信，它的语言也是可以去定制的，不会像之前一样必须用Go语言去写。通过标准化的方式，通过Moby这个项目就可以把这些组件进行组合，成为自己所依赖的容器系统。<br>Docker项目现在改名成Moby项目，但是Docker会逐渐的从Moby项目中去抽象和剥离出来，作为Moby的一种组装方式，比如Docker依赖于这里面的一些库，它就特化成一种组装，组装成自己的Docker CE的版本，也就是Docker的社区版。Docker社区版后面也会继续做开源，所以用户和开发者不需要担心以后用Docker就会收费了，对于Docker用户来说，他也无须感知用户接口的变化，使用的命令还是Docker不是Moby，需要更多运维支持的可以选择Docker EE的版本，让Docker公司的工程师去替你去做运维和更复杂的线上支持，如果自己开发可以继续选择Docker社区版。对于架构师而言，现在就可以不强依赖于Docker项目，而是通过这些组件去拼装出来一个容器引擎去满足自己的需求。</p>
-<h2 id="安装Docker-CE"><a href="#安装Docker-CE" class="headerlink" title="安装Docker CE"></a>安装Docker CE</h2><h3 id="版本说明"><a href="#版本说明" class="headerlink" title="版本说明"></a>版本说明</h3><p>2017年2月份，Docker公司发布了全新的Docker版本：V1.13.0。从2017年3月1号开始，Docker的版本命名发生如下变化：<br>| 项目 | 说明 |<br>| ——| —— |<br>| 版本格式 | YY.MM |<br>| stable版本 | 每个季度发行 |<br>| edge版本 | 每个月发行 |</p>
+<h2 id="安装Docker-CE"><a href="#安装Docker-CE" class="headerlink" title="安装Docker CE"></a>安装Docker CE</h2><h3 id="版本说明"><a href="#版本说明" class="headerlink" title="版本说明"></a>版本说明</h3><p>2017年2月份，Docker公司发布了全新的Docker版本：V1.13.0。从2017年3月1号开始，Docker的版本命名发生如下变化：<br>| 项目 | 说明 |<br>| —- | —- |<br>| 版本格式 | YY.MM |<br>| stable版本 | 每个季度发行 |<br>| edge版本 | 每个月发行 |</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>版本格式</td>
+<td>YY.MM</td>
+</tr>
+<tr>
+<td>stable版本</td>
+<td>每个季度发行</td>
+</tr>
+<tr>
+<td>edge版本</td>
+<td>每个月发行</td>
+</tr>
+</tbody>
+</table>
 <p>同时将Docker分成CE和EE 2个版本。CE版本即社区版（免费，支持周期三个月），EE即企业版，强调安全，付费使用。<br>Docker 会每月发布一个 edge 版本(17.03, 17.04, 17.05…)，每三个月发布一个 stable 版本(17.03, 17.06, 17.09…)，企业版(EE) 和 stable 版本号保持一致，但每个版本提供一年维护。<br>Docker 的 Linux 发行版的软件仓库也从以前的<a href="https://apt.dockerproject.org和https://yum.dockerproject.org" target="_blank" rel="external">https://apt.dockerproject.org和https://yum.dockerproject.org</a> 变更为目前的 <a href="https://download.docker.com" target="_blank" rel="external">https://download.docker.com</a> 。软件包名变更为 docker-ce(社区版) 和 docker-ee(企业版)。<br>当前的CE版本为17.03.0，基于V1.13.0。主要修复错误，没有重大功能增加，API亦保持不变。本文以此版本安装。<br>此版本的发行说明，请参考：<a href="https://github.com/docker/docker/releases" target="_blank" rel="external">https://github.com/docker/docker/releases</a></p>
 <h3 id="安装Docker"><a href="#安装Docker" class="headerlink" title="安装Docker"></a>安装Docker</h3><p>官方安装文档：<a href="https://docs.docker.com/engine/installation/linux/docker-ce/centos/" target="_blank" rel="external">https://docs.docker.com/engine/installation/linux/docker-ce/centos/</a></p>
 <h4 id="环境要求"><a href="#环境要求" class="headerlink" title="环境要求"></a>环境要求</h4><p>To install Docker CE, you need the 64-bit version of CentOS 7.<br>The centos-extras repository must be enabled. This repository is enabled by default, but if you have disabled it, you need to re-enable it.</p>
@@ -690,7 +712,7 @@ Cgroup Driver: cgroupfs
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共76.4k字</span>
+  <span class="post-count">博客全站共76.5k字</span>
 </div>
 
         
