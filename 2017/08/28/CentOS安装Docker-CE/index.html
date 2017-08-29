@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="监控 zabbix," />
+  <meta name="keywords" content="容器 Docker," />
 
 
 
@@ -104,57 +104,18 @@
 
 
 
-<meta name="description" content="zabbix web添加主机 进入zabbix web界面，点击配置—&amp;gt;主机—&amp;gt;创建主机。">
-<meta name="keywords" content="监控 zabbix">
+<meta name="description" content="背景在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how">
+<meta name="keywords" content="容器 Docker">
 <meta property="og:type" content="article">
-<meta property="og:title" content="zabbix监控实例">
-<meta property="og:url" content="http://yoursite.com/2017/05/14/zabbix监控实例/index.html">
+<meta property="og:title" content="CentOS安装Docker CE">
+<meta property="og:url" content="http://yoursite.com/2017/08/28/CentOS安装Docker-CE/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="zabbix web添加主机 进入zabbix web界面，点击配置—&amp;gt;主机—&amp;gt;创建主机。">
+<meta property="og:description" content="背景在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/28.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/29.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/30.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/31.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/32.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/33.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/34.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/35.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/36.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/37.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/38.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/39.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/40.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/41.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/42.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/43.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/44.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/45.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/46.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/47.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/48.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/49.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/50.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/51.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/52.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/53.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/54.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/55.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/56.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/57.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/58.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/59.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/60.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/61.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/62.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/63.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/64.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/65.png">
-<meta property="og:updated_time" content="2017-06-12T07:56:29.000Z">
+<meta property="og:updated_time" content="2017-08-29T01:50:34.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zabbix监控实例">
-<meta name="twitter:description" content="zabbix web添加主机 进入zabbix web界面，点击配置—&amp;gt;主机—&amp;gt;创建主机。">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/28.png">
+<meta name="twitter:title" content="CentOS安装Docker CE">
+<meta name="twitter:description" content="背景在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how">
 
 
 
@@ -172,7 +133,7 @@
   };
 </script>
 
-  <title> zabbix监控实例 | jkzhao's blog </title>
+  <title> CentOS安装Docker CE | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -362,7 +323,7 @@
             
             
               
-                zabbix监控实例
+                CentOS安装Docker CE
               
             
           </h1>
@@ -374,14 +335,14 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-05-14T21:44:33+08:00" content="2017-05-14">
-              2017-05-14
+            <time itemprop="dateCreated" datetime="2017-08-28T13:29:47+08:00" content="2017-08-28">
+              2017-08-28
             </time>
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-06-12T15:56:29+08:00" content="2017-06-12">
-              2017-06-12
+              <time itemprop="dateUpdated" datetime="2017-08-29T09:50:34+08:00" content="2017-08-29">
+              2017-08-29
               </time>
               </span>
             
@@ -396,8 +357,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Zabbix/" itemprop="url" rel="index">
-                    <span itemprop="name">Zabbix</span>
+                  <a href="/categories/Docker/" itemprop="url" rel="index">
+                    <span itemprop="name">Docker</span>
                   </a>
                 </span>
 
@@ -416,7 +377,7 @@
 
           
           
-             <span id="/2017/05/14/zabbix监控实例/" class="leancloud_visitors" data-flag-title="zabbix监控实例">
+             <span id="/2017/08/28/CentOS安装Docker-CE/" class="leancloud_visitors" data-flag-title="CentOS安装Docker CE">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -440,62 +401,56 @@
       
 
       
-        <h1 id="zabbix-web添加主机"><a href="#zabbix-web添加主机" class="headerlink" title="zabbix web添加主机"></a>zabbix web添加主机</h1><ol>
-<li><p>进入zabbix web界面，点击配置—&gt;主机—&gt;创建主机。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/28.png" alt=""></p>
-<a id="more"></a>
-</li>
-<li><p>填入下图中的信息，点击添加。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/29.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/30.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/31.png" alt=""></p>
-</li>
-</ol>
-<h1 id="定义Items"><a href="#定义Items" class="headerlink" title="定义Items"></a>定义Items</h1><p>要真正实现数据采集，需要定义监控项(Items)。多个Items可以归为一个组，称为Applications。定义好Items之后，还应该为Items定义Triggers(触发器)。我这里演示下创建监控网卡进入和出去的流量。</p>
-<h2 id="创建item监控网卡出去流量"><a href="#创建item监控网卡出去流量" class="headerlink" title="创建item监控网卡出去流量"></a>创建item监控网卡出去流量</h2><p>登录zabbix web管控台，点击配置—&gt;主机—&gt;监控项。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/32.png" alt=""><br>点击右上角的“创建监控项”。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/33.png" alt=""><br>在如下的界面填入以下内容：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/34.png" alt=""><br>其中，在key那一栏，点击select按钮，选择key值。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/35.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/36.png" alt=""><br>回到hosts，你会发现已经有application和item了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/37.png" alt=""><br>每创建一个Item，会自动帮你创建图形的。点击监控—&gt;最新的数据，输入要查的主机，点击select，就可以看到为刚才我们创建的item所创建的图形。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/38.png" alt=""><br>点击图形。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/39.png" alt=""><br><strong>注意:数据量从右往左走的。</strong></p>
-<h2 id="创建item监控进入网卡流量"><a href="#创建item监控进入网卡流量" class="headerlink" title="创建item监控进入网卡流量"></a>创建item监控进入网卡流量</h2><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/40.png" alt=""><br><strong>注意:</strong>有时候，不是一创建完item，graph那边就有数据了，你可以主要通过浏览器去访问监听在这个网卡的某个端口上的服务，然后graph就会有数据了。</p>
-<h1 id="创建graph"><a href="#创建graph" class="headerlink" title="创建graph"></a>创建graph</h1><p>为什么要创建graph？拿上节中的网卡进出流量来举例，进和出此时都不在一张图上，这就需要Graphs自定义图像。将多个指标放在一起。</p>
-<p>点击配置—&gt;主机，点击Graphs。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/41.png" alt=""><br>点击右上角的创建图形。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/42.png" alt=""><br>输入Name，点击图中倒数第二个add。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/43.png" alt=""><br>选择监控项。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/44.png" alt=""><br>最后点击添加。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/45.png" alt=""><br>点击监控—&gt;图形，在右上角输入主机组，主机和图形。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/46.png" alt=""></p>
-<h1 id="创建模板"><a href="#创建模板" class="headerlink" title="创建模板"></a>创建模板</h1><p>如果我们在加一个主机进来，假如说我们每一次都想监控某几个同样的指标，每台主机都要这么去定义的话，就太痛苦了。这就要使用到模板。</p>
-<h2 id="创建模板-1"><a href="#创建模板-1" class="headerlink" title="创建模板"></a>创建模板</h2><p>点击配置—&gt;模板，点击创建模板。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/47.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/48.png" alt=""></p>
-<h2 id="创建Item"><a href="#创建Item" class="headerlink" title="创建Item"></a>创建Item</h2><p>创建完模板后，其上是没有任何Item和trigger等。所以我们需要创建这一系列监控项。但是由于这里我是要监控Elasticsearch状态，而zabbix是没有内置的key来监控elasticsearch的，所以需要自定义监控项来监控。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/49.png" alt=""></p>
-<ol>
-<li><p>在elasticsearch主机定义zabbix agent的UserParameter</p>
-<pre><code>[root@log1 ~]# cd /usr/local/zabbix-3.0.1/etc/
-[root@log1 etc]# vim zabbix_agentd.conf
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how registries are handled.”，并且建议我尝试较新的版本。在2017年4月份的DockerCon会议上，Docker公司直接将 Github 上原隶属于 Docker 组织的 Docker 项目，直接 transfer 到了一个新的、名叫 Moby 的组织下，并将其重命名为 Moby 项目。由此先来了解下这个Moby项目。<br><a id="more"></a></p>
+<h2 id="Moby项目"><a href="#Moby项目" class="headerlink" title="Moby项目"></a>Moby项目</h2><p>为什么会产生Moby这个项目呢？可以看到最近几年里面，在2015年之后的Docker 1.17版本之后，引入了很多的新特性，比如Network、runC等，Docker的组件越来越多，提供支持的场景也越来越复杂，比如微服务、机器学习、物联网等，所以Docker镜像的下载量也呈现指数型上升，最终Docker运行的环境，也是越来越复杂，越来越多，比如在Linux，Windows，还有在嵌入式设备上。<br>所以Docker原本的发行版本已经不能适配于这些越来越复杂的场景了，举个例子，其实在IoT里面，树莓派的性能是比较好的，但是它去运行Docker的话，Docker就会占整个性能的一大部分，这样它上面就已经无法运行其他的一些自己的应用了，那用户要怎么去解决这些事情，难道自己去再写一个Docker容器引擎吗？这个成本是很高的，需要自己去造轮子。所以为了提供更加开放的生态，Docker公司把Docker项目中现在的一些组件抽象成Moby项目，这样系统构建者就可以通过Moby项目把现有的组件去进行组装，然后组装成自己所需要的一个容器引擎。<br>Moby项目现在有80多个组件，通过这些组件，用户可以避免重复地去造轮子。用户可以按照自己的需要去组装组件，做出自己的一个容器系统。这些组件有一个标准化的调用方式，他们之间通过gRPC通信，它的语言也是可以去定制的，不会像之前一样必须用Go语言去写。通过标准化的方式，通过Moby这个项目就可以把这些组件进行组合，成为自己所依赖的容器系统。<br>Docker项目现在改名成Moby项目，但是Docker会逐渐的从Moby项目中去抽象和剥离出来，作为Moby的一种组装方式，比如Docker依赖于这里面的一些库，它就特化成一种组装，组装成自己的Docker CE的版本，也就是Docker的社区版。Docker社区版后面也会继续做开源，所以用户和开发者不需要担心以后用Docker就会收费了，对于Docker用户来说，他也无须感知用户接口的变化，使用的命令还是Docker不是Moby，需要更多运维支持的可以选择Docker EE的版本，让Docker公司的工程师去替你去做运维和更复杂的线上支持，如果自己开发可以继续选择Docker社区版。对于架构师而言，现在就可以不强依赖于Docker项目，而是通过这些组件去拼装出来一个容器引擎去满足自己的需求。</p>
+<h2 id="安装Docker-CE"><a href="#安装Docker-CE" class="headerlink" title="安装Docker CE"></a>安装Docker CE</h2><h3 id="版本说明"><a href="#版本说明" class="headerlink" title="版本说明"></a>版本说明</h3><p>2017年2月份，Docker公司发布了全新的Docker版本：V1.13.0。从2017年3月1号开始，Docker的版本命名发生如下变化：<br>| 项目 | 说明 |<br>| ——| —— |<br>| 版本格式 | YY.MM |<br>| stable版本 | 每个季度发行 |<br>| edge版本 | 每个月发行 |</p>
+<p>同时将Docker分成CE和EE 2个版本。CE版本即社区版（免费，支持周期三个月），EE即企业版，强调安全，付费使用。<br>Docker 会每月发布一个 edge 版本(17.03, 17.04, 17.05…)，每三个月发布一个 stable 版本(17.03, 17.06, 17.09…)，企业版(EE) 和 stable 版本号保持一致，但每个版本提供一年维护。<br>Docker 的 Linux 发行版的软件仓库也从以前的<a href="https://apt.dockerproject.org和https://yum.dockerproject.org" target="_blank" rel="external">https://apt.dockerproject.org和https://yum.dockerproject.org</a> 变更为目前的 <a href="https://download.docker.com" target="_blank" rel="external">https://download.docker.com</a> 。软件包名变更为 docker-ce(社区版) 和 docker-ee(企业版)。<br>当前的CE版本为17.03.0，基于V1.13.0。主要修复错误，没有重大功能增加，API亦保持不变。本文以此版本安装。<br>此版本的发行说明，请参考：<a href="https://github.com/docker/docker/releases" target="_blank" rel="external">https://github.com/docker/docker/releases</a></p>
+<h3 id="安装Docker"><a href="#安装Docker" class="headerlink" title="安装Docker"></a>安装Docker</h3><p>官方安装文档：<a href="https://docs.docker.com/engine/installation/linux/docker-ce/centos/" target="_blank" rel="external">https://docs.docker.com/engine/installation/linux/docker-ce/centos/</a></p>
+<h4 id="环境要求"><a href="#环境要求" class="headerlink" title="环境要求"></a>环境要求</h4><p>To install Docker CE, you need the 64-bit version of CentOS 7.<br>The centos-extras repository must be enabled. This repository is enabled by default, but if you have disabled it, you need to re-enable it.</p>
+<h4 id="卸载安装的所有Docker组件"><a href="#卸载安装的所有Docker组件" class="headerlink" title="卸载安装的所有Docker组件"></a>卸载安装的所有Docker组件</h4><pre><code>[root@spark32 lib]# systemctl stop docker.service
+[root@spark32 lib]# yum remove docker docker-common docker-selinux docker-engine container-selinux
+[root@spark32 lib]# rm -rf docker/
+</code></pre><h4 id="通过仓库安装Docker-CE"><a href="#通过仓库安装Docker-CE" class="headerlink" title="通过仓库安装Docker CE"></a>通过仓库安装Docker CE</h4><p>1.安装依赖包</p>
+<pre><code>[root@spark32 ~]# yum install -y yum-utils device-mapper-persistent-data lvm2
+</code></pre><p>2.下载docker yum源</p>
+<pre><code>[root@spark32 ~]# yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+</code></pre><p>3.更新软件缓存</p>
+<pre><code>[root@spark32 ~]# yum makecache fast
+</code></pre><p>4.安装Docker CE</p>
+<pre><code>[root@spark32 ~]# yum install docker-ce -y
+</code></pre><p>5.启动docker</p>
+<pre><code>[root@spark32 ~]# systemctl start docker.service
+</code></pre><p>6.查看docker版本信息</p>
+<pre><code>[root@spark32 ~]# docker info
+Containers: 0
+ Running: 0
+ Paused: 0
+ Stopped: 0
+Images: 0
+Server Version: 17.06.1-ce
+Storage Driver: overlay
+ Backing Filesystem: extfs
+ Supports d_type: true
+Logging Driver: json-file
+Cgroup Driver: cgroupfs
+</code></pre><p>【注意】:在生产环境中，可能需要使用某一个特定版本的Docker，而不是使用最新的版本，我们可以先列出版本，然后安装指定版本：</p>
+<pre><code>[root@spark32 ~]# yum list docker-ce.x86_64  --showduplicates | sort -r
+[root@spark32 ~]# yum install docker-ce-&lt;VERSION&gt;
+</code></pre><h4 id="卸载Docker-CE"><a href="#卸载Docker-CE" class="headerlink" title="卸载Docker-CE"></a>卸载Docker-CE</h4><pre><code># yum remove docker-ce
+# rm -rf /var/lib/docker
+</code></pre><h3 id="配置镜像加速"><a href="#配置镜像加速" class="headerlink" title="配置镜像加速"></a>配置镜像加速</h3><p>国内访问 Docker Hub 有时会遇到困难，此时可以配置镜像加速器。国内很多云服务商都提供了加速器服务，例如：</p>
+<ul>
+<li>阿里云加速器</li>
+<li>DaoCloud 加速器</li>
+<li><p>灵雀云加速器<br>以阿里云加速器为例<br>1.首先进入<a href="https://dev.aliyun.com/" target="_blank" rel="external">阿里云docker库首页</a><br>注册用户并登录，点击右上角“管理中心”。如果第一次，会提示“您还没有开通服务”，点击“确定”，然后会出现弹窗“初始化设置”，设置docker登录时使用的密码。<br>2.点击左侧菜单“Docker Hub镜像站点”，可以看到“您的专属加速器地址：<a href="https://6101v8g5.mirror.aliyuncs.com”，我们需要将其配置到Docker" target="_blank" rel="external">https://6101v8g5.mirror.aliyuncs.com”，我们需要将其配置到Docker</a> 引擎。<br>3.修改daemon配置文件/etc/docker/daemon.json来使用加速器：</p>
+<pre><code>[root@spark32 ~]# vim /etc/docker/daemon.json
+{
+  &quot;registry-mirrors&quot;: [&quot;https://6101v8g5.mirror.aliyuncs.com&quot;]
+}
+[root@spark32 ~]# systemctl daemon-reload
+[root@spark32 ~]# systemctl restart docker
 </code></pre></li>
-</ol>
-<p>输入内容：</p>
-<pre><code>UserParameter=Elasticsearch.status[*],/usr/bin/curl -s &apos;http://$1:$2/_cluster/health?pretty=true&apos; | awk -F&apos;&quot;&apos; &apos;/status/{print $$4}&apos;
-</code></pre><ol>
-<li><p>重启zabbix agent</p>
-<pre><code>[root@log1 ~] # killall -9 zabbix_agentd
-[root@log1 ~]# /usr/local/zabbix-3.0.1/sbin/zabbix_agentd
-</code></pre></li>
-<li><p>在zabbix server端使用zabbix_get模拟获取数据</p>
-<pre><code>[root@console ~]# /usr/local/zabbix-3.0.1/bin/zabbix_get -s 114.55.29.86 -k &quot;Elasticsearch.status[114.55.29.86,9200]&quot;
-green
-</code></pre></li>
-<li><p>创建模板的Item<br>(1)找到刚才新建的模板，点击Item。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/50.png" alt=""><br>(2)点击右上角的Create Item<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/51.png" alt=""><br>(3)输入如下的信息<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/52.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/53.png" alt=""></p>
-</li>
-</ol>
-<h2 id="为模板上的Item创建触发器"><a href="#为模板上的Item创建触发器" class="headerlink" title="为模板上的Item创建触发器"></a>为模板上的Item创建触发器</h2><ol>
-<li><p>点击触发器。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/54.png" alt=""></p>
-</li>
-<li><p>点击右上角的创建触发器<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/55.png" alt=""></p>
-</li>
-<li><p>定义触发器名字，然后点击Add。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/56.png" alt=""></p>
-</li>
-<li><p>点击Select，选择对哪个Item做Trigger。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/57.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/58.png" alt=""></p>
-</li>
-</ol>
-<h2 id="将模板应用到主机上"><a href="#将模板应用到主机上" class="headerlink" title="将模板应用到主机上"></a>将模板应用到主机上</h2><ol>
-<li><p>点击配置—&gt;主机，点击log1主机。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/59.png" alt=""></p>
-</li>
-<li><p>点击模板，点击选择。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/60.png" alt=""></p>
-</li>
-<li><p>选择我们需要的模板，点击选择。然后在点击Add。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/61.png" alt=""></p>
-</li>
-<li><p>这是Add后显示页面，再点击Update。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/62.png" alt=""><br>这样你就可以看到这边log1主机有应用的模板的。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/63.png" alt=""></p>
-</li>
-</ol>
-<h2 id="查看监控数据"><a href="#查看监控数据" class="headerlink" title="查看监控数据"></a>查看监控数据</h2><p>点击监控—&gt;最新数据，找到Elasticsearch status这个监控项，点击后面的History。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/64.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/65.png" alt=""></p>
+</ul>
 
       
     </div>
@@ -517,7 +472,7 @@ green
       
         <div class="post-tags">
           
-            <a href="/tags/监控-zabbix/" rel="tag"><i class="fa fa-tag"></i>监控 zabbix</a>
+            <a href="/tags/容器-Docker/" rel="tag"><i class="fa fa-tag"></i>容器 Docker</a>
           
         </div>
       
@@ -526,17 +481,13 @@ green
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/05/10/zabbix安装配置/" rel="next" title="zabbix安装配置">
-                <i class="fa fa-chevron-left"></i> zabbix安装配置
+              <a href="/2017/08/25/Dockerfile构建镜像/" rel="next" title="Dockerfile构建镜像">
+                <i class="fa fa-chevron-left"></i> Dockerfile构建镜像
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/05/16/zabbix监控Nginx/" rel="prev" title="zabbix监控Nginx">
-                zabbix监控Nginx <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -693,7 +644,7 @@ green
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#zabbix-web添加主机"><span class="nav-number">1.</span> <span class="nav-text">zabbix web添加主机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#定义Items"><span class="nav-number">2.</span> <span class="nav-text">定义Items</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建item监控网卡出去流量"><span class="nav-number">2.1.</span> <span class="nav-text">创建item监控网卡出去流量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建item监控进入网卡流量"><span class="nav-number">2.2.</span> <span class="nav-text">创建item监控进入网卡流量</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建graph"><span class="nav-number">3.</span> <span class="nav-text">创建graph</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建模板"><span class="nav-number">4.</span> <span class="nav-text">创建模板</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建模板-1"><span class="nav-number">4.1.</span> <span class="nav-text">创建模板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Item"><span class="nav-number">4.2.</span> <span class="nav-text">创建Item</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为模板上的Item创建触发器"><span class="nav-number">4.3.</span> <span class="nav-text">为模板上的Item创建触发器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#将模板应用到主机上"><span class="nav-number">4.4.</span> <span class="nav-text">将模板应用到主机上</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看监控数据"><span class="nav-number">4.5.</span> <span class="nav-text">查看监控数据</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Moby项目"><span class="nav-number">2.</span> <span class="nav-text">Moby项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Docker-CE"><span class="nav-number">3.</span> <span class="nav-text">安装Docker CE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#版本说明"><span class="nav-number">3.1.</span> <span class="nav-text">版本说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Docker"><span class="nav-number">3.2.</span> <span class="nav-text">安装Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#环境要求"><span class="nav-number">3.2.1.</span> <span class="nav-text">环境要求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#卸载安装的所有Docker组件"><span class="nav-number">3.2.2.</span> <span class="nav-text">卸载安装的所有Docker组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过仓库安装Docker-CE"><span class="nav-number">3.2.3.</span> <span class="nav-text">通过仓库安装Docker CE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#卸载Docker-CE"><span class="nav-number">3.2.4.</span> <span class="nav-text">卸载Docker-CE</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置镜像加速"><span class="nav-number">3.3.</span> <span class="nav-text">配置镜像加速</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
