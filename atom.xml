@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-08-29T01:50:34.000Z</updated>
+  <updated>2017-08-28T03:38:51.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,78 +14,6 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>CentOS安装Docker CE</title>
-    <link href="http://yoursite.com/2017/08/28/CentOS%E5%AE%89%E8%A3%85Docker-CE/"/>
-    <id>http://yoursite.com/2017/08/28/CentOS安装Docker-CE/</id>
-    <published>2017-08-28T05:29:47.000Z</published>
-    <updated>2017-08-29T01:50:34.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how registries are handled.”，并且建议我尝试较新的版本。在2017年4月份的DockerCon会议上，Docker公司直接将 Github 上原隶属于 Docker 组织的 Docker 项目，直接 transfer 到了一个新的、名叫 Moby 的组织下，并将其重命名为 Moby 项目。由此先来了解下这个Moby项目。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;Moby项目&quot;&gt;&lt;a href=&quot;#Moby项目&quot; class=&quot;headerlink&quot; title=&quot;Moby项目&quot;&gt;&lt;/a&gt;Moby项目&lt;/h2&gt;&lt;p&gt;为什么会产生Moby这个项目呢？可以看到最近几年里面，在2015年之后的Docker 1.17版本之后，引入了很多的新特性，比如Network、runC等，Docker的组件越来越多，提供支持的场景也越来越复杂，比如微服务、机器学习、物联网等，所以Docker镜像的下载量也呈现指数型上升，最终Docker运行的环境，也是越来越复杂，越来越多，比如在Linux，Windows，还有在嵌入式设备上。&lt;br&gt;所以Docker原本的发行版本已经不能适配于这些越来越复杂的场景了，举个例子，其实在IoT里面，树莓派的性能是比较好的，但是它去运行Docker的话，Docker就会占整个性能的一大部分，这样它上面就已经无法运行其他的一些自己的应用了，那用户要怎么去解决这些事情，难道自己去再写一个Docker容器引擎吗？这个成本是很高的，需要自己去造轮子。所以为了提供更加开放的生态，Docker公司把Docker项目中现在的一些组件抽象成Moby项目，这样系统构建者就可以通过Moby项目把现有的组件去进行组装，然后组装成自己所需要的一个容器引擎。&lt;br&gt;Moby项目现在有80多个组件，通过这些组件，用户可以避免重复地去造轮子。用户可以按照自己的需要去组装组件，做出自己的一个容器系统。这些组件有一个标准化的调用方式，他们之间通过gRPC通信，它的语言也是可以去定制的，不会像之前一样必须用Go语言去写。通过标准化的方式，通过Moby这个项目就可以把这些组件进行组合，成为自己所依赖的容器系统。&lt;br&gt;Docker项目现在改名成Moby项目，但是Docker会逐渐的从Moby项目中去抽象和剥离出来，作为Moby的一种组装方式，比如Docker依赖于这里面的一些库，它就特化成一种组装，组装成自己的Docker CE的版本，也就是Docker的社区版。Docker社区版后面也会继续做开源，所以用户和开发者不需要担心以后用Docker就会收费了，对于Docker用户来说，他也无须感知用户接口的变化，使用的命令还是Docker不是Moby，需要更多运维支持的可以选择Docker EE的版本，让Docker公司的工程师去替你去做运维和更复杂的线上支持，如果自己开发可以继续选择Docker社区版。对于架构师而言，现在就可以不强依赖于Docker项目，而是通过这些组件去拼装出来一个容器引擎去满足自己的需求。&lt;/p&gt;
-&lt;h2 id=&quot;安装Docker-CE&quot;&gt;&lt;a href=&quot;#安装Docker-CE&quot; class=&quot;headerlink&quot; title=&quot;安装Docker CE&quot;&gt;&lt;/a&gt;安装Docker CE&lt;/h2&gt;&lt;h3 id=&quot;版本说明&quot;&gt;&lt;a href=&quot;#版本说明&quot; class=&quot;headerlink&quot; title=&quot;版本说明&quot;&gt;&lt;/a&gt;版本说明&lt;/h3&gt;&lt;p&gt;2017年2月份，Docker公司发布了全新的Docker版本：V1.13.0。从2017年3月1号开始，Docker的版本命名发生如下变化：&lt;br&gt;| 项目 | 说明 |&lt;br&gt;| ——| —— |&lt;br&gt;| 版本格式 | YY.MM |&lt;br&gt;| stable版本 | 每个季度发行 |&lt;br&gt;| edge版本 | 每个月发行 |&lt;/p&gt;
-&lt;p&gt;同时将Docker分成CE和EE 2个版本。CE版本即社区版（免费，支持周期三个月），EE即企业版，强调安全，付费使用。&lt;br&gt;Docker 会每月发布一个 edge 版本(17.03, 17.04, 17.05…)，每三个月发布一个 stable 版本(17.03, 17.06, 17.09…)，企业版(EE) 和 stable 版本号保持一致，但每个版本提供一年维护。&lt;br&gt;Docker 的 Linux 发行版的软件仓库也从以前的&lt;a href=&quot;https://apt.dockerproject.org和https://yum.dockerproject.org&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://apt.dockerproject.org和https://yum.dockerproject.org&lt;/a&gt; 变更为目前的 &lt;a href=&quot;https://download.docker.com&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://download.docker.com&lt;/a&gt; 。软件包名变更为 docker-ce(社区版) 和 docker-ee(企业版)。&lt;br&gt;当前的CE版本为17.03.0，基于V1.13.0。主要修复错误，没有重大功能增加，API亦保持不变。本文以此版本安装。&lt;br&gt;此版本的发行说明，请参考：&lt;a href=&quot;https://github.com/docker/docker/releases&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/docker/docker/releases&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&quot;安装Docker&quot;&gt;&lt;a href=&quot;#安装Docker&quot; class=&quot;headerlink&quot; title=&quot;安装Docker&quot;&gt;&lt;/a&gt;安装Docker&lt;/h3&gt;&lt;p&gt;官方安装文档：&lt;a href=&quot;https://docs.docker.com/engine/installation/linux/docker-ce/centos/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.docker.com/engine/installation/linux/docker-ce/centos/&lt;/a&gt;&lt;/p&gt;
-&lt;h4 id=&quot;环境要求&quot;&gt;&lt;a href=&quot;#环境要求&quot; class=&quot;headerlink&quot; title=&quot;环境要求&quot;&gt;&lt;/a&gt;环境要求&lt;/h4&gt;&lt;p&gt;To install Docker CE, you need the 64-bit version of CentOS 7.&lt;br&gt;The centos-extras repository must be enabled. This repository is enabled by default, but if you have disabled it, you need to re-enable it.&lt;/p&gt;
-&lt;h4 id=&quot;卸载安装的所有Docker组件&quot;&gt;&lt;a href=&quot;#卸载安装的所有Docker组件&quot; class=&quot;headerlink&quot; title=&quot;卸载安装的所有Docker组件&quot;&gt;&lt;/a&gt;卸载安装的所有Docker组件&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@spark32 lib]# systemctl stop docker.service
-[root@spark32 lib]# yum remove docker docker-common docker-selinux docker-engine container-selinux
-[root@spark32 lib]# rm -rf docker/
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;通过仓库安装Docker-CE&quot;&gt;&lt;a href=&quot;#通过仓库安装Docker-CE&quot; class=&quot;headerlink&quot; title=&quot;通过仓库安装Docker CE&quot;&gt;&lt;/a&gt;通过仓库安装Docker CE&lt;/h4&gt;&lt;p&gt;1.安装依赖包&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# yum install -y yum-utils device-mapper-persistent-data lvm2
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.下载docker yum源&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.更新软件缓存&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# yum makecache fast
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.安装Docker CE&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# yum install docker-ce -y
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.启动docker&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# systemctl start docker.service
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;6.查看docker版本信息&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# docker info
-Containers: 0
- Running: 0
- Paused: 0
- Stopped: 0
-Images: 0
-Server Version: 17.06.1-ce
-Storage Driver: overlay
- Backing Filesystem: extfs
- Supports d_type: true
-Logging Driver: json-file
-Cgroup Driver: cgroupfs
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】:在生产环境中，可能需要使用某一个特定版本的Docker，而不是使用最新的版本，我们可以先列出版本，然后安装指定版本：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# yum list docker-ce.x86_64  --showduplicates | sort -r
-[root@spark32 ~]# yum install docker-ce-&amp;lt;VERSION&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;卸载Docker-CE&quot;&gt;&lt;a href=&quot;#卸载Docker-CE&quot; class=&quot;headerlink&quot; title=&quot;卸载Docker-CE&quot;&gt;&lt;/a&gt;卸载Docker-CE&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# yum remove docker-ce
-# rm -rf /var/lib/docker
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置镜像加速&quot;&gt;&lt;a href=&quot;#配置镜像加速&quot; class=&quot;headerlink&quot; title=&quot;配置镜像加速&quot;&gt;&lt;/a&gt;配置镜像加速&lt;/h3&gt;&lt;p&gt;国内访问 Docker Hub 有时会遇到困难，此时可以配置镜像加速器。国内很多云服务商都提供了加速器服务，例如：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;阿里云加速器&lt;/li&gt;
-&lt;li&gt;DaoCloud 加速器&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;灵雀云加速器&lt;br&gt;以阿里云加速器为例&lt;br&gt;1.首先进入&lt;a href=&quot;https://dev.aliyun.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;阿里云docker库首页&lt;/a&gt;&lt;br&gt;注册用户并登录，点击右上角“管理中心”。如果第一次，会提示“您还没有开通服务”，点击“确定”，然后会出现弹窗“初始化设置”，设置docker登录时使用的密码。&lt;br&gt;2.点击左侧菜单“Docker Hub镜像站点”，可以看到“您的专属加速器地址：&lt;a href=&quot;https://6101v8g5.mirror.aliyuncs.com”，我们需要将其配置到Docker&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://6101v8g5.mirror.aliyuncs.com”，我们需要将其配置到Docker&lt;/a&gt; 引擎。&lt;br&gt;3.修改daemon配置文件/etc/docker/daemon.json来使用加速器：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# vim /etc/docker/daemon.json
-{
-  &amp;quot;registry-mirrors&amp;quot;: [&amp;quot;https://6101v8g5.mirror.aliyuncs.com&amp;quot;]
-}
-[root@spark32 ~]# systemctl daemon-reload
-[root@spark32 ~]# systemctl restart docker
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;/ul&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how registries are handled.”，并且建议我尝试较新的版本。在2017年4月份的DockerCon会议上，Docker公司直接将 Github 上原隶属于 Docker 组织的 Docker 项目，直接 transfer 到了一个新的、名叫 Moby 的组织下，并将其重命名为 Moby 项目。由此先来了解下这个Moby项目。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
-    
-    
-      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
-    
-  </entry>
   
   <entry>
     <title>Dockerfile构建镜像</title>
@@ -3027,6 +2955,174 @@ export PATH=$STORM_HOME/bin:$PATH
     
     
       <category term="Storm 实时处理" scheme="http://yoursite.com/tags/Storm-%E5%AE%9E%E6%97%B6%E5%A4%84%E7%90%86/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>RabbitMQ介绍及安装部署</title>
+    <link href="http://yoursite.com/2017/06/04/RabbitMQ%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
+    <id>http://yoursite.com/2017/06/04/RabbitMQ介绍及安装部署/</id>
+    <published>2017-06-04T12:45:36.000Z</published>
+    <updated>2017-07-16T08:01:05.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;RabbitMQ介绍&quot;&gt;&lt;a href=&quot;#RabbitMQ介绍&quot; class=&quot;headerlink&quot; title=&quot;RabbitMQ介绍&quot;&gt;&lt;/a&gt;RabbitMQ介绍&lt;/h2&gt;&lt;p&gt;消息系统通过将消息的发送和接收分离来实现应用程序的异步和解偶。&lt;br&gt;或许你正在考虑进行数据投递，非阻塞操作或推送通知。或许你想要实现发布／订阅，异步处理，或者工作队列。所有这些都属于消息系统的模式。&lt;br&gt;RabbitMQ是一个消息代理，一个消息系统的媒介。它可以为你的应用提供一个通用的消息发送和接收平台，并且保证消息再传输过程中的安全。&lt;br&gt;RabbitMQ是一个在AMQP协议标准上完整的、可复用的企业消息系统。它遵循Mozilla Public License开源协议，采用Erlang语言实现的工业级的消息队列。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;RabbitMQ运行原理&quot;&gt;&lt;a href=&quot;#RabbitMQ运行原理&quot; class=&quot;headerlink&quot; title=&quot;RabbitMQ运行原理&quot;&gt;&lt;/a&gt;RabbitMQ运行原理&lt;/h2&gt;&lt;p&gt;RabbitMQ的两大核心组件是Exchange和Queue，以下是它的运行原理图：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;RabbitMQ重要术语&quot;&gt;&lt;a href=&quot;#RabbitMQ重要术语&quot; class=&quot;headerlink&quot; title=&quot;RabbitMQ重要术语&quot;&gt;&lt;/a&gt;RabbitMQ重要术语&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.Server(broker):&lt;/strong&gt; 接受客户端连接，实现AMQP消息队列和路由功能的进程。&lt;br&gt;&lt;strong&gt;2.Vitual Host:&lt;/strong&gt; 这是一个虚拟概念，类似于权限控制组，一个Vitual Host里面可以有若干个Exchange和Queue，但是权限控制的最小粒度是Vitual Host。&lt;br&gt;&lt;strong&gt;3.Exchange:&lt;/strong&gt; 接收生产者发送的消息，并根据Binding规则将消息路由给服务器中的队列。ExchangeType决定了Exchange路由消息的行为，例如，在RabbitMQ中，ExchangeType有direct、Fanout和Topic三种，不同类型的Exchange路由的行为是不一样的。&lt;br&gt;&lt;strong&gt;4.Message Queue:&lt;/strong&gt; 消息队列，用于存储还未被消费者消费的消息。&lt;br&gt;&lt;strong&gt;5.Message:&lt;/strong&gt; 由Header和Body组成，Header是由生产者添加的各种属性的集合，包括Message是否被持久化、由哪个Message Queue接受、优先级是多少等。而body是真正需要传输的APP数据。&lt;br&gt;&lt;strong&gt;6.BindingKey:&lt;/strong&gt; 所谓绑定就是将一个特定的一个Exchange和一个特定的Queue绑定起来，绑定关键字称为BindingKey。&lt;/p&gt;
+&lt;h2 id=&quot;三种ExchangeType&quot;&gt;&lt;a href=&quot;#三种ExchangeType&quot; class=&quot;headerlink&quot; title=&quot;三种ExchangeType&quot;&gt;&lt;/a&gt;三种ExchangeType&lt;/h2&gt;&lt;p&gt;RabbitMQ消息模型的核心理念是：发布者（producer）不会直接发送任何消息给队列。事实上，发布者（producer）甚至不知道消息是否已经被投递到队列。&lt;br&gt;发布者（producer）只需要把消息发送给一个交换机（exchange）。交换机非常简单，它一边从发布者方接收消息，一边把消息推送到队列。交换机必须知道如何处理它接收到的消息，是应该推送到指定的队列还是是多个队列，或者是直接忽略消息。这些规则是通过交换机类型（exchange type）来定义的。&lt;/p&gt;
+&lt;h3 id=&quot;直接式交换器类型-Direct&quot;&gt;&lt;a href=&quot;#直接式交换器类型-Direct&quot; class=&quot;headerlink&quot; title=&quot;直接式交换器类型(Direct)&quot;&gt;&lt;/a&gt;直接式交换器类型(Direct)&lt;/h3&gt;&lt;p&gt;Direct Exchange：直接交互式处理路由键。需要将一个队列绑定到交换机上，要求该消息与一个特定的路由键完全匹配，这是一个完整的匹配。路由键就是BindingKey。如果一个队列绑定到该交换机上要求路由键“dog”，则只有被标记为“dog”的消息才被转发，不会转发dog.puppy，也不会转发dog.guard，只会转发dog。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/2.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;广播式交换机类型-Fanout&quot;&gt;&lt;a href=&quot;#广播式交换机类型-Fanout&quot; class=&quot;headerlink&quot; title=&quot;广播式交换机类型(Fanout)&quot;&gt;&lt;/a&gt;广播式交换机类型(Fanout)&lt;/h3&gt;&lt;p&gt;Fanout Exchange：广播式路由键。你只需要简单的将队列绑定到交换机上。一个发送到交换机的消息都被转发到与该交换机绑定的所有队列上。很像子网广播，每台子网内的主机都获得了一份复制的消息。Fanout交换机转发消息是最快的。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/3.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;主题式交换金类型-Topic&quot;&gt;&lt;a href=&quot;#主题式交换金类型-Topic&quot; class=&quot;headerlink&quot; title=&quot;主题式交换金类型(Topic)&quot;&gt;&lt;/a&gt;主题式交换金类型(Topic)&lt;/h3&gt;&lt;p&gt;Topic Exchange：主题式交换器。通过消息的路由关键字和绑定关键字的模式匹配，将消息路由到被绑定的队列中。这种路由器类型可以被用来支持经典的发布/订阅消息传输类型——使用主题名字空间作为消息寻址模式，将消息传递给那些部分或者全部匹配主题模式的多个消费者。主题交换器类型的工作方式如下：绑定关键字用零个或多个标记构成，每一个标记之间用“.”字符分隔。绑定关键字必须用这种形式明确说明，并支持通配符：“&lt;em&gt;”匹配一个词组，“#”零个或多个词组。因此绑定关键字“&lt;/em&gt;.stock.#”匹配路由关键字“usd.stock”和“eur.stock.db”，但是不匹配“stock.nasdaq”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/4.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;RabbitMQ集群种类&quot;&gt;&lt;a href=&quot;#RabbitMQ集群种类&quot; class=&quot;headerlink&quot; title=&quot;RabbitMQ集群种类&quot;&gt;&lt;/a&gt;RabbitMQ集群种类&lt;/h2&gt;&lt;p&gt;RabbitMQ是用erlang开发的，集群非常方便，因为erlang天生就是一门分布式语言,但其本身并不支持负载均衡。&lt;br&gt;Rabbit模式大概分为以下三种：单一模式、普通模式、镜像模式。&lt;br&gt;&lt;strong&gt;1.单一模式：&lt;/strong&gt;最简单的情况，非集群模式。&lt;br&gt;&lt;strong&gt;2.普通模式：&lt;/strong&gt;默认的集群模式。&lt;br&gt;对于Queue来说，消息实体只存在于其中一个节点，A、B两个节点仅有相同的元数据，即队列结构。&lt;br&gt;当消息进入A节点的Queue中后，consumer从B节点拉取时，RabbitMQ会临时在A、B间进行消息传输，把A中的消息实体取出并经过B发送给consumer。&lt;br&gt;所以consumer应尽量连接每一个节点，从中取消息。即对于同一个逻辑队列，要在多个节点建立物理Queue。否则无论consumer连A或B，出口总在A，会产生瓶颈。&lt;br&gt;该模式存在一个问题就是当A节点故障后，B节点无法取到A节点中还未消费的消息实体。&lt;br&gt;如果做了消息持久化，那么得等A节点恢复，然后才可被消费；如果没有持久化的话，然后就没有然后了……&lt;br&gt;&lt;strong&gt;3.镜像模式：&lt;/strong&gt;把需要的队列做成镜像队列，存在于多个节点，属于RabbitMQ的HA方案。&lt;br&gt;该模式解决了上述问题，其实质和普通模式不同之处在于，消息实体会主动在镜像节点间同步，而不是在consumer取数据时临时拉取。&lt;br&gt;该模式带来的副作用也很明显，除了降低系统性能外，如果镜像队列数量过多，加之大量的消息进入，集群内部的网络带宽将会被这种同步通讯大大消耗掉。&lt;br&gt;所以在对可靠性要求较高的场合中适用。&lt;/p&gt;
+&lt;h2 id=&quot;集群基本概念&quot;&gt;&lt;a href=&quot;#集群基本概念&quot; class=&quot;headerlink&quot; title=&quot;集群基本概念&quot;&gt;&lt;/a&gt;集群基本概念&lt;/h2&gt;&lt;p&gt;RabbitMQ的集群节点包括内存节点、磁盘节点。内存节点就是将所有数据放在内存，磁盘节点将数据放在磁盘。不过，如果在投递消息时，打开了消息的持久化，那么即使是内存节点，数据还是安全的放在磁盘。&lt;br&gt;一个rabbitmq集群中可以共享 user，vhost，queue，exchange等，所有的数据和状态都是必须在所有节点上复制的，一个例外是，那些当前只属于创建它的节点的消息队列，尽管它们可见且可被所有节点读取。rabbitmq节点可以动态的加入到集群中，一个节点它可以加入到集群中，也可以从集群环集群会进行一个基本的负载均衡。&lt;br&gt;集群中有两种节点：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;内存节点：只保存状态到内存（一个例外的情况是：持久的queue的持久内容将被保存到disk）&lt;/li&gt;
+&lt;li&gt;磁盘节点：保存状态到内存和磁盘。&lt;br&gt;内存节点虽然不写入磁盘，但是它执行比磁盘节点要好。集群中，只需要一个磁盘节点来保存状态就足够了。&lt;br&gt;如果集群中只有内存节点，那么不能停止它们，否则所有的状态，消息等都会丢失。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;镜像模式部署集群&quot;&gt;&lt;a href=&quot;#镜像模式部署集群&quot; class=&quot;headerlink&quot; title=&quot;镜像模式部署集群&quot;&gt;&lt;/a&gt;镜像模式部署集群&lt;/h2&gt;&lt;h3 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;安装软件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;console&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;114.55.248.157&lt;/td&gt;
+&lt;td&gt;haproxy-1.5.14&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;log1&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;114.55.29.86&lt;/td&gt;
+&lt;td&gt;erlang、rabbitmq-server-3.5.0-1.noarch.rpm&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;log2&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;114.55.29.241&lt;/td&gt;
+&lt;td&gt;erlang、rabbitmq-server-3.5.0-1.noarch.rpm&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;【环境说明】:集群中有3台机器，console主机作为反向代理，另外两台是rabbitmq server，一台使用磁盘模式，一台使用内存模式。&lt;br&gt;【注意】:请确保两台rabbitmq server主机的/etc/hosts里有ip地址和主机名的对应关系。如：&lt;br&gt;114.55.29.86 log1&lt;br&gt;114.55.29.241 log2&lt;/p&gt;
+&lt;h3 id=&quot;集群每个节点安装rabbitmq-server&quot;&gt;&lt;a href=&quot;#集群每个节点安装rabbitmq-server&quot; class=&quot;headerlink&quot; title=&quot;集群每个节点安装rabbitmq server&quot;&gt;&lt;/a&gt;集群每个节点安装rabbitmq server&lt;/h3&gt;&lt;p&gt;log1和log2分别安装rabbitmq server。&lt;br&gt;1.配置好epel源&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;rpm -Uvh http://download.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.安装依赖包&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# yum install erlang –y
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.安装rabbitMq&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# wget http://www.rabbitmq.com/releases/rabbitmq-server/v3.5.0/rabbitmq-server-3.5.0-1.noarch.rpm
+[root@log1 local]# yum localinstall rabbitmq-server-3.5.0-1.noarch.rpm -y
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.添加开机启动&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# chkconfig rabbitmq-server on
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.启动&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# service rabbitmq-server start
+Starting rabbitmq-server: SUCCESS
+rabbitmq-server.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;6.开启web管理界面&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# rabbitmq-plugins enable rabbitmq_management
+The following plugins have been enabled:
+  mochiweb
+  webmachine
+  rabbitmq_web_dispatch
+  amqp_client
+  rabbitmq_management_agent
+  rabbitmq_management
+
+Applying plugin configuration to rabbit@log1... started 6 plugins.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;7.修改配置文件&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# cp /usr/share/doc/rabbitmq-server-3.5.0/rabbitmq.config.example /etc/rabbitmq/rabbitmq.config
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;修改用户配置 让其可以通过远程访问 不限于localhost。注意：rabbitmq从3.3.0开始禁止使用guest/guest权限通过除localhost外的访问。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# vim /etc/rabbitmq/rabbitmq.config
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;{loopback_users, []} 删除前面的注释%%，同时注意后面的逗号，只有一个配置项的时候，请删除后面的逗号。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;以上7步在log2主机上都要执行&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;8.因为默认用户为guest，要添加其他的管理账户。&lt;br&gt;&lt;strong&gt;注意:如果是集群的话，只要在一台主机设置即可，其它会自动同步。&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# rabbitmqctl add_user zxadmin wisedu@2016
+Creating user &amp;quot;zxadmin&amp;quot; ...
+[root@log1 local]# rabbitmqctl set_user_tags zxadmin administrator
+Setting tags for user &amp;quot;zxadmin&amp;quot; to [administrator] ...
+[root@log1 local]# rabbitmqctl set_permissions -p / zxadmin &amp;quot;.*&amp;quot; &amp;quot;.*&amp;quot; &amp;quot;.*&amp;quot;
+Setting permissions for user &amp;quot;zxadmin&amp;quot; in vhost &amp;quot;/&amp;quot; ...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;9.重启rabbitMQ&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 local]# service rabbitmq-server restart
+Restarting rabbitmq-server: SUCCESS
+rabbitmq-server.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;10.访问管控台&lt;br&gt;浏览器输入URL：&lt;a href=&quot;http://ip/15672&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://ip/15672&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/7.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;设置每个节点Cookie&quot;&gt;&lt;a href=&quot;#设置每个节点Cookie&quot; class=&quot;headerlink&quot; title=&quot;设置每个节点Cookie&quot;&gt;&lt;/a&gt;设置每个节点Cookie&lt;/h3&gt;&lt;p&gt;Rabbitmq的集群是依赖于erlang的集群来工作的，所以必须先构建起erlang的集群环境。Erlang的集群中各节点是通过一个magic cookie来实现的，这个cookie存放在  /var/lib/rabbitmq/.erlang.cookie 中，文件是400的权限。所以必须保证各节点cookie保持一致，否则节点之间就无法通信。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/8.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;将其中一台节点上的.erlang.cookie值复制下来保存到其他节点上。或者使用scp的方法也可，但是要注意文件的权限和属主属组。我这里将log1中的cookie 复制到log2中。&lt;br&gt;1.因为.erlang.cookie是只读的，先修改下log2中的.erlang.cookie权限&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 rabbitmq]# chmod 777 .erlang.cookie
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.copy log1主机上的.erlang.cookie到log2主机/var/lib/rabbitmq/目录下&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 rabbitmq]# scp -p .erlang.cookie root@114.55.29.241:/var/lib/rabbitmq/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.停止所有节点RabbitMq服务，然后使用detached参数独立运行，这步很关键，尤其增加节点停止节点后再次启动遇到无法启动都可以参照这个顺序。&lt;br&gt;停止：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 rabbitmq]# service rabbitmq-server stop
+[root@log2 rabbitmq]# service rabbitmq-server stop
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 rabbitmq]# rabbitmq-server -detached
+Warning: PID file not written; -detached was passed.
+[root@log2 rabbitmq]# rabbitmq-server -detached
+Warning: PID file not written; -detached was passed.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.分别查看下每个节点&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 rabbitmq]# rabbitmqctl cluster_status
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/9.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 rabbitmq]# rabbitmqctl cluster_status
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/10.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;5.将log2作为内存节点与log1连接起来，在log2上执行如下命令：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 rabbitmq]# rabbitmqctl stop_app
+[root@log2 rabbitmq]# rabbitmqctl join_cluster --ram rabbit@log1
+[root@log2 rabbitmq]# rabbitmqctl start_app
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;上述命令先停掉rabbitmq应用，然后调用cluster命令，将log2连接到log1，使两者成为一个集群，最后重启log2的rabbitmq应用。在这个cluster命令下，log2是内存节点，log1是磁盘节点（RabbitMQ启动后，默认是磁盘节点）。&lt;br&gt;log1如果要使log2在集群里也是磁盘节点，join_cluster 命令去掉–ram参数即可：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 rabbitmq]# rabbitmqctl join_cluster rabbit@log1 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;只要在节点列表里包含了自己，它就成为一个磁盘节点。在RabbitMQ集群里，必须至少有一个磁盘节点存在。&lt;/p&gt;
+&lt;p&gt;6.再次查看各节点状态&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 rabbitmq]# rabbitmqctl cluster_status
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/11.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 rabbitmq]# rabbitmqctl cluster_status
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/12.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这样RabbitMQ集群就正常工作了。可以访问任意一个web管控台：&lt;a href=&quot;http://ip/15672&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://ip/15672&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/13.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;添加镜像模式配置&quot;&gt;&lt;a href=&quot;#添加镜像模式配置&quot; class=&quot;headerlink&quot; title=&quot;添加镜像模式配置&quot;&gt;&lt;/a&gt;添加镜像模式配置&lt;/h3&gt;&lt;p&gt;上面配置RabbitMQ默认集群模式，但并不保证队列的高可用性，尽管交换机、绑定这些可以复制到集群里的任何一个节点，但是队列内容不会复制，虽然该模式解决一部分节点压力，但队列节点宕机直接导致该队列无法使用，只能等待重启，所以要想在队列节点宕机或故障也能正常使用，就要复制队列内容到集群里的每个节点，需要创建镜像队列。&lt;br&gt;1.安装haproxy&lt;br&gt;haproxy是在主机名为console上安装的。可以选择源代码编译安装或者yum安装，在这里我选择了yum安装。安装版本：haproxy-1.5.14-3.el7.x86_64 &lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# yum install -y haproxy
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.修改配置/etc/haproxy/haproxy.cfg&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# vim /etc/haproxy/haproxy.cfg
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;删除 main frontend which proxys to the backends以下的所有内容，并添加&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;listen rabbitmq_cluster 0.0.0.0:5672
+    mode tcp
+    balance roundrobin
+    server   rqslave1 114.55.29.241:5672 check inter 2000 rise 2 fall 3
+    server   rqmaster 114.55.29.86:5672 check inter 2000 rise 2 fall 3
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果有3台或3台以上，可以把disc节点注释掉，原因就是让rabbitmq性能最佳化。这样负载均衡器会监听5672端口，轮询多个内存节点的5672端口，磁盘节点可以只做备份不提供给生产者、消费者使用，当然如果我们服务器资源充足情况也可以配置多个磁盘节点。此外，还需要修改defaults段配置：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/14.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;检查配置文件语法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# haproxy -c -f /etc/haproxy/haproxy.cfg
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动haproxy：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# service haproxy start
+Redirecting to /bin/systemctl start  haproxy.service
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.配置策略：设置ha模式&lt;br&gt;使用Rabbit镜像功能，需要基于rabbitmq策略来实现，政策是用来控制和修改群集范围的某个vhost队列行为和Exchange行为。&lt;br&gt;其中ha-mode有三种模式:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;all: 同步至所有的；&lt;/li&gt;
+&lt;li&gt;exactly: 同步最多N个机器. 当现有集群机器数小于N时,同步所有,大于等于N时则不进行同步. N需要额外通过ha-params来指定；&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;nodes: 只同步至符合指定名称的nodes. N需要额外通过ha-params来指定。&lt;br&gt;在cluster中任意节点启用策略，策略会自动同步到集群节点。我这里设置的是同步全部的queue, 可以按需自己选择指定的queue。语法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;rabbitmqctl set_policy  [-p  vhostpath ] { name } { pattern } { definition } [ priority ]
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在log1主机上执行如下命令：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log1 ~]# rabbitmqctl set_policy ha-all &amp;quot;^&amp;quot; &amp;apos;{&amp;quot;ha-mode&amp;quot;:&amp;quot;all&amp;quot;}&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/RabbitMQ/15.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这行命令创建了一个策略，策略名称为ha-all,策略模式为 all ，即复制到所有节点，包含新增节点，策略正则表达式为 “^” 表示所有匹配所有队列名称。&lt;/p&gt;
+&lt;h3 id=&quot;集群退出&quot;&gt;&lt;a href=&quot;#集群退出&quot; class=&quot;headerlink&quot; title=&quot;集群退出&quot;&gt;&lt;/a&gt;集群退出&lt;/h3&gt;&lt;p&gt;假设要把log2退出集群。&lt;br&gt;在log2上执行：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#rabbitmqctl stop_app
+#rabbitmqctl reset
+#rabbitmqctl start_app 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在集群主节点上执行：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# rabbitmqctl forget_cluster_node rabbit@log2
+&lt;/code&gt;&lt;/pre&gt;</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;RabbitMQ介绍&quot;&gt;&lt;a href=&quot;#RabbitMQ介绍&quot; class=&quot;headerlink&quot; title=&quot;RabbitMQ介绍&quot;&gt;&lt;/a&gt;RabbitMQ介绍&lt;/h2&gt;&lt;p&gt;消息系统通过将消息的发送和接收分离来实现应用程序的异步和解偶。&lt;br&gt;或许你正在考虑进行数据投递，非阻塞操作或推送通知。或许你想要实现发布／订阅，异步处理，或者工作队列。所有这些都属于消息系统的模式。&lt;br&gt;RabbitMQ是一个消息代理，一个消息系统的媒介。它可以为你的应用提供一个通用的消息发送和接收平台，并且保证消息再传输过程中的安全。&lt;br&gt;RabbitMQ是一个在AMQP协议标准上完整的、可复用的企业消息系统。它遵循Mozilla Public License开源协议，采用Erlang语言实现的工业级的消息队列。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="消息队列" scheme="http://yoursite.com/categories/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/"/>
+    
+    
+      <category term="消息队列" scheme="http://yoursite.com/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/"/>
     
   </entry>
   
