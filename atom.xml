@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-08-29T02:10:55.000Z</updated>
+  <updated>2017-09-02T14:03:32.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,252 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Registry私有仓库搭建及认证</title>
+    <link href="http://yoursite.com/2017/09/01/Registry%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA%E5%8F%8A%E8%AE%A4%E8%AF%81/"/>
+    <id>http://yoursite.com/2017/09/01/Registry私有仓库搭建及认证/</id>
+    <published>2017-09-01T09:44:19.000Z</published>
+    <updated>2017-09-02T14:03:32.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Registry相关概念&quot;&gt;&lt;a href=&quot;#Registry相关概念&quot; class=&quot;headerlink&quot; title=&quot;Registry相关概念&quot;&gt;&lt;/a&gt;Registry相关概念&lt;/h2&gt;&lt;p&gt;前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。&lt;br&gt;image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。可以很容易和本地源代码以及远端Git服务的关系相对应。&lt;br&gt;Docker hub是Docker公司提供的一些存储镜像的空间，这部分空间是有限的。我们一般会自主建设Docker私有仓库Registry。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;Registry-V1和V2&quot;&gt;&lt;a href=&quot;#Registry-V1和V2&quot; class=&quot;headerlink&quot; title=&quot;Registry V1和V2&quot;&gt;&lt;/a&gt;Registry V1和V2&lt;/h2&gt;&lt;p&gt;Docker Registry 2.0版本在安全性和性能上做了诸多优化，并重新设计了镜像的存储的格式。Docker目前1.6之后支持V2。&lt;/p&gt;
+&lt;h2 id=&quot;安装Docker&quot;&gt;&lt;a href=&quot;#安装Docker&quot; class=&quot;headerlink&quot; title=&quot;安装Docker&quot;&gt;&lt;/a&gt;安装Docker&lt;/h2&gt;&lt;p&gt;见前面发布的文章《CentOS安装Docker CE》。注意，在docker 1.12版本上测试registry有问题。&lt;/p&gt;
+&lt;h2 id=&quot;搭建本地registry-v2&quot;&gt;&lt;a href=&quot;#搭建本地registry-v2&quot; class=&quot;headerlink&quot; title=&quot;搭建本地registry v2&quot;&gt;&lt;/a&gt;搭建本地registry v2&lt;/h2&gt;&lt;p&gt;环境：172.16.7.151&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -d -p 5000:5000 --name wisedu_registry registry:2
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;本地上传:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker pull ubuntu:16.04
+[root@node1 ~]# docker tag ubuntu:16.04 localhost:5000/my-ubuntu
+[root@node1 ~]# docker push localhost:5000/my-ubuntu
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;删除本地的ubuntu:16.04和localhost:5000/my-ubuntu&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker image remove ubuntu:16.04
+[root@node1 ~]# docker image remove localhost:5000/my-ubuntu
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;从本地registry中拉取 localhost:5000/my-ubuntu 镜像：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker pull localhost:5000/my-ubuntu
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;但是这种registry只是本地能使用，我们找另外一台主机172.16.7.152来push镜像：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node2 ~]# docker pull ubuntu:16.04
+[root@node2 docker]# docker tag ubuntu:16.04 172.16.7.151:5000/ubuntu:v1
+[root@node2 docker]# docker push 172.16.7.151:5000/ubuntu:v1
+The push refers to a repository [172.16.7.151:5000/ubuntu]
+Get https://172.16.7.151:5000/v2/: http: server gave HTTP response to HTTPS client
+[root@node2 ~]# echo $?
+1
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这是因为从docker1.13.2版本开始，使用registry时，必须使用TLS保证其安全。&lt;/p&gt;
+&lt;p&gt;停止并删除本地registry：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker stop wisedu_registry         
+wisedu_registry
+[root@node1 ~]# docker rm -v wisedu_registry
+wisedu_registry
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;搭建外部可访问的Registry&quot;&gt;&lt;a href=&quot;#搭建外部可访问的Registry&quot; class=&quot;headerlink&quot; title=&quot;搭建外部可访问的Registry&quot;&gt;&lt;/a&gt;搭建外部可访问的Registry&lt;/h2&gt;&lt;p&gt;官方文档：&lt;a href=&quot;https://docs.docker.com/registry/deploying/#run-an-externally-accessible-registry&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.docker.com/registry/deploying/#run-an-externally-accessible-registry&lt;/a&gt;&lt;br&gt;Running a registry only accessible on localhost has limited usefulness. In order to make your registry accessible to external hosts, you must first secure it using TLS.&lt;/p&gt;
+&lt;h3 id=&quot;获取证书&quot;&gt;&lt;a href=&quot;#获取证书&quot; class=&quot;headerlink&quot; title=&quot;获取证书&quot;&gt;&lt;/a&gt;获取证书&lt;/h3&gt;&lt;p&gt;使用TLS认证registry容器时，必须有证书。一般情况下，是要去认证机构购买签名证书。这里使用openssl生成自签名的证书。&lt;br&gt;1.生成自签名证书&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# mkdir -p /opt/docker/registry/certs
+[root@spark32 ~]# openssl req -newkey rsa:4096 -nodes -sha256 -keyout /opt/docker/registry/certs/domain.key -x509 -days 365 -out /opt/docker/registry/certs/domain.crt
+Generating a 4096 bit RSA private key
+...
+Country Name (2 letter code) [XX]:CN
+State or Province Name (full name) []:JiangSu
+Locality Name (eg, city) [Default City]:NanJing
+Organization Name (eg, company) [Default Company Ltd]:wisedu
+Organizational Unit Name (eg, section) []:edu
+Common Name (eg, your name or your server&amp;apos;s hostname) []:registry.docker.com
+Email Address []:01115004@wisedu.com
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.创建带有TLS认证的registry容器&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# docker run -d --name registry2 -p 5000:5000 -v /opt/docker/registry/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.在每一个docker客户端宿主机上配置/etc/hosts，以使客户端宿主机可以解析域名”registry.docker.com”。并创建与这个registry服务器域名一致的目录（因为我这里的域名是假的）&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# vim /etc/hosts
+172.16.206.32 registry.docker.com
+[root@node1 ~]# cd /etc/docker/certs.d/
+[root@node1 certs.d]# mkdir registry.docker.com:5000
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.将证书 domain.crt 复制到每一个docker客户端宿主机/etc/docker/certs.d/registry.docker.com:5000/ca.crt，不需要重启docker&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# scp -p /opt/docker/registry/certs/domain.crt root@172.16.7.151:/etc/docker/certs.d/registry.docker.com\:5000/ca.crt
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.push镜像到registry&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 certs.d]# docker tag ubuntu:16.04 registry.docker.com:5000/my-ubuntu:v1
+[root@node1 certs.d]# docker push registry.docker.com:5000/my-ubuntu:v1
+The push refers to a repository [registry.docker.com:5000/my-ubuntu]
+a09947e71dc0: Pushed 
+9c42c2077cde: Pushed 
+625c7a2a783b: Pushed 
+25e0901a71b8: Pushed 
+8aa4fcad5eeb: Pushed 
+v1: digest: sha256:634a341aa83f32b48949ef428db8fefcd897dbacfdac26f044b60c14d1b5e972 size: 1357
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;6.列出私有仓库中的所有镜像&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 certs.d]# curl -X GET https://registry.docker.com:5000/v2/_catalog -k
+{&amp;quot;repositories&amp;quot;:[&amp;quot;my-ubuntu&amp;quot;]}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;7.查看存储在registry:2宿主机上的镜像&lt;br&gt;在registry:2创建的私有仓库中，上传的镜像保存在容器的/var/lib/registry目录下。创建registry:2的容器时，会自动创建一个数据卷(Data Volumes)，数据卷对应的宿主机下的目录一般为：/var/lib/docker/volumes/XXX/_data。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# ls /var/lib/docker/volumes/91a0091963fa6d107dc988a60b61790bba843a115573e331db967921d5e83372/_data/docker/registry/v2/repositories/my-ubuntu/
+_layers  _manifests  _uploads
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可以在创建registry:2的容器时，通过-v参数，修改这种数据卷关系：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;–v /opt/docker/registry/data:/var/lib/registry
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;除了可以将数据保存在当前主机的文件系统上，registry也支持其他基于云的存储系统，比如S3，Microsoft Azure, Ceph Rados, OpenStack Swift and Aliyun OSS等。可以在配置文件中进行配置：&lt;a href=&quot;https://github.com/docker/distribution/blob/master/docs/configuration.md#storage&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/docker/distribution/blob/master/docs/configuration.md#storage&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;【补充】：&lt;br&gt;一般情况下，证书只支持域名访问，要使其支持IP地址访问，需要修改配置文件openssl.cnf。&lt;br&gt;在Redhat7系统中，文件所在位置是/etc/pki/tls/openssl.cnf。在其中的[ v3_ca]部分，添加subjectAltName选项：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[ v3_ca ]  
+subjectAltName = IP:192.168.1.104 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;生成证书：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;...  
+Country Name (2 letter code) [XX]:  
+State or Province Name (full name) []:  
+Locality Name (eg, city) [Default City]:  
+Organization Name (eg, company) [Default Company Ltd]:  
+Organizational Unit Name (eg, section) []:  
+Common Name (eg, your name or your server&amp;apos;s hostname) []:172.16.206.32:5000  
+Email Address []:  
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;添加认证&quot;&gt;&lt;a href=&quot;#添加认证&quot; class=&quot;headerlink&quot; title=&quot;添加认证&quot;&gt;&lt;/a&gt;添加认证&lt;/h2&gt;&lt;h3 id=&quot;Native-basic-auth&quot;&gt;&lt;a href=&quot;#Native-basic-auth&quot; class=&quot;headerlink&quot; title=&quot;Native basic auth&quot;&gt;&lt;/a&gt;Native basic auth&lt;/h3&gt;&lt;p&gt;The simplest way to achieve access restriction is through basic authentication (this is very similar to other web servers’ basic authentication mechanism). This example uses native basic authentication using htpasswd to store the secrets.&lt;/p&gt;
+&lt;p&gt;1.创建用户密码文件，testuser，testpassword&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# mkdir /opt/docker/registry/auth
+[root@spark32 ~]# docker run --entrypoint htpasswd registry:2 -Bbn testuser testpassword &amp;gt; /opt/docker/registry/auth/htpasswd
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.运行registry容器&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# docker run -d --name registry_native_auth -p 5000:5000 -v /opt/docker/registry/auth:/auth -e &amp;quot;REGISTRY_AUTH=htpasswd&amp;quot; -e &amp;quot;REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm&amp;quot; -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd -v /opt/docker/registry/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.现在尝试拉取镜像：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker pull registry.docker.com:5000/my-ubuntu:v1
+Error response from daemon: Get https://registry.docker.com:5000/v2/my-ubuntu/manifests/v1: no basic auth credentials
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.登录registry，push镜像：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker login registry.docker.com:5000
+Username: testuser
+Password: 
+Login Succeeded
+[root@node1 ~]# docker tag ubuntu:16.04 registry.docker.com:5000/my-ubuntu:v1
+[root@node1 ~]# docker push registry.docker.com:5000/my-ubuntu:v1 
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;更高级的认证&quot;&gt;&lt;a href=&quot;#更高级的认证&quot; class=&quot;headerlink&quot; title=&quot;更高级的认证&quot;&gt;&lt;/a&gt;更高级的认证&lt;/h2&gt;&lt;p&gt;更好的方式是在registry前使用代理，利用代理提供https的ssl的认证和basic authentication。&lt;a href=&quot;https://docs.docker.com/registry/recipes/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.docker.com/registry/recipes/&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;配置Nginx作为认证代理&quot;&gt;&lt;a href=&quot;#配置Nginx作为认证代理&quot; class=&quot;headerlink&quot; title=&quot;配置Nginx作为认证代理&quot;&gt;&lt;/a&gt;配置Nginx作为认证代理&lt;/h3&gt;&lt;p&gt;&lt;a href=&quot;https://docs.docker.com/registry/recipes/nginx/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.docker.com/registry/recipes/nginx/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;1.创建需要的目录&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# mkdir -p /opt/nginx_proxy_registry/{auth,data}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.创建Nginx主配置文件&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# vim /opt/nginx_proxy_registry/auth/nginx.conf
+events {
+    worker_connections  1024;
+}
+
+http {
+
+  upstream docker-registry {
+    server registry:5000;
+  }
+
+  ## Set a variable to help us decide if we need to add the
+  ## &amp;apos;Docker-Distribution-Api-Version&amp;apos; header.
+  ## The registry always sets this header.
+  ## In the case of nginx performing auth, the header will be unset
+  ## since nginx is auth-ing before proxying.
+  map $upstream_http_docker_distribution_api_version $docker_distribution_api_version {
+    &amp;apos;&amp;apos; &amp;apos;registry/2.0&amp;apos;;
+  }
+
+  server {
+    listen 443 ssl;
+    server_name registry.docker.com;
+
+    # SSL
+    ssl_certificate /etc/nginx/conf.d/domain.crt;
+    ssl_certificate_key /etc/nginx/conf.d/domain.key;
+
+    # Recommendations from https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
+    ssl_protocols TLSv1.1 TLSv1.2;
+    ssl_ciphers &amp;apos;EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH&amp;apos;;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+
+    # disable any limits to avoid HTTP 413 for large image uploads
+    client_max_body_size 0;
+
+    # required to avoid HTTP 411: see Issue #1486 (https://github.com/moby/moby/issues/1486)
+    chunked_transfer_encoding on;
+
+    location /v2/ {
+      # Do not allow connections from docker 1.5 and earlier
+      # docker pre-1.6.0 did not properly set the user agent on ping, catch &amp;quot;Go *&amp;quot; user agents
+      if ($http_user_agent ~ &amp;quot;^(docker\/1\.(3|4|5(?!\.[0-9]-dev))|Go ).*$&amp;quot; ) {
+        return 404;
+      }
+
+      # To add basic authentication to v2 use auth_basic setting.
+      auth_basic &amp;quot;Registry realm&amp;quot;;
+      auth_basic_user_file /etc/nginx/conf.d/nginx.htpasswd;
+
+      ## If $docker_distribution_api_version is empty, the header will not be added.
+      ## See the map directive above where this variable is defined.
+      add_header &amp;apos;Docker-Distribution-Api-Version&amp;apos; $docker_distribution_api_version always;
+
+      proxy_pass                          http://docker-registry;
+      proxy_set_header  Host              $http_host;   # required for docker client&amp;apos;s sake
+      proxy_set_header  X-Real-IP         $remote_addr; # pass on real client&amp;apos;s IP
+      proxy_set_header  X-Forwarded-For   $proxy_add_x_forwarded_for;
+      proxy_set_header  X-Forwarded-Proto $scheme;
+      proxy_read_timeout                  900;
+    }
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.创建密码认证文件&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# docker run --rm --entrypoint htpasswd registry:2 -bn testuser testpassword &amp;gt; /opt/nginx_proxy_registry/auth/nginx.htpasswd
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.拷贝之前生成的证书和key到auth目录下&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# cp /opt/docker/registry/certs/domain.crt /opt/nginx_proxy_registry/auth/
+[root@spark32 ~]# cp /opt/docker/registry/certs/domain.key /opt/nginx_proxy_registry/auth/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.创建compose文件 &lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# cd /opt/nginx_proxy_registry/
+[root@spark32 nginx_proxy_registry]# vim docker-compose.yml
+nginx:
+  image: &amp;quot;nginx:1.9&amp;quot;
+  ports:
+    - 5043:443
+  links:
+    - registry:registry
+  volumes:
+    - ./auth:/etc/nginx/conf.d
+    - ./auth/nginx.conf:/etc/nginx/nginx.conf:ro
+
+registry:
+  image: registry:2
+  ports:
+    - 127.0.0.1:5000:5000
+  volumes:
+    - ./data:/var/lib/registry
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;6.启动&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 nginx_proxy_registry]# docker-compose up -d
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;7.验证启动的服务&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 nginx_proxy_registry]# docker-compose ps
+[root@spark32 ~]# docker ps 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;找一台docker客户端机器登录：&lt;br&gt;创建需要的目录：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# mkdir /etc/docker/certs.d/registry.docker.com:5043
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;把 domain.crt 传到上一步生成的目录里：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# scp -p /opt/nginx_proxy_registry/auth/domain.crt root@172.16.7.151:/etc/docker/certs.d/registry.docker.com:5043/ca.crt
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;登录：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker login -u=testuser -p=testpassword registry.docker.com:5043
+Login Succeeded
+[root@node1 ~]# docker tag ubuntu:16.04 registry.docker.com:5043/ubuntu-test:v1
+[root@node1 ~]# docker push registry.docker.com:5043/ubuntu-test:v1
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;8.停止服务&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# cd /opt/nginx_proxy_registry/
+[root@spark32 nginx_proxy_registry]# docker-compose stop
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;9.查看日志&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 nginx_proxy_registry]# docker-compose logs
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;补充Docker-compose&quot;&gt;&lt;a href=&quot;#补充Docker-compose&quot; class=&quot;headerlink&quot; title=&quot;补充Docker compose&quot;&gt;&lt;/a&gt;补充Docker compose&lt;/h3&gt;&lt;h4 id=&quot;Docker-compose是什么&quot;&gt;&lt;a href=&quot;#Docker-compose是什么&quot; class=&quot;headerlink&quot; title=&quot;Docker compose是什么&quot;&gt;&lt;/a&gt;Docker compose是什么&lt;/h4&gt;&lt;p&gt;Docker Compose是一个用来定义和运行复杂应用的Docker工具。使用Compose，你可以在一个文件中定义一个多容器应用，然后使用一条命令来启动你的应用，完成一切准备工作。&lt;br&gt;一个使用Docker容器的应用，通常由多个容器组成。使用Docker Compose，不再需要使用shell脚本来启动容器。&lt;/p&gt;
+&lt;h4 id=&quot;安装docker-compose&quot;&gt;&lt;a href=&quot;#安装docker-compose&quot; class=&quot;headerlink&quot; title=&quot;安装docker compose&quot;&gt;&lt;/a&gt;安装docker compose&lt;/h4&gt;&lt;p&gt;将变量 $dockerComposeVersion 换成指定的&lt;a href=&quot;https://github.com/docker/compose/releases&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;版本&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# curl -L https://github.com/docker/compose/releases/download/$dockerComposeVersion/docker-compose-`uname -m` -o /usr/local/bin/docker-compose
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;比如下载1.15.0版本：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# curl -L https://github.com/docker/compose/releases/download/1.15.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可能会下载失败，多试几次。实在不行就需要翻墙去下载。&lt;/p&gt;
+&lt;p&gt;赋予执行权限：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# chmod +x /usr/local/bin/docker-compose
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看docker compose版本：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# docker-compose --version
+docker-compose version 1.15.0, build e12f3b9
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;卸载docker-compose&quot;&gt;&lt;a href=&quot;#卸载docker-compose&quot; class=&quot;headerlink&quot; title=&quot;卸载docker compose&quot;&gt;&lt;/a&gt;卸载docker compose&lt;/h4&gt;&lt;p&gt;如果docker compose是通过curl安装的:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;rm /usr/local/bin/docker-compose
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果docker compose是通过pip安装的:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;pip uninstall docker-compose
+&lt;/code&gt;&lt;/pre&gt;</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Registry相关概念&quot;&gt;&lt;a href=&quot;#Registry相关概念&quot; class=&quot;headerlink&quot; title=&quot;Registry相关概念&quot;&gt;&lt;/a&gt;Registry相关概念&lt;/h2&gt;&lt;p&gt;前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。&lt;br&gt;image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。可以很容易和本地源代码以及远端Git服务的关系相对应。&lt;br&gt;Docker hub是Docker公司提供的一些存储镜像的空间，这部分空间是有限的。我们一般会自主建设Docker私有仓库Registry。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+    
+    
+      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
+    
+  </entry>
   
   <entry>
     <title>CentOS安装Docker CE</title>
@@ -2944,111 +3190,6 @@ curl -XPOST http:// 114.55.29.86:9200/index/fulltext/4 -d&amp;apos;
     
     
       <category term="搜索 Elasticsearch" scheme="http://yoursite.com/tags/%E6%90%9C%E7%B4%A2-Elasticsearch/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Storm介绍及安装部署</title>
-    <link href="http://yoursite.com/2017/06/10/Storm%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
-    <id>http://yoursite.com/2017/06/10/Storm介绍及安装部署/</id>
-    <published>2017-06-10T02:39:13.000Z</published>
-    <updated>2017-07-29T13:39:00.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;Apache-Storm是什么&quot;&gt;&lt;a href=&quot;#Apache-Storm是什么&quot; class=&quot;headerlink&quot; title=&quot;Apache Storm是什么&quot;&gt;&lt;/a&gt;Apache Storm是什么&lt;/h2&gt;&lt;p&gt;Apache Storm是自由开源的分布式实时计算系统，擅长处理海量数据，适用于数据实时处理而非批处理。&lt;br&gt;批处理使用的大多是鼎鼎大名的hadoop或者hive，作为一个批处理系统，hadoop以其吞吐量大、自动容错等优点，在海量数据处理上得到了广泛的使用。但是，hadoop不擅长实时计算，因为它天然就是为批处理而生的，这也是业界一致的共识。否则最近几年也不会有s4,storm,puma这些实时计算系统如雨后春笋般冒出来啦。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;举个搜索场景中的例子，当一个卖家发布了一条宝贝信息时，他希望的当然是这个宝贝马上就可以被卖家搜索出来、点击、购买啦，相反，如果这个宝贝要等到第二天或者更久才可以被搜出来，估计就会有不少损失了。&lt;br&gt;再举一个推荐的例子，如果用户昨天在淘宝上买了一双袜子，今天想买一副泳镜去游泳，但是却发现系统在不遗余力地给他推荐袜子、鞋子，根本对他今天寻找泳镜的行为视而不见，这样商家的利益就有所损失。这是因为后台系统做的是每天一次的全量处理，而且大多是在夜深人静之时做的，那么客户今天白天做的事情要到明天才能反映出来。这也就是为什么需要实时处理的原因。&lt;/p&gt;
-&lt;h2 id=&quot;Apache-Storm核心概念&quot;&gt;&lt;a href=&quot;#Apache-Storm核心概念&quot; class=&quot;headerlink&quot; title=&quot;Apache Storm核心概念&quot;&gt;&lt;/a&gt;Apache Storm核心概念&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;Nimbus：Storm集群主节点，负责资源分配和任务调度。我们提交任务和截止任务都是在Nimbus上操作的。一个Storm集群只有一个Nimbus节点。&lt;/li&gt;
-&lt;li&gt;Supervisor：Storm集群工作节点，接受Nimbus分配任务，管理所有Worker。&lt;/li&gt;
-&lt;li&gt;Worker：工作进程，每个工作进程中都有多个Task。&lt;/li&gt;
-&lt;li&gt;Task：任务，每个Spout和Bolt都是一个任务，每个任务都是一个线程。&lt;/li&gt;
-&lt;li&gt;Topology：计算拓扑，包含了应用程序的逻辑。&lt;/li&gt;
-&lt;li&gt;Stream：消息流，关键抽象，是没有边界的Tuple序列。&lt;/li&gt;
-&lt;li&gt;Spout：消息流的源头，Topology的消息生产者。&lt;/li&gt;
-&lt;li&gt;Bolt：消息处理单元，可以过滤、聚合、查询数据库。&lt;/li&gt;
-&lt;li&gt;Stream grouping：消息分发策略，一共6种，定义每个Bolt接受何种输入。&lt;/li&gt;
-&lt;li&gt;Reliability：可靠性，Storm保证每个Tuple都会被处理。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;Storm原理架构&quot;&gt;&lt;a href=&quot;#Storm原理架构&quot; class=&quot;headerlink&quot; title=&quot;Storm原理架构&quot;&gt;&lt;/a&gt;Storm原理架构&lt;/h2&gt;&lt;h3 id=&quot;Storm集群架构图&quot;&gt;&lt;a href=&quot;#Storm集群架构图&quot; class=&quot;headerlink&quot; title=&quot;Storm集群架构图&quot;&gt;&lt;/a&gt;Storm集群架构图&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;Zookeeper集群在Storm集群中的作用：&lt;br&gt;Zookeeper集群负责Nimbus节点和Supervior节点之间的通信，监控各个节点之间的状态。比如通常我们提交任务的时候是在Nimbus节点上执行的，Nimbus节点通过zk集群将任务分发下去，而Supervisor是真正执行任务的地方。Nimbus节点通过zk集群监控各个Supervisor节点的状态，当某个Supervisor节点出现故障的时候，Nimbus节点就会通过zk集群将那个Supervisor节点上的任务重新分发，在其他Supervisor节点上执行。这就意味着Storm集群也是高可用集群，如果Nimbus节点出现故障的时候，整个任务并不会停止，但是任务的管理会出现影响，通常这种情况下我们只需要将Nimbus节点恢复就可以了。Nimbus节点不支持高可用，这也是Storm目前面临的问题之一。不过一般情况下，Nimbus节点的压力不大，通常不会出现问题。&lt;br&gt;一般情况下，Zookeeper集群的压力并不大，一般只需要部署3台就够了。Zookeeper集群在Storm集群中逻辑上是独立的，但在实际部署的时候，一般会将zk节点部署在Nimbus节点或Supervisor节点上。&lt;/p&gt;
-&lt;h3 id=&quot;数据处理流程图&quot;&gt;&lt;a href=&quot;#数据处理流程图&quot; class=&quot;headerlink&quot; title=&quot;数据处理流程图&quot;&gt;&lt;/a&gt;数据处理流程图&lt;/h3&gt;&lt;p&gt;storm处理数据的特点：数据源源不断，不断处理。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/2.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;拓扑图分析&quot;&gt;&lt;a href=&quot;#拓扑图分析&quot; class=&quot;headerlink&quot; title=&quot;拓扑图分析&quot;&gt;&lt;/a&gt;拓扑图分析&lt;/h3&gt;&lt;p&gt;storm中是没有数据存储结构的，我们需要自己设计数据落地接口，指明数据存储到哪一部分中。Storm本身是不存储数据的。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/3.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;Storm集群安装部署&quot;&gt;&lt;a href=&quot;#Storm集群安装部署&quot; class=&quot;headerlink&quot; title=&quot;Storm集群安装部署&quot;&gt;&lt;/a&gt;Storm集群安装部署&lt;/h2&gt;&lt;h3 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h3&gt;&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;主机名&lt;/th&gt;
-&lt;th&gt;操作系统版本&lt;/th&gt;
-&lt;th&gt;IP地址&lt;/th&gt;
-&lt;th&gt;安装软件&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;log1&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;114.55.29.86&lt;/td&gt;
-&lt;td&gt;JDK1.7、zookeeper-3.4.6、apache-storm-1.0.0&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;log2&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;114.55.29.241&lt;/td&gt;
-&lt;td&gt;JDK1.7、zookeeper-3.4.6、apache-storm-1.0.0&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;log3&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;114.55.253.15&lt;/td&gt;
-&lt;td&gt;JDK1.7、zookeeper-3.4.6、apache-storm-1.0.0&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id=&quot;安装Zookeeper集群&quot;&gt;&lt;a href=&quot;#安装Zookeeper集群&quot; class=&quot;headerlink&quot; title=&quot;安装Zookeeper集群&quot;&gt;&lt;/a&gt;安装Zookeeper集群&lt;/h3&gt;&lt;p&gt;见之前的文章《Zookeeper介绍及安装部署》。&lt;/p&gt;
-&lt;h3 id=&quot;安装Storm集群&quot;&gt;&lt;a href=&quot;#安装Storm集群&quot; class=&quot;headerlink&quot; title=&quot;安装Storm集群&quot;&gt;&lt;/a&gt;安装Storm集群&lt;/h3&gt;&lt;p&gt;log1、log2和log3部署storm集群，log1作为Nimbus节点，log2和log3作为surpervisor节点。&lt;/p&gt;
-&lt;p&gt;1.下载安装软件并解压&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 local]# wget http://apache.fayea.com/storm/apache-storm-1.0.0/apache-storm-1.0.0.tar.gz
-[root@log1 local]# tar zxf apache-storm-1.0.0.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.配置storm&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 ~]# cd /usr/local/apache-storm-1.0.0/
-[root@log1 apache-storm-1.0.0]# vim conf/storm.yaml
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(1)配置Zookeeper地址（配置Zookeeper的主机名）&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;注意: 如果Zookeeper集群使用的不是默认端口，那么还需要配置storm.zookeeper.port。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;(2)storm.local.dir: The Nimbus and Supervisor daemons require a directory on the local disk to store small amounts of state (like jars, confs, and things like that).&lt;br&gt;添加一行：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;storm.local.dir: &amp;quot;/usr/local/apache-storm-1.0.0/status&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这个status目录在storm启动的时候会自动创建，当然也可以提前创建好。&lt;/p&gt;
-&lt;p&gt;(3)配置nimbus.seeds：用于配置主控节点的地址，可以配置多个。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/6.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;(4)配置supervisor.slots.ports&lt;br&gt;supervisor.slots.ports:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- 6700
-- 6701
-- 6702
-- 6703
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;配置工作节点上的进程端口。你配置一个端口，意味着工作节点上启动一个worker，在实际的生产环境中，我们需要根据实际的物理配置以及每个节点上的负载情况来配置这个端口的数量。在这里每个节点我象征性的配置4个端口。&lt;br&gt;&lt;strong&gt;注意:以上配置，凡是有冒号的地方，冒号后都要有个空格。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;log2和log3主机也是同样的配置。拷贝这台机器的storm包到log2和log3主机：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 local]# scp -pr apache-storm-1.0.0 root@114.55.29.241:/usr/local/
-[root@log1 local]# scp -pr apache-storm-1.0.0 root@114.55.253.15:/usr/local/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(5)对于两台supervisor node，我们额外开启JMX支持，在配置文件中加入如下配置：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;supervisor.childopts: -verbose:gc -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=9998
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/8.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;9998就是用于通过JMX收集supervisior JVM指标的端口。&lt;/p&gt;
-&lt;p&gt;3.配置storm环境变量&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 apache-storm-0.10.0]# vim /etc/profile
-export STORM_HOME=/usr/local/apache-storm-0.10.0
-export PATH=$STORM_HOME/bin:$PATH
-[root@log1 apache-storm-0.10.0]# source /etc/profile
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;启动storm-ui、Nimbus和Supervisor&quot;&gt;&lt;a href=&quot;#启动storm-ui、Nimbus和Supervisor&quot; class=&quot;headerlink&quot; title=&quot;启动storm ui、Nimbus和Supervisor&quot;&gt;&lt;/a&gt;启动storm ui、Nimbus和Supervisor&lt;/h2&gt;&lt;p&gt;log1节点启动nimbus和storm ui：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 ~]# nohup storm ui &amp;gt;/dev/null 2&amp;gt;&amp;amp;1 &amp;amp;
-[root@log1 ~]# nohup storm nimbus &amp;gt;/dev/null 2&amp;gt;&amp;amp;1 &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;log2和log3主机启动Supervisor节点：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log2 ~]# nohup storm supervisor &amp;gt;/dev/null 2&amp;gt;&amp;amp;1 &amp;amp;
-[root@log3 ~]# nohup storm supervisor &amp;gt;/dev/null 2&amp;gt;&amp;amp;1 &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;访问ui页面：&lt;br&gt;&lt;a href=&quot;http://114.55.29.86:8080/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://114.55.29.86:8080/&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Storm/9.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;界面简单介绍：&lt;br&gt;Used slots：使用的worker数。&lt;br&gt;Free slots：空闲的worker数。&lt;br&gt;Executors：每个worker的物理线程数。&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Apache-Storm是什么&quot;&gt;&lt;a href=&quot;#Apache-Storm是什么&quot; class=&quot;headerlink&quot; title=&quot;Apache Storm是什么&quot;&gt;&lt;/a&gt;Apache Storm是什么&lt;/h2&gt;&lt;p&gt;Apache Storm是自由开源的分布式实时计算系统，擅长处理海量数据，适用于数据实时处理而非批处理。&lt;br&gt;批处理使用的大多是鼎鼎大名的hadoop或者hive，作为一个批处理系统，hadoop以其吞吐量大、自动容错等优点，在海量数据处理上得到了广泛的使用。但是，hadoop不擅长实时计算，因为它天然就是为批处理而生的，这也是业界一致的共识。否则最近几年也不会有s4,storm,puma这些实时计算系统如雨后春笋般冒出来啦。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="实时处理" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E5%A4%84%E7%90%86/"/>
-    
-    
-      <category term="Storm 实时处理" scheme="http://yoursite.com/tags/Storm-%E5%AE%9E%E6%97%B6%E5%A4%84%E7%90%86/"/>
     
   </entry>
   
