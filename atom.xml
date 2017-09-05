@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-02T14:03:32.000Z</updated>
+  <updated>2017-09-05T09:04:46.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,159 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>overlay实现容器跨主机通信</title>
+    <link href="http://yoursite.com/2017/09/05/overlay%E5%AE%9E%E7%8E%B0%E5%AE%B9%E5%99%A8%E8%B7%A8%E4%B8%BB%E6%9C%BA%E9%80%9A%E4%BF%A1/"/>
+    <id>http://yoursite.com/2017/09/05/overlay实现容器跨主机通信/</id>
+    <published>2017-09-05T05:42:06.000Z</published>
+    <updated>2017-09-05T09:04:46.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;a href=&quot;#Docker容器跨主机通信方案&quot; class=&quot;headerlink&quot; title=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;/a&gt;Docker容器跨主机通信方案&lt;/h2&gt;&lt;p&gt;实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。&lt;br&gt;Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是docker 1.11版本，这是我以前做的一个方案，现整理出来。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h2&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;Docker版本&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;node1&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;172.16.7.151&lt;/td&gt;
+&lt;td&gt;1.11.0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;node2&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;172.16.7.152&lt;/td&gt;
+&lt;td&gt;1.11.0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&quot;升级内核&quot;&gt;&lt;a href=&quot;#升级内核&quot; class=&quot;headerlink&quot; title=&quot;升级内核&quot;&gt;&lt;/a&gt;升级内核&lt;/h2&gt;&lt;p&gt;默认内核：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# uname -r
+3.10.0-229.el7.x86_64
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;1.升级内核需要使用 elrepo 的yum 源&lt;br&gt;首先我们导入 elrepo 的key&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.安装 elrepo 源&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.在yum的ELRepo源中，mainline 为最新版本的内核&lt;br&gt;安装 ml 的内核&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# yum --enablerepo=elrepo-kernel install  kernel-ml-devel kernel-ml -y
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.修改内核启动顺序，默认启动的顺序应该为1,升级以后内核是往前面插入，为0&lt;br&gt;由于CentOS 7使用grub2作为引导程序 ，所以和CentOS 6有所不同，并不是修改/etc/grub.conf来修改启动项，需要如下操作：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# cat /boot/grub2/grub.cfg |grep menuentry   #查看有哪些内核选项
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/21.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;        [root@node1 ~]# grub2-editenv list&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/22.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;        [root@node1 ~]# grub2-set-default 0&lt;/p&gt;
+&lt;p&gt;5.重启系统&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# shutdown -r now
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;6.查看 内核版本&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# uname -r
+4.5.2-1.el7.elrepo.x86_64
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装docker&quot;&gt;&lt;a href=&quot;#安装docker&quot; class=&quot;headerlink&quot; title=&quot;安装docker&quot;&gt;&lt;/a&gt;安装docker&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim /etc/yum.repos.d/docker.repo
+[dockerrepo]
+name=Docker Repository
+baseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/
+enabled=1
+gpgcheck=1
+gpgkey=https://yum.dockerproject.org/gpg
+
+[root@node1 ~]# yum install -y docker-engine
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果后面升级：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# yum update docker-engine
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;卸载：yum remove  &lt;/p&gt;
+&lt;h2 id=&quot;防火墙设置和开启内核转发&quot;&gt;&lt;a href=&quot;#防火墙设置和开启内核转发&quot; class=&quot;headerlink&quot; title=&quot;防火墙设置和开启内核转发&quot;&gt;&lt;/a&gt;防火墙设置和开启内核转发&lt;/h2&gt;&lt;p&gt;停止firewalld，安装iptables-services&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# systemctl stop firewalld.service
+[root@node1 ~]# systemctl disable firewalld.service
+[root@node1 ~]# yum install -y iptables-services
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;修改防火墙策略：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim /etc/sysconfig/iptables
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/23.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;        [root@node1 ~]# systemctl start iptables.service&lt;br&gt;        [root@node1 ~]# systemctl enable iptables.service&lt;/p&gt;
+&lt;p&gt;开启内核转发，在/etc/sysctl.conf中添加一行配置：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim /etc/sysctl.conf 
+net.ipv4.ip_forward=1
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行下面的命令使内核修改生效：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# sysctl -p
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装启动consul&quot;&gt;&lt;a href=&quot;#安装启动consul&quot; class=&quot;headerlink&quot; title=&quot;安装启动consul&quot;&gt;&lt;/a&gt;安装启动consul&lt;/h2&gt;&lt;p&gt;overlay一般需要一个全局的KV存储（sdn controller、etcd、consul）来存储各个主机节点在overlay网络中的配置信息。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# wget https://releases.hashicorp.com/consul/0.6.4/consul_0.6.4_linux_amd64.zip
+# unzip -oq consul_0.6.4_linux_amd64.zip
+# mv consul /usr/local/bin/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动consul：&lt;br&gt;host-1 Start Consul as a server in bootstrap mode:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# nohup consul agent -server -bootstrap -data-dir /tmp/consul -bind=172.16.7.151 &amp;amp;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;host-2 Start the Consul agent:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node2 ~]# nohup consul agent -data-dir /tmp/consul -bind=172.16.7.152 &amp;amp;
+[root@node2 ~]# consul join 172.16.7.151
+Successfully joined cluster by contacting 1 nodes.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/24.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;启动Docker&quot;&gt;&lt;a href=&quot;#启动Docker&quot; class=&quot;headerlink&quot; title=&quot;启动Docker&quot;&gt;&lt;/a&gt;启动Docker&lt;/h2&gt;&lt;h3 id=&quot;修改docker-daemon配置&quot;&gt;&lt;a href=&quot;#修改docker-daemon配置&quot; class=&quot;headerlink&quot; title=&quot;修改docker daemon配置&quot;&gt;&lt;/a&gt;修改docker daemon配置&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# cp /usr/lib/systemd/system/docker.service /etc/systemd/system/
+# vim /etc/systemd/system/docker.service
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在ExecStart那行加上如下的选项，其中ens32是网卡名字：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;--cluster-store=consul://localhost:8500 --cluster-advertise=ens32:2376
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/25.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;其中–cluster-store是指向key-value存储的地址，我这里就是consul的地址，consul里保存着整个overlay网络配置和节点信息。–cluster-advertise中是Host1和Host2互通的端口。&lt;/p&gt;
+&lt;h3 id=&quot;启动Docker-1&quot;&gt;&lt;a href=&quot;#启动Docker-1&quot; class=&quot;headerlink&quot; title=&quot;启动Docker&quot;&gt;&lt;/a&gt;启动Docker&lt;/h3&gt;&lt;p&gt;执行systemctl daemon-reload使配置生效，然后执行systemctl start docker.service启动docker服务。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# systemctl daemon-reload
+# systemctl start docker.service
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;加入开机自启动：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# systemctl enable docker.service
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;创建overlay-network&quot;&gt;&lt;a href=&quot;#创建overlay-network&quot; class=&quot;headerlink&quot; title=&quot;创建overlay network&quot;&gt;&lt;/a&gt;创建overlay network&lt;/h2&gt;&lt;h3 id=&quot;vxlan简介&quot;&gt;&lt;a href=&quot;#vxlan简介&quot; class=&quot;headerlink&quot; title=&quot;vxlan简介&quot;&gt;&lt;/a&gt;vxlan简介&lt;/h3&gt;&lt;p&gt;overlay network这种方式一般也是只需要三层可达，容器就能互通。overlay模式容器有独立IP，不同overlay方案之间的性能差别也是很大的。我这里采用的的vxlan技术。&lt;br&gt;vxlan(virtual Extensible LAN)虚拟可扩展局域网，是一种overlay的网络技术，使用MAC in UDP的方法进 行封装，共50字节的封装报文头。&lt;br&gt;用于对VXLAN报文进行封装/解封装，包括ARP请求报文和正常的VXLAN数据报文，在一段封装报文 后通过隧道向另一端VTEP发送封装报文，另一端VTEP接收到封装的报文解封装后根据封装的MAC地址进行转发。VTEP可由支持VXLAN的硬件设备或软件来实现。&lt;br&gt;从封装的结构上来看，VXLAN提供了将二层网络overlay在三层网络上的能力。&lt;/p&gt;
+&lt;h3 id=&quot;创建overlay-network-1&quot;&gt;&lt;a href=&quot;#创建overlay-network-1&quot; class=&quot;headerlink&quot; title=&quot;创建overlay network&quot;&gt;&lt;/a&gt;创建overlay network&lt;/h3&gt;&lt;p&gt;默认情况下，docker启动后初始化3种网络，这3种都是不能删除的。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# docker network ls
+NETWORK ID          NAME                DRIVER
+5944745e7d6d             bridge                   bridge              
+ce5d1ba0be32             host                       host                
+244bb9a34016             none                      null  
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在node1主机上创建overlay network:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker network create -d overlay --subnet=10.10.10.0/24 net1
+ca0c50dd3a49e028c3323024b9d6e8f837f4b76889b8d5848046ec0a5948ee2d
+[root@node1 ~]# docker network ls
+NETWORK ID          NAME                DRIVER
+5944745e7d6d             bridge                  bridge              
+ce5d1ba0be32             host                     host                
+ca0c50dd3a49             net1                    overlay             
+244bb9a34016             none                    null
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在其他主机上执行docker network ls，也会看到新建的这个名字叫net1的overlay网络。&lt;/p&gt;
+&lt;h2 id=&quot;创建容器&quot;&gt;&lt;a href=&quot;#创建容器&quot; class=&quot;headerlink&quot; title=&quot;创建容器&quot;&gt;&lt;/a&gt;创建容器&lt;/h2&gt;&lt;p&gt;node1主机创建容器：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it --net=net1 --name=contain1 --hostname=test1 --ip=10.10.10.3 --add-host test2:10.10.10.4 centos:centos7
+[root@test1 /]# yum install -y iproute net-tools
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/26.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/27.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;node2上创建容器：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node2 ~]# docker run -it --net=net1 --name=contain2 --hostname=test2 --ip=10.10.10.4 --add-host test1:10.10.10.3 centos:centos7
+[root@test2 /]# yum install -y iproute net-tools
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/28.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/29.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;测试容器跨主机通信&quot;&gt;&lt;a href=&quot;#测试容器跨主机通信&quot; class=&quot;headerlink&quot; title=&quot;测试容器跨主机通信&quot;&gt;&lt;/a&gt;测试容器跨主机通信&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/30.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/31.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;网络拓扑&quot;&gt;&lt;a href=&quot;#网络拓扑&quot; class=&quot;headerlink&quot; title=&quot;网络拓扑&quot;&gt;&lt;/a&gt;网络拓扑&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/32.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;容器内部有两个网络接口eth0、eth1。实际上，eth1连接到docker_gwbridge，这可以从ip就能看出。eth0即为overlay network的接口。&lt;/p&gt;
+&lt;h2 id=&quot;抓包分析&quot;&gt;&lt;a href=&quot;#抓包分析&quot; class=&quot;headerlink&quot; title=&quot;抓包分析&quot;&gt;&lt;/a&gt;抓包分析&lt;/h2&gt;&lt;p&gt;在node2主机上使用tcpdump抓包，然后在windows上用wireshark分析。&lt;br&gt;1.container1容器里ping container2的ip地址：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/33.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;2.node2主机上抓包&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node2 ~]# tcpdump -i ens32 -s 0 -X -nnn -vvv -w /tmp/package.pcap
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.把package.pcap传下来放到wireshark上分析&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/34.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/35.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;以在container1中ping container2，分析数据包流向：&lt;/strong&gt;&lt;br&gt;①container1(10.10.10.3)中ping container2(10.10.10.4)，根据container1的路由表，数据包可通过直连网络到达container2。于是arp请求获取container2的MAC地址(在xvlan上的arp这里不详述)，得到mac地址后，封包，从eth0发出；&lt;br&gt;②eth0桥接在net ns 1-ca0c50dd3a中的br0上，这个br0是个网桥(交换机)虚拟设备，需要将来自eth0的包转发出去，于是包转给了vxlan设备；这个可以通过arp -a看到一些端倪：&lt;br&gt;[root@node1 ~]# ip netns exec 1-ca0c50dd3a arp -a&lt;br&gt;③vxlan是个特殊设备，收到包后，由vxlan设备创建时注册的设备处理程序对包进行处理，即进行VXLAN封包（这期间会查询consul中存储的net1信息），将ICMP包整体作为UDP包的payload封装起来，并将UDP包通过宿主机的eth0发送出去。&lt;br&gt;④152宿主机收到UDP包后，发现是VXLAN包，根据VXLAN包中的相关信息（比如Vxlan Network Identifier，VNI=256)找到vxlan设备，并转给该vxlan设备处理。vxlan设备的处理程序进行解包，并将UDP中的payload取出，整体通过br0转给veth口，net1c2从eth0收到ICMP数据包，回复icmp reply。&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;strong&gt;从这个通信过程中来看，跨主机通信过程中的步骤如下：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;容器的网络命名空间与overlay网络的网络命名空间通过一对veth pair连接起来，当容器对外通信时，veth pair起到网线的作用，将流量发送到overlay网络的网络命名空间中。 &lt;/li&gt;
+&lt;li&gt;容器的veth pair对端eth2与vxlan设备通过br0这个Linux bridge桥接在一起，br0在同一宿主机上起到虚拟机交换机的作用，如果目标地址在同一宿主机上，则直接通信，如果不再则通过设置在vxlan1这个vxlan设备进行跨主机通信。 &lt;/li&gt;
+&lt;li&gt;vxlan1设备上会在创建时，由docker daemon为其分配vxlan隧道ID，起到网络隔离的作用。 &lt;/li&gt;
+&lt;li&gt;docker主机集群通过key/value存储共享数据，在7946端口上，相互之间通过gossip协议学习各个宿主机上运行了哪些容器。守护进程根据这些数据来在vxlan1设备上生成静态MAC转发表。 &lt;/li&gt;
+&lt;li&gt;根据静态MAC转发表的设置，通过UDP端口4789，将流量转发到对端宿主机的网卡上。&lt;br&gt;根据流量包中的vxlan隧道ID，将流量转发到对端宿主机的overlay网络的网络命名空间中。 &lt;/li&gt;
+&lt;li&gt;对端宿主机的overlay网络的网络命名空间中br0网桥，起到虚拟交换机的作用，将流量根据MAC地址转发到对应容器内部。&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;a href=&quot;#Docker容器跨主机通信方案&quot; class=&quot;headerlink&quot; title=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;/a&gt;Docker容器跨主机通信方案&lt;/h2&gt;&lt;p&gt;实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。&lt;br&gt;Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是docker 1.11版本，这是我以前做的一个方案，现整理出来。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+    
+    
+      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Registry私有仓库搭建及认证</title>
     <link href="http://yoursite.com/2017/09/01/Registry%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA%E5%8F%8A%E8%AE%A4%E8%AF%81/"/>
     <id>http://yoursite.com/2017/09/01/Registry私有仓库搭建及认证/</id>
     <published>2017-09-01T09:44:19.000Z</published>
-    <updated>2017-09-02T14:03:32.000Z</updated>
+    <updated>2017-09-04T13:21:24.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Registry相关概念&quot;&gt;&lt;a href=&quot;#Registry相关概念&quot; class=&quot;headerlink&quot; title=&quot;Registry相关概念&quot;&gt;&lt;/a&gt;Registry相关概念&lt;/h2&gt;&lt;p&gt;前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。&lt;br&gt;image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。可以很容易和本地源代码以及远端Git服务的关系相对应。&lt;br&gt;Docker hub是Docker公司提供的一些存储镜像的空间，这部分空间是有限的。我们一般会自主建设Docker私有仓库Registry。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;Registry-V1和V2&quot;&gt;&lt;a href=&quot;#Registry-V1和V2&quot; class=&quot;headerlink&quot; title=&quot;Registry V1和V2&quot;&gt;&lt;/a&gt;Registry V1和V2&lt;/h2&gt;&lt;p&gt;Docker Registry 2.0版本在安全性和性能上做了诸多优化，并重新设计了镜像的存储的格式。Docker目前1.6之后支持V2。&lt;/p&gt;
@@ -231,7 +379,7 @@ Login Succeeded
 [root@spark32 nginx_proxy_registry]# docker-compose stop
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;9.查看日志&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@spark32 nginx_proxy_registry]# docker-compose logs
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;补充Docker-compose&quot;&gt;&lt;a href=&quot;#补充Docker-compose&quot; class=&quot;headerlink&quot; title=&quot;补充Docker compose&quot;&gt;&lt;/a&gt;补充Docker compose&lt;/h3&gt;&lt;h4 id=&quot;Docker-compose是什么&quot;&gt;&lt;a href=&quot;#Docker-compose是什么&quot; class=&quot;headerlink&quot; title=&quot;Docker compose是什么&quot;&gt;&lt;/a&gt;Docker compose是什么&lt;/h4&gt;&lt;p&gt;Docker Compose是一个用来定义和运行复杂应用的Docker工具。使用Compose，你可以在一个文件中定义一个多容器应用，然后使用一条命令来启动你的应用，完成一切准备工作。&lt;br&gt;一个使用Docker容器的应用，通常由多个容器组成。使用Docker Compose，不再需要使用shell脚本来启动容器。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;补充Docker-compose&quot;&gt;&lt;a href=&quot;#补充Docker-compose&quot; class=&quot;headerlink&quot; title=&quot;补充Docker compose&quot;&gt;&lt;/a&gt;补充Docker compose&lt;/h3&gt;&lt;h4 id=&quot;Docker-compose是什么&quot;&gt;&lt;a href=&quot;#Docker-compose是什么&quot; class=&quot;headerlink&quot; title=&quot;Docker compose是什么&quot;&gt;&lt;/a&gt;Docker compose是什么&lt;/h4&gt;&lt;p&gt;Docker Compose是一个用来定义和运行复杂应用的Docker工具。使用Compose，你可以在一个文件中定义一个多容器应用，然后使用一条命令来启动你的应用，完成一切准备工作。&lt;br&gt;一个使用Docker容器的应用，通常由多个容器组成。使用Docker Compose，不再需要使用shell脚本来启动容器。&lt;br&gt;Docker Compose将所管理的容器分为三层，工程(project)、服务(service)以及容器(contaienr)。一个工程当中可包含多个服务，每个服务中定义了容器运行的镜像，参数，依赖。一个服务当中可包括多个容器实例，Docker Compose并没有解决负载均衡的问题，因此需要借助其他工具实现服务发现及负载均衡。&lt;/p&gt;
 &lt;h4 id=&quot;安装docker-compose&quot;&gt;&lt;a href=&quot;#安装docker-compose&quot; class=&quot;headerlink&quot; title=&quot;安装docker compose&quot;&gt;&lt;/a&gt;安装docker compose&lt;/h4&gt;&lt;p&gt;将变量 $dockerComposeVersion 换成指定的&lt;a href=&quot;https://github.com/docker/compose/releases&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;版本&lt;/a&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@spark32 ~]# curl -L https://github.com/docker/compose/releases/download/$dockerComposeVersion/docker-compose-`uname -m` -o /usr/local/bin/docker-compose
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;比如下载1.15.0版本：&lt;/p&gt;
@@ -3003,193 +3151,6 @@ server {
     
     
       <category term="Elasticsearch 搜索引擎" scheme="http://yoursite.com/tags/Elasticsearch-%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Elasticsearch介绍及安装部署</title>
-    <link href="http://yoursite.com/2017/06/20/Elasticsearch%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
-    <id>http://yoursite.com/2017/06/20/Elasticsearch介绍及安装部署/</id>
-    <published>2017-06-20T03:29:04.000Z</published>
-    <updated>2017-07-23T04:31:52.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;Elasticsearch介绍&quot;&gt;&lt;a href=&quot;#Elasticsearch介绍&quot; class=&quot;headerlink&quot; title=&quot;Elasticsearch介绍&quot;&gt;&lt;/a&gt;Elasticsearch介绍&lt;/h2&gt;&lt;p&gt;Elasticsearch是一个分布式搜索服务，提供Restful API，底层基于Lucene，采用多shard的方式保证数据安全，并且提供自动resharding的功能，加之github等大型的站点也采用 Elasticsearch作为其搜索服务。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;Elasticsearch集群安装部署&quot;&gt;&lt;a href=&quot;#Elasticsearch集群安装部署&quot; class=&quot;headerlink&quot; title=&quot;Elasticsearch集群安装部署&quot;&gt;&lt;/a&gt;Elasticsearch集群安装部署&lt;/h2&gt;&lt;h3 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h3&gt;&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;主机名&lt;/th&gt;
-&lt;th&gt;操作系统版本&lt;/th&gt;
-&lt;th&gt;IP地址&lt;/th&gt;
-&lt;th&gt;安装软件&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;log1&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;114.55.29.86&lt;/td&gt;
-&lt;td&gt;JDK1.7、elasticsearch-2.2.3&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;log2&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;114.55.29.241&lt;/td&gt;
-&lt;td&gt;JDK1.7、elasticsearch-2.2.3&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;log3&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;114.55.253.15&lt;/td&gt;
-&lt;td&gt;JDK1.7、elasticsearch-2.2.3&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id=&quot;安装JDK1-8&quot;&gt;&lt;a href=&quot;#安装JDK1-8&quot; class=&quot;headerlink&quot; title=&quot;安装JDK1.8&quot;&gt;&lt;/a&gt;安装JDK1.8&lt;/h3&gt;&lt;p&gt;版本是Elasticsearch 2.2.3，官方建议jdk是1.8。&lt;br&gt;&lt;strong&gt;3台机器都需要安装jdk1.8，添加新用户es。&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 local]# mkdir /usr/java
-[root@log1 local]# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;添加用户&quot;&gt;&lt;a href=&quot;#添加用户&quot; class=&quot;headerlink&quot; title=&quot;添加用户&quot;&gt;&lt;/a&gt;添加用户&lt;/h3&gt;&lt;p&gt;Elasticsearch不能使用root用户去启动。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 local]# groupadd -g 510 es
-[root@log1 local]# useradd -g 510 -u 510 es
-[root@log1 local]# echo &amp;quot;wisedu123&amp;quot; | passwd --stdin es &amp;amp;&amp;gt; /dev/null
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;用新创建的用户登录shell，配置PATH环境变量。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es@log1 ~]$ vim ~/.bashrc
-export JAVA_HOME=/usr/java/jdk1.8.0_73
-export PATH=$JAVA_HOME/bin:$PATH
-export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-[es@log1 ~]$ source ~/.bashrc
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;创建安装elasticsearch的目录。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# mkdir /usr/local/elasticsearch
-# chown -R es.es elasticsearch
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;下载安装elasticsearch&quot;&gt;&lt;a href=&quot;#下载安装elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;下载安装elasticsearch&quot;&gt;&lt;/a&gt;下载安装elasticsearch&lt;/h3&gt;&lt;p&gt;es用户登录shell，下载安装elasticsearch。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es@log1 ~]$ cd /usr/local/elasticsearch/
-[es@log1 elasticsearch]$ wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.2.3/elasticsearch-2.2.3.tar.gz 
-[es@log1 elasticsearch]$ tar zxf elasticsearch-2.2.3.tar.gz 
-[es@log1 elasticsearch]$ mv elasticsearch-2.2.1/* ./
-[es@log1 elasticsearch]$ rm -rf elasticsearch-2.2.1
-[es@log1 elasticsearch]$ rm -f elasticsearch-2.2.1.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置elasticsearch&quot;&gt;&lt;a href=&quot;#配置elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;配置elasticsearch&quot;&gt;&lt;/a&gt;配置elasticsearch&lt;/h3&gt;&lt;p&gt;1.配置elasticsearch 堆内存，编辑bin/elasticsearch.in.sh&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es@log1 elasticsearch]$ vim bin/elasticsearch.in.sh
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;将参数：ES_MIN_MEM、ES_MAX_MEM设置为当前物理机内存的一半（注意单位，并保证两个值相等）&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;2.配置Elasticsearch集群名称以及节点名称、是否为主节点、path data等信息&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es@log1 elasticsearch]$ vim config/elasticsearch.yml
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/3.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;3.配置保护Elasticsearch使用的内存防止其被swapped。&lt;br&gt;在memory section下，启用配置：bootstrap.mlockall: true&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/4.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;4.配置network host&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;【注意】:另外，请在Network段在多加两个配置，内容如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;network.bind_host: 114.55.29.86
-# Set the address other nodes will use to communicate with this node. If not 
-# set, it is automatically derived. It must point to an actual IP address.
-network.publish_host: 114.55.29.86
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;如果不加上如上的配置，程序在连接时会报错：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;^A[2016-03-28 16:18:08.791] [ERROR] [godseye] [godseye] [RMI TCP Connection(2)-127.0.0.1] [com.wisedu.godseye.search.util.SearchUtil] [buildIndex:70] NoNodeAvailableException[None of the configured nodes are available: [{#transport#-1}{114.55.29.86}{114.55.29.86:9300}]]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.配置Elasticsearch的自动发现机制&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/7.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;另外两台也是做如上的安装配置。只不过在配置中需要修改下面几处。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/8.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/9.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;Elasticsearch优化&quot;&gt;&lt;a href=&quot;#Elasticsearch优化&quot; class=&quot;headerlink&quot; title=&quot;Elasticsearch优化&quot;&gt;&lt;/a&gt;Elasticsearch优化&lt;/h2&gt;&lt;p&gt;1.检验配置中的bootstrap.mlockall: true是否生效&lt;br&gt;启动Elasticsearch：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es@log1 elasticsearch]$ bin/elasticsearch -d
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在shell终端执行命令：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;curl http://114.55.29.86:9200/_nodes/process?pretty
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;关注这个这个请求返回数据中的mlockall的值，如果为false，则说明锁定内存失败，这可能由于运行elasticsearch的用户不具备这样的权限。解决该问题的方法是：&lt;br&gt;在运行elasticsearch之前，以root身份执行：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;ulimit -l unlimited
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后再次重启elasticsearch。并查看上面的请求中的mlockall的值是否为true。&lt;br&gt;&lt;strong&gt;【注意】：这时候需要在root执行ulimit -l unlimited的shell终端上su - es，然后重启elasticsearch。因为这是命令行设置的ulimit -l unlimited，只对当前会话生效。&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 ~]# ulimit -l unlimited
-[root@log1 ~]# su - es
-[es@log1 ~]$ ps -ef|grep elasticsearch
-[es@log1 ~]$ kill -9 27189
-[es@log1 ~]$ /usr/local/elasticsearch/bin/elasticsearch -d
-[es@log1 ~]$ curl http://114.55.29.86:9200/_nodes/process?pretty
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/10.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;如果仍然是false，可能是下面的原因：&lt;br&gt;Another possible reason why mlockall can fail is that the temporary directory (usually /tmp) is mounted with the noexec option. This can be solved by specifying a new temp directory, by starting Elasticsearch with:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;./bin/elasticsearch -Djna.tmpdir=/path/to/new/dir
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;要想永久修改锁定内存大小无限制，需修改/etc/security/limits.conf，添加下面的内容，改完不需要重启系统，但是需要重新打开一个shell建立会话。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;es - memlock -1
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中，es代表运行elasticsearch的用户，-表示同时设置了soft和hard，memlock代表设置的是”锁定内存”这个类型，-1(unlimited或者infinity)代表没限制。&lt;/p&gt;
-&lt;p&gt;2.配置操作系统文件描述符数&lt;br&gt;查看elasticsearch能打开的最大文件描述符个数：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;curl http://114.55.29.86:9200/_nodes/stats/process?pretty
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看参数：max_file_descriptors&lt;br&gt;推荐设置到32K甚至64K。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/11.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;或者输入下面的命令进行查看：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ ulimit -a
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/12.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;设置需要修改：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;vim /etc/security/limits.conf
-es               -       nofile          65535
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.增大虚拟内存mmap count配置&lt;br&gt;备注：如果你以.deb或.rpm包安装，则默认不需要设置此项，因为已经被自动设置，查看方式为：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;sysctl vm.max_map_count
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果是手动安装，以root身份执行如下命令：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;sysctl vm.max_map_count=262144
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;并修改文件使设置永久生效：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 ~]# vim /etc/sysctl.conf    
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;添加一行：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;vm.max_map_count = 262144
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;使生效：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 ~]# sysctl -p
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;改完后，重启elasticsearch。&lt;br&gt;在浏览器输入&lt;a href=&quot;http://ip:9200/，查看页面信息，是否正常启动。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://ip:9200/，查看页面信息，是否正常启动。&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/13.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;另外两台也需要做这些优化。&lt;/p&gt;
-&lt;h2 id=&quot;安装插件：中文分词器ik&quot;&gt;&lt;a href=&quot;#安装插件：中文分词器ik&quot; class=&quot;headerlink&quot; title=&quot;安装插件：中文分词器ik&quot;&gt;&lt;/a&gt;安装插件：中文分词器ik&lt;/h2&gt;&lt;p&gt;elasticsearch-analysis-ik 是一款中文的分词插件，支持自定义词库。项目地址为：&lt;a href=&quot;https://github.com/medcl/elasticsearch-analysis-ik&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/medcl/elasticsearch-analysis-ik&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&quot;安装Maven&quot;&gt;&lt;a href=&quot;#安装Maven&quot; class=&quot;headerlink&quot; title=&quot;安装Maven&quot;&gt;&lt;/a&gt;安装Maven&lt;/h3&gt;&lt;p&gt;由于该项目使用了Maven来管理，源代码放到github上。所以要先在服务器上面安装Maven，便可以直接在服务器上面生成项目jar包，部署起来更加方便了。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log1 ~]# yum install -y maven
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装ik&quot;&gt;&lt;a href=&quot;#安装ik&quot; class=&quot;headerlink&quot; title=&quot;安装ik&quot;&gt;&lt;/a&gt;安装ik&lt;/h3&gt;&lt;p&gt;注意分词插件的版本，2.2.3对应的插件版本是1.9.3&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/14.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es@log1 ~]$ git clone https://github.com/medcl/elasticsearch-analysis-ik.git
-[es@log1 ~]$ cd elasticsearch-analysis-ik/
-[es@log1 elasticsearch-analysis-ik]$ mvn package
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;拷贝和解压&quot;&gt;&lt;a href=&quot;#拷贝和解压&quot; class=&quot;headerlink&quot; title=&quot;拷贝和解压&quot;&gt;&lt;/a&gt;拷贝和解压&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[es@log1 elasticsearch-analysis-ik]$ mkdir -p /usr/local/elasticsearch/plugins/ik
-[es@log1 elasticsearch-analysis-ik]$ cp target/releases/elasticsearch-analysis-ik-1.9.3.zip /usr/local/elasticsearch/plugins/ik
-[es@log1 ~]$ cd /usr/local/elasticsearch/plugins/ik/
-[es@log1 ik]$ unzip -oq elasticsearch-analysis-ik-1.9.3.zip
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;重启elasticsearch&quot;&gt;&lt;a href=&quot;#重启elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;重启elasticsearch&quot;&gt;&lt;/a&gt;重启elasticsearch&lt;/h3&gt;&lt;p&gt;直接重启就可以了，不需要在Elasticsearch中添加配置index.analysis.analyzer.ik.type : “ik”  。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es@log1 ik]$ cd /usr/local/elasticsearch/bin/
-[es@log1 bin]$ jps
-20221 Jps
-14910 Elasticsearch
-[es@log1 bin]$ kill -9 14910
-[es@log1 elasticsearch]$ bin/elasticsearch -d
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;另外两台也需要解压这个插件进去，重新启动。&lt;/p&gt;
-&lt;h3 id=&quot;分词测试&quot;&gt;&lt;a href=&quot;#分词测试&quot; class=&quot;headerlink&quot; title=&quot;分词测试&quot;&gt;&lt;/a&gt;分词测试&lt;/h3&gt;&lt;p&gt;①    创建一个索引，名为index&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es@log1 elasticsearch]$ curl -XPUT http://114.55.29.86:9200/index
-{&amp;quot;acknowledged&amp;quot;:true}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;②    index some docs&lt;br&gt;命令行输入以下内容：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;curl -XPOST http://114.55.29.86:9200/index/fulltext/1 -d&amp;apos;
-{&amp;quot;content&amp;quot;:&amp;quot;美国留给伊拉克的是个烂摊子吗&amp;quot;}
-&amp;apos;
-
-curl -XPOST http://114.55.29.86:9200/index/fulltext/2 -d&amp;apos;
-{&amp;quot;content&amp;quot;:&amp;quot;公安部：各地校车将享最高路权&amp;quot;}
-&amp;apos;
-
-curl -XPOST http:// 114.55.29.86:9200/index/fulltext/3 -d&amp;apos;
-{&amp;quot;content&amp;quot;:&amp;quot;中韩渔警冲突调查：韩警平均每天扣1艘中国渔船&amp;quot;}
-&amp;apos;
-
-curl -XPOST http:// 114.55.29.86:9200/index/fulltext/4 -d&amp;apos;
-{&amp;quot;content&amp;quot;:&amp;quot;中国驻洛杉矶领事馆遭亚裔男子枪击 嫌犯已自首&amp;quot;}
-&amp;apos;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;③    测试&lt;br&gt;命令行输入：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;curl -XPOST http://114.55.29.86:9200/index/fulltext/_search  -d&amp;apos;
-{
-    &amp;quot;query&amp;quot; : { &amp;quot;term&amp;quot; : { &amp;quot;content&amp;quot; : &amp;quot;中国&amp;quot; }},
-    &amp;quot;highlight&amp;quot; : {
-        &amp;quot;pre_tags&amp;quot; : [&amp;quot;&amp;lt;tag1&amp;gt;&amp;quot;, &amp;quot;&amp;lt;tag2&amp;gt;&amp;quot;],
-        &amp;quot;post_tags&amp;quot; : [&amp;quot;&amp;lt;/tag1&amp;gt;&amp;quot;, &amp;quot;&amp;lt;/tag2&amp;gt;&amp;quot;],
-        &amp;quot;fields&amp;quot; : {
-            &amp;quot;content&amp;quot; : {}
-        }
-    }
-}
-&amp;apos;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;结果：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;{&amp;quot;took&amp;quot;:74,&amp;quot;timed_out&amp;quot;:false,&amp;quot;_shards&amp;quot;:{&amp;quot;total&amp;quot;:5,&amp;quot;successful&amp;quot;:5,&amp;quot;failed&amp;quot;:0},&amp;quot;hits&amp;quot;:{&amp;quot;total&amp;quot;:2,&amp;quot;max_score&amp;quot;:1.5,&amp;quot;hits&amp;quot;:[{&amp;quot;_index&amp;quot;:&amp;quot;index&amp;quot;,&amp;quot;_type&amp;quot;:&amp;quot;fulltext&amp;quot;,&amp;quot;_id&amp;quot;:&amp;quot;4&amp;quot;,&amp;quot;_score&amp;quot;:1.5,&amp;quot;_source&amp;quot;:
-{&amp;quot;content&amp;quot;:&amp;quot;中国驻洛杉矶领事馆遭亚裔男子枪击 嫌犯已自首&amp;quot;}
-,&amp;quot;highlight&amp;quot;:{&amp;quot;content&amp;quot;:[&amp;quot;&amp;lt;tag1&amp;gt;中国&amp;lt;/tag1&amp;gt;驻洛杉矶领事馆遭亚裔男子枪击 嫌犯已自首&amp;quot;]}},{&amp;quot;_index&amp;quot;:&amp;quot;index&amp;quot;,&amp;quot;_type&amp;quot;:&amp;quot;fulltext&amp;quot;,&amp;quot;_id&amp;quot;:&amp;quot;3&amp;quot;,&amp;quot;_score&amp;quot;:0.53699243,&amp;quot;_source&amp;quot;:
-{&amp;quot;content&amp;quot;:&amp;quot;中韩渔警冲突调查：韩警平均每天扣1艘中国渔船&amp;quot;}
-,&amp;quot;highlight&amp;quot;:{&amp;quot;content&amp;quot;:[&amp;quot;中韩渔警冲突调查：韩警平均每天扣1艘&amp;lt;tag1&amp;gt;中国&amp;lt;/tag1&amp;gt;渔船&amp;quot;]}}]}}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/15.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Elasticsearch介绍&quot;&gt;&lt;a href=&quot;#Elasticsearch介绍&quot; class=&quot;headerlink&quot; title=&quot;Elasticsearch介绍&quot;&gt;&lt;/a&gt;Elasticsearch介绍&lt;/h2&gt;&lt;p&gt;Elasticsearch是一个分布式搜索服务，提供Restful API，底层基于Lucene，采用多shard的方式保证数据安全，并且提供自动resharding的功能，加之github等大型的站点也采用 Elasticsearch作为其搜索服务。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="搜索引擎" scheme="http://yoursite.com/categories/%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/"/>
-    
-    
-      <category term="搜索 Elasticsearch" scheme="http://yoursite.com/tags/%E6%90%9C%E7%B4%A2-Elasticsearch/"/>
     
   </entry>
   

@@ -112,7 +112,7 @@
 <meta property="og:site_name" content="jkzhao&#39;s blog">
 <meta property="og:description" content="Registry相关概念前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-09-02T14:03:32.000Z">
+<meta property="og:updated_time" content="2017-09-04T13:21:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Registry私有仓库搭建及认证">
 <meta name="twitter:description" content="Registry相关概念前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。">
@@ -341,8 +341,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-09-02T22:03:32+08:00" content="2017-09-02">
-              2017-09-02
+              <time itemprop="dateUpdated" datetime="2017-09-04T21:21:24+08:00" content="2017-09-04">
+              2017-09-04
               </time>
               </span>
             
@@ -610,7 +610,7 @@ Login Succeeded
 [root@spark32 nginx_proxy_registry]# docker-compose stop
 </code></pre><p>9.查看日志</p>
 <pre><code>[root@spark32 nginx_proxy_registry]# docker-compose logs
-</code></pre><h3 id="补充Docker-compose"><a href="#补充Docker-compose" class="headerlink" title="补充Docker compose"></a>补充Docker compose</h3><h4 id="Docker-compose是什么"><a href="#Docker-compose是什么" class="headerlink" title="Docker compose是什么"></a>Docker compose是什么</h4><p>Docker Compose是一个用来定义和运行复杂应用的Docker工具。使用Compose，你可以在一个文件中定义一个多容器应用，然后使用一条命令来启动你的应用，完成一切准备工作。<br>一个使用Docker容器的应用，通常由多个容器组成。使用Docker Compose，不再需要使用shell脚本来启动容器。</p>
+</code></pre><h3 id="补充Docker-compose"><a href="#补充Docker-compose" class="headerlink" title="补充Docker compose"></a>补充Docker compose</h3><h4 id="Docker-compose是什么"><a href="#Docker-compose是什么" class="headerlink" title="Docker compose是什么"></a>Docker compose是什么</h4><p>Docker Compose是一个用来定义和运行复杂应用的Docker工具。使用Compose，你可以在一个文件中定义一个多容器应用，然后使用一条命令来启动你的应用，完成一切准备工作。<br>一个使用Docker容器的应用，通常由多个容器组成。使用Docker Compose，不再需要使用shell脚本来启动容器。<br>Docker Compose将所管理的容器分为三层，工程(project)、服务(service)以及容器(contaienr)。一个工程当中可包含多个服务，每个服务中定义了容器运行的镜像，参数，依赖。一个服务当中可包括多个容器实例，Docker Compose并没有解决负载均衡的问题，因此需要借助其他工具实现服务发现及负载均衡。</p>
 <h4 id="安装docker-compose"><a href="#安装docker-compose" class="headerlink" title="安装docker compose"></a>安装docker compose</h4><p>将变量 $dockerComposeVersion 换成指定的<a href="https://github.com/docker/compose/releases" target="_blank" rel="external">版本</a></p>
 <pre><code>[root@spark32 ~]# curl -L https://github.com/docker/compose/releases/download/$dockerComposeVersion/docker-compose-`uname -m` -o /usr/local/bin/docker-compose
 </code></pre><p>比如下载1.15.0版本：</p>
@@ -662,6 +662,10 @@ docker-compose version 1.15.0, build e12f3b9
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/05/overlay实现容器跨主机通信/" rel="prev" title="overlay实现容器跨主机通信">
+                overlay实现容器跨主机通信 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -731,7 +735,7 @@ docker-compose version 1.15.0, build e12f3b9
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-count">37</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -864,7 +868,7 @@ docker-compose version 1.15.0, build e12f3b9
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共78.9k字</span>
+  <span class="post-count">博客全站共81.1k字</span>
 </div>
 
         

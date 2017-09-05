@@ -1,0 +1,1003 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="容器 Docker," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Docker容器跨主机通信方案实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是doc">
+<meta name="keywords" content="容器 Docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="overlay实现容器跨主机通信">
+<meta property="og:url" content="http://yoursite.com/2017/09/05/overlay实现容器跨主机通信/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="Docker容器跨主机通信方案实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是doc">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/21.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/22.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/23.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/24.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/25.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/26.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/27.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/28.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/29.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/30.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/31.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/32.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/33.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/34.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/35.png">
+<meta property="og:updated_time" content="2017-09-05T09:04:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="overlay实现容器跨主机通信">
+<meta name="twitter:description" content="Docker容器跨主机通信方案实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是doc">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/21.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> overlay实现容器跨主机通信 | jkzhao's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                overlay实现容器跨主机通信
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-09-05T13:42:06+08:00" content="2017-09-05">
+              2017-09-05
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2017-09-05T17:04:46+08:00" content="2017-09-05">
+              2017-09-05
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Docker/" itemprop="url" rel="index">
+                    <span itemprop="name">Docker</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/09/05/overlay实现容器跨主机通信/" class="leancloud_visitors" data-flag-title="overlay实现容器跨主机通信">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Docker容器跨主机通信方案"><a href="#Docker容器跨主机通信方案" class="headerlink" title="Docker容器跨主机通信方案"></a>Docker容器跨主机通信方案</h2><p>实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。<br>Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是docker 1.11版本，这是我以前做的一个方案，现整理出来。<br><a id="more"></a></p>
+<h2 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h2><table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>操作系统版本</th>
+<th>IP地址</th>
+<th>Docker版本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>node1</td>
+<td>CentOS 7.0</td>
+<td>172.16.7.151</td>
+<td>1.11.0</td>
+</tr>
+<tr>
+<td>node2</td>
+<td>CentOS 7.0</td>
+<td>172.16.7.152</td>
+<td>1.11.0</td>
+</tr>
+</tbody>
+</table>
+<h2 id="升级内核"><a href="#升级内核" class="headerlink" title="升级内核"></a>升级内核</h2><p>默认内核：</p>
+<pre><code>[root@node1 ~]# uname -r
+3.10.0-229.el7.x86_64
+</code></pre><p>1.升级内核需要使用 elrepo 的yum 源<br>首先我们导入 elrepo 的key</p>
+<pre><code>[root@node1 ~]# rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+</code></pre><p>2.安装 elrepo 源</p>
+<pre><code>[root@node1 ~]# rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+</code></pre><p>3.在yum的ELRepo源中，mainline 为最新版本的内核<br>安装 ml 的内核</p>
+<pre><code>[root@node1 ~]# yum --enablerepo=elrepo-kernel install  kernel-ml-devel kernel-ml -y
+</code></pre><p>4.修改内核启动顺序，默认启动的顺序应该为1,升级以后内核是往前面插入，为0<br>由于CentOS 7使用grub2作为引导程序 ，所以和CentOS 6有所不同，并不是修改/etc/grub.conf来修改启动项，需要如下操作：</p>
+<pre><code>[root@node1 ~]# cat /boot/grub2/grub.cfg |grep menuentry   #查看有哪些内核选项
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/21.png" alt=""><br>        [root@node1 ~]# grub2-editenv list<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/22.png" alt=""><br>        [root@node1 ~]# grub2-set-default 0</p>
+<p>5.重启系统</p>
+<pre><code>[root@node1 ~]# shutdown -r now
+</code></pre><p>6.查看 内核版本</p>
+<pre><code>[root@node1 ~]# uname -r
+4.5.2-1.el7.elrepo.x86_64
+</code></pre><h2 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h2><pre><code>[root@node1 ~]# vim /etc/yum.repos.d/docker.repo
+[dockerrepo]
+name=Docker Repository
+baseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/
+enabled=1
+gpgcheck=1
+gpgkey=https://yum.dockerproject.org/gpg
+
+[root@node1 ~]# yum install -y docker-engine
+</code></pre><p>如果后面升级：</p>
+<pre><code>[root@node1 ~]# yum update docker-engine
+</code></pre><p>卸载：yum remove  </p>
+<h2 id="防火墙设置和开启内核转发"><a href="#防火墙设置和开启内核转发" class="headerlink" title="防火墙设置和开启内核转发"></a>防火墙设置和开启内核转发</h2><p>停止firewalld，安装iptables-services</p>
+<pre><code>[root@node1 ~]# systemctl stop firewalld.service
+[root@node1 ~]# systemctl disable firewalld.service
+[root@node1 ~]# yum install -y iptables-services
+</code></pre><p>修改防火墙策略：</p>
+<pre><code>[root@node1 ~]# vim /etc/sysconfig/iptables
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/23.png" alt=""><br>        [root@node1 ~]# systemctl start iptables.service<br>        [root@node1 ~]# systemctl enable iptables.service</p>
+<p>开启内核转发，在/etc/sysctl.conf中添加一行配置：</p>
+<pre><code>[root@node1 ~]# vim /etc/sysctl.conf 
+net.ipv4.ip_forward=1
+</code></pre><p>运行下面的命令使内核修改生效：</p>
+<pre><code>[root@node1 ~]# sysctl -p
+</code></pre><h2 id="安装启动consul"><a href="#安装启动consul" class="headerlink" title="安装启动consul"></a>安装启动consul</h2><p>overlay一般需要一个全局的KV存储（sdn controller、etcd、consul）来存储各个主机节点在overlay网络中的配置信息。</p>
+<pre><code># wget https://releases.hashicorp.com/consul/0.6.4/consul_0.6.4_linux_amd64.zip
+# unzip -oq consul_0.6.4_linux_amd64.zip
+# mv consul /usr/local/bin/
+</code></pre><p>启动consul：<br>host-1 Start Consul as a server in bootstrap mode:</p>
+<pre><code>[root@node1 ~]# nohup consul agent -server -bootstrap -data-dir /tmp/consul -bind=172.16.7.151 &amp;
+</code></pre><p>host-2 Start the Consul agent:</p>
+<pre><code>[root@node2 ~]# nohup consul agent -data-dir /tmp/consul -bind=172.16.7.152 &amp;
+[root@node2 ~]# consul join 172.16.7.151
+Successfully joined cluster by contacting 1 nodes.
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/24.png" alt=""></p>
+<h2 id="启动Docker"><a href="#启动Docker" class="headerlink" title="启动Docker"></a>启动Docker</h2><h3 id="修改docker-daemon配置"><a href="#修改docker-daemon配置" class="headerlink" title="修改docker daemon配置"></a>修改docker daemon配置</h3><pre><code># cp /usr/lib/systemd/system/docker.service /etc/systemd/system/
+# vim /etc/systemd/system/docker.service
+</code></pre><p>在ExecStart那行加上如下的选项，其中ens32是网卡名字：</p>
+<pre><code>--cluster-store=consul://localhost:8500 --cluster-advertise=ens32:2376
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/25.png" alt=""><br>其中–cluster-store是指向key-value存储的地址，我这里就是consul的地址，consul里保存着整个overlay网络配置和节点信息。–cluster-advertise中是Host1和Host2互通的端口。</p>
+<h3 id="启动Docker-1"><a href="#启动Docker-1" class="headerlink" title="启动Docker"></a>启动Docker</h3><p>执行systemctl daemon-reload使配置生效，然后执行systemctl start docker.service启动docker服务。</p>
+<pre><code># systemctl daemon-reload
+# systemctl start docker.service
+</code></pre><p>加入开机自启动：</p>
+<pre><code># systemctl enable docker.service
+</code></pre><h2 id="创建overlay-network"><a href="#创建overlay-network" class="headerlink" title="创建overlay network"></a>创建overlay network</h2><h3 id="vxlan简介"><a href="#vxlan简介" class="headerlink" title="vxlan简介"></a>vxlan简介</h3><p>overlay network这种方式一般也是只需要三层可达，容器就能互通。overlay模式容器有独立IP，不同overlay方案之间的性能差别也是很大的。我这里采用的的vxlan技术。<br>vxlan(virtual Extensible LAN)虚拟可扩展局域网，是一种overlay的网络技术，使用MAC in UDP的方法进 行封装，共50字节的封装报文头。<br>用于对VXLAN报文进行封装/解封装，包括ARP请求报文和正常的VXLAN数据报文，在一段封装报文 后通过隧道向另一端VTEP发送封装报文，另一端VTEP接收到封装的报文解封装后根据封装的MAC地址进行转发。VTEP可由支持VXLAN的硬件设备或软件来实现。<br>从封装的结构上来看，VXLAN提供了将二层网络overlay在三层网络上的能力。</p>
+<h3 id="创建overlay-network-1"><a href="#创建overlay-network-1" class="headerlink" title="创建overlay network"></a>创建overlay network</h3><p>默认情况下，docker启动后初始化3种网络，这3种都是不能删除的。</p>
+<pre><code># docker network ls
+NETWORK ID          NAME                DRIVER
+5944745e7d6d             bridge                   bridge              
+ce5d1ba0be32             host                       host                
+244bb9a34016             none                      null  
+</code></pre><p>在node1主机上创建overlay network:</p>
+<pre><code>[root@node1 ~]# docker network create -d overlay --subnet=10.10.10.0/24 net1
+ca0c50dd3a49e028c3323024b9d6e8f837f4b76889b8d5848046ec0a5948ee2d
+[root@node1 ~]# docker network ls
+NETWORK ID          NAME                DRIVER
+5944745e7d6d             bridge                  bridge              
+ce5d1ba0be32             host                     host                
+ca0c50dd3a49             net1                    overlay             
+244bb9a34016             none                    null
+</code></pre><p>在其他主机上执行docker network ls，也会看到新建的这个名字叫net1的overlay网络。</p>
+<h2 id="创建容器"><a href="#创建容器" class="headerlink" title="创建容器"></a>创建容器</h2><p>node1主机创建容器：</p>
+<pre><code>[root@node1 ~]# docker run -it --net=net1 --name=contain1 --hostname=test1 --ip=10.10.10.3 --add-host test2:10.10.10.4 centos:centos7
+[root@test1 /]# yum install -y iproute net-tools
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/26.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/27.png" alt=""></p>
+<p>node2上创建容器：</p>
+<pre><code>[root@node2 ~]# docker run -it --net=net1 --name=contain2 --hostname=test2 --ip=10.10.10.4 --add-host test1:10.10.10.3 centos:centos7
+[root@test2 /]# yum install -y iproute net-tools
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/28.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/29.png" alt=""></p>
+<h2 id="测试容器跨主机通信"><a href="#测试容器跨主机通信" class="headerlink" title="测试容器跨主机通信"></a>测试容器跨主机通信</h2><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/30.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/31.png" alt=""></p>
+<h2 id="网络拓扑"><a href="#网络拓扑" class="headerlink" title="网络拓扑"></a>网络拓扑</h2><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/32.png" alt=""><br>容器内部有两个网络接口eth0、eth1。实际上，eth1连接到docker_gwbridge，这可以从ip就能看出。eth0即为overlay network的接口。</p>
+<h2 id="抓包分析"><a href="#抓包分析" class="headerlink" title="抓包分析"></a>抓包分析</h2><p>在node2主机上使用tcpdump抓包，然后在windows上用wireshark分析。<br>1.container1容器里ping container2的ip地址：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/33.png" alt=""></p>
+<p>2.node2主机上抓包</p>
+<pre><code>[root@node2 ~]# tcpdump -i ens32 -s 0 -X -nnn -vvv -w /tmp/package.pcap
+</code></pre><p>3.把package.pcap传下来放到wireshark上分析<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/34.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/35.png" alt=""><br><strong>以在container1中ping container2，分析数据包流向：</strong><br>①container1(10.10.10.3)中ping container2(10.10.10.4)，根据container1的路由表，数据包可通过直连网络到达container2。于是arp请求获取container2的MAC地址(在xvlan上的arp这里不详述)，得到mac地址后，封包，从eth0发出；<br>②eth0桥接在net ns 1-ca0c50dd3a中的br0上，这个br0是个网桥(交换机)虚拟设备，需要将来自eth0的包转发出去，于是包转给了vxlan设备；这个可以通过arp -a看到一些端倪：<br>[root@node1 ~]# ip netns exec 1-ca0c50dd3a arp -a<br>③vxlan是个特殊设备，收到包后，由vxlan设备创建时注册的设备处理程序对包进行处理，即进行VXLAN封包（这期间会查询consul中存储的net1信息），将ICMP包整体作为UDP包的payload封装起来，并将UDP包通过宿主机的eth0发送出去。<br>④152宿主机收到UDP包后，发现是VXLAN包，根据VXLAN包中的相关信息（比如Vxlan Network Identifier，VNI=256)找到vxlan设备，并转给该vxlan设备处理。vxlan设备的处理程序进行解包，并将UDP中的payload取出，整体通过br0转给veth口，net1c2从eth0收到ICMP数据包，回复icmp reply。<br><br><br><strong>从这个通信过程中来看，跨主机通信过程中的步骤如下：</strong></p>
+<ul>
+<li>容器的网络命名空间与overlay网络的网络命名空间通过一对veth pair连接起来，当容器对外通信时，veth pair起到网线的作用，将流量发送到overlay网络的网络命名空间中。 </li>
+<li>容器的veth pair对端eth2与vxlan设备通过br0这个Linux bridge桥接在一起，br0在同一宿主机上起到虚拟机交换机的作用，如果目标地址在同一宿主机上，则直接通信，如果不再则通过设置在vxlan1这个vxlan设备进行跨主机通信。 </li>
+<li>vxlan1设备上会在创建时，由docker daemon为其分配vxlan隧道ID，起到网络隔离的作用。 </li>
+<li>docker主机集群通过key/value存储共享数据，在7946端口上，相互之间通过gossip协议学习各个宿主机上运行了哪些容器。守护进程根据这些数据来在vxlan1设备上生成静态MAC转发表。 </li>
+<li>根据静态MAC转发表的设置，通过UDP端口4789，将流量转发到对端宿主机的网卡上。<br>根据流量包中的vxlan隧道ID，将流量转发到对端宿主机的overlay网络的网络命名空间中。 </li>
+<li>对端宿主机的overlay网络的网络命名空间中br0网桥，起到虚拟交换机的作用，将流量根据MAC地址转发到对应容器内部。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/容器-Docker/" rel="tag"><i class="fa fa-tag"></i>容器 Docker</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/01/Registry私有仓库搭建及认证/" rel="next" title="Registry私有仓库搭建及认证">
+                <i class="fa fa-chevron-left"></i> Registry私有仓库搭建及认证
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">37</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker容器跨主机通信方案"><span class="nav-number">1.</span> <span class="nav-text">Docker容器跨主机通信方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境信息"><span class="nav-number">2.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#升级内核"><span class="nav-number">3.</span> <span class="nav-text">升级内核</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装docker"><span class="nav-number">4.</span> <span class="nav-text">安装docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#防火墙设置和开启内核转发"><span class="nav-number">5.</span> <span class="nav-text">防火墙设置和开启内核转发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装启动consul"><span class="nav-number">6.</span> <span class="nav-text">安装启动consul</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动Docker"><span class="nav-number">7.</span> <span class="nav-text">启动Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改docker-daemon配置"><span class="nav-number">7.1.</span> <span class="nav-text">修改docker daemon配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动Docker-1"><span class="nav-number">7.2.</span> <span class="nav-text">启动Docker</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建overlay-network"><span class="nav-number">8.</span> <span class="nav-text">创建overlay network</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#vxlan简介"><span class="nav-number">8.1.</span> <span class="nav-text">vxlan简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建overlay-network-1"><span class="nav-number">8.2.</span> <span class="nav-text">创建overlay network</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建容器"><span class="nav-number">9.</span> <span class="nav-text">创建容器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试容器跨主机通信"><span class="nav-number">10.</span> <span class="nav-text">测试容器跨主机通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络拓扑"><span class="nav-number">11.</span> <span class="nav-text">网络拓扑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抓包分析"><span class="nav-number">12.</span> <span class="nav-text">抓包分析</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共81.1k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+    <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+</body>
+</html>
