@@ -119,7 +119,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/5.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/6.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/7.png">
-<meta property="og:updated_time" content="2017-08-28T05:30:19.000Z">
+<meta property="og:updated_time" content="2017-09-05T11:25:17.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Docker介绍">
 <meta name="twitter:description" content="Docker的诞生dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。">
@@ -349,8 +349,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-08-28T13:30:19+08:00" content="2017-08-28">
-              2017-08-28
+              <time itemprop="dateUpdated" datetime="2017-09-05T19:25:17+08:00" content="2017-09-05">
+              2017-09-05
               </time>
               </span>
             
@@ -409,7 +409,7 @@
       
 
       
-        <h2 id="Docker的诞生"><a href="#Docker的诞生" class="headerlink" title="Docker的诞生"></a>Docker的诞生</h2><p>dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。<br>Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。<br><a id="more"></a></p>
+        <h2 id="Docker的诞生"><a href="#Docker的诞生" class="headerlink" title="Docker的诞生"></a>Docker的诞生</h2><p>dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。<br>Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。<br><a id="more"></a><br>容器技术其实早在2000年早起的UNIX系统上就出现了，直到2007年才加入Linux。容器的行为表现与虚拟机非常类似。现在人们提起容器，基本上指的都是Docker容器了。Docker极大地简化了容器的使用方法，将基于Linux内核隔离机制的容器实现细节统统隐藏在一条简单的命令：docker run之后。另外，Docker提供了一种容器格式，允许将应用和服务打包成一个理论上可以运行在任何安装了Docker Daemon的Linux系统上的容器。</p>
 <h2 id="Hypervisor与Docker"><a href="#Hypervisor与Docker" class="headerlink" title="Hypervisor与Docker"></a>Hypervisor与Docker</h2><h3 id="Hypervisor"><a href="#Hypervisor" class="headerlink" title="Hypervisor"></a>Hypervisor</h3><p>Hypervisor是一种运行在物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享一套基础物理硬件，因此也可以看作是虚拟环境中的“元”操作系统，它可以协调访问服务器上的所有物理设备和虚拟机，也叫虚拟机监视器（Virtual Machine Monitor）。Hypervisor是所有虚拟化技术的核心。<br>Hypervisor是一种运行在基础物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享硬件。也可叫做VMM（ virtual machine monitor ），即虚拟机监视器。 Hypervisors是一种在虚拟环境中的“元”操作系统。他们可以访问服务器上包括磁盘和内存在内的所有物理设备。Hypervisors不但协调着这些硬件资源的访问，也同时在各个虚拟机之间施加防护。当服务器启动并执行Hypervisor时，它会加载所有虚拟机客户端的操作系统同时会分配给每一台虚拟机适量的内存，CPU，网络和磁盘。</p>
 <h3 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h3><p>Docker也是虚拟化的一种，是通过内核虚拟化技术(namespaces和cgroups等)来提供容器的资源隔离与安全保障等。由于Docker通过操作系统层虚拟化实现隔离，所以Docker容器在运行时，不需要类似虚拟机(VM)额外的操作系统开销，提高资源利用率。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/1.png" alt=""></p>
 <h2 id="Docker要解决的问题"><a href="#Docker要解决的问题" class="headerlink" title="Docker要解决的问题"></a>Docker要解决的问题</h2><ul>
@@ -684,7 +684,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共81.1k字</span>
+  <span class="post-count">博客全站共81.2k字</span>
 </div>
 
         

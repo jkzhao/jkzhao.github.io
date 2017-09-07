@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-05T09:04:46.000Z</updated>
+  <updated>2017-09-05T09:06:09.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/09/05/overlay%E5%AE%9E%E7%8E%B0%E5%AE%B9%E5%99%A8%E8%B7%A8%E4%B8%BB%E6%9C%BA%E9%80%9A%E4%BF%A1/"/>
     <id>http://yoursite.com/2017/09/05/overlay实现容器跨主机通信/</id>
     <published>2017-09-05T05:42:06.000Z</published>
-    <updated>2017-09-05T09:04:46.000Z</updated>
+    <updated>2017-09-05T09:06:09.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;a href=&quot;#Docker容器跨主机通信方案&quot; class=&quot;headerlink&quot; title=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;/a&gt;Docker容器跨主机通信方案&lt;/h2&gt;&lt;p&gt;实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。&lt;br&gt;Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是docker 1.11版本，这是我以前做的一个方案，现整理出来。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h2&gt;&lt;table&gt;
@@ -168,7 +168,7 @@ ca0c50dd3a49             net1                    overlay
     <link href="http://yoursite.com/2017/09/01/Registry%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA%E5%8F%8A%E8%AE%A4%E8%AF%81/"/>
     <id>http://yoursite.com/2017/09/01/Registry私有仓库搭建及认证/</id>
     <published>2017-09-01T09:44:19.000Z</published>
-    <updated>2017-09-04T13:21:24.000Z</updated>
+    <updated>2017-09-07T01:33:53.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Registry相关概念&quot;&gt;&lt;a href=&quot;#Registry相关概念&quot; class=&quot;headerlink&quot; title=&quot;Registry相关概念&quot;&gt;&lt;/a&gt;Registry相关概念&lt;/h2&gt;&lt;p&gt;前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。&lt;br&gt;image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。可以很容易和本地源代码以及远端Git服务的关系相对应。&lt;br&gt;Docker hub是Docker公司提供的一些存储镜像的空间，这部分空间是有限的。我们一般会自主建设Docker私有仓库Registry。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;Registry-V1和V2&quot;&gt;&lt;a href=&quot;#Registry-V1和V2&quot; class=&quot;headerlink&quot; title=&quot;Registry V1和V2&quot;&gt;&lt;/a&gt;Registry V1和V2&lt;/h2&gt;&lt;p&gt;Docker Registry 2.0版本在安全性和性能上做了诸多优化，并重新设计了镜像的存储的格式。Docker目前1.6之后支持V2。&lt;/p&gt;
@@ -199,7 +199,7 @@ wisedu_registry
 [root@node1 ~]# docker rm -v wisedu_registry
 wisedu_registry
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;搭建外部可访问的Registry&quot;&gt;&lt;a href=&quot;#搭建外部可访问的Registry&quot; class=&quot;headerlink&quot; title=&quot;搭建外部可访问的Registry&quot;&gt;&lt;/a&gt;搭建外部可访问的Registry&lt;/h2&gt;&lt;p&gt;官方文档：&lt;a href=&quot;https://docs.docker.com/registry/deploying/#run-an-externally-accessible-registry&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.docker.com/registry/deploying/#run-an-externally-accessible-registry&lt;/a&gt;&lt;br&gt;Running a registry only accessible on localhost has limited usefulness. In order to make your registry accessible to external hosts, you must first secure it using TLS.&lt;/p&gt;
-&lt;h3 id=&quot;获取证书&quot;&gt;&lt;a href=&quot;#获取证书&quot; class=&quot;headerlink&quot; title=&quot;获取证书&quot;&gt;&lt;/a&gt;获取证书&lt;/h3&gt;&lt;p&gt;使用TLS认证registry容器时，必须有证书。一般情况下，是要去认证机构购买签名证书。这里使用openssl生成自签名的证书。&lt;br&gt;1.生成自签名证书&lt;/p&gt;
+&lt;p&gt;使用TLS认证registry容器时，必须有证书。一般情况下，是要去认证机构购买签名证书。这里使用openssl生成自签名的证书。&lt;br&gt;1.生成自签名证书&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@spark32 ~]# mkdir -p /opt/docker/registry/certs
 [root@spark32 ~]# openssl req -newkey rsa:4096 -nodes -sha256 -keyout /opt/docker/registry/certs/domain.key -x509 -days 365 -out /opt/docker/registry/certs/domain.crt
 Generating a 4096 bit RSA private key
@@ -1052,9 +1052,9 @@ Hello world
     <link href="http://yoursite.com/2017/08/14/Docker%E4%BB%8B%E7%BB%8D/"/>
     <id>http://yoursite.com/2017/08/14/Docker介绍/</id>
     <published>2017-08-14T01:17:58.000Z</published>
-    <updated>2017-08-28T05:30:19.000Z</updated>
+    <updated>2017-09-05T11:25:17.000Z</updated>
     
-    <content type="html">&lt;h2 id=&quot;Docker的诞生&quot;&gt;&lt;a href=&quot;#Docker的诞生&quot; class=&quot;headerlink&quot; title=&quot;Docker的诞生&quot;&gt;&lt;/a&gt;Docker的诞生&lt;/h2&gt;&lt;p&gt;dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。&lt;br&gt;Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+    <content type="html">&lt;h2 id=&quot;Docker的诞生&quot;&gt;&lt;a href=&quot;#Docker的诞生&quot; class=&quot;headerlink&quot; title=&quot;Docker的诞生&quot;&gt;&lt;/a&gt;Docker的诞生&lt;/h2&gt;&lt;p&gt;dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。&lt;br&gt;Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;容器技术其实早在2000年早起的UNIX系统上就出现了，直到2007年才加入Linux。容器的行为表现与虚拟机非常类似。现在人们提起容器，基本上指的都是Docker容器了。Docker极大地简化了容器的使用方法，将基于Linux内核隔离机制的容器实现细节统统隐藏在一条简单的命令：docker run之后。另外，Docker提供了一种容器格式，允许将应用和服务打包成一个理论上可以运行在任何安装了Docker Daemon的Linux系统上的容器。&lt;/p&gt;
 &lt;h2 id=&quot;Hypervisor与Docker&quot;&gt;&lt;a href=&quot;#Hypervisor与Docker&quot; class=&quot;headerlink&quot; title=&quot;Hypervisor与Docker&quot;&gt;&lt;/a&gt;Hypervisor与Docker&lt;/h2&gt;&lt;h3 id=&quot;Hypervisor&quot;&gt;&lt;a href=&quot;#Hypervisor&quot; class=&quot;headerlink&quot; title=&quot;Hypervisor&quot;&gt;&lt;/a&gt;Hypervisor&lt;/h3&gt;&lt;p&gt;Hypervisor是一种运行在物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享一套基础物理硬件，因此也可以看作是虚拟环境中的“元”操作系统，它可以协调访问服务器上的所有物理设备和虚拟机，也叫虚拟机监视器（Virtual Machine Monitor）。Hypervisor是所有虚拟化技术的核心。&lt;br&gt;Hypervisor是一种运行在基础物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享硬件。也可叫做VMM（ virtual machine monitor ），即虚拟机监视器。 Hypervisors是一种在虚拟环境中的“元”操作系统。他们可以访问服务器上包括磁盘和内存在内的所有物理设备。Hypervisors不但协调着这些硬件资源的访问，也同时在各个虚拟机之间施加防护。当服务器启动并执行Hypervisor时，它会加载所有虚拟机客户端的操作系统同时会分配给每一台虚拟机适量的内存，CPU，网络和磁盘。&lt;/p&gt;
 &lt;h3 id=&quot;Docker&quot;&gt;&lt;a href=&quot;#Docker&quot; class=&quot;headerlink&quot; title=&quot;Docker&quot;&gt;&lt;/a&gt;Docker&lt;/h3&gt;&lt;p&gt;Docker也是虚拟化的一种，是通过内核虚拟化技术(namespaces和cgroups等)来提供容器的资源隔离与安全保障等。由于Docker通过操作系统层虚拟化实现隔离，所以Docker容器在运行时，不需要类似虚拟机(VM)额外的操作系统开销，提高资源利用率。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h2 id=&quot;Docker要解决的问题&quot;&gt;&lt;a href=&quot;#Docker要解决的问题&quot; class=&quot;headerlink&quot; title=&quot;Docker要解决的问题&quot;&gt;&lt;/a&gt;Docker要解决的问题&lt;/h2&gt;&lt;ul&gt;
