@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-05T09:06:09.000Z</updated>
+  <updated>2017-09-07T01:44:59.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/09/05/overlay%E5%AE%9E%E7%8E%B0%E5%AE%B9%E5%99%A8%E8%B7%A8%E4%B8%BB%E6%9C%BA%E9%80%9A%E4%BF%A1/"/>
     <id>http://yoursite.com/2017/09/05/overlay实现容器跨主机通信/</id>
     <published>2017-09-05T05:42:06.000Z</published>
-    <updated>2017-09-05T09:06:09.000Z</updated>
+    <updated>2017-09-07T01:44:59.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;a href=&quot;#Docker容器跨主机通信方案&quot; class=&quot;headerlink&quot; title=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;/a&gt;Docker容器跨主机通信方案&lt;/h2&gt;&lt;p&gt;实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。&lt;br&gt;Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是docker 1.11版本，这是我以前做的一个方案，现整理出来。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h2&gt;&lt;table&gt;
@@ -139,7 +139,7 @@ ca0c50dd3a49             net1                    overlay
 &lt;h2 id=&quot;抓包分析&quot;&gt;&lt;a href=&quot;#抓包分析&quot; class=&quot;headerlink&quot; title=&quot;抓包分析&quot;&gt;&lt;/a&gt;抓包分析&lt;/h2&gt;&lt;p&gt;在node2主机上使用tcpdump抓包，然后在windows上用wireshark分析。&lt;br&gt;1.container1容器里ping container2的ip地址：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/33.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;2.node2主机上抓包&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node2 ~]# tcpdump -i ens32 -s 0 -X -nnn -vvv -w /tmp/package.pcap
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.把package.pcap传下来放到wireshark上分析&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/34.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/35.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;以在container1中ping container2，分析数据包流向：&lt;/strong&gt;&lt;br&gt;①container1(10.10.10.3)中ping container2(10.10.10.4)，根据container1的路由表，数据包可通过直连网络到达container2。于是arp请求获取container2的MAC地址(在xvlan上的arp这里不详述)，得到mac地址后，封包，从eth0发出；&lt;br&gt;②eth0桥接在net ns 1-ca0c50dd3a中的br0上，这个br0是个网桥(交换机)虚拟设备，需要将来自eth0的包转发出去，于是包转给了vxlan设备；这个可以通过arp -a看到一些端倪：&lt;br&gt;[root@node1 ~]# ip netns exec 1-ca0c50dd3a arp -a&lt;br&gt;③vxlan是个特殊设备，收到包后，由vxlan设备创建时注册的设备处理程序对包进行处理，即进行VXLAN封包（这期间会查询consul中存储的net1信息），将ICMP包整体作为UDP包的payload封装起来，并将UDP包通过宿主机的eth0发送出去。&lt;br&gt;④152宿主机收到UDP包后，发现是VXLAN包，根据VXLAN包中的相关信息（比如Vxlan Network Identifier，VNI=256)找到vxlan设备，并转给该vxlan设备处理。vxlan设备的处理程序进行解包，并将UDP中的payload取出，整体通过br0转给veth口，net1c2从eth0收到ICMP数据包，回复icmp reply。&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;strong&gt;从这个通信过程中来看，跨主机通信过程中的步骤如下：&lt;/strong&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.把package.pcap传下来放到wireshark上分析&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/34.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/35.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;以在container1中ping container2，分析数据包流向：&lt;/strong&gt;&lt;br&gt;①container1(10.10.10.3)中ping container2(10.10.10.4)，根据container1的路由表，数据包可通过直连网络到达container2。于是arp请求获取container2的MAC地址(在xvlan上的arp这里不详述)，得到mac地址后，封包，从eth0发出；&lt;br&gt;②eth0桥接在net ns 1-ca0c50dd3a中的br0上，这个br0是个网桥(交换机)虚拟设备，需要将来自eth0的包转发出去，于是包转给了vxlan设备；这个可以通过arp -a看到一些端倪：&lt;br&gt;[root@node1 ~]# ip netns exec 1-ca0c50dd3a arp -a&lt;br&gt;③vxlan是个特殊设备，收到包后，由vxlan设备创建时注册的设备处理程序对包进行处理，即进行VXLAN封包（这期间会查询consul中存储的net1信息），将ICMP包整体作为UDP包的payload封装起来，并将UDP包通过宿主机的eth0发送出去。&lt;br&gt;④152宿主机收到UDP包后，发现是VXLAN包，根据VXLAN包中的相关信息（比如Vxlan Network Identifier，VNI=256)找到vxlan设备，并转给该vxlan设备处理。vxlan设备的处理程序进行解包，并将UDP中的payload取出，整体通过br0转给veth口，net1c2从eth0收到ICMP数据包，回复icmp reply。&lt;br&gt;&lt;strong&gt;从这个通信过程中来看，跨主机通信过程中的步骤如下：&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;容器的网络命名空间与overlay网络的网络命名空间通过一对veth pair连接起来，当容器对外通信时，veth pair起到网线的作用，将流量发送到overlay网络的网络命名空间中。 &lt;/li&gt;
 &lt;li&gt;容器的veth pair对端eth2与vxlan设备通过br0这个Linux bridge桥接在一起，br0在同一宿主机上起到虚拟机交换机的作用，如果目标地址在同一宿主机上，则直接通信，如果不再则通过设置在vxlan1这个vxlan设备进行跨主机通信。 &lt;/li&gt;
@@ -168,7 +168,7 @@ ca0c50dd3a49             net1                    overlay
     <link href="http://yoursite.com/2017/09/01/Registry%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA%E5%8F%8A%E8%AE%A4%E8%AF%81/"/>
     <id>http://yoursite.com/2017/09/01/Registry私有仓库搭建及认证/</id>
     <published>2017-09-01T09:44:19.000Z</published>
-    <updated>2017-09-07T01:33:53.000Z</updated>
+    <updated>2017-09-08T01:38:10.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Registry相关概念&quot;&gt;&lt;a href=&quot;#Registry相关概念&quot; class=&quot;headerlink&quot; title=&quot;Registry相关概念&quot;&gt;&lt;/a&gt;Registry相关概念&lt;/h2&gt;&lt;p&gt;前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。&lt;br&gt;image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。可以很容易和本地源代码以及远端Git服务的关系相对应。&lt;br&gt;Docker hub是Docker公司提供的一些存储镜像的空间，这部分空间是有限的。我们一般会自主建设Docker私有仓库Registry。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;Registry-V1和V2&quot;&gt;&lt;a href=&quot;#Registry-V1和V2&quot; class=&quot;headerlink&quot; title=&quot;Registry V1和V2&quot;&gt;&lt;/a&gt;Registry V1和V2&lt;/h2&gt;&lt;p&gt;Docker Registry 2.0版本在安全性和性能上做了诸多优化，并重新设计了镜像的存储的格式。Docker目前1.6之后支持V2。&lt;/p&gt;
@@ -394,7 +394,8 @@ docker-compose version 1.15.0, build e12f3b9
 &lt;pre&gt;&lt;code&gt;rm /usr/local/bin/docker-compose
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果docker compose是通过pip安装的:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;pip uninstall docker-compose
-&lt;/code&gt;&lt;/pre&gt;</content>
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;registry-ui&quot;&gt;&lt;a href=&quot;#registry-ui&quot; class=&quot;headerlink&quot; title=&quot;registry ui&quot;&gt;&lt;/a&gt;registry ui&lt;/h2&gt;&lt;p&gt;搭建完了docker registry，我们可以使用 docker 命令行工具对我们搭建的 registry 做各种操作了，如 push / pull。但是不够方便，比如不能直观的查看 registry 中的资源情况，如果有一个 ui 工具，能够看到仓库中有哪些镜像、每个镜像的版本是多少。&lt;br&gt;registry ui主要有3个，一个是 &lt;a href=&quot;https://github.com/kwk/docker-registry-frontend&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;docker-registry-frontend&lt;/a&gt;，一个是 &lt;a href=&quot;https://hub.docker.com/r/hyper/docker-registry-web/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;hyper/docker-registry-web&lt;/a&gt;，还有一个是&lt;a href=&quot;http://port.us.org/documentation.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Portus&lt;/a&gt;。&lt;br&gt;关于registry ui的搭建会在后面的文章中介绍。&lt;/p&gt;
+</content>
     
     <summary type="html">
     
