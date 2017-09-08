@@ -119,7 +119,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/40.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/41.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/42.png">
-<meta property="og:updated_time" content="2017-09-08T08:44:00.000Z">
+<meta property="og:updated_time" content="2017-09-08T08:49:38.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="企业级Docker Registry —— Harbor搭建和使用">
 <meta name="twitter:description" content="Harbor介绍Harbor是由VMWare公司开源的容器镜像仓库。事实上，Habor是在Docker Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制 ，AD/LDAP集成以及审计日志等。">
@@ -349,7 +349,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-09-08T16:44:00+08:00" content="2017-09-08">
+              <time itemprop="dateUpdated" datetime="2017-09-08T16:49:38+08:00" content="2017-09-08">
               2017-09-08
               </time>
               </span>
@@ -437,12 +437,14 @@
 <h3 id="安装部署harbor"><a href="#安装部署harbor" class="headerlink" title="安装部署harbor"></a>安装部署harbor</h3><pre><code>[root@spark32 ~]# cd /opt/
 [root@spark32 opt]# mkdir harbor
 [root@spark32 opt]# cd harbor/
-</code></pre><p>从<a href="https://github.com/vmware/harbor/releases下载，由于我这里服务器可以联网，离线版本又很大，所以下载的在线安装版本的1.1.2版本，将软件上传到/opt/harbor/目录下。" target="_blank" rel="external">https://github.com/vmware/harbor/releases下载，由于我这里服务器可以联网，离线版本又很大，所以下载的在线安装版本的1.1.2版本，将软件上传到/opt/harbor/目录下。</a></p>
+</code></pre><p>下载地址：<a href="https://github.com/vmware/harbor/releases" target="_blank" rel="external">https://github.com/vmware/harbor/releases</a><br>由于我这里服务器可以联网，离线版本又很大，所以下载的在线安装版本的1.1.2版本，将软件上传到/opt/harbor/目录下。</p>
 <pre><code>[root@spark32 harbor]# tar xvf harbor-online-installer-v1.1.2.tar 
 </code></pre><h3 id="配置harbor"><a href="#配置harbor" class="headerlink" title="配置harbor"></a>配置harbor</h3><p>可配置的参数在文件harbor.cfg中。在该文件中，有两种参数，必须配置的和可选的。</p>
 <ul>
 <li>必须的：这些参数会在用户更新配置文件和执行install.sh脚本重新安装harbor起作用。你至少得设置 hostname 参数。</li>
-<li><p>可选的：用户可以就使用默认值，或者在启动后通过web ui进行修改。如果这些可选参数被设置在harbor.cfg文件中，它们只会在第一次启动时起作用，以后在harbor.cfg文件中修改会被忽略。也就是说在 Harbor 初次启动时，Admin Server 从 harbor.cfg 文件读取配置并记录下来。之后重新启动Harbor的过程中，只有必需的配置会从 harbor.cfg 文件读取；其他可选的配置将不再生效，需要通过 Admin Server 的管理界面来修改。<strong>【注意】:如果你通过web ui设置这些参数，请在harbor启动后立即设置。尤其是，必须先设置 auth_mode 在你注册或创建任何用户之前。</strong><br>这些具体参数的名字和意义详见<a href="https://github.com/vmware/harbor/blob/master/docs/installation_guide.md" target="_blank" rel="external">https://github.com/vmware/harbor/blob/master/docs/installation_guide.md</a></p>
+<li>可选的：用户可以就使用默认值，或者在启动后通过web ui进行修改。如果这些可选参数被设置在harbor.cfg文件中，它们只会在第一次启动时起作用，以后在harbor.cfg文件中修改会被忽略。也就是说在 Harbor 初次启动时，Admin Server 从 harbor.cfg 文件读取配置并记录下来。之后重新启动Harbor的过程中，只有必需的配置会从 harbor.cfg 文件读取；其他可选的配置将不再生效，需要通过 Admin Server 的管理界面来修改。<br><strong>【注意】:如果你通过web ui设置这些参数，请在harbor启动后立即设置。尤其是，必须先设置 auth_mode 在你注册或创建任何用户之前。</strong></li>
+</ul>
+<p>这些具体参数的名字和意义详见<a href="https://github.com/vmware/harbor/blob/master/docs/installation_guide.md" target="_blank" rel="external">https://github.com/vmware/harbor/blob/master/docs/installation_guide.md</a></p>
 <pre><code>[root@spark32 harbor]# cd harbor/
 [root@spark32 harbor]# vim harbor.cfg
 # 指定 hostname，为IP或者域名，用于登录 Web UI 界面
@@ -456,9 +458,7 @@ email_username = 01115004@wisedu.com
 email_password = zjk230640
 email_from = admin &lt;01115004@wisedu.com&gt;
 email_ssl = on
-</code></pre></li>
-</ul>
-<h3 id="配置存储"><a href="#配置存储" class="headerlink" title="配置存储"></a>配置存储</h3><p>默认情况下，harbor把镜像存储在本地文件系统，在生产环境中，你可能考虑用其他的存储替代本地存储，比如S3, Openstack Swift, Ceph等等。你需要修改 common/templates/registry/config.yml 中的 storage 段。比如使用Openstack Swift，storage段的配置类似如下：</p>
+</code></pre><h3 id="配置存储"><a href="#配置存储" class="headerlink" title="配置存储"></a>配置存储</h3><p>默认情况下，harbor把镜像存储在本地文件系统，在生产环境中，你可能考虑用其他的存储替代本地存储，比如S3, Openstack Swift, Ceph等等。你需要修改 common/templates/registry/config.yml 中的 storage 段。比如使用Openstack Swift，storage段的配置类似如下：</p>
 <pre><code>storage:
   swift:
     username: admin
@@ -474,29 +474,18 @@ email_ssl = on
 /opt/harbor/harbor
 [root@spark32 harbor]# ./install.sh 
 </code></pre><p>我这里配置了阿里云容器加速，所以在线版安装没有问题，如果有网络问题可以选择离线包安装。</p>
-<h2 id="访问harbor"><a href="#访问harbor" class="headerlink" title="访问harbor"></a>访问harbor</h2><p>浏览器输入<a href="http://172.16.206.32，默认账号密码是admin/Harbor12345。默认是80端口，如果端口占用，我们可以去修改docker-compose.yml文件中，对应服务的端口映射。" target="_blank" rel="external">http://172.16.206.32，默认账号密码是admin/Harbor12345。默认是80端口，如果端口占用，我们可以去修改docker-compose.yml文件中，对应服务的端口映射。</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/36.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/37.png" alt=""><br>我们可以看到系统各个模块如下：</p>
+<h2 id="访问harbor"><a href="#访问harbor" class="headerlink" title="访问harbor"></a>访问harbor</h2><p>浏览器输入<a href="http://172.16.206.32" target="_blank" rel="external">http://172.16.206.32</a><br>默认账号密码是admin/Harbor12345。默认是80端口，如果端口占用，我们可以去修改docker-compose.yml文件中，对应服务的端口映射。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/36.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/37.png" alt=""><br>我们可以看到系统各个模块如下：</p>
 <ul>
 <li>项目：新增/删除项目，查看镜像仓库，给项目添加成员、查看操作日志、复制项目等</li>
 <li>日志：仓库各个镜像create、push、pull等操作日志</li>
-<li>系统管理 </li>
-<li><ul>
+<li>系统管理 <ul>
 <li>用户管理：新增/删除用户、设置管理员等</li>
-</ul>
-</li>
-<li><ul>
 <li>复制管理：新增/删除从库目标、新建/删除/启停复制规则等</li>
-</ul>
-</li>
-<li><ul>
 <li>配置管理：认证模式、复制、邮箱设置、系统设置等</li>
 </ul>
 </li>
-<li>其他设置 </li>
-<li><ul>
+<li>其他设置 <ul>
 <li>用户设置：修改用户名、邮箱、名称信息</li>
-</ul>
-</li>
-<li><ul>
 <li>修改密码：修改用户密码<br><strong>注意：非系统管理员用户登录，只能看到有权限的项目和日志，其他模块不可见。</strong></li>
 </ul>
 </li>
@@ -522,8 +511,9 @@ registry             /entrypoint.sh serve /etc/ ...   Up      5000/tcp
 <li>harbor-log : 运行着rsyslogd的容器，通过log-driver的形式收集其他容器的日志</li>
 <li>harbor-ui : 即架构中的core services, 构成此容器的代码是Harbor项目的主体</li>
 <li>nginx : 由 nginx 服务器构成的反向代理</li>
-<li>registry : 由Docker官方的开源 registry 镜像构成的容器实例<br>这几个 Contianer 通过 Docker link 的形式连接在一起，在容器之间通过容器名字互相访问。对终端用户而言，只需要暴露 proxy（即Nginx）的服务端口。</li>
+<li>registry : 由Docker官方的开源 registry 镜像构成的容器实例</li>
 </ul>
+<p>这几个 Contianer 通过 Docker link 的形式连接在一起，在容器之间通过容器名字互相访问。对终端用户而言，只需要暴露 proxy（即Nginx）的服务端口。</p>
 <p><strong>【注意】:之前的版本更新配置，需要修改harbor.cfg，然后停止并删除现有Harbor实例，再重新运行Harbor，比较繁琐。新版本的adminconsole可以使用户很方便地通过WEB界面配置认证、同步、邮件和系统等信息，修改立即生效，无需重启整个系统。</strong></p>
 <h2 id="harbor持久化数据和日志"><a href="#harbor持久化数据和日志" class="headerlink" title="harbor持久化数据和日志"></a>harbor持久化数据和日志</h2><p>默认情况下，registrys数据被持久化在宿主机的/data/目录下，甚至你删除harbor容器或者重新被创建，这部分数据也不会改变。<br>另外，harbor使用rsyslog来收集每一个容器日志，默认情况下，这些日志存放在宿主机的/var/log/harbor/目录下。</p>
 <h2 id="管理harbor的生命"><a href="#管理harbor的生命" class="headerlink" title="管理harbor的生命"></a>管理harbor的生命</h2><p>可以使用docker-compose来管理harbor的启动、停止和销毁。但是注意必须切换到docker-compose.yml同级目录运行以下的命令。</p>
@@ -541,14 +531,16 @@ registry             /entrypoint.sh serve /etc/ ...   Up      5000/tcp
 <h3 id="用户"><a href="#用户" class="headerlink" title="用户"></a>用户</h3><p>用户主要分两类：</p>
 <ul>
 <li>管理员</li>
-<li>普通用户。<br>两类用户都可以成为项目的成员。而管理员可以对用户进行管理。</li>
+<li>普通用户。</li>
 </ul>
+<p>两类用户都可以成为项目的成员。而管理员可以对用户进行管理。</p>
 <h3 id="成员"><a href="#成员" class="headerlink" title="成员"></a>成员</h3><p>成员是对应于项目的概念，分为三类：</p>
 <ul>
 <li>管理员</li>
 <li>开发者</li>
-<li>访客<br>管理员可以对开发者和访客作权限的配置和管理。测试和运维人员可以访客身份读取项目镜像，或者公共镜像库中的文件。<br>从项目的角度出发，项目管理员拥有最大的项目权限，如果要对用户进行禁用或限权等，可以通过修改用户在项目中的成员角色来实现，甚至将用户移除出这个项目。<br>下面以实际操作来演示。</li>
+<li>访客</li>
 </ul>
+<p>管理员可以对开发者和访客作权限的配置和管理。测试和运维人员可以访客身份读取项目镜像，或者公共镜像库中的文件。<br>从项目的角度出发，项目管理员拥有最大的项目权限，如果要对用户进行禁用或限权等，可以通过修改用户在项目中的成员角色来实现，甚至将用户移除出这个项目。<br>下面以实际操作来演示。</p>
 <h2 id="harbor使用"><a href="#harbor使用" class="headerlink" title="harbor使用"></a>harbor使用</h2><h3 id="web-ui创建项目"><a href="#web-ui创建项目" class="headerlink" title="web ui创建项目"></a>web ui创建项目</h3><p>注意：当项目设为公开后，任何人都有此项目下镜像的读权限。命令行用户不需要“docker login”就可以拉取此项目下的镜像。所以一般需要建立私有项目。<br>1.登录harbor，点击“+项目”<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/39.png" alt=""></p>
 <p>2.点击左侧菜单“用户管理”，点击“+用户”<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/40.png" alt=""></p>
 <p>3.点击左侧菜单项目，选择刚才创建的项目“godseye”，在点击右侧正文中的选项卡“成员”，点击“+成员”，输入刚才创建的用户，并设置其为管理员。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/41.png" alt=""><br>对于权限(角色)，项目管理员和开发人员可以有 push 的权限，而访客只能查看和 pull</p>
