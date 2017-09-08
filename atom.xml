@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-08T08:49:38.000Z</updated>
+  <updated>2017-09-08T08:52:02.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/09/08/%E4%BC%81%E4%B8%9A%E7%BA%A7Docker-Registry-%E2%80%94%E2%80%94-Harbor%E6%90%AD%E5%BB%BA%E5%92%8C%E4%BD%BF%E7%94%A8/"/>
     <id>http://yoursite.com/2017/09/08/企业级Docker-Registry-——-Harbor搭建和使用/</id>
     <published>2017-09-08T08:38:52.000Z</published>
-    <updated>2017-09-08T08:49:38.000Z</updated>
+    <updated>2017-09-08T08:52:02.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Harbor介绍&quot;&gt;&lt;a href=&quot;#Harbor介绍&quot; class=&quot;headerlink&quot; title=&quot;Harbor介绍&quot;&gt;&lt;/a&gt;Harbor介绍&lt;/h2&gt;&lt;p&gt;Harbor是由VMWare公司开源的容器镜像仓库。事实上，Habor是在Docker Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制 ，AD/LDAP集成以及审计日志等。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;安装部署Harbor&quot;&gt;&lt;a href=&quot;#安装部署Harbor&quot; class=&quot;headerlink&quot; title=&quot;安装部署Harbor&quot;&gt;&lt;/a&gt;安装部署Harbor&lt;/h2&gt;&lt;p&gt;官方安装文档：&lt;br&gt;&lt;a href=&quot;https://github.com/vmware/harbor/blob/master/docs/installation_guide.md&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/vmware/harbor/blob/master/docs/installation_guide.md&lt;/a&gt;&lt;/p&gt;
@@ -99,10 +99,11 @@ email_ssl = on
 &lt;/li&gt;
 &lt;li&gt;其他设置 &lt;ul&gt;
 &lt;li&gt;用户设置：修改用户名、邮箱、名称信息&lt;/li&gt;
-&lt;li&gt;修改密码：修改用户密码&lt;br&gt;&lt;strong&gt;注意：非系统管理员用户登录，只能看到有权限的项目和日志，其他模块不可见。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;修改密码：修改用户密码&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;注意：非系统管理员用户登录，只能看到有权限的项目和日志，其他模块不可见。&lt;/strong&gt;&lt;/p&gt;
 &lt;h3 id=&quot;修改管理员密码&quot;&gt;&lt;a href=&quot;#修改管理员密码&quot; class=&quot;headerlink&quot; title=&quot;修改管理员密码&quot;&gt;&lt;/a&gt;修改管理员密码&lt;/h3&gt;&lt;p&gt;点击右上角的admin，点击修改密码。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/38.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h3 id=&quot;启动后相关容器&quot;&gt;&lt;a href=&quot;#启动后相关容器&quot; class=&quot;headerlink&quot; title=&quot;启动后相关容器&quot;&gt;&lt;/a&gt;启动后相关容器&lt;/h3&gt;&lt;p&gt;Harbor的所有服务组件都是在Docker中部署的。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@spark32 harbor]# ls
@@ -154,7 +155,7 @@ registry             /entrypoint.sh serve /etc/ ...   Up      5000/tcp
 &lt;li&gt;访客&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;管理员可以对开发者和访客作权限的配置和管理。测试和运维人员可以访客身份读取项目镜像，或者公共镜像库中的文件。&lt;br&gt;从项目的角度出发，项目管理员拥有最大的项目权限，如果要对用户进行禁用或限权等，可以通过修改用户在项目中的成员角色来实现，甚至将用户移除出这个项目。&lt;br&gt;下面以实际操作来演示。&lt;/p&gt;
-&lt;h2 id=&quot;harbor使用&quot;&gt;&lt;a href=&quot;#harbor使用&quot; class=&quot;headerlink&quot; title=&quot;harbor使用&quot;&gt;&lt;/a&gt;harbor使用&lt;/h2&gt;&lt;h3 id=&quot;web-ui创建项目&quot;&gt;&lt;a href=&quot;#web-ui创建项目&quot; class=&quot;headerlink&quot; title=&quot;web ui创建项目&quot;&gt;&lt;/a&gt;web ui创建项目&lt;/h3&gt;&lt;p&gt;注意：当项目设为公开后，任何人都有此项目下镜像的读权限。命令行用户不需要“docker login”就可以拉取此项目下的镜像。所以一般需要建立私有项目。&lt;br&gt;1.登录harbor，点击“+项目”&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/39.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;harbor使用&quot;&gt;&lt;a href=&quot;#harbor使用&quot; class=&quot;headerlink&quot; title=&quot;harbor使用&quot;&gt;&lt;/a&gt;harbor使用&lt;/h2&gt;&lt;p&gt;注意：当项目设为公开后，任何人都有此项目下镜像的读权限。命令行用户不需要“docker login”就可以拉取此项目下的镜像。所以一般需要建立私有项目。&lt;br&gt;1.登录harbor，点击“+项目”&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/39.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;2.点击左侧菜单“用户管理”，点击“+用户”&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/40.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;3.点击左侧菜单项目，选择刚才创建的项目“godseye”，在点击右侧正文中的选项卡“成员”，点击“+成员”，输入刚才创建的用户，并设置其为管理员。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/41.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;对于权限(角色)，项目管理员和开发人员可以有 push 的权限，而访客只能查看和 pull&lt;/p&gt;
 &lt;p&gt;4.测试&lt;br&gt;我这里找了另外一台机器，安装了docker 1.12.6。由于这里harbor采用了默认的 http 方式连接，而 Docker 认为这是不安全的，所以在 push 之前需要调整一下 docker 配置：&lt;/p&gt;
