@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-07T01:44:59.000Z</updated>
+  <updated>2017-09-08T08:44:00.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,186 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>企业级Docker Registry —— Harbor搭建和使用</title>
+    <link href="http://yoursite.com/2017/09/08/%E4%BC%81%E4%B8%9A%E7%BA%A7Docker-Registry-%E2%80%94%E2%80%94-Harbor%E6%90%AD%E5%BB%BA%E5%92%8C%E4%BD%BF%E7%94%A8/"/>
+    <id>http://yoursite.com/2017/09/08/企业级Docker-Registry-——-Harbor搭建和使用/</id>
+    <published>2017-09-08T08:38:52.000Z</published>
+    <updated>2017-09-08T08:44:00.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Harbor介绍&quot;&gt;&lt;a href=&quot;#Harbor介绍&quot; class=&quot;headerlink&quot; title=&quot;Harbor介绍&quot;&gt;&lt;/a&gt;Harbor介绍&lt;/h2&gt;&lt;p&gt;Harbor是由VMWare公司开源的容器镜像仓库。事实上，Habor是在Docker Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制 ，AD/LDAP集成以及审计日志等。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;安装部署Harbor&quot;&gt;&lt;a href=&quot;#安装部署Harbor&quot; class=&quot;headerlink&quot; title=&quot;安装部署Harbor&quot;&gt;&lt;/a&gt;安装部署Harbor&lt;/h2&gt;&lt;p&gt;官方安装文档：&lt;br&gt;&lt;a href=&quot;https://github.com/vmware/harbor/blob/master/docs/installation_guide.md&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/vmware/harbor/blob/master/docs/installation_guide.md&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;环境要求&quot;&gt;&lt;a href=&quot;#环境要求&quot; class=&quot;headerlink&quot; title=&quot;环境要求&quot;&gt;&lt;/a&gt;环境要求&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;python 2.7+&lt;/li&gt;
+&lt;li&gt;docker 1.10+&lt;/li&gt;
+&lt;li&gt;docker-compose 1.6.0+&lt;br&gt;Docker的安装见文章《Docker镜像和容器》和docker-compose的安装见文章《Registry私有仓库搭建及认证》。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;安装软件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;spark32&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;172.16.206.32&lt;/td&gt;
+&lt;td&gt;docker-ce 17.06.1、docker-compose 1.15.0、harbor-online-installer-v1.1.2.tar&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&quot;安装部署harbor&quot;&gt;&lt;a href=&quot;#安装部署harbor&quot; class=&quot;headerlink&quot; title=&quot;安装部署harbor&quot;&gt;&lt;/a&gt;安装部署harbor&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# cd /opt/
+[root@spark32 opt]# mkdir harbor
+[root@spark32 opt]# cd harbor/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;从&lt;a href=&quot;https://github.com/vmware/harbor/releases下载，由于我这里服务器可以联网，离线版本又很大，所以下载的在线安装版本的1.1.2版本，将软件上传到/opt/harbor/目录下。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/vmware/harbor/releases下载，由于我这里服务器可以联网，离线版本又很大，所以下载的在线安装版本的1.1.2版本，将软件上传到/opt/harbor/目录下。&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 harbor]# tar xvf harbor-online-installer-v1.1.2.tar 
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置harbor&quot;&gt;&lt;a href=&quot;#配置harbor&quot; class=&quot;headerlink&quot; title=&quot;配置harbor&quot;&gt;&lt;/a&gt;配置harbor&lt;/h3&gt;&lt;p&gt;可配置的参数在文件harbor.cfg中。在该文件中，有两种参数，必须配置的和可选的。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;必须的：这些参数会在用户更新配置文件和执行install.sh脚本重新安装harbor起作用。你至少得设置 hostname 参数。&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;可选的：用户可以就使用默认值，或者在启动后通过web ui进行修改。如果这些可选参数被设置在harbor.cfg文件中，它们只会在第一次启动时起作用，以后在harbor.cfg文件中修改会被忽略。也就是说在 Harbor 初次启动时，Admin Server 从 harbor.cfg 文件读取配置并记录下来。之后重新启动Harbor的过程中，只有必需的配置会从 harbor.cfg 文件读取；其他可选的配置将不再生效，需要通过 Admin Server 的管理界面来修改。&lt;strong&gt;【注意】:如果你通过web ui设置这些参数，请在harbor启动后立即设置。尤其是，必须先设置 auth_mode 在你注册或创建任何用户之前。&lt;/strong&gt;&lt;br&gt;这些具体参数的名字和意义详见&lt;a href=&quot;https://github.com/vmware/harbor/blob/master/docs/installation_guide.md&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/vmware/harbor/blob/master/docs/installation_guide.md&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 harbor]# cd harbor/
+[root@spark32 harbor]# vim harbor.cfg
+# 指定 hostname，为IP或者域名，用于登录 Web UI 界面
+hostname = 172.16.206.32
+# mysql 数据库 root 账户密码
+db_password = wisedu123
+# 邮件相关信息配置，如忘记密码发送邮件
+email_server = smtp.exmail.qq.com
+email_server_port = 465
+email_username = 01115004@wisedu.com
+email_password = zjk230640
+email_from = admin &amp;lt;01115004@wisedu.com&amp;gt;
+email_ssl = on
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;配置存储&quot;&gt;&lt;a href=&quot;#配置存储&quot; class=&quot;headerlink&quot; title=&quot;配置存储&quot;&gt;&lt;/a&gt;配置存储&lt;/h3&gt;&lt;p&gt;默认情况下，harbor把镜像存储在本地文件系统，在生产环境中，你可能考虑用其他的存储替代本地存储，比如S3, Openstack Swift, Ceph等等。你需要修改 common/templates/registry/config.yml 中的 storage 段。比如使用Openstack Swift，storage段的配置类似如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;storage:
+  swift:
+    username: admin
+    password: ADMIN_PASS
+    authurl: http://keystone_addr:35357/v3/auth
+    tenant: admin
+    domain: default
+    region: regionOne
+    container: docker_images
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;更详细的存储配置，见 &lt;a href=&quot;https://docs.docker.com/registry/configuration/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Registry Configuration Reference&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;完成安装和启动harbor&quot;&gt;&lt;a href=&quot;#完成安装和启动harbor&quot; class=&quot;headerlink&quot; title=&quot;完成安装和启动harbor&quot;&gt;&lt;/a&gt;完成安装和启动harbor&lt;/h3&gt;&lt;p&gt;一旦harbor.cfg和后端存储(可选的)配置完成，就可以使用install.sh脚本安装和启动harbor了。注意在线安装可能需要等待一些时间从dockerhubs下载harbor镜像。&lt;br&gt;&lt;strong&gt;【注意】：请确保主机上80和443端口没被占用。如果想修改端口，需要去修改docker-compose.yml文件&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 harbor]# pwd
+/opt/harbor/harbor
+[root@spark32 harbor]# ./install.sh 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我这里配置了阿里云容器加速，所以在线版安装没有问题，如果有网络问题可以选择离线包安装。&lt;/p&gt;
+&lt;h2 id=&quot;访问harbor&quot;&gt;&lt;a href=&quot;#访问harbor&quot; class=&quot;headerlink&quot; title=&quot;访问harbor&quot;&gt;&lt;/a&gt;访问harbor&lt;/h2&gt;&lt;p&gt;浏览器输入&lt;a href=&quot;http://172.16.206.32，默认账号密码是admin/Harbor12345。默认是80端口，如果端口占用，我们可以去修改docker-compose.yml文件中，对应服务的端口映射。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.32，默认账号密码是admin/Harbor12345。默认是80端口，如果端口占用，我们可以去修改docker-compose.yml文件中，对应服务的端口映射。&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/36.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/37.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;我们可以看到系统各个模块如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;项目：新增/删除项目，查看镜像仓库，给项目添加成员、查看操作日志、复制项目等&lt;/li&gt;
+&lt;li&gt;日志：仓库各个镜像create、push、pull等操作日志&lt;/li&gt;
+&lt;li&gt;系统管理 &lt;/li&gt;
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;用户管理：新增/删除用户、设置管理员等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;复制管理：新增/删除从库目标、新建/删除/启停复制规则等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;配置管理：认证模式、复制、邮箱设置、系统设置等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;其他设置 &lt;/li&gt;
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;用户设置：修改用户名、邮箱、名称信息&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;修改密码：修改用户密码&lt;br&gt;&lt;strong&gt;注意：非系统管理员用户登录，只能看到有权限的项目和日志，其他模块不可见。&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;修改管理员密码&quot;&gt;&lt;a href=&quot;#修改管理员密码&quot; class=&quot;headerlink&quot; title=&quot;修改管理员密码&quot;&gt;&lt;/a&gt;修改管理员密码&lt;/h3&gt;&lt;p&gt;点击右上角的admin，点击修改密码。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/38.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;启动后相关容器&quot;&gt;&lt;a href=&quot;#启动后相关容器&quot; class=&quot;headerlink&quot; title=&quot;启动后相关容器&quot;&gt;&lt;/a&gt;启动后相关容器&lt;/h3&gt;&lt;p&gt;Harbor的所有服务组件都是在Docker中部署的。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 harbor]# ls
+common  docker-compose.notary.yml  docker-compose.yml  harbor_1_1_0_template  harbor.cfg  install.sh  LICENSE  NOTICE  prepare  upgrade
+[root@spark32 harbor]# docker-compose ps
+       Name                     Command               State                                Ports                               
+------------------------------------------------------------------------------------------------------------------------------
+harbor-adminserver   /harbor/harbor_adminserver       Up                                                                       
+harbor-db            docker-entrypoint.sh mysqld      Up      3306/tcp                                                         
+harbor-jobservice    /harbor/harbor_jobservice        Up                                                                       
+harbor-log           /bin/sh -c crond &amp;amp;&amp;amp; rm -f  ...   Up      127.0.0.1:1514-&amp;gt;514/tcp                                          
+harbor-ui            /harbor/harbor_ui                Up                                                                       
+nginx                nginx -g daemon off;             Up      0.0.0.0:443-&amp;gt;443/tcp, 0.0.0.0:4443-&amp;gt;4443/tcp, 0.0.0.0:80-&amp;gt;80/tcp 
+registry             /entrypoint.sh serve /etc/ ...   Up      5000/tcp 
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;harbor-adminserver：用来管理系统配置，并提供了相应的 WEB 页面和 API 来供用户操作，改进了之前需用户手动修改配置文件并手动重启系统的用户体验。&lt;/li&gt;
+&lt;li&gt;harbor-db : 由官方MySql镜像构成的数据库容器&lt;/li&gt;
+&lt;li&gt;harbor-jobservice：是harbor的job管理模块，job在harbor里面主要是为了镜像仓库同步使用的。&lt;/li&gt;
+&lt;li&gt;harbor-log : 运行着rsyslogd的容器，通过log-driver的形式收集其他容器的日志&lt;/li&gt;
+&lt;li&gt;harbor-ui : 即架构中的core services, 构成此容器的代码是Harbor项目的主体&lt;/li&gt;
+&lt;li&gt;nginx : 由 nginx 服务器构成的反向代理&lt;/li&gt;
+&lt;li&gt;registry : 由Docker官方的开源 registry 镜像构成的容器实例&lt;br&gt;这几个 Contianer 通过 Docker link 的形式连接在一起，在容器之间通过容器名字互相访问。对终端用户而言，只需要暴露 proxy（即Nginx）的服务端口。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;【注意】:之前的版本更新配置，需要修改harbor.cfg，然后停止并删除现有Harbor实例，再重新运行Harbor，比较繁琐。新版本的adminconsole可以使用户很方便地通过WEB界面配置认证、同步、邮件和系统等信息，修改立即生效，无需重启整个系统。&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&quot;harbor持久化数据和日志&quot;&gt;&lt;a href=&quot;#harbor持久化数据和日志&quot; class=&quot;headerlink&quot; title=&quot;harbor持久化数据和日志&quot;&gt;&lt;/a&gt;harbor持久化数据和日志&lt;/h2&gt;&lt;p&gt;默认情况下，registrys数据被持久化在宿主机的/data/目录下，甚至你删除harbor容器或者重新被创建，这部分数据也不会改变。&lt;br&gt;另外，harbor使用rsyslog来收集每一个容器日志，默认情况下，这些日志存放在宿主机的/var/log/harbor/目录下。&lt;/p&gt;
+&lt;h2 id=&quot;管理harbor的生命&quot;&gt;&lt;a href=&quot;#管理harbor的生命&quot; class=&quot;headerlink&quot; title=&quot;管理harbor的生命&quot;&gt;&lt;/a&gt;管理harbor的生命&lt;/h2&gt;&lt;p&gt;可以使用docker-compose来管理harbor的启动、停止和销毁。但是注意必须切换到docker-compose.yml同级目录运行以下的命令。&lt;/p&gt;
+&lt;h3 id=&quot;停止harbor&quot;&gt;&lt;a href=&quot;#停止harbor&quot; class=&quot;headerlink&quot; title=&quot;停止harbor&quot;&gt;&lt;/a&gt;停止harbor&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# docker-compose stop
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;启动harbor&quot;&gt;&lt;a href=&quot;#启动harbor&quot; class=&quot;headerlink&quot; title=&quot;启动harbor&quot;&gt;&lt;/a&gt;启动harbor&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# docker-compose start
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;修改配置后启动&quot;&gt;&lt;a href=&quot;#修改配置后启动&quot; class=&quot;headerlink&quot; title=&quot;修改配置后启动&quot;&gt;&lt;/a&gt;修改配置后启动&lt;/h3&gt;&lt;p&gt;先停止harbor，在修改配置文件harbor.cfg，然后运行prepare脚本应用配置，最后重新创建harbor并运行它。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# docker-compose down -v
+# vim harbor.cfg
+# prepare
+# docker-compose up -d
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;清除harbor容器，保留镜像和数据&quot;&gt;&lt;a href=&quot;#清除harbor容器，保留镜像和数据&quot; class=&quot;headerlink&quot; title=&quot;清除harbor容器，保留镜像和数据&quot;&gt;&lt;/a&gt;清除harbor容器，保留镜像和数据&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# docker-compose down -v
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;删除harbors数据库和镜像-用于干净的重新安装&quot;&gt;&lt;a href=&quot;#删除harbors数据库和镜像-用于干净的重新安装&quot; class=&quot;headerlink&quot; title=&quot;删除harbors数据库和镜像(用于干净的重新安装)&quot;&gt;&lt;/a&gt;删除harbors数据库和镜像(用于干净的重新安装)&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# rm -r /data/database
+# rm -r /data/registry
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;Harbor的安全机制&quot;&gt;&lt;a href=&quot;#Harbor的安全机制&quot; class=&quot;headerlink&quot; title=&quot;Harbor的安全机制&quot;&gt;&lt;/a&gt;Harbor的安全机制&lt;/h2&gt;&lt;p&gt;企业中的软件研发团队往往划分为诸多角色，如项目经理、产品经理、测试、运维等。在实际的软件开发和运维过程中，这些角色对于镜像的使用需求是不一样的。比如：开发人员需要拥有对镜像的读写(PULL/PUSH)权限以更新和改正代码；测试人员中需要读取(PULL)权限；而项目经理需要对上述的角色进行管理。&lt;br&gt;Harbor为这种需求提供了用户和成员两种管理概念。&lt;/p&gt;
+&lt;h3 id=&quot;用户&quot;&gt;&lt;a href=&quot;#用户&quot; class=&quot;headerlink&quot; title=&quot;用户&quot;&gt;&lt;/a&gt;用户&lt;/h3&gt;&lt;p&gt;用户主要分两类：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;管理员&lt;/li&gt;
+&lt;li&gt;普通用户。&lt;br&gt;两类用户都可以成为项目的成员。而管理员可以对用户进行管理。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;成员&quot;&gt;&lt;a href=&quot;#成员&quot; class=&quot;headerlink&quot; title=&quot;成员&quot;&gt;&lt;/a&gt;成员&lt;/h3&gt;&lt;p&gt;成员是对应于项目的概念，分为三类：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;管理员&lt;/li&gt;
+&lt;li&gt;开发者&lt;/li&gt;
+&lt;li&gt;访客&lt;br&gt;管理员可以对开发者和访客作权限的配置和管理。测试和运维人员可以访客身份读取项目镜像，或者公共镜像库中的文件。&lt;br&gt;从项目的角度出发，项目管理员拥有最大的项目权限，如果要对用户进行禁用或限权等，可以通过修改用户在项目中的成员角色来实现，甚至将用户移除出这个项目。&lt;br&gt;下面以实际操作来演示。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;harbor使用&quot;&gt;&lt;a href=&quot;#harbor使用&quot; class=&quot;headerlink&quot; title=&quot;harbor使用&quot;&gt;&lt;/a&gt;harbor使用&lt;/h2&gt;&lt;h3 id=&quot;web-ui创建项目&quot;&gt;&lt;a href=&quot;#web-ui创建项目&quot; class=&quot;headerlink&quot; title=&quot;web ui创建项目&quot;&gt;&lt;/a&gt;web ui创建项目&lt;/h3&gt;&lt;p&gt;注意：当项目设为公开后，任何人都有此项目下镜像的读权限。命令行用户不需要“docker login”就可以拉取此项目下的镜像。所以一般需要建立私有项目。&lt;br&gt;1.登录harbor，点击“+项目”&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/39.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;2.点击左侧菜单“用户管理”，点击“+用户”&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/40.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;3.点击左侧菜单项目，选择刚才创建的项目“godseye”，在点击右侧正文中的选项卡“成员”，点击“+成员”，输入刚才创建的用户，并设置其为管理员。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/41.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;对于权限(角色)，项目管理员和开发人员可以有 push 的权限，而访客只能查看和 pull&lt;/p&gt;
+&lt;p&gt;4.测试&lt;br&gt;我这里找了另外一台机器，安装了docker 1.12.6。由于这里harbor采用了默认的 http 方式连接，而 Docker 认为这是不安全的，所以在 push 之前需要调整一下 docker 配置：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node3 ~]# vim /etc/docker/daemon.json 
+{
+   &amp;quot;insecure-registries&amp;quot;: [&amp;quot;172.16.206.32&amp;quot;]
+}
+[root@node3 ~]# systemctl restart docker
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;登录harbor：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node3 ~]# docker login 172.16.206.32
+Username: jkzhao
+Password: 
+Login Succeeded
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后 tag 一个 image，名称一定要标准( registryAddress[:端口]/项目/imageName[:tag] )，最后将其 push 即可&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node3 ~]# docker tag centos:centos7 172.16.206.32/godseye/centos:latest
+[root@node3 ~]# docker push 172.16.206.32/godseye/centos:latest
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后到web ui上查看刚才push的镜像是否成功了：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/42.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Harbor介绍&quot;&gt;&lt;a href=&quot;#Harbor介绍&quot; class=&quot;headerlink&quot; title=&quot;Harbor介绍&quot;&gt;&lt;/a&gt;Harbor介绍&lt;/h2&gt;&lt;p&gt;Harbor是由VMWare公司开源的容器镜像仓库。事实上，Habor是在Docker Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制 ，AD/LDAP集成以及审计日志等。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+    
+    
+      <category term="容器 Docker Registry" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker-Registry/"/>
+    
+  </entry>
   
   <entry>
     <title>overlay实现容器跨主机通信</title>
@@ -168,12 +348,12 @@ ca0c50dd3a49             net1                    overlay
     <link href="http://yoursite.com/2017/09/01/Registry%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA%E5%8F%8A%E8%AE%A4%E8%AF%81/"/>
     <id>http://yoursite.com/2017/09/01/Registry私有仓库搭建及认证/</id>
     <published>2017-09-01T09:44:19.000Z</published>
-    <updated>2017-09-08T01:38:10.000Z</updated>
+    <updated>2017-09-08T08:39:54.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Registry相关概念&quot;&gt;&lt;a href=&quot;#Registry相关概念&quot; class=&quot;headerlink&quot; title=&quot;Registry相关概念&quot;&gt;&lt;/a&gt;Registry相关概念&lt;/h2&gt;&lt;p&gt;前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。&lt;br&gt;image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。可以很容易和本地源代码以及远端Git服务的关系相对应。&lt;br&gt;Docker hub是Docker公司提供的一些存储镜像的空间，这部分空间是有限的。我们一般会自主建设Docker私有仓库Registry。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;Registry-V1和V2&quot;&gt;&lt;a href=&quot;#Registry-V1和V2&quot; class=&quot;headerlink&quot; title=&quot;Registry V1和V2&quot;&gt;&lt;/a&gt;Registry V1和V2&lt;/h2&gt;&lt;p&gt;Docker Registry 2.0版本在安全性和性能上做了诸多优化，并重新设计了镜像的存储的格式。Docker目前1.6之后支持V2。&lt;/p&gt;
 &lt;h2 id=&quot;安装Docker&quot;&gt;&lt;a href=&quot;#安装Docker&quot; class=&quot;headerlink&quot; title=&quot;安装Docker&quot;&gt;&lt;/a&gt;安装Docker&lt;/h2&gt;&lt;p&gt;见前面发布的文章《CentOS安装Docker CE》。注意，在docker 1.12版本上测试registry有问题。&lt;/p&gt;
-&lt;h2 id=&quot;搭建本地registry-v2&quot;&gt;&lt;a href=&quot;#搭建本地registry-v2&quot; class=&quot;headerlink&quot; title=&quot;搭建本地registry v2&quot;&gt;&lt;/a&gt;搭建本地registry v2&lt;/h2&gt;&lt;p&gt;环境：172.16.7.151&lt;/p&gt;
+&lt;h2 id=&quot;搭建本地registry-v2&quot;&gt;&lt;a href=&quot;#搭建本地registry-v2&quot; class=&quot;headerlink&quot; title=&quot;搭建本地registry v2&quot;&gt;&lt;/a&gt;搭建本地registry v2&lt;/h2&gt;&lt;p&gt;环境：172.16.7.151 CentOS 7.0&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -d -p 5000:5000 --name wisedu_registry registry:2
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;本地上传:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker pull ubuntu:16.04
@@ -394,7 +574,7 @@ docker-compose version 1.15.0, build e12f3b9
 &lt;pre&gt;&lt;code&gt;rm /usr/local/bin/docker-compose
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果docker compose是通过pip安装的:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;pip uninstall docker-compose
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;registry-ui&quot;&gt;&lt;a href=&quot;#registry-ui&quot; class=&quot;headerlink&quot; title=&quot;registry ui&quot;&gt;&lt;/a&gt;registry ui&lt;/h2&gt;&lt;p&gt;搭建完了docker registry，我们可以使用 docker 命令行工具对我们搭建的 registry 做各种操作了，如 push / pull。但是不够方便，比如不能直观的查看 registry 中的资源情况，如果有一个 ui 工具，能够看到仓库中有哪些镜像、每个镜像的版本是多少。&lt;br&gt;registry ui主要有3个，一个是 &lt;a href=&quot;https://github.com/kwk/docker-registry-frontend&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;docker-registry-frontend&lt;/a&gt;，一个是 &lt;a href=&quot;https://hub.docker.com/r/hyper/docker-registry-web/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;hyper/docker-registry-web&lt;/a&gt;，还有一个是&lt;a href=&quot;http://port.us.org/documentation.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Portus&lt;/a&gt;。&lt;br&gt;关于registry ui的搭建会在后面的文章中介绍。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;registry-web-ui&quot;&gt;&lt;a href=&quot;#registry-web-ui&quot; class=&quot;headerlink&quot; title=&quot;registry web ui&quot;&gt;&lt;/a&gt;registry web ui&lt;/h2&gt;&lt;p&gt;搭建完了docker registry，我们可以使用 docker 命令行工具对我们搭建的 registry 做各种操作了，如 push / pull。但是不够方便，比如不能直观的查看 registry 中的资源情况，如果有一个 ui 工具，能够看到仓库中有哪些镜像、每个镜像的版本是多少。&lt;br&gt;registry web ui主要有3个，一个是 &lt;a href=&quot;https://github.com/kwk/docker-registry-frontend&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;docker-registry-frontend&lt;/a&gt;，一个是 &lt;a href=&quot;https://hub.docker.com/r/hyper/docker-registry-web/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;hyper/docker-registry-web&lt;/a&gt;，还有一个是&lt;a href=&quot;http://port.us.org/documentation.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Portus&lt;/a&gt;。&lt;br&gt;关于registry ui的搭建会在后面的文章中介绍。&lt;/p&gt;
 </content>
     
     <summary type="html">
@@ -406,7 +586,7 @@ docker-compose version 1.15.0, build e12f3b9
       <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
     
     
-      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
+      <category term="容器 Docker Registry" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker-Registry/"/>
     
   </entry>
   
@@ -2878,280 +3058,6 @@ a1.sinks.k1.channel = c1
     
     
       <category term="Flume 数据采集" scheme="http://yoursite.com/tags/Flume-%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Elasticsearch安全问题</title>
-    <link href="http://yoursite.com/2017/06/29/Elasticsearch%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98/"/>
-    <id>http://yoursite.com/2017/06/29/Elasticsearch安全问题/</id>
-    <published>2017-06-29T03:51:51.000Z</published>
-    <updated>2017-07-25T06:09:52.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Elasticsearch设计之初就定位在纯私网环境而不做权限和安全控制，虽然有个叫Security Manager的配置，但是显然是不够的。但是后来专门出了个收费的shield来保护Elasticsearch，可是毕竟是收费的。当然我们也有替代品：search-guard。下面介绍下 Elasticsearch 围绕安全方面的的几点使用事项：&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;修改默认的-Elasticsearch-集群名称&quot;&gt;&lt;a href=&quot;#修改默认的-Elasticsearch-集群名称&quot; class=&quot;headerlink&quot; title=&quot;修改默认的 Elasticsearch 集群名称&quot;&gt;&lt;/a&gt;修改默认的 Elasticsearch 集群名称&lt;/h2&gt;&lt;p&gt;Elasticsearch 默认的集群名称是 elasticsearch，请在生成环境上一定要修改成其他的名称，并且不同的环境和不同的集群要保证不相同，监控集群节点情况，如果有未知节点加入，一定要及时预警。&lt;/p&gt;
-&lt;h2 id=&quot;不要暴露-Elasticsearch-在公网上&quot;&gt;&lt;a href=&quot;#不要暴露-Elasticsearch-在公网上&quot; class=&quot;headerlink&quot; title=&quot;不要暴露 Elasticsearch 在公网上&quot;&gt;&lt;/a&gt;不要暴露 Elasticsearch 在公网上&lt;/h2&gt;&lt;p&gt;Elasticsearch默认的http.port是9200，集群各节点间的通信端口transport.tcp.port是9300。建议修改这两个端口。&lt;/p&gt;
-&lt;p&gt;所以强烈建议替换掉Elasticsearch的监控端口，就像是给你家金库做了个“暗门”，骇客想要进入金库至少先得找到门路才行。&lt;/p&gt;
-&lt;h2 id=&quot;不要以-root-身份运行-Elasticsearch&quot;&gt;&lt;a href=&quot;#不要以-root-身份运行-Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;不要以 root 身份运行 Elasticsearch&quot;&gt;&lt;/a&gt;不要以 root 身份运行 Elasticsearch&lt;/h2&gt;&lt;p&gt;一定不要以 root 身份来运行 Elasticsearch，另外，要不和其他的服务公用相同的用户，然后还要保证该用户的权限要最小化。&lt;/p&gt;
-&lt;h2 id=&quot;定期对-Elasticsearch-进行备份&quot;&gt;&lt;a href=&quot;#定期对-Elasticsearch-进行备份&quot; class=&quot;headerlink&quot; title=&quot;定期对 Elasticsearch 进行备份&quot;&gt;&lt;/a&gt;定期对 Elasticsearch 进行备份&lt;/h2&gt;&lt;p&gt;使用 Elasticsearch 提供的备份还原机制，定期对 Elasticsearch 的数据进行快照备份，以备不时之需。官网的备份介绍：&lt;a href=&quot;https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;安装Elasticsearch的权限系统插件-SearchGuard&quot;&gt;&lt;a href=&quot;#安装Elasticsearch的权限系统插件-SearchGuard&quot; class=&quot;headerlink&quot; title=&quot;安装Elasticsearch的权限系统插件-SearchGuard&quot;&gt;&lt;/a&gt;安装Elasticsearch的权限系统插件-SearchGuard&lt;/h2&gt;&lt;p&gt;search-guard是elastcisearch的一款插件，提供加密，身份验证和授权，基于search guard SSL，另外提供可插入的身份验证/授权模块，search-guard是shield的替代品，可免费提供所有的基本安全功能，其功能特性：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;基于用户和角色的权限控制&lt;/li&gt;
-&lt;li&gt;支持SSL和TLS方式安全认证&lt;/li&gt;
-&lt;li&gt;支持LDAP认证&lt;br&gt;项目地址：&lt;a href=&quot;https://github.com/floragunncom/search-guard&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/floragunncom/search-guard&lt;/a&gt;&lt;br&gt;依赖关系：&lt;a href=&quot;https://github.com/floragunncom/search-guard/wiki&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/floragunncom/search-guard/wiki&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;安装插件&quot;&gt;&lt;a href=&quot;#安装插件&quot; class=&quot;headerlink&quot; title=&quot;安装插件&quot;&gt;&lt;/a&gt;安装插件&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;注意：插件版本需要和你使用的Elasticsearch版本对应。&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ bin/plugin install -b com.floragunn/search-guard-2/2.3.3.10
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/16.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ bin/plugin install -b com.floragunn/search-guard-ssl/2.3.3.19
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;注意:以上两步在集群每个节点都要执行。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;证书&quot;&gt;&lt;a href=&quot;#证书&quot; class=&quot;headerlink&quot; title=&quot;证书&quot;&gt;&lt;/a&gt;证书&lt;/h3&gt;&lt;p&gt;根据自身情况修改官方脚本生成admin证书、node证书、根证书，将 node 证书和根证书放在 elasticsearch 配置文件目录下，同时将admin证书和根证书放到search-guard 配置文件目录下。&lt;br&gt;1.集群中任意一台机器下载 searchguard-ssl 的包，里面包含自动创建证书的脚本：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es@log1 elasticsearch]$ wget https://github.com/floragunncom/search-guard-ssl/archive/v2.3.3.19.zip  
-[es@log1 elasticsearch]$ unzip -oq v2.3.3.19.zip
-[es@log1 elasticsearch]$ cd search-guard-ssl-2.3.3.19/example-pki-scripts/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;有三个脚本：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;gen_client_node_cert.sh 创建客户端证书&lt;/li&gt;
-&lt;li&gt;gen_node_cert.sh        创建节点证书&lt;/li&gt;
-&lt;li&gt;gen_root_ca.sh          创建根证书&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;2.生成证书&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;#生成文件：
-./example.sh
-#管理员的证书：
-./gen_client_node_cert.sh admin changeit capass
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;命令会生成一个admin-keystore.jks的文件，把truststore.jks、admin-keystore.jks拷贝到${ES_HOME}/plugins/search-guard-2/sgconfig目录下&lt;/p&gt;
-&lt;p&gt;给plugins/search-guard-2/tools/sgadmin.sh执行权限：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ chmod +x plugins/search-guard-2/tools/sgadmin.sh
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;将example-pki-scripts下生成的truststore.jks文件复制到ES集群中各个节点的config目录下，且把生成的node-&lt;em&gt;-keystore.jks文件复制到各个节点的config目录下。&lt;em&gt;*注意: The keystore files are specific per node. Copy node-0-keystore.jks to the config directory of your first ES node, node-1-keystore.jks to the second and so forth.&lt;/em&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es@log1 example-pki-scripts]$ cp truststore.jks node-0-keystore.jks /usr/local/elasticsearch/config/
-[es@log1 example-pki-scripts]$ scp -p truststore.jks node-1-keystore.jks es@log2:/usr/local/elasticsearch/config/
-[es@log1 example-pki-scripts]$ scp -p truststore.jks node-2-keystore.jks es@log3:/usr/local/elasticsearch/config/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.在Elasticsearch中添加search-guard和search-guard-ssl的配置项&lt;br&gt;找到config/elasticsearch.yml文件，添加以下配置项：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;##########################################################
-# SEARCH GUARD SSL                                                                             
-# Configuration
-##########################################################
-################## Transport layer SSL ###################                        
-####节点下放的是node-*，这里就写哪个
-searchguard.ssl.transport.enabled: true
-searchguard.ssl.transport.keystore_filepath: node-0-keystore.jks
-searchguard.ssl.transport.keystore_password: changeit
-searchguard.ssl.transport.truststore_filepath: truststore.jks
-searchguard.ssl.transport.truststore_password: changeit
-searchguard.ssl.transport.enforce_hostname_verification: false
-searchguard.ssl.transport.resolve_hostname: false
-searchguard.ssl.transport.enabled_protocols:
- - &amp;quot;TLSv1&amp;quot;
- - &amp;quot;TLSv1.1&amp;quot;
- - &amp;quot;TLSv1.2&amp;quot;
-
-################# HTTP/REST layer SSL ####################
-searchguard.ssl.http.enabled: true
-searchguard.ssl.http.keystore_filepath: node-0-keystore.jks
-searchguard.ssl.http.truststore_filepath: truststore.jks
-searchguard.ssl.http.truststore_password: changeit
-searchguard.ssl.http.enabled_protocols:
- - &amp;quot;TLSv1&amp;quot;
- - &amp;quot;TLSv1.1&amp;quot;
- - &amp;quot;TLSv1.2&amp;quot;
-
-##### 管理员账号配置
-searchguard.authcz.admin_dn:
-  - &amp;quot;CN=admin, OU=client, O=client, L=Test, C=DE&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;注意：配置文件的node-x-keystore.jks对应每台config目录下放置的文件。&lt;/strong&gt;  &lt;/p&gt;
-&lt;p&gt;4.重启集群中的各台Elasticsearch然后初始化search-guard的配置项&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ bin/elasticsearch -d
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3台集群中的节点都要重启。重启后，elasticsearch 之间的连接已经是加密的了。&lt;/p&gt;
-&lt;p&gt;在log1上初始化searchguard索引：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ cd /usr/local/elasticsearch
-$ plugins/search-guard-2/tools/sgadmin.sh -cd plugins/search-guard-2/sgconfig -ts plugins/search-guard-2/sgconfig/truststore.jks -ks  plugins/search-guard-2/sgconfig/admin-keystore.jks -kspass changeit -tspass changeit  -icl -nhnv -h 114.55.253.15 
-Will connect to 114.55.253.15:9300 ... done
-Contacting elasticsearch cluster &amp;apos;elasticsearch&amp;apos; and wait for YELLOW clusterstate ...
-Clustername: wisedu
-Clusterstate: GREEN
-Number of nodes: 3
-Number of data nodes: 3
-searchguard index does not exists, attempt to create it ... done (with 2 replicas, auto expand replicas is off)
-Populate config from /usr/local/elasticsearch/plugins/search-guard-2/sgconfig
-Will update &amp;apos;config&amp;apos; with plugins/search-guard-2/sgconfig/sg_config.yml
-   SUCC: Configuration for &amp;apos;config&amp;apos; created or updated
-Will update &amp;apos;roles&amp;apos; with plugins/search-guard-2/sgconfig/sg_roles.yml
-   SUCC: Configuration for &amp;apos;roles&amp;apos; created or updated
-Will update &amp;apos;rolesmapping&amp;apos; with plugins/search-guard-2/sgconfig/sg_roles_mapping.yml
-   SUCC: Configuration for &amp;apos;rolesmapping&amp;apos; created or updated
-Will update &amp;apos;internalusers&amp;apos; with plugins/search-guard-2/sgconfig/sg_internal_users.yml
-   SUCC: Configuration for &amp;apos;internalusers&amp;apos; created or updated
-Will update &amp;apos;actiongroups&amp;apos; with plugins/search-guard-2/sgconfig/sg_action_groups.yml
-   SUCC: Configuration for &amp;apos;actiongroups&amp;apos; created or updated
-Done with success 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这里的-icl是忽略集群的名称，不加会报错。&lt;br&gt;&lt;strong&gt;注意1：如果修改了searchguard，则需要重新加载配置执行。&lt;br&gt;注意2：search-guard配置的相关改动不需要重启elasticsearch，相关的配置实际上存储在searchguard 的indice下了。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;其中 sg_internal_users.yml 保存着默认的用户和密码：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es@log1 elasticsearch]$ cd plugins/search-guard-2/sgconfig/
-[es@log1 sgconfig]$ head -n 5  sg_internal_users.yml
-# This is the internal user database
-# The hash value is a bcrypt hash and can be generated with plugin/tools/hash.sh
-admin:
-  hash: $2a$12$VcCDgh2NDk07JGN0rjGbM.Ad41qVR/YFJcgHp0UGns5JDymv..TOG
-  #password is: admin
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;浏览器输入&lt;a href=&quot;https://114.55.253.15:9200/，输入用户名和密码admin/admin&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://114.55.253.15:9200/，输入用户名和密码admin/admin&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/17.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/18.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;HTTP和Java-Api方式访问ElasticSearch&quot;&gt;&lt;a href=&quot;#HTTP和Java-Api方式访问ElasticSearch&quot; class=&quot;headerlink&quot; title=&quot;HTTP和Java Api方式访问ElasticSearch&quot;&gt;&lt;/a&gt;HTTP和Java Api方式访问ElasticSearch&lt;/h3&gt;&lt;h4 id=&quot;HTTP方式访问Elasticsearch&quot;&gt;&lt;a href=&quot;#HTTP方式访问Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;HTTP方式访问Elasticsearch&quot;&gt;&lt;/a&gt;HTTP方式访问Elasticsearch&lt;/h4&gt;&lt;p&gt;1.在浏览器上访问Elasticsearch，会直接出弹窗，输入用户名密码即可。&lt;br&gt;2.在服务器上使用curl的话需要加上参数-u adminName，类似如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;curl -u adminName:adminname -XGET &amp;quot;http://114.55.253.15:9200/blog/article/1?pretty&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;Java-API中使用search-guard&quot;&gt;&lt;a href=&quot;#Java-API中使用search-guard&quot; class=&quot;headerlink&quot; title=&quot;Java API中使用search-guard&quot;&gt;&lt;/a&gt;Java API中使用search-guard&lt;/h4&gt;&lt;p&gt;1.加入jar包&lt;br&gt;进到/usr/local/elasticsearch/plugins/search-guard-ssl目录下拷贝以下jar包加到CLASSPATH中。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;search-guard-ssl-2.3.4.14.jar
-netty-buffer-4.0.37.Final.jar
-netty-codec-4.0.37.Final.jar
-netty-common-4.0.37.Final.jar
-netty-handler-4.0.37.Final.jar
-netty-transport-4.0.37.Final.jar
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.修改setting&lt;br&gt;以下部分需要从ES节点的这个目录下复制出来放到工程中，并且修改为你实际的路径。&lt;br&gt;目录：/usr/local/elasticsearch/plugins/search-guard-2/sgconfig中。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import com.floragunn.searchguard.ssl.SearchGuardSSLPlugin;
-
-Settings settings = Settings.settingsBuilder()
-        .put(&amp;quot;path.home&amp;quot;, &amp;quot;.&amp;quot;)
-        .put(&amp;quot;cluster.name&amp;quot;, &amp;quot;wisedu&amp;quot;)
-        .put(&amp;quot;searchguard.ssl.transport.enabled&amp;quot;, true)
-        .put(&amp;quot;searchguard.ssl.transport.keystore_filepath&amp;quot;, &amp;quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/admin-keystore.jks&amp;quot;)
-        .put(&amp;quot;searchguard.ssl.transport.truststore_filepath&amp;quot;, &amp;quot;I:/Work/WorkSpace/ultrasearch/plugins/search-guard-2/sgconfig/truststore.jks&amp;quot;)
-        .put(&amp;quot;searchguard.ssl.transport.enforce_hostname_verification&amp;quot;, false)              
-        .build();
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.修改client&lt;br&gt;以下为你想要连接的ES节点的ip和port，请修改为你实际的。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;TransportClient client = TransportClient.builder().settings(settings).addPlugin(SearchGuardSSLPlugin.class).build();
-TransportClient addTransportAddress = client.addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(&amp;quot;114.55.253.15&amp;quot;, 9300)));
-//do something with tc
-NodesInfoRequest nodesInfoRequest= new NodesInfoRequest();
-nodesInfoRequest.putHeader(&amp;quot;sg.impersonate.as&amp;quot;, &amp;quot;worf&amp;quot;);
-client.admin().cluster().nodesInfo(new NodesInfoRequest()).actionGet();
-client.admin().cluster().nodesInfo(nodesInfoRequest).actionGet();
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;search-guard中的用户权限管理介绍&quot;&gt;&lt;a href=&quot;#search-guard中的用户权限管理介绍&quot; class=&quot;headerlink&quot; title=&quot;search-guard中的用户权限管理介绍&quot;&gt;&lt;/a&gt;search-guard中的用户权限管理介绍&lt;/h3&gt;&lt;p&gt;searchguard 主要有5个配置文件在/ultra/ES/elasticsearch-2.3.4/plugins/search-guard-2/sgconfig 下：&lt;br&gt;1.sg_config.yml：主配置文件不需要做改动。&lt;/p&gt;
-&lt;p&gt;2.sg_internal_users.yml：本地用户文件，定义用户密码以及对应的权限。例如：对于 ELK 我们需要一个 kibana 登录用户和一个 logstash 用户，如下所示：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;kibana4:
-  hash: $2a$12$xZOcnwYPYQ3zIadnlQIJ0eNhX1ngwMkTN.oMwkKxoGvDVPn4/6XtO
-  #password is: kirk
-  roles:
-    - kibana4
-logstash:
-  hash: $2a$12$xZOcnwYPYQ3zIadnlQIJ0eNhX1ngwMkTN.oMwkKxoGvDVPn4/6XtO
-  roles:
-    - logstash
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;注意：用户的密码可用plugins/search-guard-2/tools/hash.sh生成。比如修改admin用户的默认密码为wisedu123：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es@log1 tools]$ ./hash.sh -p wisedu123
-$2a$12$AmrZnl1wYGLGNODLDMY5/O86wmYE9eBcXtVa6AQjfzsF1gcKhkXqe
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.sg_roles.yml：权限配置文件，以下为kibana4 和 logstash 的权限样例：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;#&amp;lt;sg_role_name&amp;gt;:
-#  cluster:
-#    - &amp;apos;&amp;lt;permission&amp;gt;&amp;apos;
-#  indices:
-#    &amp;apos;&amp;lt;indexname or alias&amp;gt;&amp;apos;:
-#      &amp;apos;&amp;lt;type&amp;gt;&amp;apos;:  
-#        - &amp;apos;&amp;lt;permission&amp;gt;&amp;apos;
-#      _dls_: &amp;apos;&amp;lt;querydsl query&amp;gt;&amp;apos;
-#      _fls_:
-#        - &amp;apos;&amp;lt;field&amp;gt;&amp;apos;
-#        - &amp;apos;&amp;lt;field&amp;gt;&amp;apos;
-sg_kibana4:
-  cluster:
-      - cluster:monitor/nodes/info
-      - cluster:monitor/health
-  indices:
-    &amp;apos;*&amp;apos;:
-      &amp;apos;*&amp;apos;:
-        - indices:admin/mappings/fields/get
-        - indices:admin/validate/query
-        - indices:data/read/search
-        - indices:data/read/msearch
-        - indices:admin/get
-        - indices:data/read/field_stats
-    &amp;apos;?kibana&amp;apos;:
-      &amp;apos;*&amp;apos;:
-        - indices:admin/exists
-        - indices:admin/mapping/put
-        - indices:admin/mappings/fields/get
-        - indices:admin/refresh
-        - indices:admin/validate/query
-        - indices:data/read/get
-sg_logstash:
-  cluster:
-    - indices:admin/template/get
-    - indices:admin/template/put
-  indices:
-    &amp;apos;logstash-*&amp;apos;:
-      &amp;apos;*&amp;apos;:
-        - WRITE
-        - indices:data/write/bulk
-        - indices:data/write/delete
-        - indices:data/write/update
-        - indices:data/read/search
-        - indices:data/read/scroll
-        - CREATE_INDEX
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.sg_roles_mapping.yml:定义用户的映射关系，添加 kibana 及 logstash 用户对应的映射如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;sg_logstash:
-  users:
-    - logstash
-sg_kibana4:
-  backendroles:
-    - kibana
-  users:
-    - kibana4
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.sg_action_groups.yml：定义权限。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;补充一点：Search Guard可以实现和Logstash、Kibana的完美结合，对于使用ELK的用户大可不必担心，修改集成很容易的。&lt;br&gt;并且，Elasticsearch在5.x之后，对Search Guard、Search Guard SSL （当然还有Logstash 、Kibana）等插件的版本号都做了统一，变得更加的简单直观了。&lt;/strong&gt;&lt;/p&gt;
-&lt;h2 id=&quot;利用操作系统防火墙设置规避9200端口开放问题&quot;&gt;&lt;a href=&quot;#利用操作系统防火墙设置规避9200端口开放问题&quot; class=&quot;headerlink&quot; title=&quot;利用操作系统防火墙设置规避9200端口开放问题&quot;&gt;&lt;/a&gt;利用操作系统防火墙设置规避9200端口开放问题&lt;/h2&gt;&lt;p&gt;对于search-guard插件配置繁琐，也可以使用操作系统防火墙对访问源IP进行隔离控制。&lt;br&gt;架设Nginx反向代理服务器，ES主机防火墙设置仅允许Nginx所在主机访问ES主机的9200端口。&lt;/p&gt;
-&lt;h3 id=&quot;安装防火墙&quot;&gt;&lt;a href=&quot;#安装防火墙&quot; class=&quot;headerlink&quot; title=&quot;安装防火墙&quot;&gt;&lt;/a&gt;安装防火墙&lt;/h3&gt;&lt;p&gt;在centos7上停止firewalld，启用iptables。&lt;br&gt;停止firewalld：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# systemctl stop firewalld.service   #停止firewall
-# systemctl disable firewalld.service    #禁止firewall开机启动
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;安装iptables防火墙：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# yum install -y iptables-services
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置防火墙&quot;&gt;&lt;a href=&quot;#配置防火墙&quot; class=&quot;headerlink&quot; title=&quot;配置防火墙&quot;&gt;&lt;/a&gt;配置防火墙&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# vim /etc/sysconfig/iptables     #修改默认的配置文件
-*filter
-:INPUT ACCEPT [1837:149118]
-:FORWARD ACCEPT [0:0]
-:OUTPUT ACCEPT [1656:224717]
--A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
--A INPUT -s 114.55.248.157/32 -p tcp -m tcp --dport 9200 -j ACCEPT
--A INPUT -p tcp -m tcp --dport 9200 -j DROP
-COMMIT
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Elasticsearch/19.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;其实也就是加了两条规则：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;iptables -A INPUT -s 114.55.248.157 -p TCP --dport 9200 -j ACCEPT
-iptables -A INPUT -p TCP --dport 9200 -j DROP
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动防火墙和设置开机启动：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# systemctl start iptables.service      
-# systemctl enable iptables.service    
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置Nginx&quot;&gt;&lt;a href=&quot;#配置Nginx&quot; class=&quot;headerlink&quot; title=&quot;配置Nginx&quot;&gt;&lt;/a&gt;配置Nginx&lt;/h3&gt;&lt;p&gt;Nginx主要配置：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;upstream elasticsearch_servers {
-        server 114.55.253.15:9200;
-        server 114.55.132.143:9200;
-        server 114.55.252.185:9200;
-}
-
-server {
-        listen  8080;
-        access_log logs/es_access.log main;
-
-        location = /* {
-            deny all;
-        }
-
-        location / {
-            proxy_pass http://elasticsearch_servers;
-        }
-
-}
-&lt;/code&gt;&lt;/pre&gt;</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Elasticsearch设计之初就定位在纯私网环境而不做权限和安全控制，虽然有个叫Security Manager的配置，但是显然是不够的。但是后来专门出了个收费的shield来保护Elasticsearch，可是毕竟是收费的。当然我们也有替代品：search-guard。下面介绍下 Elasticsearch 围绕安全方面的的几点使用事项：&lt;br&gt;
-    
-    </summary>
-    
-      <category term="搜索引擎" scheme="http://yoursite.com/categories/%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/"/>
-    
-    
-      <category term="Elasticsearch 搜索引擎" scheme="http://yoursite.com/tags/Elasticsearch-%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/"/>
     
   </entry>
   

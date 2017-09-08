@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="容器 Docker," />
+  <meta name="keywords" content="容器 Docker Registry," />
 
 
 
@@ -105,14 +105,14 @@
 
 
 <meta name="description" content="Registry相关概念前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。">
-<meta name="keywords" content="容器 Docker">
+<meta name="keywords" content="容器 Docker Registry">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Registry私有仓库搭建及认证">
 <meta property="og:url" content="http://yoursite.com/2017/09/01/Registry私有仓库搭建及认证/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
 <meta property="og:description" content="Registry相关概念前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-09-08T01:38:10.000Z">
+<meta property="og:updated_time" content="2017-09-08T08:39:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Registry私有仓库搭建及认证">
 <meta name="twitter:description" content="Registry相关概念前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。">
@@ -341,7 +341,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-09-08T09:38:10+08:00" content="2017-09-08">
+              <time itemprop="dateUpdated" datetime="2017-09-08T16:39:54+08:00" content="2017-09-08">
               2017-09-08
               </time>
               </span>
@@ -404,7 +404,7 @@
         <h2 id="Registry相关概念"><a href="#Registry相关概念" class="headerlink" title="Registry相关概念"></a>Registry相关概念</h2><p>前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。<br>image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。可以很容易和本地源代码以及远端Git服务的关系相对应。<br>Docker hub是Docker公司提供的一些存储镜像的空间，这部分空间是有限的。我们一般会自主建设Docker私有仓库Registry。<br><a id="more"></a></p>
 <h2 id="Registry-V1和V2"><a href="#Registry-V1和V2" class="headerlink" title="Registry V1和V2"></a>Registry V1和V2</h2><p>Docker Registry 2.0版本在安全性和性能上做了诸多优化，并重新设计了镜像的存储的格式。Docker目前1.6之后支持V2。</p>
 <h2 id="安装Docker"><a href="#安装Docker" class="headerlink" title="安装Docker"></a>安装Docker</h2><p>见前面发布的文章《CentOS安装Docker CE》。注意，在docker 1.12版本上测试registry有问题。</p>
-<h2 id="搭建本地registry-v2"><a href="#搭建本地registry-v2" class="headerlink" title="搭建本地registry v2"></a>搭建本地registry v2</h2><p>环境：172.16.7.151</p>
+<h2 id="搭建本地registry-v2"><a href="#搭建本地registry-v2" class="headerlink" title="搭建本地registry v2"></a>搭建本地registry v2</h2><p>环境：172.16.7.151 CentOS 7.0</p>
 <pre><code>[root@node1 ~]# docker run -d -p 5000:5000 --name wisedu_registry registry:2
 </code></pre><p>本地上传:</p>
 <pre><code>[root@node1 ~]# docker pull ubuntu:16.04
@@ -625,7 +625,7 @@ docker-compose version 1.15.0, build e12f3b9
 <pre><code>rm /usr/local/bin/docker-compose
 </code></pre><p>如果docker compose是通过pip安装的:</p>
 <pre><code>pip uninstall docker-compose
-</code></pre><h2 id="registry-ui"><a href="#registry-ui" class="headerlink" title="registry ui"></a>registry ui</h2><p>搭建完了docker registry，我们可以使用 docker 命令行工具对我们搭建的 registry 做各种操作了，如 push / pull。但是不够方便，比如不能直观的查看 registry 中的资源情况，如果有一个 ui 工具，能够看到仓库中有哪些镜像、每个镜像的版本是多少。<br>registry ui主要有3个，一个是 <a href="https://github.com/kwk/docker-registry-frontend" target="_blank" rel="external">docker-registry-frontend</a>，一个是 <a href="https://hub.docker.com/r/hyper/docker-registry-web/" target="_blank" rel="external">hyper/docker-registry-web</a>，还有一个是<a href="http://port.us.org/documentation.html" target="_blank" rel="external">Portus</a>。<br>关于registry ui的搭建会在后面的文章中介绍。</p>
+</code></pre><h2 id="registry-web-ui"><a href="#registry-web-ui" class="headerlink" title="registry web ui"></a>registry web ui</h2><p>搭建完了docker registry，我们可以使用 docker 命令行工具对我们搭建的 registry 做各种操作了，如 push / pull。但是不够方便，比如不能直观的查看 registry 中的资源情况，如果有一个 ui 工具，能够看到仓库中有哪些镜像、每个镜像的版本是多少。<br>registry web ui主要有3个，一个是 <a href="https://github.com/kwk/docker-registry-frontend" target="_blank" rel="external">docker-registry-frontend</a>，一个是 <a href="https://hub.docker.com/r/hyper/docker-registry-web/" target="_blank" rel="external">hyper/docker-registry-web</a>，还有一个是<a href="http://port.us.org/documentation.html" target="_blank" rel="external">Portus</a>。<br>关于registry ui的搭建会在后面的文章中介绍。</p>
 
       
     </div>
@@ -647,7 +647,7 @@ docker-compose version 1.15.0, build e12f3b9
       
         <div class="post-tags">
           
-            <a href="/tags/容器-Docker/" rel="tag"><i class="fa fa-tag"></i>容器 Docker</a>
+            <a href="/tags/容器-Docker-Registry/" rel="tag"><i class="fa fa-tag"></i>容器 Docker Registry</a>
           
         </div>
       
@@ -736,7 +736,7 @@ docker-compose version 1.15.0, build e12f3b9
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">37</span>
+              <span class="site-state-item-count">38</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -753,7 +753,7 @@ docker-compose version 1.15.0, build e12f3b9
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">18</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -823,7 +823,7 @@ docker-compose version 1.15.0, build e12f3b9
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Registry相关概念"><span class="nav-number">1.</span> <span class="nav-text">Registry相关概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Registry-V1和V2"><span class="nav-number">2.</span> <span class="nav-text">Registry V1和V2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Docker"><span class="nav-number">3.</span> <span class="nav-text">安装Docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搭建本地registry-v2"><span class="nav-number">4.</span> <span class="nav-text">搭建本地registry v2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搭建外部可访问的Registry"><span class="nav-number">5.</span> <span class="nav-text">搭建外部可访问的Registry</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加认证"><span class="nav-number">6.</span> <span class="nav-text">添加认证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Native-basic-auth"><span class="nav-number">6.1.</span> <span class="nav-text">Native basic auth</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更高级的认证"><span class="nav-number">7.</span> <span class="nav-text">更高级的认证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Nginx作为认证代理"><span class="nav-number">7.1.</span> <span class="nav-text">配置Nginx作为认证代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#补充Docker-compose"><span class="nav-number">7.2.</span> <span class="nav-text">补充Docker compose</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Docker-compose是什么"><span class="nav-number">7.2.1.</span> <span class="nav-text">Docker compose是什么</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装docker-compose"><span class="nav-number">7.2.2.</span> <span class="nav-text">安装docker compose</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#卸载docker-compose"><span class="nav-number">7.2.3.</span> <span class="nav-text">卸载docker compose</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#registry-ui"><span class="nav-number">8.</span> <span class="nav-text">registry ui</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Registry相关概念"><span class="nav-number">1.</span> <span class="nav-text">Registry相关概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Registry-V1和V2"><span class="nav-number">2.</span> <span class="nav-text">Registry V1和V2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Docker"><span class="nav-number">3.</span> <span class="nav-text">安装Docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搭建本地registry-v2"><span class="nav-number">4.</span> <span class="nav-text">搭建本地registry v2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搭建外部可访问的Registry"><span class="nav-number">5.</span> <span class="nav-text">搭建外部可访问的Registry</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加认证"><span class="nav-number">6.</span> <span class="nav-text">添加认证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Native-basic-auth"><span class="nav-number">6.1.</span> <span class="nav-text">Native basic auth</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更高级的认证"><span class="nav-number">7.</span> <span class="nav-text">更高级的认证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Nginx作为认证代理"><span class="nav-number">7.1.</span> <span class="nav-text">配置Nginx作为认证代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#补充Docker-compose"><span class="nav-number">7.2.</span> <span class="nav-text">补充Docker compose</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Docker-compose是什么"><span class="nav-number">7.2.1.</span> <span class="nav-text">Docker compose是什么</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装docker-compose"><span class="nav-number">7.2.2.</span> <span class="nav-text">安装docker compose</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#卸载docker-compose"><span class="nav-number">7.2.3.</span> <span class="nav-text">卸载docker compose</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#registry-web-ui"><span class="nav-number">8.</span> <span class="nav-text">registry web ui</span></a></li></ol></div>
             
           </div>
         </section>
@@ -869,7 +869,7 @@ docker-compose version 1.15.0, build e12f3b9
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共81.3k字</span>
+  <span class="post-count">博客全站共83.9k字</span>
 </div>
 
         

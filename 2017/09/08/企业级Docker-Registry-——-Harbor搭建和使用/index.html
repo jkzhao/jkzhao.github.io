@@ -1,0 +1,1027 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="容器 Docker Registry," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Harbor介绍Harbor是由VMWare公司开源的容器镜像仓库。事实上，Habor是在Docker Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制 ，AD/LDAP集成以及审计日志等。">
+<meta name="keywords" content="容器 Docker Registry">
+<meta property="og:type" content="article">
+<meta property="og:title" content="企业级Docker Registry —— Harbor搭建和使用">
+<meta property="og:url" content="http://yoursite.com/2017/09/08/企业级Docker-Registry-——-Harbor搭建和使用/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="Harbor介绍Harbor是由VMWare公司开源的容器镜像仓库。事实上，Habor是在Docker Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制 ，AD/LDAP集成以及审计日志等。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/36.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/37.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/38.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/39.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/40.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/41.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/42.png">
+<meta property="og:updated_time" content="2017-09-08T08:44:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="企业级Docker Registry —— Harbor搭建和使用">
+<meta name="twitter:description" content="Harbor介绍Harbor是由VMWare公司开源的容器镜像仓库。事实上，Habor是在Docker Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制 ，AD/LDAP集成以及审计日志等。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/36.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> 企业级Docker Registry —— Harbor搭建和使用 | jkzhao's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                企业级Docker Registry —— Harbor搭建和使用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-09-08T16:38:52+08:00" content="2017-09-08">
+              2017-09-08
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2017-09-08T16:44:00+08:00" content="2017-09-08">
+              2017-09-08
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Docker/" itemprop="url" rel="index">
+                    <span itemprop="name">Docker</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/09/08/企业级Docker-Registry-——-Harbor搭建和使用/" class="leancloud_visitors" data-flag-title="企业级Docker Registry —— Harbor搭建和使用">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Harbor介绍"><a href="#Harbor介绍" class="headerlink" title="Harbor介绍"></a>Harbor介绍</h2><p>Harbor是由VMWare公司开源的容器镜像仓库。事实上，Habor是在Docker Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制 ，AD/LDAP集成以及审计日志等。<br><a id="more"></a></p>
+<h2 id="安装部署Harbor"><a href="#安装部署Harbor" class="headerlink" title="安装部署Harbor"></a>安装部署Harbor</h2><p>官方安装文档：<br><a href="https://github.com/vmware/harbor/blob/master/docs/installation_guide.md" target="_blank" rel="external">https://github.com/vmware/harbor/blob/master/docs/installation_guide.md</a></p>
+<h3 id="环境要求"><a href="#环境要求" class="headerlink" title="环境要求"></a>环境要求</h3><ul>
+<li>python 2.7+</li>
+<li>docker 1.10+</li>
+<li>docker-compose 1.6.0+<br>Docker的安装见文章《Docker镜像和容器》和docker-compose的安装见文章《Registry私有仓库搭建及认证》。</li>
+</ul>
+<h3 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h3><table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>操作系统版本</th>
+<th>IP地址</th>
+<th>安装软件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>spark32</td>
+<td>CentOS 7.0</td>
+<td>172.16.206.32</td>
+<td>docker-ce 17.06.1、docker-compose 1.15.0、harbor-online-installer-v1.1.2.tar</td>
+</tr>
+</tbody>
+</table>
+<h3 id="安装部署harbor"><a href="#安装部署harbor" class="headerlink" title="安装部署harbor"></a>安装部署harbor</h3><pre><code>[root@spark32 ~]# cd /opt/
+[root@spark32 opt]# mkdir harbor
+[root@spark32 opt]# cd harbor/
+</code></pre><p>从<a href="https://github.com/vmware/harbor/releases下载，由于我这里服务器可以联网，离线版本又很大，所以下载的在线安装版本的1.1.2版本，将软件上传到/opt/harbor/目录下。" target="_blank" rel="external">https://github.com/vmware/harbor/releases下载，由于我这里服务器可以联网，离线版本又很大，所以下载的在线安装版本的1.1.2版本，将软件上传到/opt/harbor/目录下。</a></p>
+<pre><code>[root@spark32 harbor]# tar xvf harbor-online-installer-v1.1.2.tar 
+</code></pre><h3 id="配置harbor"><a href="#配置harbor" class="headerlink" title="配置harbor"></a>配置harbor</h3><p>可配置的参数在文件harbor.cfg中。在该文件中，有两种参数，必须配置的和可选的。</p>
+<ul>
+<li>必须的：这些参数会在用户更新配置文件和执行install.sh脚本重新安装harbor起作用。你至少得设置 hostname 参数。</li>
+<li><p>可选的：用户可以就使用默认值，或者在启动后通过web ui进行修改。如果这些可选参数被设置在harbor.cfg文件中，它们只会在第一次启动时起作用，以后在harbor.cfg文件中修改会被忽略。也就是说在 Harbor 初次启动时，Admin Server 从 harbor.cfg 文件读取配置并记录下来。之后重新启动Harbor的过程中，只有必需的配置会从 harbor.cfg 文件读取；其他可选的配置将不再生效，需要通过 Admin Server 的管理界面来修改。<strong>【注意】:如果你通过web ui设置这些参数，请在harbor启动后立即设置。尤其是，必须先设置 auth_mode 在你注册或创建任何用户之前。</strong><br>这些具体参数的名字和意义详见<a href="https://github.com/vmware/harbor/blob/master/docs/installation_guide.md" target="_blank" rel="external">https://github.com/vmware/harbor/blob/master/docs/installation_guide.md</a></p>
+<pre><code>[root@spark32 harbor]# cd harbor/
+[root@spark32 harbor]# vim harbor.cfg
+# 指定 hostname，为IP或者域名，用于登录 Web UI 界面
+hostname = 172.16.206.32
+# mysql 数据库 root 账户密码
+db_password = wisedu123
+# 邮件相关信息配置，如忘记密码发送邮件
+email_server = smtp.exmail.qq.com
+email_server_port = 465
+email_username = 01115004@wisedu.com
+email_password = zjk230640
+email_from = admin &lt;01115004@wisedu.com&gt;
+email_ssl = on
+</code></pre></li>
+</ul>
+<h3 id="配置存储"><a href="#配置存储" class="headerlink" title="配置存储"></a>配置存储</h3><p>默认情况下，harbor把镜像存储在本地文件系统，在生产环境中，你可能考虑用其他的存储替代本地存储，比如S3, Openstack Swift, Ceph等等。你需要修改 common/templates/registry/config.yml 中的 storage 段。比如使用Openstack Swift，storage段的配置类似如下：</p>
+<pre><code>storage:
+  swift:
+    username: admin
+    password: ADMIN_PASS
+    authurl: http://keystone_addr:35357/v3/auth
+    tenant: admin
+    domain: default
+    region: regionOne
+    container: docker_images
+</code></pre><p>更详细的存储配置，见 <a href="https://docs.docker.com/registry/configuration/" target="_blank" rel="external">Registry Configuration Reference</a></p>
+<h3 id="完成安装和启动harbor"><a href="#完成安装和启动harbor" class="headerlink" title="完成安装和启动harbor"></a>完成安装和启动harbor</h3><p>一旦harbor.cfg和后端存储(可选的)配置完成，就可以使用install.sh脚本安装和启动harbor了。注意在线安装可能需要等待一些时间从dockerhubs下载harbor镜像。<br><strong>【注意】：请确保主机上80和443端口没被占用。如果想修改端口，需要去修改docker-compose.yml文件</strong></p>
+<pre><code>[root@spark32 harbor]# pwd
+/opt/harbor/harbor
+[root@spark32 harbor]# ./install.sh 
+</code></pre><p>我这里配置了阿里云容器加速，所以在线版安装没有问题，如果有网络问题可以选择离线包安装。</p>
+<h2 id="访问harbor"><a href="#访问harbor" class="headerlink" title="访问harbor"></a>访问harbor</h2><p>浏览器输入<a href="http://172.16.206.32，默认账号密码是admin/Harbor12345。默认是80端口，如果端口占用，我们可以去修改docker-compose.yml文件中，对应服务的端口映射。" target="_blank" rel="external">http://172.16.206.32，默认账号密码是admin/Harbor12345。默认是80端口，如果端口占用，我们可以去修改docker-compose.yml文件中，对应服务的端口映射。</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/36.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/37.png" alt=""><br>我们可以看到系统各个模块如下：</p>
+<ul>
+<li>项目：新增/删除项目，查看镜像仓库，给项目添加成员、查看操作日志、复制项目等</li>
+<li>日志：仓库各个镜像create、push、pull等操作日志</li>
+<li>系统管理 </li>
+<li><ul>
+<li>用户管理：新增/删除用户、设置管理员等</li>
+</ul>
+</li>
+<li><ul>
+<li>复制管理：新增/删除从库目标、新建/删除/启停复制规则等</li>
+</ul>
+</li>
+<li><ul>
+<li>配置管理：认证模式、复制、邮箱设置、系统设置等</li>
+</ul>
+</li>
+<li>其他设置 </li>
+<li><ul>
+<li>用户设置：修改用户名、邮箱、名称信息</li>
+</ul>
+</li>
+<li><ul>
+<li>修改密码：修改用户密码<br><strong>注意：非系统管理员用户登录，只能看到有权限的项目和日志，其他模块不可见。</strong></li>
+</ul>
+</li>
+</ul>
+<h3 id="修改管理员密码"><a href="#修改管理员密码" class="headerlink" title="修改管理员密码"></a>修改管理员密码</h3><p>点击右上角的admin，点击修改密码。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/38.png" alt=""></p>
+<h3 id="启动后相关容器"><a href="#启动后相关容器" class="headerlink" title="启动后相关容器"></a>启动后相关容器</h3><p>Harbor的所有服务组件都是在Docker中部署的。</p>
+<pre><code>[root@spark32 harbor]# ls
+common  docker-compose.notary.yml  docker-compose.yml  harbor_1_1_0_template  harbor.cfg  install.sh  LICENSE  NOTICE  prepare  upgrade
+[root@spark32 harbor]# docker-compose ps
+       Name                     Command               State                                Ports                               
+------------------------------------------------------------------------------------------------------------------------------
+harbor-adminserver   /harbor/harbor_adminserver       Up                                                                       
+harbor-db            docker-entrypoint.sh mysqld      Up      3306/tcp                                                         
+harbor-jobservice    /harbor/harbor_jobservice        Up                                                                       
+harbor-log           /bin/sh -c crond &amp;&amp; rm -f  ...   Up      127.0.0.1:1514-&gt;514/tcp                                          
+harbor-ui            /harbor/harbor_ui                Up                                                                       
+nginx                nginx -g daemon off;             Up      0.0.0.0:443-&gt;443/tcp, 0.0.0.0:4443-&gt;4443/tcp, 0.0.0.0:80-&gt;80/tcp 
+registry             /entrypoint.sh serve /etc/ ...   Up      5000/tcp 
+</code></pre><ul>
+<li>harbor-adminserver：用来管理系统配置，并提供了相应的 WEB 页面和 API 来供用户操作，改进了之前需用户手动修改配置文件并手动重启系统的用户体验。</li>
+<li>harbor-db : 由官方MySql镜像构成的数据库容器</li>
+<li>harbor-jobservice：是harbor的job管理模块，job在harbor里面主要是为了镜像仓库同步使用的。</li>
+<li>harbor-log : 运行着rsyslogd的容器，通过log-driver的形式收集其他容器的日志</li>
+<li>harbor-ui : 即架构中的core services, 构成此容器的代码是Harbor项目的主体</li>
+<li>nginx : 由 nginx 服务器构成的反向代理</li>
+<li>registry : 由Docker官方的开源 registry 镜像构成的容器实例<br>这几个 Contianer 通过 Docker link 的形式连接在一起，在容器之间通过容器名字互相访问。对终端用户而言，只需要暴露 proxy（即Nginx）的服务端口。</li>
+</ul>
+<p><strong>【注意】:之前的版本更新配置，需要修改harbor.cfg，然后停止并删除现有Harbor实例，再重新运行Harbor，比较繁琐。新版本的adminconsole可以使用户很方便地通过WEB界面配置认证、同步、邮件和系统等信息，修改立即生效，无需重启整个系统。</strong></p>
+<h2 id="harbor持久化数据和日志"><a href="#harbor持久化数据和日志" class="headerlink" title="harbor持久化数据和日志"></a>harbor持久化数据和日志</h2><p>默认情况下，registrys数据被持久化在宿主机的/data/目录下，甚至你删除harbor容器或者重新被创建，这部分数据也不会改变。<br>另外，harbor使用rsyslog来收集每一个容器日志，默认情况下，这些日志存放在宿主机的/var/log/harbor/目录下。</p>
+<h2 id="管理harbor的生命"><a href="#管理harbor的生命" class="headerlink" title="管理harbor的生命"></a>管理harbor的生命</h2><p>可以使用docker-compose来管理harbor的启动、停止和销毁。但是注意必须切换到docker-compose.yml同级目录运行以下的命令。</p>
+<h3 id="停止harbor"><a href="#停止harbor" class="headerlink" title="停止harbor"></a>停止harbor</h3><pre><code># docker-compose stop
+</code></pre><h3 id="启动harbor"><a href="#启动harbor" class="headerlink" title="启动harbor"></a>启动harbor</h3><pre><code># docker-compose start
+</code></pre><h3 id="修改配置后启动"><a href="#修改配置后启动" class="headerlink" title="修改配置后启动"></a>修改配置后启动</h3><p>先停止harbor，在修改配置文件harbor.cfg，然后运行prepare脚本应用配置，最后重新创建harbor并运行它。</p>
+<pre><code># docker-compose down -v
+# vim harbor.cfg
+# prepare
+# docker-compose up -d
+</code></pre><h3 id="清除harbor容器，保留镜像和数据"><a href="#清除harbor容器，保留镜像和数据" class="headerlink" title="清除harbor容器，保留镜像和数据"></a>清除harbor容器，保留镜像和数据</h3><pre><code># docker-compose down -v
+</code></pre><h3 id="删除harbors数据库和镜像-用于干净的重新安装"><a href="#删除harbors数据库和镜像-用于干净的重新安装" class="headerlink" title="删除harbors数据库和镜像(用于干净的重新安装)"></a>删除harbors数据库和镜像(用于干净的重新安装)</h3><pre><code># rm -r /data/database
+# rm -r /data/registry
+</code></pre><h2 id="Harbor的安全机制"><a href="#Harbor的安全机制" class="headerlink" title="Harbor的安全机制"></a>Harbor的安全机制</h2><p>企业中的软件研发团队往往划分为诸多角色，如项目经理、产品经理、测试、运维等。在实际的软件开发和运维过程中，这些角色对于镜像的使用需求是不一样的。比如：开发人员需要拥有对镜像的读写(PULL/PUSH)权限以更新和改正代码；测试人员中需要读取(PULL)权限；而项目经理需要对上述的角色进行管理。<br>Harbor为这种需求提供了用户和成员两种管理概念。</p>
+<h3 id="用户"><a href="#用户" class="headerlink" title="用户"></a>用户</h3><p>用户主要分两类：</p>
+<ul>
+<li>管理员</li>
+<li>普通用户。<br>两类用户都可以成为项目的成员。而管理员可以对用户进行管理。</li>
+</ul>
+<h3 id="成员"><a href="#成员" class="headerlink" title="成员"></a>成员</h3><p>成员是对应于项目的概念，分为三类：</p>
+<ul>
+<li>管理员</li>
+<li>开发者</li>
+<li>访客<br>管理员可以对开发者和访客作权限的配置和管理。测试和运维人员可以访客身份读取项目镜像，或者公共镜像库中的文件。<br>从项目的角度出发，项目管理员拥有最大的项目权限，如果要对用户进行禁用或限权等，可以通过修改用户在项目中的成员角色来实现，甚至将用户移除出这个项目。<br>下面以实际操作来演示。</li>
+</ul>
+<h2 id="harbor使用"><a href="#harbor使用" class="headerlink" title="harbor使用"></a>harbor使用</h2><h3 id="web-ui创建项目"><a href="#web-ui创建项目" class="headerlink" title="web ui创建项目"></a>web ui创建项目</h3><p>注意：当项目设为公开后，任何人都有此项目下镜像的读权限。命令行用户不需要“docker login”就可以拉取此项目下的镜像。所以一般需要建立私有项目。<br>1.登录harbor，点击“+项目”<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/39.png" alt=""></p>
+<p>2.点击左侧菜单“用户管理”，点击“+用户”<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/40.png" alt=""></p>
+<p>3.点击左侧菜单项目，选择刚才创建的项目“godseye”，在点击右侧正文中的选项卡“成员”，点击“+成员”，输入刚才创建的用户，并设置其为管理员。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/41.png" alt=""><br>对于权限(角色)，项目管理员和开发人员可以有 push 的权限，而访客只能查看和 pull</p>
+<p>4.测试<br>我这里找了另外一台机器，安装了docker 1.12.6。由于这里harbor采用了默认的 http 方式连接，而 Docker 认为这是不安全的，所以在 push 之前需要调整一下 docker 配置：</p>
+<pre><code>[root@node3 ~]# vim /etc/docker/daemon.json 
+{
+   &quot;insecure-registries&quot;: [&quot;172.16.206.32&quot;]
+}
+[root@node3 ~]# systemctl restart docker
+</code></pre><p>登录harbor：</p>
+<pre><code>[root@node3 ~]# docker login 172.16.206.32
+Username: jkzhao
+Password: 
+Login Succeeded
+</code></pre><p>然后 tag 一个 image，名称一定要标准( registryAddress[:端口]/项目/imageName[:tag] )，最后将其 push 即可</p>
+<pre><code>[root@node3 ~]# docker tag centos:centos7 172.16.206.32/godseye/centos:latest
+[root@node3 ~]# docker push 172.16.206.32/godseye/centos:latest
+</code></pre><p>然后到web ui上查看刚才push的镜像是否成功了：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/42.png" alt=""></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/容器-Docker-Registry/" rel="tag"><i class="fa fa-tag"></i>容器 Docker Registry</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/05/overlay实现容器跨主机通信/" rel="next" title="overlay实现容器跨主机通信">
+                <i class="fa fa-chevron-left"></i> overlay实现容器跨主机通信
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">38</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Harbor介绍"><span class="nav-number">1.</span> <span class="nav-text">Harbor介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装部署Harbor"><span class="nav-number">2.</span> <span class="nav-text">安装部署Harbor</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境要求"><span class="nav-number">2.1.</span> <span class="nav-text">环境要求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息"><span class="nav-number">2.2.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装部署harbor"><span class="nav-number">2.3.</span> <span class="nav-text">安装部署harbor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置harbor"><span class="nav-number">2.4.</span> <span class="nav-text">配置harbor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置存储"><span class="nav-number">2.5.</span> <span class="nav-text">配置存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#完成安装和启动harbor"><span class="nav-number">2.6.</span> <span class="nav-text">完成安装和启动harbor</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问harbor"><span class="nav-number">3.</span> <span class="nav-text">访问harbor</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改管理员密码"><span class="nav-number">3.1.</span> <span class="nav-text">修改管理员密码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动后相关容器"><span class="nav-number">3.2.</span> <span class="nav-text">启动后相关容器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#harbor持久化数据和日志"><span class="nav-number">4.</span> <span class="nav-text">harbor持久化数据和日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#管理harbor的生命"><span class="nav-number">5.</span> <span class="nav-text">管理harbor的生命</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#停止harbor"><span class="nav-number">5.1.</span> <span class="nav-text">停止harbor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动harbor"><span class="nav-number">5.2.</span> <span class="nav-text">启动harbor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改配置后启动"><span class="nav-number">5.3.</span> <span class="nav-text">修改配置后启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#清除harbor容器，保留镜像和数据"><span class="nav-number">5.4.</span> <span class="nav-text">清除harbor容器，保留镜像和数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除harbors数据库和镜像-用于干净的重新安装"><span class="nav-number">5.5.</span> <span class="nav-text">删除harbors数据库和镜像(用于干净的重新安装)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Harbor的安全机制"><span class="nav-number">6.</span> <span class="nav-text">Harbor的安全机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#用户"><span class="nav-number">6.1.</span> <span class="nav-text">用户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#成员"><span class="nav-number">6.2.</span> <span class="nav-text">成员</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#harbor使用"><span class="nav-number">7.</span> <span class="nav-text">harbor使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#web-ui创建项目"><span class="nav-number">7.1.</span> <span class="nav-text">web ui创建项目</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共83.9k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+    <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+</body>
+</html>
