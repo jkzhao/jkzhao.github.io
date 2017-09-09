@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-08T08:53:52.000Z</updated>
+  <updated>2017-09-09T01:41:42.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/09/08/%E4%BC%81%E4%B8%9A%E7%BA%A7Docker-Registry-%E2%80%94%E2%80%94-Harbor%E6%90%AD%E5%BB%BA%E5%92%8C%E4%BD%BF%E7%94%A8/"/>
     <id>http://yoursite.com/2017/09/08/企业级Docker-Registry-——-Harbor搭建和使用/</id>
     <published>2017-09-08T08:38:52.000Z</published>
-    <updated>2017-09-08T08:53:52.000Z</updated>
+    <updated>2017-09-09T01:41:42.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Harbor介绍&quot;&gt;&lt;a href=&quot;#Harbor介绍&quot; class=&quot;headerlink&quot; title=&quot;Harbor介绍&quot;&gt;&lt;/a&gt;Harbor介绍&lt;/h2&gt;&lt;p&gt;Harbor是由VMWare公司开源的容器镜像仓库。事实上，Habor是在Docker Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制 ，AD/LDAP集成以及审计日志等。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;安装部署Harbor&quot;&gt;&lt;a href=&quot;#安装部署Harbor&quot; class=&quot;headerlink&quot; title=&quot;安装部署Harbor&quot;&gt;&lt;/a&gt;安装部署Harbor&lt;/h2&gt;&lt;p&gt;官方安装文档：&lt;br&gt;&lt;a href=&quot;https://github.com/vmware/harbor/blob/master/docs/installation_guide.md&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/vmware/harbor/blob/master/docs/installation_guide.md&lt;/a&gt;&lt;/p&gt;
@@ -155,7 +155,7 @@ registry             /entrypoint.sh serve /etc/ ...   Up      5000/tcp
 &lt;li&gt;访客&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;管理员可以对开发者和访客作权限的配置和管理。测试和运维人员可以访客身份读取项目镜像，或者公共镜像库中的文件。&lt;br&gt;从项目的角度出发，项目管理员拥有最大的项目权限，如果要对用户进行禁用或限权等，可以通过修改用户在项目中的成员角色来实现，甚至将用户移除出这个项目。&lt;br&gt;下面以实际操作来演示。&lt;/p&gt;
-&lt;h2 id=&quot;Harbor使用&quot;&gt;&lt;a href=&quot;#Harbor使用&quot; class=&quot;headerlink&quot; title=&quot;Harbor使用&quot;&gt;&lt;/a&gt;Harbor使用&lt;/h2&gt;&lt;p&gt;注意：当项目设为公开后，任何人都有此项目下镜像的读权限。命令行用户不需要“docker login”就可以拉取此项目下的镜像。所以一般需要建立私有项目。&lt;br&gt;1.登录harbor，点击“+项目”&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/39.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;Harbor使用&quot;&gt;&lt;a href=&quot;#Harbor使用&quot; class=&quot;headerlink&quot; title=&quot;Harbor使用&quot;&gt;&lt;/a&gt;Harbor使用&lt;/h2&gt;&lt;p&gt;官方使用文档：&lt;a href=&quot;https://github.com/vmware/harbor/blob/master/docs/user_guide.md&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/vmware/harbor/blob/master/docs/user_guide.md&lt;/a&gt;&lt;br&gt;注意：当项目设为公开后，任何人都有此项目下镜像的读权限。命令行用户不需要“docker login”就可以拉取此项目下的镜像。所以一般需要建立私有项目。&lt;br&gt;1.登录harbor，点击“+项目”&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/39.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;2.点击左侧菜单“用户管理”，点击“+用户”&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/40.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;3.点击左侧菜单项目，选择刚才创建的项目“godseye”，在点击右侧正文中的选项卡“成员”，点击“+成员”，输入刚才创建的用户，并设置其为管理员。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/41.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;对于权限(角色)，项目管理员和开发人员可以有 push 的权限，而访客只能查看和 pull&lt;/p&gt;
 &lt;p&gt;4.测试&lt;br&gt;我这里找了另外一台机器，安装了docker 1.12.6。由于这里harbor采用了默认的 http 方式连接，而 Docker 认为这是不安全的，所以在 push 之前需要调整一下 docker 配置：&lt;/p&gt;
@@ -173,7 +173,42 @@ Login Succeeded
 &lt;pre&gt;&lt;code&gt;[root@node3 ~]# docker tag centos:centos7 172.16.206.32/godseye/centos:latest
 [root@node3 ~]# docker push 172.16.206.32/godseye/centos:latest
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后到web ui上查看刚才push的镜像是否成功了：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/42.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-</content>
+&lt;h2 id=&quot;镜像删除和空间回收&quot;&gt;&lt;a href=&quot;#镜像删除和空间回收&quot; class=&quot;headerlink&quot; title=&quot;镜像删除和空间回收&quot;&gt;&lt;/a&gt;镜像删除和空间回收&lt;/h2&gt;&lt;p&gt;Docker命令没有提供Registry镜像删除功能，日积月累，将会产生许多无用的镜像，占用大量存储空间。若要删除镜像并回收空间，需要调用docker registry API来完成，比较麻烦。Harbor提供了可视化的镜像删除界面，可以逻辑删除镜像。在维护状态下可以回收垃圾镜像的空间。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node3 ~]# docker images
+REPOSITORY                           TAG                    IMAGE ID            CREATED             SIZE
+java                                 openjdk-8-jre-alpine   d61ff40a5bf6        16 months ago       108.3 MB
+[root@node3 ~]# docker login 172.16.206.32
+Username: jkzhao
+Password: 
+Login Succeeded
+[root@node3 ~]# docker tag java:openjdk-8-jre-alpine 172.16.206.32/godseye/jdk:openjdk-8-jre-alpine
+[root@node3 ~]# docker push 172.16.206.32/godseye/jdk:openjdk-8-jre-alpine
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我们先查看下宿主机上存放镜像的目录大小：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 2017-09-08]# du -sh /data/registry/docker/registry/v2/
+110M    /data/registry/docker/registry/v2/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;登录harbor界面，点击godseye项目，删除刚才上传的镜像：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/43.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;但是实际上这只是逻辑删除，我们可以查看此时宿主机上存放镜像的目录大小，仍然是110M：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 2017-09-08]# du -sh /data/registry/docker/registry/v2/
+110M    /data/registry/docker/registry/v2/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;此时你完全可以再次上传这个镜像，会显示这些镜像层已经存在了：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node3 ~]# docker push 172.16.206.32/godseye/jdk:openjdk-8-jre-alpine
+The push refers to a repository [172.16.206.32/godseye/jdk]
+2b4866cc0048: Layer already exists 
+5f70bf18a086: Layer already exists 
+82a47053c51a: Layer already exists 
+8f01a53880b9: Layer already exists 
+openjdk-8-jre-alpine: digest:sha256:56b1ffe13af2ee1c5e2c9a3d3cd8c377b5f1bc6130a87648d48ba3fffab0d5eb size: 1977
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;那么如何彻底删除这个镜像呢？&lt;/strong&gt;&lt;br&gt;1.首先去界面删除这个镜像&lt;br&gt;2.在harbor宿主机上执行如下的命令：&lt;br&gt;先找到当前的registry版本：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 harbor]# docker images vmware/registry
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+vmware/registry     2.6.1-photon        0f6c96580032        3 months ago        150MB
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;列出要删除的镜像：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 harbor]# docker run -it --name gc --rm --volumes-from registry vmware/registry:2.6.1-photon garbage-collect --dry-run /etc/registry/config.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;选项 –dry-run 只是在最后打印出界面删除了的但是实际上并未删除的镜像层，但是这条命令不会删除这些镜像层。&lt;br&gt;运行下面的命令删除镜像：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 harbor]# docker run -it --name gc --rm --volumes-from registry vmware/registry:2.6.1-photon garbage-collect  /etc/registry/config.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;再次查看存放镜像的目录大小：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 2017-09-08]# du -sh /data/registry/docker/registry/v2/                                              
+70M     /data/registry/docker/registry/v2/
+&lt;/code&gt;&lt;/pre&gt;</content>
     
     <summary type="html">
     
