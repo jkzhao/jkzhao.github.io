@@ -112,7 +112,7 @@
 <meta property="og:site_name" content="jkzhao&#39;s blog">
 <meta property="og:description" content="背景在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-29T02:10:55.000Z">
+<meta property="og:updated_time" content="2017-09-12T07:54:59.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CentOS安装Docker CE">
 <meta name="twitter:description" content="背景在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how">
@@ -341,8 +341,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-08-29T10:10:55+08:00" content="2017-08-29">
-              2017-08-29
+              <time itemprop="dateUpdated" datetime="2017-09-12T15:54:59+08:00" content="2017-09-12">
+              2017-09-12
               </time>
               </span>
             
@@ -458,8 +458,6 @@ Cgroup Driver: cgroupfs
 </code></pre><p>【注意】:在生产环境中，可能需要使用某一个特定版本的Docker，而不是使用最新的版本，我们可以先列出版本，然后安装指定版本：</p>
 <pre><code>[root@spark32 ~]# yum list docker-ce.x86_64  --showduplicates | sort -r
 [root@spark32 ~]# yum install docker-ce-&lt;VERSION&gt;
-</code></pre><h4 id="卸载Docker-CE"><a href="#卸载Docker-CE" class="headerlink" title="卸载Docker-CE"></a>卸载Docker-CE</h4><pre><code># yum remove docker-ce
-# rm -rf /var/lib/docker
 </code></pre><h3 id="配置镜像加速"><a href="#配置镜像加速" class="headerlink" title="配置镜像加速"></a>配置镜像加速</h3><p>国内访问 Docker Hub 有时会遇到困难，此时可以配置镜像加速器。国内很多云服务商都提供了加速器服务，例如：</p>
 <ul>
 <li>阿里云加速器</li>
@@ -473,7 +471,9 @@ Cgroup Driver: cgroupfs
 [root@spark32 ~]# systemctl restart docker
 </code></pre></li>
 </ul>
-
+<h2 id="卸载Docker-CE"><a href="#卸载Docker-CE" class="headerlink" title="卸载Docker-CE"></a>卸载Docker-CE</h2><pre><code># yum remove docker-ce
+# rm -rf /var/lib/docker
+</code></pre>
       
     </div>
 
@@ -670,7 +670,7 @@ Cgroup Driver: cgroupfs
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Moby项目"><span class="nav-number">2.</span> <span class="nav-text">Moby项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Docker-CE"><span class="nav-number">3.</span> <span class="nav-text">安装Docker CE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#版本说明"><span class="nav-number">3.1.</span> <span class="nav-text">版本说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Docker"><span class="nav-number">3.2.</span> <span class="nav-text">安装Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#环境要求"><span class="nav-number">3.2.1.</span> <span class="nav-text">环境要求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#卸载安装的所有Docker组件"><span class="nav-number">3.2.2.</span> <span class="nav-text">卸载安装的所有Docker组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过仓库安装Docker-CE"><span class="nav-number">3.2.3.</span> <span class="nav-text">通过仓库安装Docker CE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#卸载Docker-CE"><span class="nav-number">3.2.4.</span> <span class="nav-text">卸载Docker-CE</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置镜像加速"><span class="nav-number">3.3.</span> <span class="nav-text">配置镜像加速</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Moby项目"><span class="nav-number">2.</span> <span class="nav-text">Moby项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Docker-CE"><span class="nav-number">3.</span> <span class="nav-text">安装Docker CE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#版本说明"><span class="nav-number">3.1.</span> <span class="nav-text">版本说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Docker"><span class="nav-number">3.2.</span> <span class="nav-text">安装Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#环境要求"><span class="nav-number">3.2.1.</span> <span class="nav-text">环境要求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#卸载安装的所有Docker组件"><span class="nav-number">3.2.2.</span> <span class="nav-text">卸载安装的所有Docker组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过仓库安装Docker-CE"><span class="nav-number">3.2.3.</span> <span class="nav-text">通过仓库安装Docker CE</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置镜像加速"><span class="nav-number">3.3.</span> <span class="nav-text">配置镜像加速</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#卸载Docker-CE"><span class="nav-number">4.</span> <span class="nav-text">卸载Docker-CE</span></a></li></ol></div>
             
           </div>
         </section>
