@@ -115,7 +115,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/8.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/9.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/10.png">
-<meta property="og:updated_time" content="2017-08-17T08:20:02.000Z">
+<meta property="og:updated_time" content="2017-09-12T07:59:45.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Docker镜像和容器">
 <meta name="twitter:description" content="安装DockerDocker 对 Linux 内核版本的最低要求是3.10，如果内核版本低于 3.10 会缺少一些运行 Docker 容器的功能。这些比较旧的内核，在一定条件下会导致数据丢失和频繁恐慌错误。">
@@ -345,8 +345,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-08-17T16:20:02+08:00" content="2017-08-17">
-              2017-08-17
+              <time itemprop="dateUpdated" datetime="2017-09-12T15:59:45+08:00" content="2017-09-12">
+              2017-09-12
               </time>
               </span>
             
@@ -411,6 +411,9 @@
 <pre><code># yum install -y docker
 </code></pre><p>我这里用的CentOS 7。启动docker：</p>
 <pre><code># systemctl start docker.service
+</code></pre><h2 id="卸载docker"><a href="#卸载docker" class="headerlink" title="卸载docker"></a>卸载docker</h2><pre><code># systemctl stop docker.service
+# yum remove docker docker-common docker-selinux docker-engine container-selinux
+# rm -rf docker/
 </code></pre><h2 id="镜像基本操作"><a href="#镜像基本操作" class="headerlink" title="镜像基本操作"></a>镜像基本操作</h2><ul>
 <li>搜索镜像 docker search</li>
 <li>获取镜像 docker pull</li>
@@ -785,7 +788,7 @@ Hello world
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Docker"><span class="nav-number">1.</span> <span class="nav-text">安装Docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#镜像基本操作"><span class="nav-number">2.</span> <span class="nav-text">镜像基本操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#容器基本操作"><span class="nav-number">3.</span> <span class="nav-text">容器基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#启动容器"><span class="nav-number">3.1.</span> <span class="nav-text">启动容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看容器"><span class="nav-number">3.2.</span> <span class="nav-text">查看容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#停止容器"><span class="nav-number">3.3.</span> <span class="nav-text">停止容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除停止的容器"><span class="nav-number">3.4.</span> <span class="nav-text">删除停止的容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker守护式容器"><span class="nav-number">3.5.</span> <span class="nav-text">Docker守护式容器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#方式一"><span class="nav-number">3.5.1.</span> <span class="nav-text">方式一</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方式二"><span class="nav-number">3.5.2.</span> <span class="nav-text">方式二</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#进入容器"><span class="nav-number">3.5.3.</span> <span class="nav-text">进入容器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看容器日志"><span class="nav-number">3.6.</span> <span class="nav-text">查看容器日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看容器内的进程"><span class="nav-number">3.7.</span> <span class="nav-text">查看容器内的进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在运行中的容器内启动新进程"><span class="nav-number">3.8.</span> <span class="nav-text">在运行中的容器内启动新进程</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Docker"><span class="nav-number">1.</span> <span class="nav-text">安装Docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#卸载docker"><span class="nav-number">2.</span> <span class="nav-text">卸载docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#镜像基本操作"><span class="nav-number">3.</span> <span class="nav-text">镜像基本操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#容器基本操作"><span class="nav-number">4.</span> <span class="nav-text">容器基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#启动容器"><span class="nav-number">4.1.</span> <span class="nav-text">启动容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看容器"><span class="nav-number">4.2.</span> <span class="nav-text">查看容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#停止容器"><span class="nav-number">4.3.</span> <span class="nav-text">停止容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除停止的容器"><span class="nav-number">4.4.</span> <span class="nav-text">删除停止的容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker守护式容器"><span class="nav-number">4.5.</span> <span class="nav-text">Docker守护式容器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#方式一"><span class="nav-number">4.5.1.</span> <span class="nav-text">方式一</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方式二"><span class="nav-number">4.5.2.</span> <span class="nav-text">方式二</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#进入容器"><span class="nav-number">4.5.3.</span> <span class="nav-text">进入容器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看容器日志"><span class="nav-number">4.6.</span> <span class="nav-text">查看容器日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看容器内的进程"><span class="nav-number">4.7.</span> <span class="nav-text">查看容器内的进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在运行中的容器内启动新进程"><span class="nav-number">4.8.</span> <span class="nav-text">在运行中的容器内启动新进程</span></a></li></ol></li></ol></div>
             
           </div>
         </section>

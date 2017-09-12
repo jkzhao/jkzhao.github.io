@@ -1056,7 +1056,7 @@ test2.txt
     <link href="http://yoursite.com/2017/08/16/Docker%E9%95%9C%E5%83%8F%E5%92%8C%E5%AE%B9%E5%99%A8/"/>
     <id>http://yoursite.com/2017/08/16/Docker镜像和容器/</id>
     <published>2017-08-16T01:03:56.000Z</published>
-    <updated>2017-08-17T08:20:02.000Z</updated>
+    <updated>2017-09-12T07:59:45.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;安装Docker&quot;&gt;&lt;a href=&quot;#安装Docker&quot; class=&quot;headerlink&quot; title=&quot;安装Docker&quot;&gt;&lt;/a&gt;安装Docker&lt;/h2&gt;&lt;p&gt;Docker 对 Linux 内核版本的最低要求是3.10，如果内核版本低于 3.10 会缺少一些运行 Docker 容器的功能。这些比较旧的内核，在一定条件下会导致数据丢失和频繁恐慌错误。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;CentOS 6：&lt;br&gt;操作系统需要升级下内核，升级内核后安装Docker：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# yum install -y docker-io
@@ -1064,6 +1064,9 @@ test2.txt
 &lt;pre&gt;&lt;code&gt;# yum install -y docker
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我这里用的CentOS 7。启动docker：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# systemctl start docker.service
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;卸载docker&quot;&gt;&lt;a href=&quot;#卸载docker&quot; class=&quot;headerlink&quot; title=&quot;卸载docker&quot;&gt;&lt;/a&gt;卸载docker&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# systemctl stop docker.service
+# yum remove docker docker-common docker-selinux docker-engine container-selinux
+# rm -rf docker/
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;镜像基本操作&quot;&gt;&lt;a href=&quot;#镜像基本操作&quot; class=&quot;headerlink&quot; title=&quot;镜像基本操作&quot;&gt;&lt;/a&gt;镜像基本操作&lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;搜索镜像 docker search&lt;/li&gt;
 &lt;li&gt;获取镜像 docker pull&lt;/li&gt;
