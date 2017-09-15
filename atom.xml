@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-15T06:14:17.000Z</updated>
+  <updated>2017-09-15T06:51:32.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,9 +20,19 @@
     <link href="http://yoursite.com/2017/09/15/%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%B9%E5%BC%8F%E9%83%A8%E7%BD%B2Kubernetes-1-6-0%E9%9B%86%E7%BE%A4-%E5%BC%80%E5%90%AFTLS/"/>
     <id>http://yoursite.com/2017/09/15/二进制方式部署Kubernetes-1-6-0集群-开启TLS/</id>
     <published>2017-09-15T06:06:09.000Z</published>
-    <updated>2017-09-15T06:14:17.000Z</updated>
+    <updated>2017-09-15T06:51:32.000Z</updated>
     
-    <content type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;之前尝试使用kubeadm自动化部署集群，使用yum去安装kubeadm等工具，但是不翻墙的情况下，这种方式在国内几乎是不可能安装成功的。于是改为采用二进制文件部署Kubernetes集群，同时开启了集群的TLS安全认证。本篇实践是参照opsnull的文章&lt;a href=&quot;https://mp.weixin.qq.com/s/bvCZUl6LQhlqDVv_TNeDFg&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;创建 kubernetes 各组件 TLS 加密通信的证书和秘钥&lt;/a&gt;，结合公司的实际情况进行的。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+    <content type="html">&lt;h2 id=&quot;Kubernetes简介&quot;&gt;&lt;a href=&quot;#Kubernetes简介&quot; class=&quot;headerlink&quot; title=&quot;Kubernetes简介&quot;&gt;&lt;/a&gt;Kubernetes简介&lt;/h2&gt;&lt;p&gt;Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本,主要功能包括:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;基于容器的应用部署、维护和滚动升级&lt;/li&gt;
+&lt;li&gt;负载均衡和服务发现&lt;/li&gt;
+&lt;li&gt;跨机器和跨地区的集群调度&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;自动伸缩&lt;/li&gt;
+&lt;li&gt;无状态服务和有状态服务 &lt;/li&gt;
+&lt;li&gt;广泛的Volume支持 &lt;/li&gt;
+&lt;li&gt;插件机制保证扩展性&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;之前尝试使用kubeadm自动化部署集群，使用yum去安装kubeadm等工具，但是不翻墙的情况下，这种方式在国内几乎是不可能安装成功的。于是改为采用二进制文件部署Kubernetes集群，同时开启了集群的TLS安全认证。本篇实践是参照opsnull的文章&lt;a href=&quot;https://mp.weixin.qq.com/s/bvCZUl6LQhlqDVv_TNeDFg&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;创建 kubernetes 各组件 TLS 加密通信的证书和秘钥&lt;/a&gt;，结合公司的实际情况进行的。&lt;/p&gt;
 &lt;h2 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h2&gt;&lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -498,8 +508,8 @@ Switched to context &amp;quot;default&amp;quot;.
 [root@node1 kubernetes]# scp -p bootstrap.kubeconfig root@172.16.7.153:/etc/kubernetes/
 [root@node1 kubernetes]# scp -p kube-proxy.kubeconfig root@172.16.7.153:/etc/kubernetes/
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;创建高可用-etcd-集群&quot;&gt;&lt;a href=&quot;#创建高可用-etcd-集群&quot; class=&quot;headerlink&quot; title=&quot;创建高可用 etcd 集群&quot;&gt;&lt;/a&gt;创建高可用 etcd 集群&lt;/h2&gt;&lt;p&gt;etcd 是 CoreOS 团队发起的开源项目，基于 Go 语言实现，做为一个分布式键值对存储，通过分布式锁，leader选举和写屏障(write barriers)来实现可靠的分布式协作。&lt;br&gt;kubernetes系统使用etcd存储所有数据。&lt;br&gt;CoreOS官方推荐集群规模5个为宜，我这里使用了3个节点。&lt;/p&gt;
-&lt;h3 id=&quot;安装配置etcd集群&quot;&gt;&lt;a href=&quot;#安装配置etcd集群&quot; class=&quot;headerlink&quot; title=&quot;安装配置etcd集群&quot;&gt;&lt;/a&gt;安装配置etcd集群&lt;/h3&gt;&lt;p&gt;搭建etcd集群有3种方式，分别为Static, etcd Discovery, DNS Discovery。Discovery请参见官网&lt;a href=&quot;https://coreos.com/etcd/docs/latest/op-guide/clustering.html。这里仅以Static方式展示一次集群搭建过程。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://coreos.com/etcd/docs/latest/op-guide/clustering.html。这里仅以Static方式展示一次集群搭建过程。&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;首选请做好3个节点的时间同步。&lt;/p&gt;
+&lt;h3 id=&quot;安装配置etcd集群&quot;&gt;&lt;a href=&quot;#安装配置etcd集群&quot; class=&quot;headerlink&quot; title=&quot;安装配置etcd集群&quot;&gt;&lt;/a&gt;安装配置etcd集群&lt;/h3&gt;&lt;p&gt;搭建etcd集群有3种方式，分别为Static, etcd Discovery, DNS Discovery。Discovery请参见&lt;a href=&quot;https://coreos.com/etcd/docs/latest/op-guide/clustering.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;官网&lt;/a&gt;。这里仅以Static方式展示一次集群搭建过程。&lt;/p&gt;
+&lt;p&gt;首先请做好3个节点的时间同步。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;1.TLS 认证文件&lt;/strong&gt;&lt;br&gt;需要为 etcd 集群创建加密通信的 TLS 证书，这里复用以前创建的 kubernetes 证书。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ssl]# cp ca.pem kubernetes-key.pem kubernetes.pem /etc/kubernetes/ssl
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这步在之前做过，可以忽略。【注意】:kubernetes 证书的 hosts 字段列表中包含上面三台机器的 IP，否则后续证书校验会失败。&lt;/p&gt;
@@ -549,11 +559,11 @@ WantedBy=multi-user.target
 &lt;li&gt;–snapshot-count：指定有多少事务（transaction）被提交时，触发截取快照保存到磁盘&lt;/li&gt;
 &lt;li&gt;–heartbeat-interval：leader 多久发送一次心跳到 followers。默认值是 100ms&lt;/li&gt;
 &lt;li&gt;–eletion-timeout：重新投票的超时时间，如果 follow 在该时间间隔没有收到心跳包，会触发重新投票，默认为 1000 ms&lt;/li&gt;
-&lt;li&gt;–listen-peer-urls：和同伴通信的地址，比如 &lt;a href=&quot;http://ip:2380，如果有多个，使用逗号分隔。需要所有节点都能够访问，所以不要使用&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://ip:2380，如果有多个，使用逗号分隔。需要所有节点都能够访问，所以不要使用&lt;/a&gt; localhost！&lt;/li&gt;
+&lt;li&gt;–listen-peer-urls：和同伴通信的地址，比如 &lt;a href=&quot;http://ip:2380&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://ip:2380&lt;/a&gt;&lt;br&gt;如果有多个，使用逗号分隔。需要所有节点都能够访问，所以不要使用 localhost！&lt;/li&gt;
 &lt;li&gt;–listen-client-urls：对外提供服务的地址：比如 &lt;a href=&quot;http://ip:2379,http://127.0.0.1:2379，客户端会连接到这里和&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://ip:2379,http://127.0.0.1:2379，客户端会连接到这里和&lt;/a&gt; etcd 交互&lt;/li&gt;
 &lt;li&gt;–advertise-client-urls：对外公告的该节点客户端监听地址，这个值会告诉集群中其他节点&lt;/li&gt;
 &lt;li&gt;–initial-advertise-peer-urls：该节点同伴监听地址，这个值会告诉集群中其他节点&lt;/li&gt;
-&lt;li&gt;–initial-cluster：集群中所有节点的信息，格式为 node1=&lt;a href=&quot;http://ip1:2380,node2=http://ip2:2380,…。注意：这里的&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://ip1:2380,node2=http://ip2:2380,…。注意：这里的&lt;/a&gt; node1 是节点的 –name 指定的名字；后面的 ip1:2380 是 –initial-advertise-peer-urls 指定的值&lt;/li&gt;
+&lt;li&gt;–initial-cluster：集群中所有节点的信息，格式为 node1=&lt;a href=&quot;http://ip1:2380,node2=http://ip2:2380,…。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://ip1:2380,node2=http://ip2:2380,…。&lt;/a&gt;&lt;br&gt;注意：这里的 node1 是节点的 –name 指定的名字；后面的 ip1:2380 是 –initial-advertise-peer-urls 指定的值&lt;/li&gt;
 &lt;li&gt;–initial-cluster-state：新建集群的时候，这个值为new；假如已经存在的集群，这个值为 existing&lt;/li&gt;
 &lt;li&gt;–initial-cluster-token：创建集群的token，这个值每个集群保持唯一。这样的话，如果你要重新创建集群，即使配置和之前一样，也会再次生成新的集群和节点 uuid；否则会导致多个集群之间的冲突，造成未知的错误&lt;/li&gt;
 &lt;/ul&gt;
@@ -1358,7 +1368,11 @@ root@nginx:/# ping kube-dns.kube-system.svc.cluster.local
     
     <summary type="html">
     
-      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;之前尝试使用kubeadm自动化部署集群，使用yum去安装kubeadm等工具，但是不翻墙的情况下，这种方式在国内几乎是不可能安装成功的。于是改为采用二进制文件部署Kubernetes集群，同时开启了集群的TLS安全认证。本篇实践是参照opsnull的文章&lt;a href=&quot;https://mp.weixin.qq.com/s/bvCZUl6LQhlqDVv_TNeDFg&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;创建 kubernetes 各组件 TLS 加密通信的证书和秘钥&lt;/a&gt;，结合公司的实际情况进行的。&lt;br&gt;
+      &lt;h2 id=&quot;Kubernetes简介&quot;&gt;&lt;a href=&quot;#Kubernetes简介&quot; class=&quot;headerlink&quot; title=&quot;Kubernetes简介&quot;&gt;&lt;/a&gt;Kubernetes简介&lt;/h2&gt;&lt;p&gt;Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本,主要功能包括:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;基于容器的应用部署、维护和滚动升级&lt;/li&gt;
+&lt;li&gt;负载均衡和服务发现&lt;/li&gt;
+&lt;li&gt;跨机器和跨地区的集群调度
     
     </summary>
     
