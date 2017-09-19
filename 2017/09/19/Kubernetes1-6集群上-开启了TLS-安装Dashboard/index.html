@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Ansible 运维自动化," />
+  <meta name="keywords" content="容器编排 Docker Kubernetes," />
 
 
 
@@ -104,23 +104,22 @@
 
 
 
-<meta name="description" content="什么场景下会用roles？假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不">
-<meta name="keywords" content="Ansible 运维自动化">
+<meta name="description" content="配置和安装 dashboard这是接着上一篇《二进制方式部署Kubernetes 1.6.0集群(开启TLS)》写的。Kubernetes Dashboard is a general purpose, web-based UI for Kubernetes clusters. It allows users to manage applications running in the cluste">
+<meta name="keywords" content="容器编排 Docker Kubernetes">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Ansible之roles介绍">
-<meta property="og:url" content="http://yoursite.com/2017/07/24/Ansible之roles介绍/index.html">
+<meta property="og:title" content="Kubernetes1.6集群上(开启了TLS)安装Dashboard">
+<meta property="og:url" content="http://yoursite.com/2017/09/19/Kubernetes1-6集群上-开启了TLS-安装Dashboard/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="什么场景下会用roles？假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不">
+<meta property="og:description" content="配置和安装 dashboard这是接着上一篇《二进制方式部署Kubernetes 1.6.0集群(开启TLS)》写的。Kubernetes Dashboard is a general purpose, web-based UI for Kubernetes clusters. It allows users to manage applications running in the cluste">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/44.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/45.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/46.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/47.png">
-<meta property="og:updated_time" content="2017-07-24T02:52:44.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/3.png">
+<meta property="og:updated_time" content="2017-09-19T01:17:15.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Ansible之roles介绍">
-<meta name="twitter:description" content="什么场景下会用roles？假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/44.png">
+<meta name="twitter:title" content="Kubernetes1.6集群上(开启了TLS)安装Dashboard">
+<meta name="twitter:description" content="配置和安装 dashboard这是接着上一篇《二进制方式部署Kubernetes 1.6.0集群(开启TLS)》写的。Kubernetes Dashboard is a general purpose, web-based UI for Kubernetes clusters. It allows users to manage applications running in the cluste">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/3.png">
 
 
 
@@ -138,7 +137,7 @@
   };
 </script>
 
-  <title> Ansible之roles介绍 | jkzhao's blog </title>
+  <title> Kubernetes1.6集群上(开启了TLS)安装Dashboard | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -328,7 +327,7 @@
             
             
               
-                Ansible之roles介绍
+                Kubernetes1.6集群上(开启了TLS)安装Dashboard
               
             
           </h1>
@@ -340,14 +339,14 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-24T09:09:22+08:00" content="2017-07-24">
-              2017-07-24
+            <time itemprop="dateCreated" datetime="2017-09-19T09:14:24+08:00" content="2017-09-19">
+              2017-09-19
             </time>
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-07-24T10:52:44+08:00" content="2017-07-24">
-              2017-07-24
+              <time itemprop="dateUpdated" datetime="2017-09-19T09:17:15+08:00" content="2017-09-19">
+              2017-09-19
               </time>
               </span>
             
@@ -362,8 +361,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
+                  <a href="/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
                   </a>
                 </span>
 
@@ -382,7 +381,7 @@
 
           
           
-             <span id="/2017/07/24/Ansible之roles介绍/" class="leancloud_visitors" data-flag-title="Ansible之roles介绍">
+             <span id="/2017/09/19/Kubernetes1-6集群上-开启了TLS-安装Dashboard/" class="leancloud_visitors" data-flag-title="Kubernetes1.6集群上(开启了TLS)安装Dashboard">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -406,93 +405,69 @@
       
 
       
-        <h2 id="什么场景下会用roles？"><a href="#什么场景下会用roles？" class="headerlink" title="什么场景下会用roles？"></a>什么场景下会用roles？</h2><p>假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？<br>第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不利于多次调。比如说后来又加进来一个主机，这个第4个主机既是httpd服务器，又是php服务器，我们只能写第4个play，上面写上安装httpd和php。这样playbook中的代码就重复了。<br><a id="more"></a><br>为了避免代码重复，roles能够实现代码重复被调用。定义一个角色叫websrvs，第二个角色叫phpappsrvs，第三个角色叫dbsrvs。那么调用时如下来调用：</p>
-<pre><code>hosts: host1
-role:
-- websrvs
+        <h2 id="配置和安装-dashboard"><a href="#配置和安装-dashboard" class="headerlink" title="配置和安装 dashboard"></a>配置和安装 dashboard</h2><p>这是接着上一篇《二进制方式部署Kubernetes 1.6.0集群(开启TLS)》写的。<br>Kubernetes Dashboard is a general purpose, web-based UI for Kubernetes clusters. It allows users to manage applications running in the cluster and troubleshoot them, as well as manage the cluster itself.<br><a id="more"></a></p>
+<h3 id="配置dashboard"><a href="#配置dashboard" class="headerlink" title="配置dashboard"></a>配置dashboard</h3><p>官方文件目录：<a href="https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dashboard" target="_blank" rel="external">https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dashboard</a><br>我们使用的文件:<br>从 <a href="https://github.com/rootsongjc/follow-me-install-kubernetes-cluster/tree/master/manifests/dashboard" target="_blank" rel="external">https://github.com/rootsongjc/follow-me-install-kubernetes-cluster/tree/master/manifests/dashboard</a> 下载3个文件下来，并上传到/opt/kube-dashboard/目录下。</p>
+<pre><code>[root@node1 opt]# mkdir kube-dashboard
+[root@node1 opt]# cd kube-dashboard/
+[root@node1 kube-dashboard]# ls
+dashboard-controller.yaml  dashboard-rbac.yaml  dashboard-service.yaml
+</code></pre><p>修改dashboard-controller.yaml文件，将里面的image改为：</p>
+<pre><code>index.tenxcloud.com/jimmy/kubernetes-dashboard-amd64:v1.6.0
+</code></pre><p>由于 kube-apiserver 启用了 RBAC 授权，而官方源码目录的 dashboard-controller.yaml 没有定义授权的 ServiceAccount，所以后续访问 kube-apiserver 的 API 时会被拒绝，web中提示：</p>
+<pre><code>Forbidden (403)
 
-hosts: host2
-role:
-- phpappsrvs
+User &quot;system:serviceaccount:kube-system:default&quot; cannot list jobs.batch in the namespace &quot;default&quot;. (get jobs.batch)
+</code></pre><p>因此，增加了一个dashboard-rbac.yaml文件，定义一个名为 dashboard 的 ServiceAccount，然后将它和 Cluster Role view 绑定。</p>
+<h3 id="执行所有定义的文件"><a href="#执行所有定义的文件" class="headerlink" title="执行所有定义的文件"></a>执行所有定义的文件</h3><pre><code># pwd
+/opt/kube-dashboard
+# ls
+dashboard-controller.yaml  dashboard-rbac.yaml  dashboard-service.yaml
+# kubectl create -f .
+deployment &quot;kubernetes-dashboard&quot; created
+serviceaccount &quot;dashboard&quot; created
+clusterrolebinding &quot;dashboard&quot; created
+service &quot;kubernetes-dashboard&quot; created
+</code></pre><h3 id="检查执行结果"><a href="#检查执行结果" class="headerlink" title="检查执行结果"></a>检查执行结果</h3><p><strong>1.查看分配的 NodePort</strong></p>
+<pre><code># kubectl get services kubernetes-dashboard -n kube-system
+NAME                   CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+kubernetes-dashboard   10.254.207.77   &lt;nodes&gt;       80:32281/TCP   41s
+</code></pre><ul>
+<li>NodePort 32281映射到 dashboard pod 80端口；</li>
+</ul>
+<p><strong>2.检查 controller</strong></p>
+<pre><code># kubectl get deployment kubernetes-dashboard  -n kube-system
+NAME                   DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+kubernetes-dashboard   1         1         1            1           13m
+# kubectl get pods  -n kube-system | grep dashboard
+kubernetes-dashboard-2888692679-tv54g   1/1       Running   0          13m
+</code></pre><h3 id="访问dashboard"><a href="#访问dashboard" class="headerlink" title="访问dashboard"></a>访问dashboard</h3><p>有以下三种方式：</p>
+<ul>
+<li>kubernetes-dashboard 服务暴露了 NodePort，可以使用 <a href="http://NodeIP:nodePort" target="_blank" rel="external">http://NodeIP:nodePort</a> 地址访问 dashboard；</li>
+<li>通过 kube-apiserver 访问 dashboard（https 6443端口和http 8080端口方式）；</li>
+<li>通过 kubectl proxy 访问 dashboard</li>
+</ul>
+<h4 id="使用-http-NodeIP-nodePort-地址访问-dashboard"><a href="#使用-http-NodeIP-nodePort-地址访问-dashboard" class="headerlink" title="使用 http://NodeIP:nodePort 地址访问 dashboard"></a>使用 <a href="http://NodeIP:nodePort" target="_blank" rel="external">http://NodeIP:nodePort</a> 地址访问 dashboard</h4><pre><code># kubectl get services kubernetes-dashboard -n kube-system
+NAME                   CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+kubernetes-dashboard   10.254.207.77   &lt;nodes&gt;       80:32281/TCP   41s
+</code></pre><p>然后检查出这个pod是运行在集群中哪个服务器上的，我这里是检查是运行在node1节点上的，所以浏览器输入<a href="http://172.16.7.151:32281/" target="_blank" rel="external">http://172.16.7.151:32281/</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/3.png" alt=""></p>
+<h4 id="通过-kubectl-proxy-访问-dashboard"><a href="#通过-kubectl-proxy-访问-dashboard" class="headerlink" title="通过 kubectl proxy 访问 dashboard"></a>通过 kubectl proxy 访问 dashboard</h4><p>1.启动代理</p>
+<pre><code>[root@node1 kube-dashboard]# kubectl proxy --address=&apos;172.16.7.151&apos; --port=8086 --accept-hosts=&apos;^*$&apos;         
+Starting to serve on 172.16.7.151:8086
+</code></pre><ul>
+<li>需要指定 –accept-hosts 选项，否则浏览器访问 dashboard 页面时提示 “Unauthorized”</li>
+</ul>
+<p>2.访问<br>浏览器访问 URL：<a href="http://172.16.7.151:8086/ui" target="_blank" rel="external">http://172.16.7.151:8086/ui</a> 自动跳转到：<a href="http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard/#/workload?namespace=default" target="_blank" rel="external">http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard/#/workload?namespace=default</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/3.png" alt=""></p>
+<h4 id="通过-kube-apiserver-访问dashboard"><a href="#通过-kube-apiserver-访问dashboard" class="headerlink" title="通过 kube-apiserver 访问dashboard"></a>通过 kube-apiserver 访问dashboard</h4><p>1.获取集群服务地址列表</p>
+<pre><code>[root@node1 ~]# kubectl cluster-info
+Kubernetes master is running at https://172.16.7.151:6443
+KubeDNS is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kube-dns
+kubernetes-dashboard is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard
 
-hosts: host3
-role:
-- dbsrvs
-
-hosts: host4
-role:
-- websrvs
-- phpappsrvs
-</code></pre><p>这样代码就可以重复利用了,每个角色可以被独立重复调用。下面举例说明使用方式。</p>
-<h2 id="roles示例"><a href="#roles示例" class="headerlink" title="roles示例"></a>roles示例</h2><p>假设有3台主机，172.16.7.151主机上安装MySQL，172.16.7.152上安装httpd，172.16.7.153上安装MySQL和httpd。我们建立两个角色websrvs和dbsrvs，然后应用到这几个主机上。</p>
-<h3 id="创建roles的必需目录"><a href="#创建roles的必需目录" class="headerlink" title="创建roles的必需目录"></a>创建roles的必需目录</h3><pre><code>[root@node1 opt]# mkdir -pv ansible_playbooks/roles/{websrvs,dbsrvs}/{tasks,files,templates,meta,handlers,vars}
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/44.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/45.png" alt=""><br>每个role下面有个目录叫meta，在里面可以新建文件main.yml，在文件中可以设置该role和其它role之前的关联关系。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/46.png" alt=""></p>
-<h3 id="配置角色"><a href="#配置角色" class="headerlink" title="配置角色"></a>配置角色</h3><h4 id="配置角色websrvs"><a href="#配置角色websrvs" class="headerlink" title="配置角色websrvs"></a>配置角色websrvs</h4><pre><code>[root@node1 opt]# cd ansible_playbooks/roles/
-[root@node1 roles]# cd websrvs/
-[root@node1 websrvs]# ls
-files  handlers  meta  tasks  templates  vars
-</code></pre><p>1.将httpd配置文件上传到files目录下，我这里假设httpd.conf每台主机都是一样的，实际上应该用模板，先用一样的配置文件举例</p>
-<pre><code>[root@node1 websrvs]# cp /etc/httpd/conf/httpd.conf files/
-</code></pre><p><strong>直接复制的静态文件都放在files目录下。打算用模板文件的都放在templates目录下。</strong></p>
-<p>2.编写任务列表tasks</p>
-<pre><code>[root@node1 websrvs]# vim tasks/main.yml
-- name: install httpd package
-  yum: name=httpd
-- name: install configuration file
-  copy: src=httpd.conf dest=/etc/httpd/conf
-  tags:
-  - conf
-  notify:
-  - restart httpd
-- name: start httpd
-  service: name=httpd state=started
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/47.png" alt=""></p>
-<p>3.由于上面的tasks中定义了notify，所以要定义handlers</p>
-<pre><code>[root@node1 websrvs]# vim handlers/main.yml
-- name: restart httpd
-  service: name=httpd state=restarted
-</code></pre><p>如果需要定义变量，则在vars目录下创建main.yml文件，在文件中写入变量，以key:value的形式定义，比如：</p>
-<pre><code>http_port: 8080
-</code></pre><h4 id="配置角色dbsrvs"><a href="#配置角色dbsrvs" class="headerlink" title="配置角色dbsrvs"></a>配置角色dbsrvs</h4><pre><code>[root@node1 roles]# cd dbsrvs/
-[root@node1 dbsrvs]# ls
-files  handlers  meta  tasks  templates  vars
-</code></pre><p>1.将MySQL配置文件上传到files目录下。<br>2.编写任务列表tasks</p>
-<pre><code>[root@node1 dbsrvs]# vim tasks/main.yml
-- name: install mysql-server package
-  yum: name=mysql-server state=latest
-- name: install configuration file
-  copy: src=my.cnf dest/etc/my.cnf
-  tags:
-  - conf
-  notify:
-  - restart mysqld
-- name:
-  service: name=mysqld enabled=true state=started
-</code></pre><p>3.定义handlers</p>
-<pre><code>[root@node1 dbsrvs]# vim handlers/main.yml
-- name: restart mysqld
-  service: name=mysqld state=restarted
-</code></pre><h4 id="定义playbook"><a href="#定义playbook" class="headerlink" title="定义playbook"></a>定义playbook</h4><p>【注意】：要在roles目录同级创建playbook。</p>
-<pre><code>[root@node1 ansible_playbooks]# vim web.yml
-- hosts: 172.16.7.152
-  roles:
-  - websrvs 
-
-[root@node1 ansible_playbooks]# vim db.yml
-- hosts: 172.16.7.151
-  roles:
-  - dbsrvs 
-
-[root@node1 ansible_playbooks]# vim site.yml
-- hosts: 172.16.7.153
-  roles:
-  - websrvs
-  - dbsrvs 
-</code></pre><p>运行：</p>
-<pre><code>[root@node1 ansible_playbooks]# ansible-playbook web.yml
-[root@node1 ansible_playbooks]# ansible-playbook db.yml
-[root@node1 ansible_playbooks]# ansible-playbook site.yml
-</code></pre><p>当然也可以把这些内容写入同一个playbook中。playbook的名字可以自定义。</p>
+To further debug and diagnose cluster problems, use &apos;kubectl cluster-info dump&apos;.
+</code></pre><p>2.导入证书<br>将生成的admin.pem证书转换格式。</p>
+<pre><code>[root@node1 ~]# cd /etc/kubernetes/ssl/
+[root@node1 ~]# openssl pkcs12 -export -in admin.pem  -out admin.p12 -inkey admin-key.pem
+</code></pre><p>将生成的admin.p12证书导入的你的电脑，导出的时候记住你设置的密码，导入的时候还要用到。<br>如果你不想使用https的话，可以直接访问insecure port 8080端口:<a href="http://172.16.7.151:8080/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard" target="_blank" rel="external">http://172.16.7.151:8080/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/3.png" alt=""><br>由于缺少 Heapster 插件，当前 dashboard 不能展示 Pod、Nodes 的 CPU、内存等 metric 图形。</p>
 
       
     </div>
@@ -514,7 +489,7 @@ files  handlers  meta  tasks  templates  vars
       
         <div class="post-tags">
           
-            <a href="/tags/Ansible-运维自动化/" rel="tag"><i class="fa fa-tag"></i>Ansible 运维自动化</a>
+            <a href="/tags/容器编排-Docker-Kubernetes/" rel="tag"><i class="fa fa-tag"></i>容器编排 Docker Kubernetes</a>
           
         </div>
       
@@ -523,17 +498,13 @@ files  handlers  meta  tasks  templates  vars
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/07/22/Ansible之tags介绍/" rel="next" title="Ansible之tags介绍">
-                <i class="fa fa-chevron-left"></i> Ansible之tags介绍
+              <a href="/2017/09/15/二进制方式部署Kubernetes-1-6-0集群-开启TLS/" rel="next" title="二进制方式部署Kubernetes 1.6.0集群(开启TLS)">
+                <i class="fa fa-chevron-left"></i> 二进制方式部署Kubernetes 1.6.0集群(开启TLS)
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/07/27/Ansible实战：部署分布式日志系统/" rel="prev" title="Ansible实战：部署分布式日志系统">
-                Ansible实战：部署分布式日志系统 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -690,7 +661,7 @@ files  handlers  meta  tasks  templates  vars
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么场景下会用roles？"><span class="nav-number">1.</span> <span class="nav-text">什么场景下会用roles？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#roles示例"><span class="nav-number">2.</span> <span class="nav-text">roles示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建roles的必需目录"><span class="nav-number">2.1.</span> <span class="nav-text">创建roles的必需目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置角色"><span class="nav-number">2.2.</span> <span class="nav-text">配置角色</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置角色websrvs"><span class="nav-number">2.2.1.</span> <span class="nav-text">配置角色websrvs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置角色dbsrvs"><span class="nav-number">2.2.2.</span> <span class="nav-text">配置角色dbsrvs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#定义playbook"><span class="nav-number">2.2.3.</span> <span class="nav-text">定义playbook</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置和安装-dashboard"><span class="nav-number">1.</span> <span class="nav-text">配置和安装 dashboard</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置dashboard"><span class="nav-number">1.1.</span> <span class="nav-text">配置dashboard</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#执行所有定义的文件"><span class="nav-number">1.2.</span> <span class="nav-text">执行所有定义的文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检查执行结果"><span class="nav-number">1.3.</span> <span class="nav-text">检查执行结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问dashboard"><span class="nav-number">1.4.</span> <span class="nav-text">访问dashboard</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用-http-NodeIP-nodePort-地址访问-dashboard"><span class="nav-number">1.4.1.</span> <span class="nav-text">使用 http://NodeIP:nodePort 地址访问 dashboard</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过-kubectl-proxy-访问-dashboard"><span class="nav-number">1.4.2.</span> <span class="nav-text">通过 kubectl proxy 访问 dashboard</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过-kube-apiserver-访问dashboard"><span class="nav-number">1.4.3.</span> <span class="nav-text">通过 kube-apiserver 访问dashboard</span></a></li></ol></li></ol></li></ol></div>
             
           </div>
         </section>

@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-15T06:51:32.000Z</updated>
+  <updated>2017-09-19T01:17:15.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,96 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Kubernetes1.6集群上(开启了TLS)安装Dashboard</title>
+    <link href="http://yoursite.com/2017/09/19/Kubernetes1-6%E9%9B%86%E7%BE%A4%E4%B8%8A-%E5%BC%80%E5%90%AF%E4%BA%86TLS-%E5%AE%89%E8%A3%85Dashboard/"/>
+    <id>http://yoursite.com/2017/09/19/Kubernetes1-6集群上-开启了TLS-安装Dashboard/</id>
+    <published>2017-09-19T01:14:24.000Z</published>
+    <updated>2017-09-19T01:17:15.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;配置和安装-dashboard&quot;&gt;&lt;a href=&quot;#配置和安装-dashboard&quot; class=&quot;headerlink&quot; title=&quot;配置和安装 dashboard&quot;&gt;&lt;/a&gt;配置和安装 dashboard&lt;/h2&gt;&lt;p&gt;这是接着上一篇《二进制方式部署Kubernetes 1.6.0集群(开启TLS)》写的。&lt;br&gt;Kubernetes Dashboard is a general purpose, web-based UI for Kubernetes clusters. It allows users to manage applications running in the cluster and troubleshoot them, as well as manage the cluster itself.&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;配置dashboard&quot;&gt;&lt;a href=&quot;#配置dashboard&quot; class=&quot;headerlink&quot; title=&quot;配置dashboard&quot;&gt;&lt;/a&gt;配置dashboard&lt;/h3&gt;&lt;p&gt;官方文件目录：&lt;a href=&quot;https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dashboard&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dashboard&lt;/a&gt;&lt;br&gt;我们使用的文件:&lt;br&gt;从 &lt;a href=&quot;https://github.com/rootsongjc/follow-me-install-kubernetes-cluster/tree/master/manifests/dashboard&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/rootsongjc/follow-me-install-kubernetes-cluster/tree/master/manifests/dashboard&lt;/a&gt; 下载3个文件下来，并上传到/opt/kube-dashboard/目录下。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 opt]# mkdir kube-dashboard
+[root@node1 opt]# cd kube-dashboard/
+[root@node1 kube-dashboard]# ls
+dashboard-controller.yaml  dashboard-rbac.yaml  dashboard-service.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;修改dashboard-controller.yaml文件，将里面的image改为：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;index.tenxcloud.com/jimmy/kubernetes-dashboard-amd64:v1.6.0
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;由于 kube-apiserver 启用了 RBAC 授权，而官方源码目录的 dashboard-controller.yaml 没有定义授权的 ServiceAccount，所以后续访问 kube-apiserver 的 API 时会被拒绝，web中提示：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Forbidden (403)
+
+User &amp;quot;system:serviceaccount:kube-system:default&amp;quot; cannot list jobs.batch in the namespace &amp;quot;default&amp;quot;. (get jobs.batch)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;因此，增加了一个dashboard-rbac.yaml文件，定义一个名为 dashboard 的 ServiceAccount，然后将它和 Cluster Role view 绑定。&lt;/p&gt;
+&lt;h3 id=&quot;执行所有定义的文件&quot;&gt;&lt;a href=&quot;#执行所有定义的文件&quot; class=&quot;headerlink&quot; title=&quot;执行所有定义的文件&quot;&gt;&lt;/a&gt;执行所有定义的文件&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# pwd
+/opt/kube-dashboard
+# ls
+dashboard-controller.yaml  dashboard-rbac.yaml  dashboard-service.yaml
+# kubectl create -f .
+deployment &amp;quot;kubernetes-dashboard&amp;quot; created
+serviceaccount &amp;quot;dashboard&amp;quot; created
+clusterrolebinding &amp;quot;dashboard&amp;quot; created
+service &amp;quot;kubernetes-dashboard&amp;quot; created
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;检查执行结果&quot;&gt;&lt;a href=&quot;#检查执行结果&quot; class=&quot;headerlink&quot; title=&quot;检查执行结果&quot;&gt;&lt;/a&gt;检查执行结果&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1.查看分配的 NodePort&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# kubectl get services kubernetes-dashboard -n kube-system
+NAME                   CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+kubernetes-dashboard   10.254.207.77   &amp;lt;nodes&amp;gt;       80:32281/TCP   41s
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;NodePort 32281映射到 dashboard pod 80端口；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;2.检查 controller&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# kubectl get deployment kubernetes-dashboard  -n kube-system
+NAME                   DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+kubernetes-dashboard   1         1         1            1           13m
+# kubectl get pods  -n kube-system | grep dashboard
+kubernetes-dashboard-2888692679-tv54g   1/1       Running   0          13m
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;访问dashboard&quot;&gt;&lt;a href=&quot;#访问dashboard&quot; class=&quot;headerlink&quot; title=&quot;访问dashboard&quot;&gt;&lt;/a&gt;访问dashboard&lt;/h3&gt;&lt;p&gt;有以下三种方式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;kubernetes-dashboard 服务暴露了 NodePort，可以使用 &lt;a href=&quot;http://NodeIP:nodePort&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://NodeIP:nodePort&lt;/a&gt; 地址访问 dashboard；&lt;/li&gt;
+&lt;li&gt;通过 kube-apiserver 访问 dashboard（https 6443端口和http 8080端口方式）；&lt;/li&gt;
+&lt;li&gt;通过 kubectl proxy 访问 dashboard&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;使用-http-NodeIP-nodePort-地址访问-dashboard&quot;&gt;&lt;a href=&quot;#使用-http-NodeIP-nodePort-地址访问-dashboard&quot; class=&quot;headerlink&quot; title=&quot;使用 http://NodeIP:nodePort 地址访问 dashboard&quot;&gt;&lt;/a&gt;使用 &lt;a href=&quot;http://NodeIP:nodePort&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://NodeIP:nodePort&lt;/a&gt; 地址访问 dashboard&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# kubectl get services kubernetes-dashboard -n kube-system
+NAME                   CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+kubernetes-dashboard   10.254.207.77   &amp;lt;nodes&amp;gt;       80:32281/TCP   41s
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后检查出这个pod是运行在集群中哪个服务器上的，我这里是检查是运行在node1节点上的，所以浏览器输入&lt;a href=&quot;http://172.16.7.151:32281/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.151:32281/&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/3.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h4 id=&quot;通过-kubectl-proxy-访问-dashboard&quot;&gt;&lt;a href=&quot;#通过-kubectl-proxy-访问-dashboard&quot; class=&quot;headerlink&quot; title=&quot;通过 kubectl proxy 访问 dashboard&quot;&gt;&lt;/a&gt;通过 kubectl proxy 访问 dashboard&lt;/h4&gt;&lt;p&gt;1.启动代理&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 kube-dashboard]# kubectl proxy --address=&amp;apos;172.16.7.151&amp;apos; --port=8086 --accept-hosts=&amp;apos;^*$&amp;apos;         
+Starting to serve on 172.16.7.151:8086
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;需要指定 –accept-hosts 选项，否则浏览器访问 dashboard 页面时提示 “Unauthorized”&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;2.访问&lt;br&gt;浏览器访问 URL：&lt;a href=&quot;http://172.16.7.151:8086/ui&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.151:8086/ui&lt;/a&gt; 自动跳转到：&lt;a href=&quot;http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard/#/workload?namespace=default&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard/#/workload?namespace=default&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/3.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h4 id=&quot;通过-kube-apiserver-访问dashboard&quot;&gt;&lt;a href=&quot;#通过-kube-apiserver-访问dashboard&quot; class=&quot;headerlink&quot; title=&quot;通过 kube-apiserver 访问dashboard&quot;&gt;&lt;/a&gt;通过 kube-apiserver 访问dashboard&lt;/h4&gt;&lt;p&gt;1.获取集群服务地址列表&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# kubectl cluster-info
+Kubernetes master is running at https://172.16.7.151:6443
+KubeDNS is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kube-dns
+kubernetes-dashboard is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard
+
+To further debug and diagnose cluster problems, use &amp;apos;kubectl cluster-info dump&amp;apos;.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.导入证书&lt;br&gt;将生成的admin.pem证书转换格式。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# cd /etc/kubernetes/ssl/
+[root@node1 ~]# openssl pkcs12 -export -in admin.pem  -out admin.p12 -inkey admin-key.pem
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;将生成的admin.p12证书导入的你的电脑，导出的时候记住你设置的密码，导入的时候还要用到。&lt;br&gt;如果你不想使用https的话，可以直接访问insecure port 8080端口:&lt;a href=&quot;http://172.16.7.151:8080/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.151:8080/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;由于缺少 Heapster 插件，当前 dashboard 不能展示 Pod、Nodes 的 CPU、内存等 metric 图形。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;配置和安装-dashboard&quot;&gt;&lt;a href=&quot;#配置和安装-dashboard&quot; class=&quot;headerlink&quot; title=&quot;配置和安装 dashboard&quot;&gt;&lt;/a&gt;配置和安装 dashboard&lt;/h2&gt;&lt;p&gt;这是接着上一篇《二进制方式部署Kubernetes 1.6.0集群(开启TLS)》写的。&lt;br&gt;Kubernetes Dashboard is a general purpose, web-based UI for Kubernetes clusters. It allows users to manage applications running in the cluster and troubleshoot them, as well as manage the cluster itself.&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Kubernetes" scheme="http://yoursite.com/categories/Kubernetes/"/>
+    
+    
+      <category term="容器编排 Docker Kubernetes" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8%E7%BC%96%E6%8E%92-Docker-Kubernetes/"/>
+    
+  </entry>
+  
+  <entry>
     <title>二进制方式部署Kubernetes 1.6.0集群(开启TLS)</title>
     <link href="http://yoursite.com/2017/09/15/%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%B9%E5%BC%8F%E9%83%A8%E7%BD%B2Kubernetes-1-6-0%E9%9B%86%E7%BE%A4-%E5%BC%80%E5%90%AFTLS/"/>
     <id>http://yoursite.com/2017/09/15/二进制方式部署Kubernetes-1-6-0集群-开启TLS/</id>
     <published>2017-09-15T06:06:09.000Z</published>
-    <updated>2017-09-15T06:51:32.000Z</updated>
+    <updated>2017-09-18T02:07:32.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Kubernetes简介&quot;&gt;&lt;a href=&quot;#Kubernetes简介&quot; class=&quot;headerlink&quot; title=&quot;Kubernetes简介&quot;&gt;&lt;/a&gt;Kubernetes简介&lt;/h2&gt;&lt;p&gt;Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本,主要功能包括:&lt;/p&gt;
 &lt;ul&gt;
@@ -402,7 +487,7 @@ Certificate:
 [root@node1 ssl]# scp -p *.pem root@172.16.7.152:/etc/kubernetes/ssl/
 [root@node1 ssl]# scp -p *.pem root@172.16.7.153:/etc/kubernetes/ssl/
 [root@node1 ssl]# scp -p *.pem root@172.16.206.32:/etc/kubernetes/ssl/
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;下载和配置-kubectl-命令行工具&quot;&gt;&lt;a href=&quot;#下载和配置-kubectl-命令行工具&quot; class=&quot;headerlink&quot; title=&quot;下载和配置 kubectl 命令行工具&quot;&gt;&lt;/a&gt;下载和配置 kubectl 命令行工具&lt;/h2&gt;&lt;h3 id=&quot;下载kubectl&quot;&gt;&lt;a href=&quot;#下载kubectl&quot; class=&quot;headerlink&quot; title=&quot;下载kubectl&quot;&gt;&lt;/a&gt;下载kubectl&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 local]# wget https://dl.k8s.io/v1.6.0/kubernetes-client-linux-amd64.tar.gz
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;下载和配置-kubectl-kubecontrol-命令行工具&quot;&gt;&lt;a href=&quot;#下载和配置-kubectl-kubecontrol-命令行工具&quot; class=&quot;headerlink&quot; title=&quot;下载和配置 kubectl(kubecontrol) 命令行工具&quot;&gt;&lt;/a&gt;下载和配置 kubectl(kubecontrol) 命令行工具&lt;/h2&gt;&lt;h3 id=&quot;下载kubectl&quot;&gt;&lt;a href=&quot;#下载kubectl&quot; class=&quot;headerlink&quot; title=&quot;下载kubectl&quot;&gt;&lt;/a&gt;下载kubectl&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 local]# wget https://dl.k8s.io/v1.6.0/kubernetes-client-linux-amd64.tar.gz
 [root@node1 local]# tar zxf kubernetes-client-linux-amd64.tar.gz
 [root@node1 local]# cp kubernetes/client/bin/kube* /usr/bin/
 [root@node1 local]# chmod +x /usr/bin/kube*
@@ -779,6 +864,8 @@ KUBE_API_ARGS=&amp;quot;--authorization-mode=RBAC --runtime-config=rbac.authoriz
 &lt;h4 id=&quot;启动kube-apiserver&quot;&gt;&lt;a href=&quot;#启动kube-apiserver&quot; class=&quot;headerlink&quot; title=&quot;启动kube-apiserver&quot;&gt;&lt;/a&gt;启动kube-apiserver&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# systemctl daemon-reload
 # systemctl enable kube-apiserver
 # systemctl start kube-apiserver
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动过程中可以观察日志：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# tail -f /var/log/message
 &lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置和启动-kube-controller-manager&quot;&gt;&lt;a href=&quot;#配置和启动-kube-controller-manager&quot; class=&quot;headerlink&quot; title=&quot;配置和启动 kube-controller-manager&quot;&gt;&lt;/a&gt;配置和启动 kube-controller-manager&lt;/h3&gt;&lt;h4 id=&quot;创建-kube-controller-manager-的service配置文件&quot;&gt;&lt;a href=&quot;#创建-kube-controller-manager-的service配置文件&quot; class=&quot;headerlink&quot; title=&quot;创建 kube-controller-manager 的service配置文件&quot;&gt;&lt;/a&gt;创建 kube-controller-manager 的service配置文件&lt;/h4&gt;&lt;p&gt;在/usr/lib/systemd/system/下创建kube-controller-manager.service，内容如下：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# pwd
 /usr/lib/systemd/system
@@ -1231,10 +1318,10 @@ deployment &amp;quot;nginx&amp;quot; deleted
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;但是这样存在几个问题：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;每次收到获取podIP太扯了，总不能每次都要手动改程序或者配置才能访问服务吧，要怎么提前知道podIP呢？&lt;/li&gt;
-&lt;li&gt;Pod在运行中可能会重建，IP变了怎么解？&lt;/li&gt;
+&lt;li&gt;Pod在运行中可能会重建，Pod的IP地址会随着Pod的重启而变化,并 不建议直接拿Pod的IP来交互&lt;/li&gt;
 &lt;li&gt;如何在多个Pod中实现负载均衡嘞？&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;使用k8s Service就可以解决。所以紧接着就创建了个service：&lt;/p&gt;
+&lt;p&gt;使用k8s Service就可以解决。Service为一组Pod(通过labels来选择)提供一个统一的入口,并为它们提供负载均衡 和自动服务发现。&lt;br&gt;所以紧接着就创建了个service：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# kubectl expose deployment nginx --type=NodePort --name=example-service
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;创建之后，仍需要获取Service的Cluster-IP，再结合Port访问Nginx服务。&lt;br&gt;获取IP：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# kubectl get service example-service
@@ -1242,7 +1329,7 @@ NAME              CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
 example-service   10.254.67.61   &amp;lt;nodes&amp;gt;       80:32201/TCP   1h
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在集群内访问Service：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# curl &amp;quot;10.254.67.61:80&amp;quot; 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;虽然Service解决了Pod的服务发现和负载均衡问题，但存在着类似的问题：不提前知道Service的IP，还是需要改程序或配置啊。kube-dns就是用来解决上面这个问题的。&lt;br&gt;kube-dns可以解决Service的发现问题，&lt;br&gt;k8s将Service的名称当做域名注册到kube-dns中，通过Service的名称就可以访问其提供的服务。也就是说其他应用能够直接使用服务的名字，不需要关心它实际的 ip 地址，中间的转换能够自动完成。名字和 ip 之间的转换就是 DNS 系统的功能。&lt;br&gt;kubu-dns 服务不是独立的系统服务，而是一种 addon ，作为插件来安装的，不是 kubernetes 集群必须的（但是非常推荐安装）。可以把它看做运行在集群上的应用，只不过这个应用比较特殊而已。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;而在cluster外面，则只能通过&lt;a href=&quot;http://node-ip:32201来访问。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://node-ip:32201来访问。&lt;/a&gt;&lt;br&gt;虽然Service解决了Pod的服务发现和负载均衡问题，但存在着类似的问题：不提前知道Service的IP，还是需要改程序或配置啊。kube-dns就是用来解决上面这个问题的。&lt;br&gt;kube-dns可以解决Service的发现问题，&lt;br&gt;k8s将Service的名称当做域名注册到kube-dns中，通过Service的名称就可以访问其提供的服务。也就是说其他应用能够直接使用服务的名字，不需要关心它实际的 ip 地址，中间的转换能够自动完成。名字和 ip 之间的转换就是 DNS 系统的功能。&lt;br&gt;kubu-dns 服务不是独立的系统服务，而是一种 addon ，作为插件来安装的，不是 kubernetes 集群必须的（但是非常推荐安装）。可以把它看做运行在集群上的应用，只不过这个应用比较特殊而已。&lt;/p&gt;
 &lt;h3 id=&quot;安装配置kube-dns&quot;&gt;&lt;a href=&quot;#安装配置kube-dns&quot; class=&quot;headerlink&quot; title=&quot;安装配置kube-dns&quot;&gt;&lt;/a&gt;安装配置kube-dns&lt;/h3&gt;&lt;p&gt;官方的yaml文件目录：&lt;a href=&quot;https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dns。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dns。&lt;/a&gt;&lt;br&gt;kube-dns 有两种配置方式，在 1.3 之前使用 etcd + kube2sky + skydns 的方式，在 1.3 之后可以使用 kubedns + dnsmasq 的方式。&lt;br&gt;该插件直接使用kubernetes部署，实际上kube-dns插件只是运行在kube-system命名空间下的Pod，完全可以手动创建它。官方的配置文件中包含以下镜像：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64:1.14.1
 gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.1
@@ -1314,7 +1401,8 @@ CONTAINER ID        IMAGE                                                       
 a455dc0a9b55        index.tenxcloud.com/jimmy/k8s-dns-dnsmasq-nanny-amd64@sha256:b253876345427dbd626b145897be51d87bfd535e2cd5d7d166deb97ea37701f8   &amp;quot;/dnsmasq-nanny -v=2 &amp;quot;   4 hours ago         Up 4 hours                              k8s_dnsmasq_kube-dns-351402727-6vnsj_kube-system_efb96c05-9928-11e7-9acc-005056b7609a_0
 7f18c10c8d60        index.tenxcloud.com/jimmy/k8s-dns-kube-dns-amd64@sha256:94426e872d1a4a0cf88e6c5cd928a1acbe1687871ae5fe91ed751593aa6052d3        &amp;quot;/kube-dns --domain=c&amp;quot;   4 hours ago         Up 4 hours                              k8s_kubedns_kube-dns-351402727-6vnsj_kube-system_efb96c05-9928-11e7-9acc-005056b7609a_0
 a6feb213296b        registry.access.redhat.com/rhel7/pod-infrastructure                                                                             &amp;quot;/usr/bin/pod&amp;quot;           4 hours ago         Up 4 hours                              k8s_POD_kube-dns-351402727-6vnsj_kube-system_efb96c05-9928-11e7-9acc-005056b7609a_0
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;检查-kube-dns-功能&quot;&gt;&lt;a href=&quot;#检查-kube-dns-功能&quot; class=&quot;headerlink&quot; title=&quot;检查 kube-dns 功能&quot;&gt;&lt;/a&gt;检查 kube-dns 功能&lt;/h3&gt;&lt;p&gt;新建一个 Deployment：&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;检查-kube-dns-功能&quot;&gt;&lt;a href=&quot;#检查-kube-dns-功能&quot; class=&quot;headerlink&quot; title=&quot;检查 kube-dns 功能&quot;&gt;&lt;/a&gt;检查 kube-dns 功能&lt;/h3&gt;&lt;p&gt;上面是通过 kubectl run 来启动了第一个Pod，但是并不支持所有的功能。使用kubectl run在设定很复杂的时候需要非常长的一条语句，敲半天也很容易出错，也没法保存，在碰到转义字符的时候也经常会很抓狂，所以更多场景下会使用yaml或者json文件，而使用kubectl create或者delete就可以利用这些yaml文件。通过 kubectl create -f file.yaml 来创建资源。kubectl run 并不是直接创建一个Pod，而是先创建一个Deployment资源 (replicas=1)，再由Deployment来自动创建Pod。&lt;/p&gt;
+&lt;p&gt;新建一个 Deployment：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 kube-dns]# vim my-nginx.yaml
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -1363,7 +1451,7 @@ options ndots:5
 root@nginx:/# ping my-nginx
 root@nginx:/# ping kubernetes
 root@nginx:/# ping kube-dns.kube-system.svc.cluster.local
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;从结果来看，service名称可以正常解析。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;从结果来看，service名称可以正常解析。&lt;br&gt;使用kubernetes的时候建议不要再用docker命令操作。&lt;/p&gt;
 </content>
     
     <summary type="html">
@@ -4258,112 +4346,6 @@ echo &amp;quot;hello world&amp;quot; &amp;gt;/tmp/nba.txt
 &lt;li&gt;-f forks：启动的并发线程数，就是一次并行处理多少主机；&lt;/li&gt;
 &lt;li&gt;-m module_name：要使用的模块；&lt;/li&gt;
 &lt;li&gt;-a args：模块特有的参数。
-    
-    </summary>
-    
-      <category term="运维自动化" scheme="http://yoursite.com/categories/%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
-    
-    
-      <category term="Ansible 运维自动化" scheme="http://yoursite.com/tags/Ansible-%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Ansible介绍及安装部署</title>
-    <link href="http://yoursite.com/2017/07/05/Ansible%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
-    <id>http://yoursite.com/2017/07/05/Ansible介绍及安装部署/</id>
-    <published>2017-07-05T07:33:54.000Z</published>
-    <updated>2017-07-07T01:17:11.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;运维工具&quot;&gt;&lt;a href=&quot;#运维工具&quot; class=&quot;headerlink&quot; title=&quot;运维工具&quot;&gt;&lt;/a&gt;运维工具&lt;/h2&gt;&lt;p&gt;作为一个Linux运维人员，需要了解大量的运维工具，并熟知这些工具的差异，能够熟练运用这些工具去解决一些手动重复的劳动，一方面是避免人工操作失误，另一方面也可以提高工作效率。同时还能将自己从这些重复的工作中解放出来，以便研究更新和更深的技术。&lt;br&gt;运维工具大体上可以分为3类：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;OS Provisioning：提供操作系统安装的。PXE，Cobbler(repository,distritution,profile)。&lt;/li&gt;
-&lt;li&gt;OS Config：cfengine、puppet、saltstack、chef、func、Task Excute工具(fabric、func、saltstack)&lt;/li&gt;
-&lt;li&gt;Deployment：capistranoc、fabric&lt;br&gt;而Ansible是一款较新的工具，可以实现OS Config、Task Excute和Deployment。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-运维工具实现远程管理的两种方式：&lt;br&gt;1.有agent：puppet、saltstack、func&lt;br&gt;2.agentless：ansible、fabric&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;Ansible特性&quot;&gt;&lt;a href=&quot;#Ansible特性&quot; class=&quot;headerlink&quot; title=&quot;Ansible特性&quot;&gt;&lt;/a&gt;Ansible特性&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;学习曲线平缓；&lt;/li&gt;
-&lt;li&gt;不需要agent；&lt;/li&gt;
-&lt;li&gt;没有有线状态图，没有次序，我们自己定义动作间的依赖关系就行，任何一个任务出错会很快出错，你可以立即进行修改；&lt;/li&gt;
-&lt;li&gt;没有代理；&lt;/li&gt;
-&lt;li&gt;没有服务端；&lt;/li&gt;
-&lt;li&gt;依赖ssh来工作，无需ssl，也就无需证书等功能；&lt;/li&gt;
-&lt;li&gt;模块可以使用任何编程语言来编写，包括shell脚本；&lt;/li&gt;
-&lt;li&gt;默认使用ssh工作；&lt;/li&gt;
-&lt;li&gt;支持多级的解决方案。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;Ansible架构图和核心组件&quot;&gt;&lt;a href=&quot;#Ansible架构图和核心组件&quot; class=&quot;headerlink&quot; title=&quot;Ansible架构图和核心组件&quot;&gt;&lt;/a&gt;Ansible架构图和核心组件&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;架构图：&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;ansible是Python编写的，Python有一个模块叫paramiko，paramiko组件能够实现并行地基于ssh协议远程连接至各主机的库。ansible就是用了paramiko。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;核心组件：&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;ansible core：ansible核心。&lt;/li&gt;
-&lt;li&gt;host inventory：主机池，或叫主机列表，主机归档文件。&lt;/li&gt;
-&lt;li&gt;core modules：ansible核心模块。&lt;/li&gt;
-&lt;li&gt;custom modules：用户可以自定义模块&lt;/li&gt;
-&lt;li&gt;playbook：将多个任务写在一个yaml格式的配置文件中。支持使用Python的jinjia2来定义模板。同一个playbook应用带同一台主机上，无论你应用多少次，他们的结果都是相等的，不会重复执行。这种特性我们称为幂等性。&lt;/li&gt;
-&lt;li&gt;connect plugins：连接插件&lt;/li&gt;
-&lt;li&gt;plugins：其他的一些插件，比如email、logging等等。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;安装Ansible&quot;&gt;&lt;a href=&quot;#安装Ansible&quot; class=&quot;headerlink&quot; title=&quot;安装Ansible&quot;&gt;&lt;/a&gt;安装Ansible&lt;/h2&gt;&lt;p&gt;可以选择源码编译安装或者yum安装。ansible的rpm包在epel源中，事先安装好epel源。我这里实验环境是CentOS 7。&lt;br&gt;安装：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# yum install ansible -y
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看安装的rpm包里有哪些文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# rpm -ql ansible | more
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;ansible配置文件：/etc/ansible/ansible.cfg&lt;br&gt;inventory文件：/etc/ansible/hosts&lt;/p&gt;
-&lt;h2 id=&quot;演示使用示例&quot;&gt;&lt;a href=&quot;#演示使用示例&quot; class=&quot;headerlink&quot; title=&quot;演示使用示例&quot;&gt;&lt;/a&gt;演示使用示例&lt;/h2&gt;&lt;h3 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h3&gt;&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;主机名&lt;/th&gt;
-&lt;th&gt;操作系统版本&lt;/th&gt;
-&lt;th&gt;IP地址&lt;/th&gt;
-&lt;th&gt;安装软件&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;node1&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;172.16.7.151&lt;/td&gt;
-&lt;td&gt;ansible-noarh-2.2.0.0-4.el7&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;node2&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;172.16.7.152&lt;/td&gt;
-&lt;td&gt;无&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;node3&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;172.16.7.153&lt;/td&gt;
-&lt;td&gt;无&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id=&quot;配置Ansible主机登录其他主机使用密钥登录&quot;&gt;&lt;a href=&quot;#配置Ansible主机登录其他主机使用密钥登录&quot; class=&quot;headerlink&quot; title=&quot;配置Ansible主机登录其他主机使用密钥登录&quot;&gt;&lt;/a&gt;配置Ansible主机登录其他主机使用密钥登录&lt;/h3&gt;&lt;p&gt;由于Ansible默认使用ssh管理主机，所以首先需要配置Ansible所在主机登录其他被管理主机不需要输入密码。在node1主机上执行如下命令：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ssh-keygen -t rsa -P &amp;apos;&amp;apos;
-[root@node1 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@172.16.7.151
-[root@node1 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@172.16.7.152
-[root@node1 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@172.16.7.153
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;定义主机&quot;&gt;&lt;a href=&quot;#定义主机&quot; class=&quot;headerlink&quot; title=&quot;定义主机&quot;&gt;&lt;/a&gt;定义主机&lt;/h3&gt;&lt;p&gt;每一个主机可以使用主机名，也可以使用ip地址。也可以把多个主机定义到一个组里。比如：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim /etc/ansible/hosts
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/3.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;使用模块&quot;&gt;&lt;a href=&quot;#使用模块&quot; class=&quot;headerlink&quot; title=&quot;使用模块&quot;&gt;&lt;/a&gt;使用模块&lt;/h3&gt;&lt;p&gt;Ansible是依赖模块进行工作的，里面有大量的模块帮助我们去完成任务。比如使用command模块：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible 172.16.7.152 -m command -a &amp;quot;date&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;如上，在执行任务时，可以指定IP，也可以指定组名，ansible有个默认的组叫all，代表/etc/ansible/hosts文件里的所有主机。&lt;/p&gt;
-&lt;p&gt;列出当前主机可以使用的ansible模块：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-doc -l
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;常用的模块有：user、yum、copy、command等。如果想知道某个模块怎么使用的，比如想知道yum怎么用：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-doc -s yum
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/6.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;运维工具&quot;&gt;&lt;a href=&quot;#运维工具&quot; class=&quot;headerlink&quot; title=&quot;运维工具&quot;&gt;&lt;/a&gt;运维工具&lt;/h2&gt;&lt;p&gt;作为一个Linux运维人员，需要了解大量的运维工具，并熟知这些工具的差异，能够熟练运用这些工具去解决一些手动重复的劳动，一方面是避免人工操作失误，另一方面也可以提高工作效率。同时还能将自己从这些重复的工作中解放出来，以便研究更新和更深的技术。&lt;br&gt;运维工具大体上可以分为3类：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;OS Provisioning：提供操作系统安装的。PXE，Cobbler(repository,distritution,profile)。&lt;/li&gt;
-&lt;li&gt;OS Config：cfengine、puppet、saltstack、chef、func、Task Excute工具(fabric、func、saltstack)&lt;/li&gt;
-&lt;li&gt;Deployment：capistranoc、fabric&lt;br&gt;而Ansible是一款较新的工具，可以实现OS Config、Task Excute和Deployment。
     
     </summary>
     
