@@ -104,13 +104,13 @@
 
 
 
-<meta name="description" content="Kubernetes 监控方案可选的方案：  Heapster + InfluxDB + Grafana Prometheus + Grafana Cadvisor + InfluxDB + Grafana  本篇文章介绍的是Heapster + InfluxDB + Grafana，kubernetes集群（1.6.0）搭建见前面的文章。 Heapster、InfluxDB和Grafana介绍开">
+<meta name="description" content="Kubernetes 监控方案可选的方案：  Heapster + InfluxDB + Grafana Prometheus + Grafana Cadvisor + InfluxDB + Grafana  本篇文章介绍的是Heapster + InfluxDB + Grafana，kubernetes集群（1.6.0）搭建见前面的文章。">
 <meta name="keywords" content="容器编排 Docker Kubernetes">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kubernetes监控:部署Heapster、InfluxDB和Grafana">
 <meta property="og:url" content="http://yoursite.com/2017/09/21/Kubernetes监控-部署Heapster、InfluxDB和Grafana/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="Kubernetes 监控方案可选的方案：  Heapster + InfluxDB + Grafana Prometheus + Grafana Cadvisor + InfluxDB + Grafana  本篇文章介绍的是Heapster + InfluxDB + Grafana，kubernetes集群（1.6.0）搭建见前面的文章。 Heapster、InfluxDB和Grafana介绍开">
+<meta property="og:description" content="Kubernetes 监控方案可选的方案：  Heapster + InfluxDB + Grafana Prometheus + Grafana Cadvisor + InfluxDB + Grafana  本篇文章介绍的是Heapster + InfluxDB + Grafana，kubernetes集群（1.6.0）搭建见前面的文章。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/4.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/5.png">
@@ -121,10 +121,10 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/7.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/8.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/9.png">
-<meta property="og:updated_time" content="2017-09-21T05:45:38.000Z">
+<meta property="og:updated_time" content="2017-09-21T05:48:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kubernetes监控:部署Heapster、InfluxDB和Grafana">
-<meta name="twitter:description" content="Kubernetes 监控方案可选的方案：  Heapster + InfluxDB + Grafana Prometheus + Grafana Cadvisor + InfluxDB + Grafana  本篇文章介绍的是Heapster + InfluxDB + Grafana，kubernetes集群（1.6.0）搭建见前面的文章。 Heapster、InfluxDB和Grafana介绍开">
+<meta name="twitter:description" content="Kubernetes 监控方案可选的方案：  Heapster + InfluxDB + Grafana Prometheus + Grafana Cadvisor + InfluxDB + Grafana  本篇文章介绍的是Heapster + InfluxDB + Grafana，kubernetes集群（1.6.0）搭建见前面的文章。">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/4.png">
 
 
@@ -351,7 +351,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-09-21T13:45:38+08:00" content="2017-09-21">
+              <time itemprop="dateUpdated" datetime="2017-09-21T13:48:24+08:00" content="2017-09-21">
               2017-09-21
               </time>
               </span>
@@ -417,7 +417,7 @@
 <li>Prometheus + Grafana</li>
 <li>Cadvisor + InfluxDB + Grafana</li>
 </ul>
-<p>本篇文章介绍的是Heapster + InfluxDB + Grafana，kubernetes集群（1.6.0）搭建见前面的文章。</p>
+<p>本篇文章介绍的是Heapster + InfluxDB + Grafana，kubernetes集群（1.6.0）搭建见前面的文章。<br><a id="more"></a></p>
 <h2 id="Heapster、InfluxDB和Grafana介绍"><a href="#Heapster、InfluxDB和Grafana介绍" class="headerlink" title="Heapster、InfluxDB和Grafana介绍"></a>Heapster、InfluxDB和Grafana介绍</h2><p>开源软件cAdvisor（Container cAdvisor）是用于监控容器运行状态的利器之一（cAdvisor项目的主页为<a href="https://github.com/cAdvisor），它被用于多个与Docker相关的开源项目中。" target="_blank" rel="external">https://github.com/cAdvisor），它被用于多个与Docker相关的开源项目中。</a><br>在kubernetes系统中，cAdvisor已经被默认集成到了kubelet组件内，当kubelet服务启动时，它会自动启动cAdvisor服务，然后cAdvisor会实时采集所在节点的性能指标及节点上运行的容器的性能指标。kubelet的启动参数–cadvisor-port可自定义cAdvisor对外提供服务的端口号，默认是4194。<br>cAdvisor提供了web页面可供浏览器访问，例如本kubernetes集群中的一个Node的ip是172.16.7.151，那么浏览器输入<a href="http://172.16.7.151:4194可以访问cAdvisor的监控页面。cAdvisor主页显示了主机的实时运行状态，包括CPU使用情况、内存使用情况、网络吞吐量及文件系统使用情况等信息。" target="_blank" rel="external">http://172.16.7.151:4194可以访问cAdvisor的监控页面。cAdvisor主页显示了主机的实时运行状态，包括CPU使用情况、内存使用情况、网络吞吐量及文件系统使用情况等信息。</a><br>但是cAdvisor只提供了单机的容器资源占用情况，而在大规模容器集群中，需要对所有的Node和全部容器进行性能监控。这就需要一套工具来实现集群性能数据的采集、存储和展示：Heapster、InfluxDB和Grafana。<br>Heapster提供了整个集群的资源监控，并支持持久化数据存储到InfluxDB、Google Cloud Monitoring或者其他的存储后端。Heapster从kubelet提供的API采集节点和容器的资源占用。另外，Heapster的 /metrics API提供了Prometheus格式的数据。<br>InfluxDB是一个开源分布式时序、事件和指标数据库；而Grafana则是InfluxDB的 dashboard，提供了强大的图表展示功能。它们常被组合使用展示图表化的监控数据。<br>Heapster、InfluxDB和Grafana均以Pod的形式启动和运行，其中Heapster需要与Kubernetes Master进行安全连接。</p>
 <h2 id="下载安装Heapster"><a href="#下载安装Heapster" class="headerlink" title="下载安装Heapster"></a>下载安装Heapster</h2><p>到<a href="https://github.com/kubernetes/heapster/releases" target="_blank" rel="external">heapster release 页面</a>下载heapster。</p>
 <pre><code>[root@node1 opt]# wget https://github.com/kubernetes/heapster/archive/v1.3.0.zip
