@@ -114,7 +114,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/1.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/2.png">
-<meta property="og:updated_time" content="2017-09-18T02:07:32.000Z">
+<meta property="og:updated_time" content="2017-09-21T01:48:27.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="二进制方式部署Kubernetes 1.6.0集群(开启TLS)">
 <meta name="twitter:description" content="Kubernetes简介Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本,主要功能包括:  基于容器的应用部署、维护和滚动升级 负载均衡和服务发现 跨机器和跨地区的集群调度">
@@ -344,8 +344,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-09-18T10:07:32+08:00" content="2017-09-18">
-              2017-09-18
+              <time itemprop="dateUpdated" datetime="2017-09-21T09:48:27+08:00" content="2017-09-21">
+              2017-09-21
               </time>
               </span>
             
@@ -1719,35 +1719,44 @@ spec:
         - containerPort: 80
 # kubectl create -f my-nginx.yaml
 deployment &quot;my-nginx&quot; created
-</code></pre><p>Export 该 Deployment,生成 my-nginx 服务:</p>
+</code></pre><p>Export 该 Deployment，生成 my-nginx 服务:</p>
 <pre><code># kubectl expose deploy my-nginx 
 service &quot;my-nginx&quot; exposed
 # kubectl get services --all-namespaces |grep my-nginx
 default       my-nginx          10.254.34.181   &lt;none&gt;        80/TCP          26s
 </code></pre><p>创建另一个 Pod，查看 /etc/resolv.conf 是否包含 kubelet 配置的 –cluster-dns 和 –cluster-domain，是否能够将服务my-nginx 解析到 Cluster IP 10.254.34.181。</p>
-<pre><code>[root@node1 kube-dns]# vim nginx-pod.yaml 
+<pre><code>[root@node1 kube-dns]# vim dns-test-busybox.yaml
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx
+  name: busybox
   namespace: default
 spec:
   containers:
-  - name: nginx
-    image: docker.io/nginx:latest
-    ports:
-    - containerPort: 80
-[root@node1 kube-dns]# kubectl create -f nginx-pod.yaml
-pod &quot;nginx&quot; created
-[root@node1 kube-dns]# kubectl exec nginx -i -t -- /bin/bash
-root@nginx:/# cat /etc/resolv.conf                                                                                                          
-nameserver 10.254.0.2
-search default.svc.cluster.local. svc.cluster.local. cluster.local.
-options ndots:5
+  - image: busybox
+    command:
+      - sleep
+      - &quot;3600&quot;
+    imagePullPolicy: IfNotPresent
+    name: busybox
+  restartPolicy: Always
+[root@node1 kube-dns]# kubectl create -f dns-test-busybox.yaml
+pod &quot;busybox&quot; created
+[root@node1 kube-dns]# kubectl exec -ti busybox -- nslookup kubernetes.default
+Server:    10.254.0.2
+Address 1: 10.254.0.2 kube-dns.kube-system.svc.cluster.local
 
-root@nginx:/# ping my-nginx
-root@nginx:/# ping kubernetes
-root@nginx:/# ping kube-dns.kube-system.svc.cluster.local
+Name:      kubernetes.default
+Address 1: 10.254.0.1 kubernetes.default.svc.cluster.local
+
+kubectl exec -ti busybox -- ping my-nginx
+PING my-nginx (10.254.34.181): 56 data bytes
+
+kubectl exec -ti busybox -- ping kubernetes
+PING kubernetes (10.254.0.1): 56 data bytes
+
+kubectl exec -ti busybox -- ping kube-dns.kube-system.svc.cluster.local
+PING kube-dns.kube-system.svc.cluster.local (10.254.0.2): 56 data bytes
 </code></pre><p>从结果来看，service名称可以正常解析。<br>使用kubernetes的时候建议不要再用docker命令操作。</p>
 
       

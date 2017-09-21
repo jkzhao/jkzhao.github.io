@@ -120,7 +120,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/5.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/6.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/7.png">
-<meta property="og:updated_time" content="2017-08-11T00:58:34.000Z">
+<meta property="og:updated_time" content="2017-09-20T12:39:19.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark介绍及安装部署">
 <meta name="twitter:description" content="Spark介绍Apache SparkApache Spark是一个围绕速度、易用性和复杂分析构建的大数据处理框架(没有数据存储)。最初在2009年由加州大学伯克利分校的AMPLab开发，并于2010年成为Apache的开源项目之一。">
@@ -350,8 +350,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-08-11T08:58:34+08:00" content="2017-08-11">
-              2017-08-11
+              <time itemprop="dateUpdated" datetime="2017-09-20T20:39:19+08:00" content="2017-09-20">
+              2017-09-20
               </time>
               </span>
             
@@ -440,7 +440,12 @@
 <li><strong>计算引擎：</strong>计算引擎由SparkContent中的DAGScheduler、RDD以及具体节点上的Executor负责执行的Map和Reduce任务组成。</li>
 <li><strong>部署模式：</strong>由于单节点不足以提供足够的存储和计算能力，所以作为大数据处理的Spark在SparkContext的TaskScheduler组件中提供了对Standalone部署模式的实现和Yarn、Mesos等分布式资源管理系统的支持。通过使用Standallone、Yarn、Mesos等部署模式为Task分配计算资源，提高任务的并发执行效率。除了可用于实际生产环境的Standalone、Yarn、Mesos等部署模式外，Spark还提供了Local模式和local-cluster模式便于开发和调试。</li>
 </ul>
-<h4 id="Spark扩展功能"><a href="#Spark扩展功能" class="headerlink" title="Spark扩展功能"></a>Spark扩展功能</h4><p>Spark SQL<br>Spark Streaming<br>GraphX<br>MLlib</p>
+<h4 id="Spark扩展功能"><a href="#Spark扩展功能" class="headerlink" title="Spark扩展功能"></a>Spark扩展功能</h4><ul>
+<li>Spark SQL</li>
+<li>Spark Streaming</li>
+<li>GraphX</li>
+<li>MLlib</li>
+</ul>
 <h3 id="Spark部署架构"><a href="#Spark部署架构" class="headerlink" title="Spark部署架构"></a>Spark部署架构</h3><h4 id="集群架构"><a href="#集群架构" class="headerlink" title="集群架构"></a>集群架构</h4><p>从集群部署的角度看，Spark集群由以下部分组成：</p>
 <ul>
 <li><strong>Cluster Manager：</strong>Spark的集群管理器，主要负责资源的分配与管理。集群管理器分配的资源属于一级分配，它将各个Worker上内存、CPU等资源分配给应用程序，但是并不负责对Executor的资源分配。目前Standalone、YARN、Mesos、EC2等都可以作为Spark的集群管理器。</li>
@@ -622,8 +627,9 @@ export SPARK_WORKER_MEMORY=4G
 <li>sbin/start-all.sh：启动上面描述的master和salve.</li>
 <li>sbin/stop-master.sh：停止bin/start-master.sh 脚本启动的master.</li>
 <li>sbin/stop-slaves.sh：停止conf/slaves 文件中配置的slave.</li>
-<li>sbin/stop-all.sh：停止上面描述的master和slave.<br><strong>【注意】:这些脚本必须在你想运行的master机器上执行，而不是你的本地机。</strong></li>
+<li>sbin/stop-all.sh：停止上面描述的master和slave.</li>
 </ul>
+<p><strong>【注意】:这些脚本必须在你想运行的master机器上执行，而不是你的本地机。</strong></p>
 <p>将master上配置好的spark通过scp复制到其他各个节点上（注意其他节点上的profile文件也要一致）</p>
 <pre><code>[root@spark17 ~]# scp -r /usr/local/spark-1.6.1 root@spark31:/usr/local/
 [root@spark17 ~]# scp -r /usr/local/spark-1.6.1 root@spark32:/usr/local/

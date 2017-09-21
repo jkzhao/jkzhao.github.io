@@ -105,7 +105,7 @@ To further debug and diagnose cluster problems, use &amp;apos;kubectl cluster-in
     <link href="http://yoursite.com/2017/09/15/%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%B9%E5%BC%8F%E9%83%A8%E7%BD%B2Kubernetes-1-6-0%E9%9B%86%E7%BE%A4-%E5%BC%80%E5%90%AFTLS/"/>
     <id>http://yoursite.com/2017/09/15/二进制方式部署Kubernetes-1-6-0集群-开启TLS/</id>
     <published>2017-09-15T06:06:09.000Z</published>
-    <updated>2017-09-18T02:07:32.000Z</updated>
+    <updated>2017-09-21T01:48:27.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Kubernetes简介&quot;&gt;&lt;a href=&quot;#Kubernetes简介&quot; class=&quot;headerlink&quot; title=&quot;Kubernetes简介&quot;&gt;&lt;/a&gt;Kubernetes简介&lt;/h2&gt;&lt;p&gt;Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本,主要功能包括:&lt;/p&gt;
 &lt;ul&gt;
@@ -1422,35 +1422,44 @@ spec:
         - containerPort: 80
 # kubectl create -f my-nginx.yaml
 deployment &amp;quot;my-nginx&amp;quot; created
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Export 该 Deployment,生成 my-nginx 服务:&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Export 该 Deployment，生成 my-nginx 服务:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# kubectl expose deploy my-nginx 
 service &amp;quot;my-nginx&amp;quot; exposed
 # kubectl get services --all-namespaces |grep my-nginx
 default       my-nginx          10.254.34.181   &amp;lt;none&amp;gt;        80/TCP          26s
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;创建另一个 Pod，查看 /etc/resolv.conf 是否包含 kubelet 配置的 –cluster-dns 和 –cluster-domain，是否能够将服务my-nginx 解析到 Cluster IP 10.254.34.181。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 kube-dns]# vim nginx-pod.yaml 
+&lt;pre&gt;&lt;code&gt;[root@node1 kube-dns]# vim dns-test-busybox.yaml
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx
+  name: busybox
   namespace: default
 spec:
   containers:
-  - name: nginx
-    image: docker.io/nginx:latest
-    ports:
-    - containerPort: 80
-[root@node1 kube-dns]# kubectl create -f nginx-pod.yaml
-pod &amp;quot;nginx&amp;quot; created
-[root@node1 kube-dns]# kubectl exec nginx -i -t -- /bin/bash
-root@nginx:/# cat /etc/resolv.conf                                                                                                          
-nameserver 10.254.0.2
-search default.svc.cluster.local. svc.cluster.local. cluster.local.
-options ndots:5
+  - image: busybox
+    command:
+      - sleep
+      - &amp;quot;3600&amp;quot;
+    imagePullPolicy: IfNotPresent
+    name: busybox
+  restartPolicy: Always
+[root@node1 kube-dns]# kubectl create -f dns-test-busybox.yaml
+pod &amp;quot;busybox&amp;quot; created
+[root@node1 kube-dns]# kubectl exec -ti busybox -- nslookup kubernetes.default
+Server:    10.254.0.2
+Address 1: 10.254.0.2 kube-dns.kube-system.svc.cluster.local
 
-root@nginx:/# ping my-nginx
-root@nginx:/# ping kubernetes
-root@nginx:/# ping kube-dns.kube-system.svc.cluster.local
+Name:      kubernetes.default
+Address 1: 10.254.0.1 kubernetes.default.svc.cluster.local
+
+kubectl exec -ti busybox -- ping my-nginx
+PING my-nginx (10.254.34.181): 56 data bytes
+
+kubectl exec -ti busybox -- ping kubernetes
+PING kubernetes (10.254.0.1): 56 data bytes
+
+kubectl exec -ti busybox -- ping kube-dns.kube-system.svc.cluster.local
+PING kube-dns.kube-system.svc.cluster.local (10.254.0.2): 56 data bytes
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;从结果来看，service名称可以正常解析。&lt;br&gt;使用kubernetes的时候建议不要再用docker命令操作。&lt;/p&gt;
 </content>
     
@@ -2774,7 +2783,7 @@ Hello world
     <link href="http://yoursite.com/2017/08/11/Spark%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2017/08/11/Spark介绍及安装部署/</id>
     <published>2017-08-11T00:11:26.000Z</published>
-    <updated>2017-08-11T00:58:34.000Z</updated>
+    <updated>2017-09-20T12:39:19.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Spark介绍&quot;&gt;&lt;a href=&quot;#Spark介绍&quot; class=&quot;headerlink&quot; title=&quot;Spark介绍&quot;&gt;&lt;/a&gt;Spark介绍&lt;/h2&gt;&lt;h3 id=&quot;Apache-Spark&quot;&gt;&lt;a href=&quot;#Apache-Spark&quot; class=&quot;headerlink&quot; title=&quot;Apache Spark&quot;&gt;&lt;/a&gt;Apache Spark&lt;/h3&gt;&lt;p&gt;Apache Spark是一个围绕速度、易用性和复杂分析构建的大数据处理框架(没有数据存储)。最初在2009年由加州大学伯克利分校的AMPLab开发，并于2010年成为Apache的开源项目之一。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;Hadoop和Spark&quot;&gt;&lt;a href=&quot;#Hadoop和Spark&quot; class=&quot;headerlink&quot; title=&quot;Hadoop和Spark&quot;&gt;&lt;/a&gt;Hadoop和Spark&lt;/h3&gt;&lt;p&gt;Hadoop常用于解决高吞吐、批量处理的业务场景，例如离线计算结果用于浏览量统计。如果需要实时查看浏览量统计信息，Hadoop显然不符合这样的要求。Spark通过内存计算能力极大地提高了大数据处理速度，满足了以上场景的需要。&lt;br&gt;与Hadoop和Storm等其他大数据和MapReduce技术相比，Spark有以下特点：&lt;br&gt;&lt;strong&gt;1.快速处理能力&lt;/strong&gt;&lt;br&gt;随着实时大数据应用越来越多，Hadoop作为离线的高吞吐、低响应框架已不能满足这类需求。Hadoop MapReduce的Job将中间输出和结果存储在HDFS中，读写HDFS造成磁盘I/O称为瓶颈。Spark允许将中间输出和结果存储在内存中，避免了大量的磁盘I/O。同时Spark自身的DAG执行引擎也支持数据在内存中的计算。Spark官网声称性能比Hadoop快100倍，如图所示。即便是内存不足，需要磁盘I/O，其速度也是Hadoop的10倍以上。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
@@ -2806,7 +2815,12 @@ Hello world
 &lt;li&gt;&lt;strong&gt;计算引擎：&lt;/strong&gt;计算引擎由SparkContent中的DAGScheduler、RDD以及具体节点上的Executor负责执行的Map和Reduce任务组成。&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;部署模式：&lt;/strong&gt;由于单节点不足以提供足够的存储和计算能力，所以作为大数据处理的Spark在SparkContext的TaskScheduler组件中提供了对Standalone部署模式的实现和Yarn、Mesos等分布式资源管理系统的支持。通过使用Standallone、Yarn、Mesos等部署模式为Task分配计算资源，提高任务的并发执行效率。除了可用于实际生产环境的Standalone、Yarn、Mesos等部署模式外，Spark还提供了Local模式和local-cluster模式便于开发和调试。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h4 id=&quot;Spark扩展功能&quot;&gt;&lt;a href=&quot;#Spark扩展功能&quot; class=&quot;headerlink&quot; title=&quot;Spark扩展功能&quot;&gt;&lt;/a&gt;Spark扩展功能&lt;/h4&gt;&lt;p&gt;Spark SQL&lt;br&gt;Spark Streaming&lt;br&gt;GraphX&lt;br&gt;MLlib&lt;/p&gt;
+&lt;h4 id=&quot;Spark扩展功能&quot;&gt;&lt;a href=&quot;#Spark扩展功能&quot; class=&quot;headerlink&quot; title=&quot;Spark扩展功能&quot;&gt;&lt;/a&gt;Spark扩展功能&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Spark SQL&lt;/li&gt;
+&lt;li&gt;Spark Streaming&lt;/li&gt;
+&lt;li&gt;GraphX&lt;/li&gt;
+&lt;li&gt;MLlib&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h3 id=&quot;Spark部署架构&quot;&gt;&lt;a href=&quot;#Spark部署架构&quot; class=&quot;headerlink&quot; title=&quot;Spark部署架构&quot;&gt;&lt;/a&gt;Spark部署架构&lt;/h3&gt;&lt;h4 id=&quot;集群架构&quot;&gt;&lt;a href=&quot;#集群架构&quot; class=&quot;headerlink&quot; title=&quot;集群架构&quot;&gt;&lt;/a&gt;集群架构&lt;/h4&gt;&lt;p&gt;从集群部署的角度看，Spark集群由以下部分组成：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;Cluster Manager：&lt;/strong&gt;Spark的集群管理器，主要负责资源的分配与管理。集群管理器分配的资源属于一级分配，它将各个Worker上内存、CPU等资源分配给应用程序，但是并不负责对Executor的资源分配。目前Standalone、YARN、Mesos、EC2等都可以作为Spark的集群管理器。&lt;/li&gt;
@@ -2988,8 +3002,9 @@ export SPARK_WORKER_MEMORY=4G
 &lt;li&gt;sbin/start-all.sh：启动上面描述的master和salve.&lt;/li&gt;
 &lt;li&gt;sbin/stop-master.sh：停止bin/start-master.sh 脚本启动的master.&lt;/li&gt;
 &lt;li&gt;sbin/stop-slaves.sh：停止conf/slaves 文件中配置的slave.&lt;/li&gt;
-&lt;li&gt;sbin/stop-all.sh：停止上面描述的master和slave.&lt;br&gt;&lt;strong&gt;【注意】:这些脚本必须在你想运行的master机器上执行，而不是你的本地机。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;sbin/stop-all.sh：停止上面描述的master和slave.&lt;/li&gt;
 &lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;【注意】:这些脚本必须在你想运行的master机器上执行，而不是你的本地机。&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;将master上配置好的spark通过scp复制到其他各个节点上（注意其他节点上的profile文件也要一致）&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@spark17 ~]# scp -r /usr/local/spark-1.6.1 root@spark31:/usr/local/
 [root@spark17 ~]# scp -r /usr/local/spark-1.6.1 root@spark32:/usr/local/
