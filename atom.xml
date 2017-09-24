@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-21T05:48:24.000Z</updated>
+  <updated>2017-09-24T09:01:33.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,66 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Kubernetes Ingress实战</title>
+    <link href="http://yoursite.com/2017/09/24/Kubernetes-Ingress%E5%AE%9E%E6%88%98/"/>
+    <id>http://yoursite.com/2017/09/24/Kubernetes-Ingress实战/</id>
+    <published>2017-09-24T08:57:22.000Z</published>
+    <updated>2017-09-24T09:01:33.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;服务发现与负载均衡&quot;&gt;&lt;a href=&quot;#服务发现与负载均衡&quot; class=&quot;headerlink&quot; title=&quot;服务发现与负载均衡&quot;&gt;&lt;/a&gt;服务发现与负载均衡&lt;/h2&gt;&lt;p&gt;在前面的安装部署kubernetes集群中已经简单用示例来演示了Pod和Service，Kubernetes通过Service资源在Kubernetes集群内针对容器实现了服务发现和负载均衡。而Service就是kubernetes服务发现与负载均衡中的一种。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;目前，kubernetes中的负载均衡大致可以分为以下几种机制，每种机制都有其特定的应用场景：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Service：直接用Service提供cluster内部的负载均衡，并借助cloud provider提供的LB提供外部访问&lt;/li&gt;
+&lt;li&gt;Ingress Controller：还是用Service提供cluster内部的负载均衡，但是通过自定义LB提供外部访问&lt;/li&gt;
+&lt;li&gt;Service Load Balancer：把load balancer直接跑在容器中，实现Bare Metal的Service Load Balancer&lt;/li&gt;
+&lt;li&gt;Custom Load Balancer：自定义负载均衡，并替代kube-proxy，一般在物理部署Kubernetes时使用，方便接入公司已有的外部服务&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;Service&quot;&gt;&lt;a href=&quot;#Service&quot; class=&quot;headerlink&quot; title=&quot;Service&quot;&gt;&lt;/a&gt;Service&lt;/h3&gt;&lt;p&gt;Service是对一组提供相同功能的Pods的抽象，并为它们提供一个统一的入口。借助Service，应用可以方便的实现服务发现与负载均衡，并实现应用的零宕机升级。Service通过标签来选取服务后端，一般配合Replication Controller或者Deployment来保证后端容器的正常运行。这些匹配标签的Pod IP和端口列表组成endpoints,由kube-proxy负责将服务IP负载均衡到这些endpoints上。&lt;br&gt;Service有四种类型:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ClusterIP:默认类型,自动分配一个仅cluster内部可以访问的虚拟IP &lt;/li&gt;
+&lt;li&gt;NodePort:在ClusterIP基础上为Service在每台机器上绑定一个端口,这样就可以 通过 &lt;nodeip&gt;:NodePort 来访问该服务 &lt;/nodeip&gt;&lt;/li&gt;
+&lt;li&gt;LoadBalancer:在NodePort的基础上,借助cloud provider创建一个外部的负载均 衡器,并将请求转发到 &lt;nodeip&gt;:NodePort&lt;/nodeip&gt;&lt;/li&gt;
+&lt;li&gt;ExternalName:将服务通过DNS CNAME记录方式转发到指定的域名(通&lt;br&gt;过 spec.externlName 设定)。需要kube-dns版本在1.7以上。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;另外,也可以将已有的服务以Service的形式加入到Kubernetes集群中来,只需要在创建 Service的时候不指定Label selector,而是在Service创建好后手动为其添加endpoint。&lt;/p&gt;
+&lt;h3 id=&quot;Ingress和Ingress-Controller简介&quot;&gt;&lt;a href=&quot;#Ingress和Ingress-Controller简介&quot; class=&quot;headerlink&quot; title=&quot;Ingress和Ingress Controller简介&quot;&gt;&lt;/a&gt;Ingress和Ingress Controller简介&lt;/h3&gt;&lt;p&gt;Service虽然解决了服务发现和负载均衡的问题,但它在使用上还是有一些限制,比如&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;只支持4层负载均衡,没有7层功能 &lt;/li&gt;
+&lt;li&gt;对外访问的时候,NodePort类型需要在外部搭建额外的负载均衡,而LoadBalancer要求kubernetes必须跑在支持的cloud provider上面。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;Ingress&quot;&gt;&lt;a href=&quot;#Ingress&quot; class=&quot;headerlink&quot; title=&quot;Ingress&quot;&gt;&lt;/a&gt;Ingress&lt;/h4&gt;&lt;p&gt;Ingress就是为了解决这些限制而引入的新资源,主要用来将服务暴露到cluster外面,并 且可以自定义服务的访问策略。比如想要通过负载均衡器实现不同子域名到不同服务的 访问:&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;foo.bar.com --|                 |-&amp;gt; foo.bar.com s1:80&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;              | 178.91.123.132  |&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;bar.foo.com --|                 |-&amp;gt; bar.foo.com s2:80&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;可以这样来定义Ingress:&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;apiVersion: extensions/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;kind: Ingress&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  name: test&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  rules:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - host: foo.bar.com&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    http:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      paths:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      - backend:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          serviceName: s1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          servicePort: 80&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - host: bar.foo.com&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    http:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      paths:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      - backend:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          serviceName: s2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          servicePort: 80&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;【注意】：Ingress本身并不会自动创建负载均衡器，cluster中需要运行一个ingress controller来根据Ingress的定义来管理负载均衡器。目前社区提供了&lt;a href=&quot;https://github.com/kubernetes/ingress/tree/master/controllers&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;nginx和gce的参考实现&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;简单的说，ingress就是从kubernetes集群外访问集群的入口,将用户的URL请求转发到 不同的service上。Ingress相当于nginx、apache等负载均衡方向代理服务器,其中还包 括规则定义,即URL的路由信息,路由信息得的刷新由Ingress controller来提供。&lt;/p&gt;
+&lt;h4 id=&quot;Ingress-Controller&quot;&gt;&lt;a href=&quot;#Ingress-Controller&quot; class=&quot;headerlink&quot; title=&quot;Ingress Controller&quot;&gt;&lt;/a&gt;Ingress Controller&lt;/h4&gt;&lt;p&gt;Ingress Controller 实质上可以理解为是个监视器,Ingress Controller 通过不断地跟 kubernetes API 打交道,实时的感知后端 service、pod 等变化,比如新增和减少 pod, service 增加与减少等;当得到这些变化信息后,Ingress Controller 再结合下文的 Ingress 生成配置,然后更新反向代理负载均衡器,并刷新其配置,达到服务发现的作用。&lt;/p&gt;
+&lt;h2 id=&quot;Ingress实战&quot;&gt;&lt;a href=&quot;#Ingress实战&quot; class=&quot;headerlink&quot; title=&quot;Ingress实战&quot;&gt;&lt;/a&gt;Ingress实战&lt;/h2&gt;&lt;p&gt;在使用Ingress resource之前，有必要先了解下面几件事情。Ingress是beta版本的resource，在kubernetes1.1之前还没有。你需要一个Ingress Controller来实现Ingress，单纯的创建一个Ingress没有任何意义。目前社区提供了&lt;a href=&quot;https://github.com/kubernetes/ingress/tree/master/controllers&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;nginx和gce的参考实现&lt;/a&gt;。当然还有其他实现，&lt;a href=&quot;https://github.com/nginxinc/kubernetes-ingress&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;开源的 NGINX 和 NGINX Plus 开发了相应的 Ingress controller&lt;/a&gt;。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;GCE/GKE会在master节点上部署一个ingress controller。你可以在一个pod中部署任意个自定义的ingress controller。你必须正确地annotate每个ingress，比如 &lt;a href=&quot;https://github.com/kubernetes/ingress/tree/master/controllers/nginx#running-multiple-ingress-controllers&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;运行多个ingress controller&lt;/a&gt; 和 &lt;a href=&quot;https://github.com/kubernetes/ingress/blob/master/controllers/gce/BETA_LIMITATIONS.md#disabling-glbc&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;关闭glbc&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;在非GCE/GKE的环境中，你需要在pod中部署一个controller。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;使用-NGINX-和-NGINX-Plus-的-Ingress-Controller-进行-Kubernetes-的负载均衡&quot;&gt;&lt;a href=&quot;#使用-NGINX-和-NGINX-Plus-的-Ingress-Controller-进行-Kubernetes-的负载均衡&quot; class=&quot;headerlink&quot; title=&quot;使用 NGINX 和 NGINX Plus 的 Ingress Controller 进行 Kubernetes 的负载均衡&quot;&gt;&lt;/a&gt;使用 NGINX 和 NGINX Plus 的 Ingress Controller 进行 Kubernetes 的负载均衡&lt;/h3&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/nginxinc/kubernetes-ingress/tree/master/examples/complete-example&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/nginxinc/kubernetes-ingress/tree/master/examples/complete-example&lt;/a&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@node1 nginx_ingress]# kubectl create -f nginx-ingress-rbac.yaml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@node1 nginx_ingress]# kubectl create -f default-server-secret.yaml &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;secret &amp;quot;default-server-secret&amp;quot; created&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@node1 nginx_ingress]# kubectl create -f nginx-ingress-rc.yaml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;replicationcontroller &amp;quot;nginx-ingress-rc&amp;quot; created&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@node1 nginx_ingress]# kubectl get pods -l app=nginx-ingress -o wide &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;NAME                     READY     STATUS    RESTARTS   AGE       IP            NODE&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;nginx-ingress-rc-rs1vh   1/1       Running   0          37s       172.30.87.4   172.16.7.151&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# 查看pod日志&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@node1 nginx_ingress]# kubectl logs nginx-ingress-rc-rs1vh&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;I0924 07:27:37.663514       1 main.go:58] Starting NGINX Ingress controller Version 1.0.0&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2017/09/24 07:27:37 [notice] 20#20: signal process started&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;I0924 07:27:37.975349       1 event.go:218] Event(v1.ObjectReference&amp;#123;Kind:&amp;quot;Secret&amp;quot;, Namespace:&amp;quot;default&amp;quot;, Name:&amp;quot;default-server-secret&amp;quot;, UID:&amp;quot;4e2d9567-9f5a-11e7-9acc-005056b7609a&amp;quot;, APIVersion:&amp;quot;v1&amp;quot;, ResourceVersion:&amp;quot;1019701&amp;quot;, FieldPath:&amp;quot;&amp;quot;&amp;#125;): type: &amp;apos;Normal&amp;apos; reason: &amp;apos;Updated&amp;apos; the default server Secret default/default-server-secret was updated&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2017/09/24 07:27:37 [notice] 26#26: signal process started&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2017/09/24 07:27:38 [notice] 30#30: signal process started&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2017/09/24 07:27:38 [notice] 34#34: signal process started&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2017/09/24 07:27:38 [notice] 38#38: signal process started&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;I0924 07:27:38.073475       1 event.go:218] Event(v1.ObjectReference&amp;#123;Kind:&amp;quot;Ingress&amp;quot;, Namespace:&amp;quot;kube-system&amp;quot;, Name:&amp;quot;traefik-web-ui&amp;quot;, UID:&amp;quot;5d604da9-9f61-11e7-9acc-005056b7609a&amp;quot;, APIVersion:&amp;quot;extensions&amp;quot;, ResourceVersion:&amp;quot;1024008&amp;quot;, FieldPath:&amp;quot;&amp;quot;&amp;#125;): type: &amp;apos;Normal&amp;apos; reason: &amp;apos;AddedOrUpdated&amp;apos; Configuration for kube-system/traefik-web-ui was added or updated&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2017/09/24 07:27:38 [notice] 44#44: signal process started&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;I0924 07:27:38.100887       1 event.go:218] Event(v1.ObjectReference&amp;#123;Kind:&amp;quot;Ingress&amp;quot;, Namespace:&amp;quot;default&amp;quot;, Name:&amp;quot;traefik-ingress&amp;quot;, UID:&amp;quot;5d693739-9f61-11e7-9acc-005056b7609a&amp;quot;, APIVersion:&amp;quot;extensions&amp;quot;, ResourceVersion:&amp;quot;1024009&amp;quot;, FieldPath:&amp;quot;&amp;quot;&amp;#125;): type: &amp;apos;Normal&amp;apos; reason: &amp;apos;AddedOrUpdated&amp;apos; Configuration for default/traefik-ingress was added or updated&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;h3 id=&quot;配置需要测试的service&quot;&gt;&lt;a href=&quot;#配置需要测试的service&quot; class=&quot;headerlink&quot; title=&quot;配置需要测试的service&quot;&gt;&lt;/a&gt;配置需要测试的service&lt;/h3&gt;&lt;p&gt;部署两个服务nginx 1.7和nginx 1.8：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;nginx1-7.yaml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apiVersion: v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;kind: Service&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  name: frontend&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  ports:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    - port: 80&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      targetPort: 80&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  selector:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    app: nginx1-7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;---&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apiVersion: apps/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;kind: Deployment&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  name: nginx1-7-deployment&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  replicas: 2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  template:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      labels:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        app: nginx1-7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      containers:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      - name: nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        image: nginx:1.7.9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        ports:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        - containerPort: 80&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;nginx1-8.yaml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apiVersion: v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;kind: Service&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  name: my-nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  ports:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    - port: 80&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      targetPort: 80&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  selector:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    app: nginx1-8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;---&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apiVersion: apps/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;kind: Deployment&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  name: nginx1-8-deployment&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  replicas: 2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  template:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      labels:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        app: nginx1-8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      containers:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      - name: nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        image: nginx:1.8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        ports:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        - containerPort: 80&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@node1 nginx_ingress]# kubectl create -f nginx1-7.yaml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;service &amp;quot;frontend&amp;quot; created&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;deployment &amp;quot;nginx1-7-deployment&amp;quot; created&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@node1 nginx_ingress]# kubectl create -f nginx1-8.yaml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;service &amp;quot;my-nginx&amp;quot; created&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;deployment &amp;quot;nginx1-8-deployment&amp;quot; created&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;h3 id=&quot;创建Ingress&quot;&gt;&lt;a href=&quot;#创建Ingress&quot; class=&quot;headerlink&quot; title=&quot;创建Ingress&quot;&gt;&lt;/a&gt;创建Ingress&lt;/h3&gt;&lt;p&gt;假设这两个服务要暴露到集群外部。要创建一个ingress：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@node1 nginx_ingress]# vim test-ingress.yaml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apiVersion: extensions/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;kind: Ingress&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  name: test&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  rules:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - host: n17.my.com&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    http:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      paths:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      - backend:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          serviceName: nginx1-7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          servicePort: 80&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - host: n18.my.com&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    http:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      paths:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      - backend:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          serviceName: nginx1-8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          servicePort: 80&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@node1 nginx_ingress]# kubectl create -f test-ingress.yaml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;ingress &amp;quot;test&amp;quot; created&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@node1 nginx_ingress]# kubectl get ing&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;NAME              HOSTS                                  ADDRESS   PORTS     AGE&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;test              n17.my.com,n18.my.com                            80        52s&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;打开客户机的/etc/hosts，配置172.16.7.151和n17.my.com,n18.my.com的对应关系，然后在浏览器访问n17.my.com或n18.my.com就可以访问到对应的服务。&lt;br&gt;如果想修改访问规则，修改test-ingress.yaml，使用kubectl replace -f更新就可以了。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;服务发现与负载均衡&quot;&gt;&lt;a href=&quot;#服务发现与负载均衡&quot; class=&quot;headerlink&quot; title=&quot;服务发现与负载均衡&quot;&gt;&lt;/a&gt;服务发现与负载均衡&lt;/h2&gt;&lt;p&gt;在前面的安装部署kubernetes集群中已经简单用示例来演示了Pod和Service，Kubernetes通过Service资源在Kubernetes集群内针对容器实现了服务发现和负载均衡。而Service就是kubernetes服务发现与负载均衡中的一种。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Kubernetes" scheme="http://yoursite.com/categories/Kubernetes/"/>
+    
+    
+      <category term="容器编排 Docker Kubernetes" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8%E7%BC%96%E6%8E%92-Docker-Kubernetes/"/>
+    
+  </entry>
   
   <entry>
     <title>Kubernetes监控:部署Heapster、InfluxDB和Grafana</title>
@@ -4406,124 +4466,6 @@ handlers:
     <summary type="html">
     
       &lt;h2 id=&quot;ansible-playbook介绍&quot;&gt;&lt;a href=&quot;#ansible-playbook介绍&quot; class=&quot;headerlink&quot; title=&quot;ansible playbook介绍&quot;&gt;&lt;/a&gt;ansible playbook介绍&lt;/h2&gt;&lt;p&gt;playbook是由一个或多个“play”组成的列表(剧本是由多出戏组成的)。play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联同起来按事先编排的机制同唱一台大戏。下面是一个简单示例。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="运维自动化" scheme="http://yoursite.com/categories/%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
-    
-    
-      <category term="Ansible 运维自动化" scheme="http://yoursite.com/tags/Ansible-%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Ansible的基础元素和YAML介绍</title>
-    <link href="http://yoursite.com/2017/07/11/Ansible%E7%9A%84%E5%9F%BA%E7%A1%80%E5%85%83%E7%B4%A0%E5%92%8CYAML%E4%BB%8B%E7%BB%8D/"/>
-    <id>http://yoursite.com/2017/07/11/Ansible的基础元素和YAML介绍/</id>
-    <published>2017-07-11T10:37:28.000Z</published>
-    <updated>2017-07-14T08:03:58.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;YAML&quot;&gt;&lt;a href=&quot;#YAML&quot; class=&quot;headerlink&quot; title=&quot;YAML&quot;&gt;&lt;/a&gt;YAML&lt;/h2&gt;&lt;h3 id=&quot;YAML介绍&quot;&gt;&lt;a href=&quot;#YAML介绍&quot; class=&quot;headerlink&quot; title=&quot;YAML介绍&quot;&gt;&lt;/a&gt;YAML介绍&lt;/h3&gt;&lt;p&gt;YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。&lt;br&gt;YAML Ain’t Markup Language，即YAML不是XML。不过，在开发的这种语言时，YAML的意思其实是：”Yet Another Markup Language”（仍是一种标记语言）。其特性：&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;YAML的可读性好&lt;/li&gt;
-&lt;li&gt;YAML和脚本语言的交互性好&lt;/li&gt;
-&lt;li&gt;YAML使用实现语言的数据类型&lt;/li&gt;
-&lt;li&gt;YAML有一个一致的信息模型&lt;/li&gt;
-&lt;li&gt;YAML易于实现&lt;/li&gt;
-&lt;li&gt;YAML可以基于流来处理&lt;/li&gt;
-&lt;li&gt;YAML表达能力强，扩展性好&lt;br&gt;更多的内容及规范参见&lt;a href=&quot;http://www.yaml.org。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://www.yaml.org。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;YAML语法&quot;&gt;&lt;a href=&quot;#YAML语法&quot; class=&quot;headerlink&quot; title=&quot;YAML语法&quot;&gt;&lt;/a&gt;YAML语法&lt;/h3&gt;&lt;p&gt;YAML的语法和其他高阶语言类似，并且可以简单表达清单、散列表、标量等数据结构。其结构（Structure）通过空格来展示，序列（Sequence）里的项用”-“来代表，Map里的键值对用”:”分隔。下面是一个示例。YAML是用键值对和缩进来表示的。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;name: John Smith
-age: 41
-gender: Male
-spouse:                         
-    name: Jane Smith
-    age: 37
-    gender: Female
-children:                     
-    - name: Jimmy Smith
-      age: 17
-      gender: Male
-    - name: Jenny Smith
-      age 13
-      gender: Female
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;YAML文件扩展名通常为.yaml，如example.yaml。&lt;/p&gt;
-&lt;h3 id=&quot;Ansible常用的数据类型&quot;&gt;&lt;a href=&quot;#Ansible常用的数据类型&quot; class=&quot;headerlink&quot; title=&quot;Ansible常用的数据类型&quot;&gt;&lt;/a&gt;Ansible常用的数据类型&lt;/h3&gt;&lt;p&gt;在ansible中常用的数据类型有序列(list)，也叫列表，还有字典，这些都很类似Python语言。&lt;/p&gt;
-&lt;h4 id=&quot;list&quot;&gt;&lt;a href=&quot;#list&quot; class=&quot;headerlink&quot; title=&quot;list&quot;&gt;&lt;/a&gt;list&lt;/h4&gt;&lt;p&gt;列表中的所有元素都使用“-”打头，例如：A list of tasty fruits&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Apple&lt;/li&gt;
-&lt;li&gt;Orange&lt;/li&gt;
-&lt;li&gt;Strawberry&lt;/li&gt;
-&lt;li&gt;Mango&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&quot;dictionary&quot;&gt;&lt;a href=&quot;#dictionary&quot; class=&quot;headerlink&quot; title=&quot;dictionary&quot;&gt;&lt;/a&gt;dictionary&lt;/h4&gt;&lt;h2 id=&quot;字典通过key与value进行标识，例如：&quot;&gt;&lt;a href=&quot;#字典通过key与value进行标识，例如：&quot; class=&quot;headerlink&quot; title=&quot;字典通过key与value进行标识，例如：&quot;&gt;&lt;/a&gt;字典通过key与value进行标识，例如：&lt;/h2&gt;&lt;p&gt;An employee record：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;name: Example Developer
-job: Developer
-skill: Elite
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;也可以将key-value放置于-中进行表示，例如：&quot;&gt;&lt;a href=&quot;#也可以将key-value放置于-中进行表示，例如：&quot; class=&quot;headerlink&quot; title=&quot;也可以将key:value放置于{}中进行表示，例如：&quot;&gt;&lt;/a&gt;也可以将key:value放置于{}中进行表示，例如：&lt;/h2&gt;&lt;p&gt;An employ record：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;{name: Example Developer, job: Developer, skill: Elite}
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;Ansible基础元素&quot;&gt;&lt;a href=&quot;#Ansible基础元素&quot; class=&quot;headerlink&quot; title=&quot;Ansible基础元素&quot;&gt;&lt;/a&gt;Ansible基础元素&lt;/h2&gt;&lt;h3 id=&quot;变量&quot;&gt;&lt;a href=&quot;#变量&quot; class=&quot;headerlink&quot; title=&quot;变量&quot;&gt;&lt;/a&gt;变量&lt;/h3&gt;&lt;h4 id=&quot;变量命名&quot;&gt;&lt;a href=&quot;#变量命名&quot; class=&quot;headerlink&quot; title=&quot;变量命名&quot;&gt;&lt;/a&gt;变量命名&lt;/h4&gt;&lt;p&gt;变量名仅能由字母、数字和下划线组成，而且只能以字母开头。&lt;/p&gt;
-&lt;h4 id=&quot;facts&quot;&gt;&lt;a href=&quot;#facts&quot; class=&quot;headerlink&quot; title=&quot;facts&quot;&gt;&lt;/a&gt;facts&lt;/h4&gt;&lt;p&gt;facts是由正在通信的远程目标主机发回的信息，这些信息被保存在ansible变量中。要获取指定的远程主机所支持的所有facts，可使用如下命令进行：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# ansible hostname -m setup
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;register&quot;&gt;&lt;a href=&quot;#register&quot; class=&quot;headerlink&quot; title=&quot;register&quot;&gt;&lt;/a&gt;register&lt;/h4&gt;&lt;p&gt;把任务的输出定义为变量，然后用于其他任务，示例如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;tasks:
-  - shell: /usr/bin/foo
-    register: foo_result
-    ignore_errors: True
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;通过命令行传递变量&quot;&gt;&lt;a href=&quot;#通过命令行传递变量&quot; class=&quot;headerlink&quot; title=&quot;通过命令行传递变量&quot;&gt;&lt;/a&gt;通过命令行传递变量&lt;/h4&gt;&lt;p&gt;在运行playbook的时候也可以传递一些变量供playbook使用，示例如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;ansible-playbook test.yml --extra-vars &amp;quot;hosts=www user=magedu&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;就是说hosts和user这两个变量可以在test.yml文件中直接调用&lt;/p&gt;
-&lt;h4 id=&quot;通过roles传递变量&quot;&gt;&lt;a href=&quot;#通过roles传递变量&quot; class=&quot;headerlink&quot; title=&quot;通过roles传递变量&quot;&gt;&lt;/a&gt;通过roles传递变量&lt;/h4&gt;&lt;p&gt;当给一个主机应用角色的时候可以传递变量，然后在角色内使用这些变量，示例如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- hosts: webservers
-  roles: 
-      - common
-      - { role: foo_app_instance, dir: &amp;apos;/web/htdocs/a.com&amp;apos;, port: 8080 }
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;注意:role、dir、port是变量名，冒号后面的是变量值。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;Inventory&quot;&gt;&lt;a href=&quot;#Inventory&quot; class=&quot;headerlink&quot; title=&quot;Inventory&quot;&gt;&lt;/a&gt;Inventory&lt;/h3&gt;&lt;p&gt;ansible的主要功能在于批量主机操作，为了便捷地使用其中的部分主机，可以在inventory file中将其分组命名。默认的inventory file为/etc/ansible/hosts。&lt;br&gt;inventory file可以有多个，且也可以通过Dynamic Inventory来动态生成。&lt;/p&gt;
-&lt;h4 id=&quot;inventory文件格式&quot;&gt;&lt;a href=&quot;#inventory文件格式&quot; class=&quot;headerlink&quot; title=&quot;inventory文件格式&quot;&gt;&lt;/a&gt;inventory文件格式&lt;/h4&gt;&lt;p&gt;inventory文件遵循INI文件风格，中括号中的字符为组名。可以将同一个主机同时归并到多个不同的组中；此外，当如若目标主机使用了非默认的SSH端口，还可以在主机名称之后使用冒号加端口号标明。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[webservers]
-www1.wisedu.com:8888
-www2.wisedu.com
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果主机名称遵循相似的命名模式，还可以使用列表的方式标识各主机，例如：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[webservers]
-www[01:50].example.com
-
-[databases]
-db-[a:f].example.com
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;主机变量&quot;&gt;&lt;a href=&quot;#主机变量&quot; class=&quot;headerlink&quot; title=&quot;主机变量&quot;&gt;&lt;/a&gt;主机变量&lt;/h4&gt;&lt;p&gt;可以在inventory中定义主机时为其添加主机变量以便于在playbook中使用，例如：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[webservers]
-www1.wisedu.com http_port=80 maxRequestsPerChild=808
-www2.wisedu.com http_port=8080 maxRequestsPerChild=909
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;组变量&quot;&gt;&lt;a href=&quot;#组变量&quot; class=&quot;headerlink&quot; title=&quot;组变量&quot;&gt;&lt;/a&gt;组变量&lt;/h4&gt;&lt;p&gt;组变量是指赋予给指定组内所有主机上的在playbook中可用的变量。例如：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; [webservers]
- www1.wisedu.com
- www2.wisedu.com
-
-[webservers:vars]   # 表示向webservers这组主机定义变量如下，回头这两台主机上都可以调用变量ntp_server和nfs_server
-ntp_server=ntp.wisedu.com
-nfs_server=ntp.wisedu.com
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;组嵌套&quot;&gt;&lt;a href=&quot;#组嵌套&quot; class=&quot;headerlink&quot; title=&quot;组嵌套&quot;&gt;&lt;/a&gt;组嵌套&lt;/h4&gt;&lt;p&gt;inventory中，组还可以包含其它的组，并且也可以向组中的主机指定变量。不过，这些变量只能在ansible-playbook中使用，而ansible不支持。例如：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[apache]
-httpd1.wisedu.com
-httpd2.wisedu.com
-
-[nginx]
-ngx1.wisedu.com
-ngx2.wisedu.com
-
-[webservers:children]     # 注意:children是固定格式
-apache
-nginx
-
-[webservers:vars]
-ntp_server=ntp.wisedu.com
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;inventory参数&quot;&gt;&lt;a href=&quot;#inventory参数&quot; class=&quot;headerlink&quot; title=&quot;inventory参数&quot;&gt;&lt;/a&gt;inventory参数&lt;/h4&gt;&lt;p&gt;ansible基于ssh连接inventory中指定的远程主机时，还可以通过参数指定其交互方式，这些参数如下所示：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/29.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/30.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;YAML&quot;&gt;&lt;a href=&quot;#YAML&quot; class=&quot;headerlink&quot; title=&quot;YAML&quot;&gt;&lt;/a&gt;YAML&lt;/h2&gt;&lt;h3 id=&quot;YAML介绍&quot;&gt;&lt;a href=&quot;#YAML介绍&quot; class=&quot;headerlink&quot; title=&quot;YAML介绍&quot;&gt;&lt;/a&gt;YAML介绍&lt;/h3&gt;&lt;p&gt;YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。&lt;br&gt;YAML Ain’t Markup Language，即YAML不是XML。不过，在开发的这种语言时，YAML的意思其实是：”Yet Another Markup Language”（仍是一种标记语言）。其特性：&lt;br&gt;
     
     </summary>
     

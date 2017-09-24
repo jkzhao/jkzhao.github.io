@@ -1,0 +1,899 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="容器编排 Docker Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="服务发现与负载均衡在前面的安装部署kubernetes集群中已经简单用示例来演示了Pod和Service，Kubernetes通过Service资源在Kubernetes集群内针对容器实现了服务发现和负载均衡。而Service就是kubernetes服务发现与负载均衡中的一种。">
+<meta name="keywords" content="容器编排 Docker Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes Ingress实战">
+<meta property="og:url" content="http://yoursite.com/2017/09/24/Kubernetes-Ingress实战/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="服务发现与负载均衡在前面的安装部署kubernetes集群中已经简单用示例来演示了Pod和Service，Kubernetes通过Service资源在Kubernetes集群内针对容器实现了服务发现和负载均衡。而Service就是kubernetes服务发现与负载均衡中的一种。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-09-24T09:01:33.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kubernetes Ingress实战">
+<meta name="twitter:description" content="服务发现与负载均衡在前面的安装部署kubernetes集群中已经简单用示例来演示了Pod和Service，Kubernetes通过Service资源在Kubernetes集群内针对容器实现了服务发现和负载均衡。而Service就是kubernetes服务发现与负载均衡中的一种。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Kubernetes Ingress实战 | jkzhao's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Kubernetes Ingress实战
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-09-24T16:57:22+08:00" content="2017-09-24">
+              2017-09-24
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2017-09-24T17:01:33+08:00" content="2017-09-24">
+              2017-09-24
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/09/24/Kubernetes-Ingress实战/" class="leancloud_visitors" data-flag-title="Kubernetes Ingress实战">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="服务发现与负载均衡"><a href="#服务发现与负载均衡" class="headerlink" title="服务发现与负载均衡"></a>服务发现与负载均衡</h2><p>在前面的安装部署kubernetes集群中已经简单用示例来演示了Pod和Service，Kubernetes通过Service资源在Kubernetes集群内针对容器实现了服务发现和负载均衡。而Service就是kubernetes服务发现与负载均衡中的一种。<br><a id="more"></a><br>目前，kubernetes中的负载均衡大致可以分为以下几种机制，每种机制都有其特定的应用场景：</p>
+<ul>
+<li>Service：直接用Service提供cluster内部的负载均衡，并借助cloud provider提供的LB提供外部访问</li>
+<li>Ingress Controller：还是用Service提供cluster内部的负载均衡，但是通过自定义LB提供外部访问</li>
+<li>Service Load Balancer：把load balancer直接跑在容器中，实现Bare Metal的Service Load Balancer</li>
+<li>Custom Load Balancer：自定义负载均衡，并替代kube-proxy，一般在物理部署Kubernetes时使用，方便接入公司已有的外部服务</li>
+</ul>
+<h3 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h3><p>Service是对一组提供相同功能的Pods的抽象，并为它们提供一个统一的入口。借助Service，应用可以方便的实现服务发现与负载均衡，并实现应用的零宕机升级。Service通过标签来选取服务后端，一般配合Replication Controller或者Deployment来保证后端容器的正常运行。这些匹配标签的Pod IP和端口列表组成endpoints,由kube-proxy负责将服务IP负载均衡到这些endpoints上。<br>Service有四种类型:</p>
+<ul>
+<li>ClusterIP:默认类型,自动分配一个仅cluster内部可以访问的虚拟IP </li>
+<li>NodePort:在ClusterIP基础上为Service在每台机器上绑定一个端口,这样就可以 通过 <nodeip>:NodePort 来访问该服务 </nodeip></li>
+<li>LoadBalancer:在NodePort的基础上,借助cloud provider创建一个外部的负载均 衡器,并将请求转发到 <nodeip>:NodePort</nodeip></li>
+<li>ExternalName:将服务通过DNS CNAME记录方式转发到指定的域名(通<br>过 spec.externlName 设定)。需要kube-dns版本在1.7以上。</li>
+</ul>
+<p>另外,也可以将已有的服务以Service的形式加入到Kubernetes集群中来,只需要在创建 Service的时候不指定Label selector,而是在Service创建好后手动为其添加endpoint。</p>
+<h3 id="Ingress和Ingress-Controller简介"><a href="#Ingress和Ingress-Controller简介" class="headerlink" title="Ingress和Ingress Controller简介"></a>Ingress和Ingress Controller简介</h3><p>Service虽然解决了服务发现和负载均衡的问题,但它在使用上还是有一些限制,比如</p>
+<ul>
+<li>只支持4层负载均衡,没有7层功能 </li>
+<li>对外访问的时候,NodePort类型需要在外部搭建额外的负载均衡,而LoadBalancer要求kubernetes必须跑在支持的cloud provider上面。</li>
+</ul>
+<h4 id="Ingress"><a href="#Ingress" class="headerlink" title="Ingress"></a>Ingress</h4><p>Ingress就是为了解决这些限制而引入的新资源,主要用来将服务暴露到cluster外面,并 且可以自定义服务的访问策略。比如想要通过负载均衡器实现不同子域名到不同服务的 访问:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">foo.bar.com --|                 |-&gt; foo.bar.com s1:80</div><div class="line">              | 178.91.123.132  |</div><div class="line">bar.foo.com --|                 |-&gt; bar.foo.com s2:80</div></pre></td></tr></table></figure></p>
+<p>可以这样来定义Ingress:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: test</div><div class="line">spec:</div><div class="line">  rules:</div><div class="line">  - host: foo.bar.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - backend:</div><div class="line">          serviceName: s1</div><div class="line">          servicePort: 80</div><div class="line">  - host: bar.foo.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - backend:</div><div class="line">          serviceName: s2</div><div class="line">          servicePort: 80</div></pre></td></tr></table></figure></p>
+<p>【注意】：Ingress本身并不会自动创建负载均衡器，cluster中需要运行一个ingress controller来根据Ingress的定义来管理负载均衡器。目前社区提供了<a href="https://github.com/kubernetes/ingress/tree/master/controllers" target="_blank" rel="external">nginx和gce的参考实现</a>。</p>
+<p>简单的说，ingress就是从kubernetes集群外访问集群的入口,将用户的URL请求转发到 不同的service上。Ingress相当于nginx、apache等负载均衡方向代理服务器,其中还包 括规则定义,即URL的路由信息,路由信息得的刷新由Ingress controller来提供。</p>
+<h4 id="Ingress-Controller"><a href="#Ingress-Controller" class="headerlink" title="Ingress Controller"></a>Ingress Controller</h4><p>Ingress Controller 实质上可以理解为是个监视器,Ingress Controller 通过不断地跟 kubernetes API 打交道,实时的感知后端 service、pod 等变化,比如新增和减少 pod, service 增加与减少等;当得到这些变化信息后,Ingress Controller 再结合下文的 Ingress 生成配置,然后更新反向代理负载均衡器,并刷新其配置,达到服务发现的作用。</p>
+<h2 id="Ingress实战"><a href="#Ingress实战" class="headerlink" title="Ingress实战"></a>Ingress实战</h2><p>在使用Ingress resource之前，有必要先了解下面几件事情。Ingress是beta版本的resource，在kubernetes1.1之前还没有。你需要一个Ingress Controller来实现Ingress，单纯的创建一个Ingress没有任何意义。目前社区提供了<a href="https://github.com/kubernetes/ingress/tree/master/controllers" target="_blank" rel="external">nginx和gce的参考实现</a>。当然还有其他实现，<a href="https://github.com/nginxinc/kubernetes-ingress" target="_blank" rel="external">开源的 NGINX 和 NGINX Plus 开发了相应的 Ingress controller</a>。</p>
+<ul>
+<li>GCE/GKE会在master节点上部署一个ingress controller。你可以在一个pod中部署任意个自定义的ingress controller。你必须正确地annotate每个ingress，比如 <a href="https://github.com/kubernetes/ingress/tree/master/controllers/nginx#running-multiple-ingress-controllers" target="_blank" rel="external">运行多个ingress controller</a> 和 <a href="https://github.com/kubernetes/ingress/blob/master/controllers/gce/BETA_LIMITATIONS.md#disabling-glbc" target="_blank" rel="external">关闭glbc</a>.</li>
+<li>在非GCE/GKE的环境中，你需要在pod中部署一个controller。</li>
+</ul>
+<h3 id="使用-NGINX-和-NGINX-Plus-的-Ingress-Controller-进行-Kubernetes-的负载均衡"><a href="#使用-NGINX-和-NGINX-Plus-的-Ingress-Controller-进行-Kubernetes-的负载均衡" class="headerlink" title="使用 NGINX 和 NGINX Plus 的 Ingress Controller 进行 Kubernetes 的负载均衡"></a>使用 NGINX 和 NGINX Plus 的 Ingress Controller 进行 Kubernetes 的负载均衡</h3><p><a href="https://github.com/nginxinc/kubernetes-ingress/tree/master/examples/complete-example" target="_blank" rel="external">https://github.com/nginxinc/kubernetes-ingress/tree/master/examples/complete-example</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">[root@node1 nginx_ingress]# kubectl create -f nginx-ingress-rbac.yaml</div><div class="line">[root@node1 nginx_ingress]# kubectl create -f default-server-secret.yaml </div><div class="line">secret &quot;default-server-secret&quot; created</div><div class="line">[root@node1 nginx_ingress]# kubectl create -f nginx-ingress-rc.yaml</div><div class="line">replicationcontroller &quot;nginx-ingress-rc&quot; created</div><div class="line"></div><div class="line">[root@node1 nginx_ingress]# kubectl get pods -l app=nginx-ingress -o wide </div><div class="line">NAME                     READY     STATUS    RESTARTS   AGE       IP            NODE</div><div class="line">nginx-ingress-rc-rs1vh   1/1       Running   0          37s       172.30.87.4   172.16.7.151</div><div class="line"></div><div class="line"># 查看pod日志</div><div class="line">[root@node1 nginx_ingress]# kubectl logs nginx-ingress-rc-rs1vh</div><div class="line">I0924 07:27:37.663514       1 main.go:58] Starting NGINX Ingress controller Version 1.0.0</div><div class="line">2017/09/24 07:27:37 [notice] 20#20: signal process started</div><div class="line">I0924 07:27:37.975349       1 event.go:218] Event(v1.ObjectReference&#123;Kind:&quot;Secret&quot;, Namespace:&quot;default&quot;, Name:&quot;default-server-secret&quot;, UID:&quot;4e2d9567-9f5a-11e7-9acc-005056b7609a&quot;, APIVersion:&quot;v1&quot;, ResourceVersion:&quot;1019701&quot;, FieldPath:&quot;&quot;&#125;): type: &apos;Normal&apos; reason: &apos;Updated&apos; the default server Secret default/default-server-secret was updated</div><div class="line">2017/09/24 07:27:37 [notice] 26#26: signal process started</div><div class="line">2017/09/24 07:27:38 [notice] 30#30: signal process started</div><div class="line">2017/09/24 07:27:38 [notice] 34#34: signal process started</div><div class="line">2017/09/24 07:27:38 [notice] 38#38: signal process started</div><div class="line">I0924 07:27:38.073475       1 event.go:218] Event(v1.ObjectReference&#123;Kind:&quot;Ingress&quot;, Namespace:&quot;kube-system&quot;, Name:&quot;traefik-web-ui&quot;, UID:&quot;5d604da9-9f61-11e7-9acc-005056b7609a&quot;, APIVersion:&quot;extensions&quot;, ResourceVersion:&quot;1024008&quot;, FieldPath:&quot;&quot;&#125;): type: &apos;Normal&apos; reason: &apos;AddedOrUpdated&apos; Configuration for kube-system/traefik-web-ui was added or updated</div><div class="line">2017/09/24 07:27:38 [notice] 44#44: signal process started</div><div class="line">I0924 07:27:38.100887       1 event.go:218] Event(v1.ObjectReference&#123;Kind:&quot;Ingress&quot;, Namespace:&quot;default&quot;, Name:&quot;traefik-ingress&quot;, UID:&quot;5d693739-9f61-11e7-9acc-005056b7609a&quot;, APIVersion:&quot;extensions&quot;, ResourceVersion:&quot;1024009&quot;, FieldPath:&quot;&quot;&#125;): type: &apos;Normal&apos; reason: &apos;AddedOrUpdated&apos; Configuration for default/traefik-ingress was added or updated</div></pre></td></tr></table></figure>
+<h3 id="配置需要测试的service"><a href="#配置需要测试的service" class="headerlink" title="配置需要测试的service"></a>配置需要测试的service</h3><p>部署两个服务nginx 1.7和nginx 1.8：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">nginx1-7.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Service</div><div class="line">metadata:</div><div class="line">  name: frontend</div><div class="line">spec:</div><div class="line">  ports:</div><div class="line">    - port: 80</div><div class="line">      targetPort: 80</div><div class="line">  selector:</div><div class="line">    app: nginx1-7</div><div class="line">---</div><div class="line">apiVersion: apps/v1beta1</div><div class="line">kind: Deployment</div><div class="line">metadata:</div><div class="line">  name: nginx1-7-deployment</div><div class="line">spec:</div><div class="line">  replicas: 2</div><div class="line">  template:</div><div class="line">    metadata:</div><div class="line">      labels:</div><div class="line">        app: nginx1-7</div><div class="line">    spec:</div><div class="line">      containers:</div><div class="line">      - name: nginx</div><div class="line">        image: nginx:1.7.9</div><div class="line">        ports:</div><div class="line">        - containerPort: 80</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">nginx1-8.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Service</div><div class="line">metadata:</div><div class="line">  name: my-nginx</div><div class="line">spec:</div><div class="line">  ports:</div><div class="line">    - port: 80</div><div class="line">      targetPort: 80</div><div class="line">  selector:</div><div class="line">    app: nginx1-8</div><div class="line">---</div><div class="line">apiVersion: apps/v1beta1</div><div class="line">kind: Deployment</div><div class="line">metadata:</div><div class="line">  name: nginx1-8-deployment</div><div class="line">spec:</div><div class="line">  replicas: 2</div><div class="line">  template:</div><div class="line">    metadata:</div><div class="line">      labels:</div><div class="line">        app: nginx1-8</div><div class="line">    spec:</div><div class="line">      containers:</div><div class="line">      - name: nginx</div><div class="line">        image: nginx:1.8</div><div class="line">        ports:</div><div class="line">        - containerPort: 80</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@node1 nginx_ingress]# kubectl create -f nginx1-7.yaml</div><div class="line">service &quot;frontend&quot; created</div><div class="line">deployment &quot;nginx1-7-deployment&quot; created</div><div class="line">[root@node1 nginx_ingress]# kubectl create -f nginx1-8.yaml</div><div class="line">service &quot;my-nginx&quot; created</div><div class="line">deployment &quot;nginx1-8-deployment&quot; created</div></pre></td></tr></table></figure>
+<h3 id="创建Ingress"><a href="#创建Ingress" class="headerlink" title="创建Ingress"></a>创建Ingress</h3><p>假设这两个服务要暴露到集群外部。要创建一个ingress：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">[root@node1 nginx_ingress]# vim test-ingress.yaml</div><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: test</div><div class="line">spec:</div><div class="line">  rules:</div><div class="line">  - host: n17.my.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - backend:</div><div class="line">          serviceName: nginx1-7</div><div class="line">          servicePort: 80</div><div class="line">  - host: n18.my.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - backend:</div><div class="line">          serviceName: nginx1-8</div><div class="line">          servicePort: 80</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@node1 nginx_ingress]# kubectl create -f test-ingress.yaml</div><div class="line">ingress &quot;test&quot; created</div><div class="line">[root@node1 nginx_ingress]# kubectl get ing</div><div class="line">NAME              HOSTS                                  ADDRESS   PORTS     AGE</div><div class="line">test              n17.my.com,n18.my.com                            80        52s</div></pre></td></tr></table></figure>
+<p>打开客户机的/etc/hosts，配置172.16.7.151和n17.my.com,n18.my.com的对应关系，然后在浏览器访问n17.my.com或n18.my.com就可以访问到对应的服务。<br>如果想修改访问规则，修改test-ingress.yaml，使用kubectl replace -f更新就可以了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/容器编排-Docker-Kubernetes/" rel="tag"><i class="fa fa-tag"></i>容器编排 Docker Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/21/Kubernetes监控-部署Heapster、InfluxDB和Grafana/" rel="next" title="Kubernetes监控:部署Heapster、InfluxDB和Grafana">
+                <i class="fa fa-chevron-left"></i> Kubernetes监控:部署Heapster、InfluxDB和Grafana
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#服务发现与负载均衡"><span class="nav-number">1.</span> <span class="nav-text">服务发现与负载均衡</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Service"><span class="nav-number">1.1.</span> <span class="nav-text">Service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ingress和Ingress-Controller简介"><span class="nav-number">1.2.</span> <span class="nav-text">Ingress和Ingress Controller简介</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Ingress"><span class="nav-number">1.2.1.</span> <span class="nav-text">Ingress</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Ingress-Controller"><span class="nav-number">1.2.2.</span> <span class="nav-text">Ingress Controller</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ingress实战"><span class="nav-number">2.</span> <span class="nav-text">Ingress实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-NGINX-和-NGINX-Plus-的-Ingress-Controller-进行-Kubernetes-的负载均衡"><span class="nav-number">2.1.</span> <span class="nav-text">使用 NGINX 和 NGINX Plus 的 Ingress Controller 进行 Kubernetes 的负载均衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置需要测试的service"><span class="nav-number">2.2.</span> <span class="nav-text">配置需要测试的service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建Ingress"><span class="nav-number">2.3.</span> <span class="nav-text">创建Ingress</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共103.1k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+    <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+</body>
+</html>
