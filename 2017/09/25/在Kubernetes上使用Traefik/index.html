@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Ansible 运维自动化," />
+  <meta name="keywords" content="容器编排 Docker Kubernetes," />
 
 
 
@@ -104,21 +104,21 @@
 
 
 
-<meta name="description" content="YAMLYAML介绍YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。YAML Ain’t Markup Language，即YAML不是XML。不过，在开发的">
-<meta name="keywords" content="Ansible 运维自动化">
+<meta name="description" content="Traefik介绍traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等编排工具具有良好的支持；同 nginx 等相比，traefik 能够自动感知后端容器变化，从而实现自动服务发现。由于微服务架构以及 Docker 技术和 kubernetes 编排工具最近几年才开始逐渐流行，所以一开始的反向代理服务器比如 nginx、apache 并未提供其支持，毕竟他们也不是先">
+<meta name="keywords" content="容器编排 Docker Kubernetes">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Ansible的基础元素和YAML介绍">
-<meta property="og:url" content="http://yoursite.com/2017/07/11/Ansible的基础元素和YAML介绍/index.html">
+<meta property="og:title" content="在Kubernetes上使用Traefik">
+<meta property="og:url" content="http://yoursite.com/2017/09/25/在Kubernetes上使用Traefik/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="YAMLYAML介绍YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。YAML Ain’t Markup Language，即YAML不是XML。不过，在开发的">
+<meta property="og:description" content="Traefik介绍traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等编排工具具有良好的支持；同 nginx 等相比，traefik 能够自动感知后端容器变化，从而实现自动服务发现。由于微服务架构以及 Docker 技术和 kubernetes 编排工具最近几年才开始逐渐流行，所以一开始的反向代理服务器比如 nginx、apache 并未提供其支持，毕竟他们也不是先">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/29.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/30.png">
-<meta property="og:updated_time" content="2017-07-14T08:03:58.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/12.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/13.png">
+<meta property="og:updated_time" content="2017-09-25T04:18:29.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Ansible的基础元素和YAML介绍">
-<meta name="twitter:description" content="YAMLYAML介绍YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。YAML Ain’t Markup Language，即YAML不是XML。不过，在开发的">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/29.png">
+<meta name="twitter:title" content="在Kubernetes上使用Traefik">
+<meta name="twitter:description" content="Traefik介绍traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等编排工具具有良好的支持；同 nginx 等相比，traefik 能够自动感知后端容器变化，从而实现自动服务发现。由于微服务架构以及 Docker 技术和 kubernetes 编排工具最近几年才开始逐渐流行，所以一开始的反向代理服务器比如 nginx、apache 并未提供其支持，毕竟他们也不是先">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/12.png">
 
 
 
@@ -136,7 +136,7 @@
   };
 </script>
 
-  <title> Ansible的基础元素和YAML介绍 | jkzhao's blog </title>
+  <title> 在Kubernetes上使用Traefik | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -326,7 +326,7 @@
             
             
               
-                Ansible的基础元素和YAML介绍
+                在Kubernetes上使用Traefik
               
             
           </h1>
@@ -338,14 +338,14 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-11T18:37:28+08:00" content="2017-07-11">
-              2017-07-11
+            <time itemprop="dateCreated" datetime="2017-09-25T11:30:01+08:00" content="2017-09-25">
+              2017-09-25
             </time>
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-07-14T16:03:58+08:00" content="2017-07-14">
-              2017-07-14
+              <time itemprop="dateUpdated" datetime="2017-09-25T12:18:29+08:00" content="2017-09-25">
+              2017-09-25
               </time>
               </span>
             
@@ -360,8 +360,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
+                  <a href="/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
                   </a>
                 </span>
 
@@ -380,7 +380,7 @@
 
           
           
-             <span id="/2017/07/11/Ansible的基础元素和YAML介绍/" class="leancloud_visitors" data-flag-title="Ansible的基础元素和YAML介绍">
+             <span id="/2017/09/25/在Kubernetes上使用Traefik/" class="leancloud_visitors" data-flag-title="在Kubernetes上使用Traefik">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -404,102 +404,283 @@
       
 
       
-        <h2 id="YAML"><a href="#YAML" class="headerlink" title="YAML"></a>YAML</h2><h3 id="YAML介绍"><a href="#YAML介绍" class="headerlink" title="YAML介绍"></a>YAML介绍</h3><p>YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。<br>YAML Ain’t Markup Language，即YAML不是XML。不过，在开发的这种语言时，YAML的意思其实是：”Yet Another Markup Language”（仍是一种标记语言）。其特性：<br><a id="more"></a></p>
-<ul>
-<li>YAML的可读性好</li>
-<li>YAML和脚本语言的交互性好</li>
-<li>YAML使用实现语言的数据类型</li>
-<li>YAML有一个一致的信息模型</li>
-<li>YAML易于实现</li>
-<li>YAML可以基于流来处理</li>
-<li>YAML表达能力强，扩展性好<br>更多的内容及规范参见<a href="http://www.yaml.org。" target="_blank" rel="external">http://www.yaml.org。</a></li>
-</ul>
-<h3 id="YAML语法"><a href="#YAML语法" class="headerlink" title="YAML语法"></a>YAML语法</h3><p>YAML的语法和其他高阶语言类似，并且可以简单表达清单、散列表、标量等数据结构。其结构（Structure）通过空格来展示，序列（Sequence）里的项用”-“来代表，Map里的键值对用”:”分隔。下面是一个示例。YAML是用键值对和缩进来表示的。</p>
-<pre><code>name: John Smith
-age: 41
-gender: Male
-spouse:                         
-    name: Jane Smith
-    age: 37
-    gender: Female
-children:                     
-    - name: Jimmy Smith
-      age: 17
-      gender: Male
-    - name: Jenny Smith
-      age 13
-      gender: Female
-</code></pre><p>YAML文件扩展名通常为.yaml，如example.yaml。</p>
-<h3 id="Ansible常用的数据类型"><a href="#Ansible常用的数据类型" class="headerlink" title="Ansible常用的数据类型"></a>Ansible常用的数据类型</h3><p>在ansible中常用的数据类型有序列(list)，也叫列表，还有字典，这些都很类似Python语言。</p>
-<h4 id="list"><a href="#list" class="headerlink" title="list"></a>list</h4><p>列表中的所有元素都使用“-”打头，例如：A list of tasty fruits</p>
-<ul>
-<li>Apple</li>
-<li>Orange</li>
-<li>Strawberry</li>
-<li>Mango</li>
-</ul>
-<h4 id="dictionary"><a href="#dictionary" class="headerlink" title="dictionary"></a>dictionary</h4><h2 id="字典通过key与value进行标识，例如："><a href="#字典通过key与value进行标识，例如：" class="headerlink" title="字典通过key与value进行标识，例如："></a>字典通过key与value进行标识，例如：</h2><p>An employee record：</p>
-<pre><code>name: Example Developer
-job: Developer
-skill: Elite
-</code></pre><h2 id="也可以将key-value放置于-中进行表示，例如："><a href="#也可以将key-value放置于-中进行表示，例如：" class="headerlink" title="也可以将key:value放置于{}中进行表示，例如："></a>也可以将key:value放置于{}中进行表示，例如：</h2><p>An employ record：</p>
-<pre><code>{name: Example Developer, job: Developer, skill: Elite}
-</code></pre><h2 id="Ansible基础元素"><a href="#Ansible基础元素" class="headerlink" title="Ansible基础元素"></a>Ansible基础元素</h2><h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><h4 id="变量命名"><a href="#变量命名" class="headerlink" title="变量命名"></a>变量命名</h4><p>变量名仅能由字母、数字和下划线组成，而且只能以字母开头。</p>
-<h4 id="facts"><a href="#facts" class="headerlink" title="facts"></a>facts</h4><p>facts是由正在通信的远程目标主机发回的信息，这些信息被保存在ansible变量中。要获取指定的远程主机所支持的所有facts，可使用如下命令进行：</p>
-<pre><code># ansible hostname -m setup
-</code></pre><h4 id="register"><a href="#register" class="headerlink" title="register"></a>register</h4><p>把任务的输出定义为变量，然后用于其他任务，示例如下：</p>
-<pre><code>tasks:
-  - shell: /usr/bin/foo
-    register: foo_result
-    ignore_errors: True
-</code></pre><h4 id="通过命令行传递变量"><a href="#通过命令行传递变量" class="headerlink" title="通过命令行传递变量"></a>通过命令行传递变量</h4><p>在运行playbook的时候也可以传递一些变量供playbook使用，示例如下：</p>
-<pre><code>ansible-playbook test.yml --extra-vars &quot;hosts=www user=magedu&quot;
-</code></pre><p>就是说hosts和user这两个变量可以在test.yml文件中直接调用</p>
-<h4 id="通过roles传递变量"><a href="#通过roles传递变量" class="headerlink" title="通过roles传递变量"></a>通过roles传递变量</h4><p>当给一个主机应用角色的时候可以传递变量，然后在角色内使用这些变量，示例如下：</p>
-<pre><code>- hosts: webservers
-  roles: 
-      - common
-      - { role: foo_app_instance, dir: &apos;/web/htdocs/a.com&apos;, port: 8080 }
-</code></pre><p><strong>注意:role、dir、port是变量名，冒号后面的是变量值。</strong></p>
-<h3 id="Inventory"><a href="#Inventory" class="headerlink" title="Inventory"></a>Inventory</h3><p>ansible的主要功能在于批量主机操作，为了便捷地使用其中的部分主机，可以在inventory file中将其分组命名。默认的inventory file为/etc/ansible/hosts。<br>inventory file可以有多个，且也可以通过Dynamic Inventory来动态生成。</p>
-<h4 id="inventory文件格式"><a href="#inventory文件格式" class="headerlink" title="inventory文件格式"></a>inventory文件格式</h4><p>inventory文件遵循INI文件风格，中括号中的字符为组名。可以将同一个主机同时归并到多个不同的组中；此外，当如若目标主机使用了非默认的SSH端口，还可以在主机名称之后使用冒号加端口号标明。</p>
-<pre><code>[webservers]
-www1.wisedu.com:8888
-www2.wisedu.com
-</code></pre><p>如果主机名称遵循相似的命名模式，还可以使用列表的方式标识各主机，例如：</p>
-<pre><code>[webservers]
-www[01:50].example.com
+        <h2 id="Traefik介绍"><a href="#Traefik介绍" class="headerlink" title="Traefik介绍"></a>Traefik介绍</h2><p>traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等编排工具具有良好的支持；同 nginx 等相比，traefik 能够自动感知后端容器变化，从而实现自动服务发现。<br>由于微服务架构以及 Docker 技术和 kubernetes 编排工具最近几年才开始逐渐流行，所以一开始的反向代理服务器比如 nginx、apache 并未提供其支持，毕竟他们也不是先知；所以才会出现 Ingress Controller 这种东西来做 kubernetes 和前端负载均衡器如 nginx 之间做衔接；即 Ingress Controller 的存在就是为了能跟 kubernetes 交互，又能写 nginx 配置，还能 reload 它，这是一种折中方案；而 traefik 天生就是提供了对 kubernetes 的支持，也就是说 traefik 本身就能跟 kubernetes API 交互，感知后端变化，因此可以得知: 在使用 traefik 时，Ingress Controller 已经没什么用了，整体架构如下：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/12.png" alt=""></p>
+<h2 id="部署测试用的两个服务"><a href="#部署测试用的两个服务" class="headerlink" title="部署测试用的两个服务"></a>部署测试用的两个服务</h2><p>部署两个服务nginx1-7和nginx1-8，后面用Traefik去负载这两个服务：<br>nginx1-7.yaml：</p>
+<pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: nginx1-7
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nginx1-7-deployment
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx1-7
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+</code></pre><p>nginx1-8.yaml：</p>
+<pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: my-nginx
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: nginx1-8
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nginx1-8-deployment
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx1-8
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.8
+        ports:
+        - containerPort: 80
+</code></pre><p>运行两个服务：</p>
+<pre><code>[root@node1 nginx_ingress]# kubectl create -f nginx1-7.yaml
+service &quot;frontend&quot; created
+deployment &quot;nginx1-7-deployment&quot; created
+[root@node1 nginx_ingress]# kubectl create -f nginx1-8.yaml
+service &quot;my-nginx&quot; created
+deployment &quot;nginx1-8-deployment&quot; created
+</code></pre><h2 id="Role-Based-Access-Control-configuration-Kubernetes-1-6-only"><a href="#Role-Based-Access-Control-configuration-Kubernetes-1-6-only" class="headerlink" title="Role Based Access Control configuration (Kubernetes 1.6+ only)"></a>Role Based Access Control configuration (Kubernetes 1.6+ only)</h2><p>我这里部署的是1.6.0集群，开启了RBAC，授权需要使用角色和绑定角色。</p>
+<pre><code>[root@node1 traefik]# pwd
+/opt/traefik
+[root@node1 traefik]# vim ingress-rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ingress
+  namespace: kube-system
 
-[databases]
-db-[a:f].example.com
-</code></pre><h4 id="主机变量"><a href="#主机变量" class="headerlink" title="主机变量"></a>主机变量</h4><p>可以在inventory中定义主机时为其添加主机变量以便于在playbook中使用，例如：</p>
-<pre><code>[webservers]
-www1.wisedu.com http_port=80 maxRequestsPerChild=808
-www2.wisedu.com http_port=8080 maxRequestsPerChild=909
-</code></pre><h4 id="组变量"><a href="#组变量" class="headerlink" title="组变量"></a>组变量</h4><p>组变量是指赋予给指定组内所有主机上的在playbook中可用的变量。例如：</p>
-<pre><code> [webservers]
- www1.wisedu.com
- www2.wisedu.com
+---
 
-[webservers:vars]   # 表示向webservers这组主机定义变量如下，回头这两台主机上都可以调用变量ntp_server和nfs_server
-ntp_server=ntp.wisedu.com
-nfs_server=ntp.wisedu.com
-</code></pre><h4 id="组嵌套"><a href="#组嵌套" class="headerlink" title="组嵌套"></a>组嵌套</h4><p>inventory中，组还可以包含其它的组，并且也可以向组中的主机指定变量。不过，这些变量只能在ansible-playbook中使用，而ansible不支持。例如：</p>
-<pre><code>[apache]
-httpd1.wisedu.com
-httpd2.wisedu.com
-
-[nginx]
-ngx1.wisedu.com
-ngx2.wisedu.com
-
-[webservers:children]     # 注意:children是固定格式
-apache
-nginx
-
-[webservers:vars]
-ntp_server=ntp.wisedu.com
-</code></pre><h4 id="inventory参数"><a href="#inventory参数" class="headerlink" title="inventory参数"></a>inventory参数</h4><p>ansible基于ssh连接inventory中指定的远程主机时，还可以通过参数指定其交互方式，这些参数如下所示：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/29.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/30.png" alt=""></p>
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: ingress
+subjects:
+  - kind: ServiceAccount
+    name: ingress
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+</code></pre><h2 id="部署Traefik"><a href="#部署Traefik" class="headerlink" title="部署Traefik"></a>部署Traefik</h2><pre><code>[root@node1 traefik]# pwd
+/opt/traefik
+[root@node1 traefik]# vim traefik-deploy.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: traefik-ingress-lb
+  namespace: kube-system
+  labels:
+    k8s-app: traefik-ingress-lb
+spec:
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      terminationGracePeriodSeconds: 60
+      hostNetwork: true
+      restartPolicy: Always
+      serviceAccountName: ingress
+      containers:
+      - image: traefik
+        name: traefik-ingress-lb
+        resources:
+          limits:
+            cpu: 200m
+            memory: 30Mi
+          requests:
+            cpu: 100m
+            memory: 20Mi
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        - name: admin
+          containerPort: 8580
+          hostPort: 8580
+        args:
+        - --web
+        - --web.address=:8580
+        - --kubernetes  
+</code></pre><p>其中 traefik 监听 node 的 80 和 8580 端口，80 提供正常服务，8580 是其自带的 UI 界面，原本默认是 8080，因为环境里端口冲突了，所以这里临时改一下。<br>注意：这里用的是Deploy类型，没有限定该pod运行在哪个主机上。</p>
+<h2 id="部署-Ingress"><a href="#部署-Ingress" class="headerlink" title="部署 Ingress"></a>部署 Ingress</h2><pre><code>[root@node1 traefik]# cat traefik.yaml 
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-ingress
+  namespace: default
+spec:
+  rules:
+  - host: traefik.nginx.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: my-nginx
+          servicePort: 80
+  - host: traefik.frontend.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: frontend
+          servicePort: 80
+</code></pre><p>其中的backend中要配置default namespace中启动的service名字，如果你没有配置namespace名字，默认使用default namespace，如果你在其他namespace中创建服务想要暴露到kubernetes集群外部，可以创建新的ingress.yaml文件，同时在文件中指定该namespace，其他配置与上面的文件格式相同。path就是URL地址后的路径，如traefik.frontend.io/path，service将会接受path这个路径，host最好使用service-name.filed1.filed2.domain-name这种类似主机名称的命名方式，方便区分服务。<br>根据实际环境中部署的service的名字和端口自行修改，有新service增加时，修改该文件后可以使用kubectl replace -f traefik.yaml来更新。</p>
+<h2 id="部署Traefik-UI"><a href="#部署Traefik-UI" class="headerlink" title="部署Traefik UI"></a>部署Traefik UI</h2><p>traefik 本身还提供了一套 UI 供我们使用，其同样以 Ingress 方式暴露，只需要创建一下即可。</p>
+<pre><code>[root@node1 traefik]# cat traefik-ui-service.yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-web-ui
+  namespace: kube-system
+spec:
+  selector:
+    k8s-app: traefik-ingress-lb
+  ports:
+  - name: web
+    port: 80
+    targetPort: 8580
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-web-ui
+  namespace: kube-system
+spec:
+  rules:
+  - host: traefik-ui.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: traefik-web-ui
+          servicePort: web
+</code></pre><p>最后一起创建：</p>
+<pre><code>[root@node1 traefik]# kubectl create -f .
+serviceaccount &quot;ingress&quot; created
+clusterrolebinding &quot;ingress&quot; created
+deployment &quot;traefik-ingress-lb&quot; created
+service &quot;traefik-web-ui&quot; created
+ingress &quot;traefik-web-ui&quot; created
+ingress &quot;traefik-ingress&quot; created
+</code></pre><h2 id="访问测试"><a href="#访问测试" class="headerlink" title="访问测试"></a>访问测试</h2><p>查看traefik pod被分配到了哪台主机上：</p>
+<pre><code>[root@node1 traefik]# kubectl get pods -n kube-system -l k8s-app=traefik-ingress-lb -o wide                       
+NAME                                  READY     STATUS    RESTARTS   AGE       IP             NODE
+traefik-ingress-lb-4237248072-1dg9n   1/1       Running   0          2m        172.16.7.152   172.16.7.152
+</code></pre><p>浏览器输入<a href="http://172.16.7.152:8580/，将可以看到dashboard。" target="_blank" rel="external">http://172.16.7.152:8580/，将可以看到dashboard。</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/13.png" alt=""><br>左侧黄色部分部分列出的是所有的rule，右侧绿色部分是所有的backend。</p>
+<p>在集群的任意一个节点上执行。假如现在我要访问nginx的”/“路径。</p>
+<pre><code>curl -H Host:traefik.nginx.io http://172.16.7.152/
+</code></pre><p>如果需要在kubernetes集群以外访问就需要设置DNS，或者修改本机的hosts文件。</p>
+<pre><code>172.16.7.152 traefik.nginx.io
+172.16.7.152 traefik.frontend.io
+</code></pre><p>所有访问这些地址的流量都会发送给172.16.7.152这台主机，就是我们启动traefik的主机。<br>Traefik会解析http请求header里的Host参数将流量转发给Ingress配置里的相应service。<br>修改hosts后就就可以在kubernetes集群外访问以上两个service。</p>
+<h2 id="健康检查"><a href="#健康检查" class="headerlink" title="健康检查"></a>健康检查</h2><p>关于健康检查，测试可以使用 kubernetes 的 Liveness Probe 实现，如果 Liveness Probe检查失败，则 traefik 会自动移除该 pod。<br>【示例】：我们定义一个 test-health 的 deployment，健康检查方式是 cat /tmp/health，容器启动 2 分钟后会删掉这个文件，模拟健康检查失败。<br>test-health的deployment：</p>
+<pre><code>[root@node1 traefik]# vim test-health-deploy.yaml
+apiVersion: v1
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: test
+  namespace: default
+  labels:
+    test: alpine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      test: alpine
+  template:
+    metadata:
+      labels:
+        test: alpine
+        name: test
+    spec:
+      containers:
+      - image: mritd/alpine:3.4
+        name: alpine
+        resources:
+          limits:
+            cpu: 200m
+            memory: 30Mi
+          requests:
+            cpu: 100m
+            memory: 20Mi
+        ports:
+        - name: http
+          containerPort: 80
+        args:
+        command:
+        - &quot;bash&quot;
+        - &quot;-c&quot;
+        - &quot;echo ok &gt; /tmp/health;sleep 120;rm -f /tmp/health&quot;
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/health
+          initialDelaySeconds: 20
+</code></pre><p>test-health 的 service：</p>
+<pre><code>[root@node1 traefik]# vim test-health-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: test 
+  labels:
+    name: test
+spec:
+  ports:
+  - port: 8123
+    targetPort: 80
+  selector:
+    name: test
+</code></pre><p>test-health的 Ingress：</p>
+<pre><code>[root@node1 traefik]# vim test-health-ingress.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: test
+spec:
+  rules:
+  - host: test.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: test
+          servicePort: 8123
+</code></pre><p>全部创建好以后，进入 traefik ui 界面，可以观察到每隔 2 分钟健康检查失败后，kubernetes 重建 pod，同时 traefik 会从后端列表中移除这个 pod。</p>
 
       
     </div>
@@ -521,7 +702,7 @@ ntp_server=ntp.wisedu.com
       
         <div class="post-tags">
           
-            <a href="/tags/Ansible-运维自动化/" rel="tag"><i class="fa fa-tag"></i>Ansible 运维自动化</a>
+            <a href="/tags/容器编排-Docker-Kubernetes/" rel="tag"><i class="fa fa-tag"></i>容器编排 Docker Kubernetes</a>
           
         </div>
       
@@ -530,17 +711,13 @@ ntp_server=ntp.wisedu.com
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/07/07/Ansible常见模块介绍/" rel="next" title="Ansible常见模块介绍">
-                <i class="fa fa-chevron-left"></i> Ansible常见模块介绍
+              <a href="/2017/09/24/Kubernetes-Ingress实战/" rel="next" title="Kubernetes Ingress实战">
+                <i class="fa fa-chevron-left"></i> Kubernetes Ingress实战
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/07/15/ansible-playbook基础组件介绍/" rel="prev" title="ansible playbook基础组件介绍">
-                ansible playbook基础组件介绍 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -697,7 +874,7 @@ ntp_server=ntp.wisedu.com
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#YAML"><span class="nav-number">1.</span> <span class="nav-text">YAML</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#YAML介绍"><span class="nav-number">1.1.</span> <span class="nav-text">YAML介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#YAML语法"><span class="nav-number">1.2.</span> <span class="nav-text">YAML语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ansible常用的数据类型"><span class="nav-number">1.3.</span> <span class="nav-text">Ansible常用的数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#list"><span class="nav-number">1.3.1.</span> <span class="nav-text">list</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dictionary"><span class="nav-number">1.3.2.</span> <span class="nav-text">dictionary</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字典通过key与value进行标识，例如："><span class="nav-number">2.</span> <span class="nav-text">字典通过key与value进行标识，例如：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#也可以将key-value放置于-中进行表示，例如："><span class="nav-number">3.</span> <span class="nav-text">也可以将key:value放置于{}中进行表示，例如：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ansible基础元素"><span class="nav-number">4.</span> <span class="nav-text">Ansible基础元素</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#变量"><span class="nav-number">4.1.</span> <span class="nav-text">变量</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#变量命名"><span class="nav-number">4.1.1.</span> <span class="nav-text">变量命名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#facts"><span class="nav-number">4.1.2.</span> <span class="nav-text">facts</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#register"><span class="nav-number">4.1.3.</span> <span class="nav-text">register</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过命令行传递变量"><span class="nav-number">4.1.4.</span> <span class="nav-text">通过命令行传递变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过roles传递变量"><span class="nav-number">4.1.5.</span> <span class="nav-text">通过roles传递变量</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Inventory"><span class="nav-number">4.2.</span> <span class="nav-text">Inventory</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#inventory文件格式"><span class="nav-number">4.2.1.</span> <span class="nav-text">inventory文件格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#主机变量"><span class="nav-number">4.2.2.</span> <span class="nav-text">主机变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#组变量"><span class="nav-number">4.2.3.</span> <span class="nav-text">组变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#组嵌套"><span class="nav-number">4.2.4.</span> <span class="nav-text">组嵌套</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#inventory参数"><span class="nav-number">4.2.5.</span> <span class="nav-text">inventory参数</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Traefik介绍"><span class="nav-number">1.</span> <span class="nav-text">Traefik介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署测试用的两个服务"><span class="nav-number">2.</span> <span class="nav-text">部署测试用的两个服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Role-Based-Access-Control-configuration-Kubernetes-1-6-only"><span class="nav-number">3.</span> <span class="nav-text">Role Based Access Control configuration (Kubernetes 1.6+ only)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署Traefik"><span class="nav-number">4.</span> <span class="nav-text">部署Traefik</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署-Ingress"><span class="nav-number">5.</span> <span class="nav-text">部署 Ingress</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署Traefik-UI"><span class="nav-number">6.</span> <span class="nav-text">部署Traefik UI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问测试"><span class="nav-number">7.</span> <span class="nav-text">访问测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#健康检查"><span class="nav-number">8.</span> <span class="nav-text">健康检查</span></a></li></ol></div>
             
           </div>
         </section>

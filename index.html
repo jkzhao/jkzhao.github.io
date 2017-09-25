@@ -321,6 +321,414 @@
             
               
                 
+                <a class="post-title-link" href="/2017/09/25/在Kubernetes上使用Traefik/" itemprop="url">
+                  在Kubernetes上使用Traefik
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-09-25T11:30:01+08:00" content="2017-09-25">
+              2017-09-25
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2017-09-25T12:18:29+08:00" content="2017-09-25">
+              2017-09-25
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/09/25/在Kubernetes上使用Traefik/" class="leancloud_visitors" data-flag-title="在Kubernetes上使用Traefik">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Traefik介绍"><a href="#Traefik介绍" class="headerlink" title="Traefik介绍"></a>Traefik介绍</h2><p>traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等编排工具具有良好的支持；同 nginx 等相比，traefik 能够自动感知后端容器变化，从而实现自动服务发现。<br>由于微服务架构以及 Docker 技术和 kubernetes 编排工具最近几年才开始逐渐流行，所以一开始的反向代理服务器比如 nginx、apache 并未提供其支持，毕竟他们也不是先知；所以才会出现 Ingress Controller 这种东西来做 kubernetes 和前端负载均衡器如 nginx 之间做衔接；即 Ingress Controller 的存在就是为了能跟 kubernetes 交互，又能写 nginx 配置，还能 reload 它，这是一种折中方案；而 traefik 天生就是提供了对 kubernetes 的支持，也就是说 traefik 本身就能跟 kubernetes API 交互，感知后端变化，因此可以得知: 在使用 traefik 时，Ingress Controller 已经没什么用了，整体架构如下：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/12.png" alt=""></p>
+<h2 id="部署测试用的两个服务"><a href="#部署测试用的两个服务" class="headerlink" title="部署测试用的两个服务"></a>部署测试用的两个服务</h2><p>部署两个服务nginx1-7和nginx1-8，后面用Traefik去负载这两个服务：<br>nginx1-7.yaml：</p>
+<pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: nginx1-7
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nginx1-7-deployment
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx1-7
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+</code></pre><p>nginx1-8.yaml：</p>
+<pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: my-nginx
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: nginx1-8
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nginx1-8-deployment
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx1-8
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.8
+        ports:
+        - containerPort: 80
+</code></pre><p>运行两个服务：</p>
+<pre><code>[root@node1 nginx_ingress]# kubectl create -f nginx1-7.yaml
+service &quot;frontend&quot; created
+deployment &quot;nginx1-7-deployment&quot; created
+[root@node1 nginx_ingress]# kubectl create -f nginx1-8.yaml
+service &quot;my-nginx&quot; created
+deployment &quot;nginx1-8-deployment&quot; created
+</code></pre><h2 id="Role-Based-Access-Control-configuration-Kubernetes-1-6-only"><a href="#Role-Based-Access-Control-configuration-Kubernetes-1-6-only" class="headerlink" title="Role Based Access Control configuration (Kubernetes 1.6+ only)"></a>Role Based Access Control configuration (Kubernetes 1.6+ only)</h2><p>我这里部署的是1.6.0集群，开启了RBAC，授权需要使用角色和绑定角色。</p>
+<pre><code>[root@node1 traefik]# pwd
+/opt/traefik
+[root@node1 traefik]# vim ingress-rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ingress
+  namespace: kube-system
+
+---
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: ingress
+subjects:
+  - kind: ServiceAccount
+    name: ingress
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+</code></pre><h2 id="部署Traefik"><a href="#部署Traefik" class="headerlink" title="部署Traefik"></a>部署Traefik</h2><pre><code>[root@node1 traefik]# pwd
+/opt/traefik
+[root@node1 traefik]# vim traefik-deploy.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: traefik-ingress-lb
+  namespace: kube-system
+  labels:
+    k8s-app: traefik-ingress-lb
+spec:
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      terminationGracePeriodSeconds: 60
+      hostNetwork: true
+      restartPolicy: Always
+      serviceAccountName: ingress
+      containers:
+      - image: traefik
+        name: traefik-ingress-lb
+        resources:
+          limits:
+            cpu: 200m
+            memory: 30Mi
+          requests:
+            cpu: 100m
+            memory: 20Mi
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        - name: admin
+          containerPort: 8580
+          hostPort: 8580
+        args:
+        - --web
+        - --web.address=:8580
+        - --kubernetes  
+</code></pre><p>其中 traefik 监听 node 的 80 和 8580 端口，80 提供正常服务，8580 是其自带的 UI 界面，原本默认是 8080，因为环境里端口冲突了，所以这里临时改一下。<br>注意：这里用的是Deploy类型，没有限定该pod运行在哪个主机上。</p>
+<h2 id="部署-Ingress"><a href="#部署-Ingress" class="headerlink" title="部署 Ingress"></a>部署 Ingress</h2><pre><code>[root@node1 traefik]# cat traefik.yaml 
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-ingress
+  namespace: default
+spec:
+  rules:
+  - host: traefik.nginx.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: my-nginx
+          servicePort: 80
+  - host: traefik.frontend.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: frontend
+          servicePort: 80
+</code></pre><p>其中的backend中要配置default namespace中启动的service名字，如果你没有配置namespace名字，默认使用default namespace，如果你在其他namespace中创建服务想要暴露到kubernetes集群外部，可以创建新的ingress.yaml文件，同时在文件中指定该namespace，其他配置与上面的文件格式相同。path就是URL地址后的路径，如traefik.frontend.io/path，service将会接受path这个路径，host最好使用service-name.filed1.filed2.domain-name这种类似主机名称的命名方式，方便区分服务。<br>根据实际环境中部署的service的名字和端口自行修改，有新service增加时，修改该文件后可以使用kubectl replace -f traefik.yaml来更新。</p>
+<h2 id="部署Traefik-UI"><a href="#部署Traefik-UI" class="headerlink" title="部署Traefik UI"></a>部署Traefik UI</h2><p>traefik 本身还提供了一套 UI 供我们使用，其同样以 Ingress 方式暴露，只需要创建一下即可。</p>
+<pre><code>[root@node1 traefik]# cat traefik-ui-service.yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-web-ui
+  namespace: kube-system
+spec:
+  selector:
+    k8s-app: traefik-ingress-lb
+  ports:
+  - name: web
+    port: 80
+    targetPort: 8580
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-web-ui
+  namespace: kube-system
+spec:
+  rules:
+  - host: traefik-ui.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: traefik-web-ui
+          servicePort: web
+</code></pre><p>最后一起创建：</p>
+<pre><code>[root@node1 traefik]# kubectl create -f .
+serviceaccount &quot;ingress&quot; created
+clusterrolebinding &quot;ingress&quot; created
+deployment &quot;traefik-ingress-lb&quot; created
+service &quot;traefik-web-ui&quot; created
+ingress &quot;traefik-web-ui&quot; created
+ingress &quot;traefik-ingress&quot; created
+</code></pre><h2 id="访问测试"><a href="#访问测试" class="headerlink" title="访问测试"></a>访问测试</h2><p>查看traefik pod被分配到了哪台主机上：</p>
+<pre><code>[root@node1 traefik]# kubectl get pods -n kube-system -l k8s-app=traefik-ingress-lb -o wide                       
+NAME                                  READY     STATUS    RESTARTS   AGE       IP             NODE
+traefik-ingress-lb-4237248072-1dg9n   1/1       Running   0          2m        172.16.7.152   172.16.7.152
+</code></pre><p>浏览器输入<a href="http://172.16.7.152:8580/，将可以看到dashboard。" target="_blank" rel="external">http://172.16.7.152:8580/，将可以看到dashboard。</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/13.png" alt=""><br>左侧黄色部分部分列出的是所有的rule，右侧绿色部分是所有的backend。</p>
+<p>在集群的任意一个节点上执行。假如现在我要访问nginx的”/“路径。</p>
+<pre><code>curl -H Host:traefik.nginx.io http://172.16.7.152/
+</code></pre><p>如果需要在kubernetes集群以外访问就需要设置DNS，或者修改本机的hosts文件。</p>
+<pre><code>172.16.7.152 traefik.nginx.io
+172.16.7.152 traefik.frontend.io
+</code></pre><p>所有访问这些地址的流量都会发送给172.16.7.152这台主机，就是我们启动traefik的主机。<br>Traefik会解析http请求header里的Host参数将流量转发给Ingress配置里的相应service。<br>修改hosts后就就可以在kubernetes集群外访问以上两个service。</p>
+<h2 id="健康检查"><a href="#健康检查" class="headerlink" title="健康检查"></a>健康检查</h2><p>关于健康检查，测试可以使用 kubernetes 的 Liveness Probe 实现，如果 Liveness Probe检查失败，则 traefik 会自动移除该 pod。<br>【示例】：我们定义一个 test-health 的 deployment，健康检查方式是 cat /tmp/health，容器启动 2 分钟后会删掉这个文件，模拟健康检查失败。<br>test-health的deployment：</p>
+<pre><code>[root@node1 traefik]# vim test-health-deploy.yaml
+apiVersion: v1
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: test
+  namespace: default
+  labels:
+    test: alpine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      test: alpine
+  template:
+    metadata:
+      labels:
+        test: alpine
+        name: test
+    spec:
+      containers:
+      - image: mritd/alpine:3.4
+        name: alpine
+        resources:
+          limits:
+            cpu: 200m
+            memory: 30Mi
+          requests:
+            cpu: 100m
+            memory: 20Mi
+        ports:
+        - name: http
+          containerPort: 80
+        args:
+        command:
+        - &quot;bash&quot;
+        - &quot;-c&quot;
+        - &quot;echo ok &gt; /tmp/health;sleep 120;rm -f /tmp/health&quot;
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/health
+          initialDelaySeconds: 20
+</code></pre><p>test-health 的 service：</p>
+<pre><code>[root@node1 traefik]# vim test-health-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: test 
+  labels:
+    name: test
+spec:
+  ports:
+  - port: 8123
+    targetPort: 80
+  selector:
+    name: test
+</code></pre><p>test-health的 Ingress：</p>
+<pre><code>[root@node1 traefik]# vim test-health-ingress.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: test
+spec:
+  rules:
+  - host: test.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: test
+          servicePort: 8123
+</code></pre><p>全部创建好以后，进入 traefik ui 界面，可以观察到每隔 2 分钟健康检查失败后，kubernetes 重建 pod，同时 traefik 会从后端列表中移除这个 pod。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2017/09/24/Kubernetes-Ingress实战/" itemprop="url">
                   Kubernetes Ingress实战
                 </a>
@@ -341,7 +749,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-09-25T10:36:21+08:00" content="2017-09-25">
+              <time itemprop="dateUpdated" datetime="2017-09-25T10:38:39+08:00" content="2017-09-25">
               2017-09-25
               </time>
               </span>
@@ -1516,142 +1924,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/08/23/手动构建镜像/" itemprop="url">
-                  手动构建镜像
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-08-23T11:15:08+08:00" content="2017-08-23">
-              2017-08-23
-            </time>
-            
-              <span class="post-updated">
-              &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-08-23T14:22:18+08:00" content="2017-08-23">
-              2017-08-23
-              </time>
-              </span>
-            
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Docker/" itemprop="url" rel="index">
-                    <span itemprop="name">Docker</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-             <span id="/2017/08/23/手动构建镜像/" class="leancloud_visitors" data-flag-title="手动构建镜像">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="创建docker镜像的方法"><a href="#创建docker镜像的方法" class="headerlink" title="创建docker镜像的方法"></a>创建docker镜像的方法</h2><ul>
-<li>使用”docker commit”命令</li>
-<li>使用”docker build”命令+”Dockerfile”文件<br>不推荐使用docker commit命令，而应该使用更灵活、更强大的dockerfile来构建docker镜像。<br>本篇文章先介绍docker commit来构建镜像。
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/08/23/手动构建镜像/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1699,7 +1971,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-count">43</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1821,7 +2093,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共103.1k字</span>
+  <span class="post-count">博客全站共104.7k字</span>
 </div>
 
         

@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-25T02:36:21.000Z</updated>
+  <updated>2017-09-25T04:18:29.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,310 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>在Kubernetes上使用Traefik</title>
+    <link href="http://yoursite.com/2017/09/25/%E5%9C%A8Kubernetes%E4%B8%8A%E4%BD%BF%E7%94%A8Traefik/"/>
+    <id>http://yoursite.com/2017/09/25/在Kubernetes上使用Traefik/</id>
+    <published>2017-09-25T03:30:01.000Z</published>
+    <updated>2017-09-25T04:18:29.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Traefik介绍&quot;&gt;&lt;a href=&quot;#Traefik介绍&quot; class=&quot;headerlink&quot; title=&quot;Traefik介绍&quot;&gt;&lt;/a&gt;Traefik介绍&lt;/h2&gt;&lt;p&gt;traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等编排工具具有良好的支持；同 nginx 等相比，traefik 能够自动感知后端容器变化，从而实现自动服务发现。&lt;br&gt;由于微服务架构以及 Docker 技术和 kubernetes 编排工具最近几年才开始逐渐流行，所以一开始的反向代理服务器比如 nginx、apache 并未提供其支持，毕竟他们也不是先知；所以才会出现 Ingress Controller 这种东西来做 kubernetes 和前端负载均衡器如 nginx 之间做衔接；即 Ingress Controller 的存在就是为了能跟 kubernetes 交互，又能写 nginx 配置，还能 reload 它，这是一种折中方案；而 traefik 天生就是提供了对 kubernetes 的支持，也就是说 traefik 本身就能跟 kubernetes API 交互，感知后端变化，因此可以得知: 在使用 traefik 时，Ingress Controller 已经没什么用了，整体架构如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;部署测试用的两个服务&quot;&gt;&lt;a href=&quot;#部署测试用的两个服务&quot; class=&quot;headerlink&quot; title=&quot;部署测试用的两个服务&quot;&gt;&lt;/a&gt;部署测试用的两个服务&lt;/h2&gt;&lt;p&gt;部署两个服务nginx1-7和nginx1-8，后面用Traefik去负载这两个服务：&lt;br&gt;nginx1-7.yaml：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: nginx1-7
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nginx1-7-deployment
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx1-7
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;nginx1-8.yaml：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;apiVersion: v1
+kind: Service
+metadata:
+  name: my-nginx
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: nginx1-8
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nginx1-8-deployment
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx1-8
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.8
+        ports:
+        - containerPort: 80
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行两个服务：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 nginx_ingress]# kubectl create -f nginx1-7.yaml
+service &amp;quot;frontend&amp;quot; created
+deployment &amp;quot;nginx1-7-deployment&amp;quot; created
+[root@node1 nginx_ingress]# kubectl create -f nginx1-8.yaml
+service &amp;quot;my-nginx&amp;quot; created
+deployment &amp;quot;nginx1-8-deployment&amp;quot; created
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;Role-Based-Access-Control-configuration-Kubernetes-1-6-only&quot;&gt;&lt;a href=&quot;#Role-Based-Access-Control-configuration-Kubernetes-1-6-only&quot; class=&quot;headerlink&quot; title=&quot;Role Based Access Control configuration (Kubernetes 1.6+ only)&quot;&gt;&lt;/a&gt;Role Based Access Control configuration (Kubernetes 1.6+ only)&lt;/h2&gt;&lt;p&gt;我这里部署的是1.6.0集群，开启了RBAC，授权需要使用角色和绑定角色。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# pwd
+/opt/traefik
+[root@node1 traefik]# vim ingress-rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ingress
+  namespace: kube-system
+
+---
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: ingress
+subjects:
+  - kind: ServiceAccount
+    name: ingress
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;部署Traefik&quot;&gt;&lt;a href=&quot;#部署Traefik&quot; class=&quot;headerlink&quot; title=&quot;部署Traefik&quot;&gt;&lt;/a&gt;部署Traefik&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# pwd
+/opt/traefik
+[root@node1 traefik]# vim traefik-deploy.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: traefik-ingress-lb
+  namespace: kube-system
+  labels:
+    k8s-app: traefik-ingress-lb
+spec:
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      terminationGracePeriodSeconds: 60
+      hostNetwork: true
+      restartPolicy: Always
+      serviceAccountName: ingress
+      containers:
+      - image: traefik
+        name: traefik-ingress-lb
+        resources:
+          limits:
+            cpu: 200m
+            memory: 30Mi
+          requests:
+            cpu: 100m
+            memory: 20Mi
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        - name: admin
+          containerPort: 8580
+          hostPort: 8580
+        args:
+        - --web
+        - --web.address=:8580
+        - --kubernetes  
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中 traefik 监听 node 的 80 和 8580 端口，80 提供正常服务，8580 是其自带的 UI 界面，原本默认是 8080，因为环境里端口冲突了，所以这里临时改一下。&lt;br&gt;注意：这里用的是Deploy类型，没有限定该pod运行在哪个主机上。&lt;/p&gt;
+&lt;h2 id=&quot;部署-Ingress&quot;&gt;&lt;a href=&quot;#部署-Ingress&quot; class=&quot;headerlink&quot; title=&quot;部署 Ingress&quot;&gt;&lt;/a&gt;部署 Ingress&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# cat traefik.yaml 
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-ingress
+  namespace: default
+spec:
+  rules:
+  - host: traefik.nginx.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: my-nginx
+          servicePort: 80
+  - host: traefik.frontend.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: frontend
+          servicePort: 80
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中的backend中要配置default namespace中启动的service名字，如果你没有配置namespace名字，默认使用default namespace，如果你在其他namespace中创建服务想要暴露到kubernetes集群外部，可以创建新的ingress.yaml文件，同时在文件中指定该namespace，其他配置与上面的文件格式相同。path就是URL地址后的路径，如traefik.frontend.io/path，service将会接受path这个路径，host最好使用service-name.filed1.filed2.domain-name这种类似主机名称的命名方式，方便区分服务。&lt;br&gt;根据实际环境中部署的service的名字和端口自行修改，有新service增加时，修改该文件后可以使用kubectl replace -f traefik.yaml来更新。&lt;/p&gt;
+&lt;h2 id=&quot;部署Traefik-UI&quot;&gt;&lt;a href=&quot;#部署Traefik-UI&quot; class=&quot;headerlink&quot; title=&quot;部署Traefik UI&quot;&gt;&lt;/a&gt;部署Traefik UI&lt;/h2&gt;&lt;p&gt;traefik 本身还提供了一套 UI 供我们使用，其同样以 Ingress 方式暴露，只需要创建一下即可。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# cat traefik-ui-service.yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-web-ui
+  namespace: kube-system
+spec:
+  selector:
+    k8s-app: traefik-ingress-lb
+  ports:
+  - name: web
+    port: 80
+    targetPort: 8580
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-web-ui
+  namespace: kube-system
+spec:
+  rules:
+  - host: traefik-ui.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: traefik-web-ui
+          servicePort: web
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;最后一起创建：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# kubectl create -f .
+serviceaccount &amp;quot;ingress&amp;quot; created
+clusterrolebinding &amp;quot;ingress&amp;quot; created
+deployment &amp;quot;traefik-ingress-lb&amp;quot; created
+service &amp;quot;traefik-web-ui&amp;quot; created
+ingress &amp;quot;traefik-web-ui&amp;quot; created
+ingress &amp;quot;traefik-ingress&amp;quot; created
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;访问测试&quot;&gt;&lt;a href=&quot;#访问测试&quot; class=&quot;headerlink&quot; title=&quot;访问测试&quot;&gt;&lt;/a&gt;访问测试&lt;/h2&gt;&lt;p&gt;查看traefik pod被分配到了哪台主机上：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# kubectl get pods -n kube-system -l k8s-app=traefik-ingress-lb -o wide                       
+NAME                                  READY     STATUS    RESTARTS   AGE       IP             NODE
+traefik-ingress-lb-4237248072-1dg9n   1/1       Running   0          2m        172.16.7.152   172.16.7.152
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;浏览器输入&lt;a href=&quot;http://172.16.7.152:8580/，将可以看到dashboard。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.152:8580/，将可以看到dashboard。&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;左侧黄色部分部分列出的是所有的rule，右侧绿色部分是所有的backend。&lt;/p&gt;
+&lt;p&gt;在集群的任意一个节点上执行。假如现在我要访问nginx的”/“路径。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;curl -H Host:traefik.nginx.io http://172.16.7.152/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果需要在kubernetes集群以外访问就需要设置DNS，或者修改本机的hosts文件。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;172.16.7.152 traefik.nginx.io
+172.16.7.152 traefik.frontend.io
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;所有访问这些地址的流量都会发送给172.16.7.152这台主机，就是我们启动traefik的主机。&lt;br&gt;Traefik会解析http请求header里的Host参数将流量转发给Ingress配置里的相应service。&lt;br&gt;修改hosts后就就可以在kubernetes集群外访问以上两个service。&lt;/p&gt;
+&lt;h2 id=&quot;健康检查&quot;&gt;&lt;a href=&quot;#健康检查&quot; class=&quot;headerlink&quot; title=&quot;健康检查&quot;&gt;&lt;/a&gt;健康检查&lt;/h2&gt;&lt;p&gt;关于健康检查，测试可以使用 kubernetes 的 Liveness Probe 实现，如果 Liveness Probe检查失败，则 traefik 会自动移除该 pod。&lt;br&gt;【示例】：我们定义一个 test-health 的 deployment，健康检查方式是 cat /tmp/health，容器启动 2 分钟后会删掉这个文件，模拟健康检查失败。&lt;br&gt;test-health的deployment：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# vim test-health-deploy.yaml
+apiVersion: v1
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: test
+  namespace: default
+  labels:
+    test: alpine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      test: alpine
+  template:
+    metadata:
+      labels:
+        test: alpine
+        name: test
+    spec:
+      containers:
+      - image: mritd/alpine:3.4
+        name: alpine
+        resources:
+          limits:
+            cpu: 200m
+            memory: 30Mi
+          requests:
+            cpu: 100m
+            memory: 20Mi
+        ports:
+        - name: http
+          containerPort: 80
+        args:
+        command:
+        - &amp;quot;bash&amp;quot;
+        - &amp;quot;-c&amp;quot;
+        - &amp;quot;echo ok &amp;gt; /tmp/health;sleep 120;rm -f /tmp/health&amp;quot;
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/health
+          initialDelaySeconds: 20
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;test-health 的 service：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# vim test-health-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: test 
+  labels:
+    name: test
+spec:
+  ports:
+  - port: 8123
+    targetPort: 80
+  selector:
+    name: test
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;test-health的 Ingress：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# vim test-health-ingress.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: test
+spec:
+  rules:
+  - host: test.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: test
+          servicePort: 8123
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;全部创建好以后，进入 traefik ui 界面，可以观察到每隔 2 分钟健康检查失败后，kubernetes 重建 pod，同时 traefik 会从后端列表中移除这个 pod。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Traefik介绍&quot;&gt;&lt;a href=&quot;#Traefik介绍&quot; class=&quot;headerlink&quot; title=&quot;Traefik介绍&quot;&gt;&lt;/a&gt;Traefik介绍&lt;/h2&gt;&lt;p&gt;traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等
+    
+    </summary>
+    
+      <category term="Kubernetes" scheme="http://yoursite.com/categories/Kubernetes/"/>
+    
+    
+      <category term="容器编排 Docker Kubernetes" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8%E7%BC%96%E6%8E%92-Docker-Kubernetes/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Kubernetes Ingress实战</title>
     <link href="http://yoursite.com/2017/09/24/Kubernetes-Ingress%E5%AE%9E%E6%88%98/"/>
     <id>http://yoursite.com/2017/09/24/Kubernetes-Ingress实战/</id>
     <published>2017-09-24T08:57:22.000Z</published>
-    <updated>2017-09-25T02:36:21.000Z</updated>
+    <updated>2017-09-25T02:38:39.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;服务发现与负载均衡&quot;&gt;&lt;a href=&quot;#服务发现与负载均衡&quot; class=&quot;headerlink&quot; title=&quot;服务发现与负载均衡&quot;&gt;&lt;/a&gt;服务发现与负载均衡&lt;/h2&gt;&lt;p&gt;在前面的安装部署kubernetes集群中已经简单用示例来演示了Pod和Service，Kubernetes通过Service资源在Kubernetes集群内针对容器实现了服务发现和负载均衡。而Service就是kubernetes服务发现与负载均衡中的一种。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;目前，kubernetes中的负载均衡大致可以分为以下几种机制，每种机制都有其特定的应用场景：&lt;/p&gt;
 &lt;ul&gt;
@@ -4305,167 +4604,6 @@ files  handlers  meta  tasks  templates  vars
     
       &lt;h2 id=&quot;Ansible条件测试&quot;&gt;&lt;a href=&quot;#Ansible条件测试&quot; class=&quot;headerlink&quot; title=&quot;Ansible条件测试&quot;&gt;&lt;/a&gt;Ansible条件测试&lt;/h2&gt;&lt;p&gt;在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。&lt;/p&gt;
 &lt;h3 id=&quot;when语句&quot;&gt;&lt;a href=&quot;#when语句&quot; class=&quot;headerlink&quot; title=&quot;when语句&quot;&gt;&lt;/a&gt;when语句&lt;/h3&gt;&lt;p&gt;在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如：&lt;br&gt;
-    
-    </summary>
-    
-      <category term="运维自动化" scheme="http://yoursite.com/categories/%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
-    
-    
-      <category term="Ansible 运维自动化" scheme="http://yoursite.com/tags/Ansible-%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>ansible playbook基础组件介绍</title>
-    <link href="http://yoursite.com/2017/07/15/ansible-playbook%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D/"/>
-    <id>http://yoursite.com/2017/07/15/ansible-playbook基础组件介绍/</id>
-    <published>2017-07-15T07:24:31.000Z</published>
-    <updated>2017-07-20T08:18:24.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;ansible-playbook介绍&quot;&gt;&lt;a href=&quot;#ansible-playbook介绍&quot; class=&quot;headerlink&quot; title=&quot;ansible playbook介绍&quot;&gt;&lt;/a&gt;ansible playbook介绍&lt;/h2&gt;&lt;p&gt;playbook是由一个或多个“play”组成的列表(剧本是由多出戏组成的)。play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联同起来按事先编排的机制同唱一台大戏。下面是一个简单示例。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- hosts: webnodes
-  vars:
-  http_port: 80
-  max_clients: 256
-remote_user: root
-tasks:          
-- name: ensure apache is at the latest version
-  yum: name=httpd state=latest
-- name: ensure apache is running
-  service: name=httpd state=started
-handlers:
-- name: restart apache
-  service: name=httpd state=restarted
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中，tasks是一个一个任务。&lt;/p&gt;
-&lt;h2 id=&quot;ansible-playbook基础组件&quot;&gt;&lt;a href=&quot;#ansible-playbook基础组件&quot; class=&quot;headerlink&quot; title=&quot;ansible playbook基础组件&quot;&gt;&lt;/a&gt;ansible playbook基础组件&lt;/h2&gt;&lt;p&gt;Playbooks结构：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Tasks：任务，即调用模块完成的某操作。&lt;/li&gt;
-&lt;li&gt;Variables：变量&lt;/li&gt;
-&lt;li&gt;Templates：模板&lt;/li&gt;
-&lt;li&gt;Handlers：处理器，指的是在某条件满足时能够触发完成的功能，或者说是由某事件触发执行的操作&lt;/li&gt;
-&lt;li&gt;Roles：角色。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;Hosts和Users&quot;&gt;&lt;a href=&quot;#Hosts和Users&quot; class=&quot;headerlink&quot; title=&quot;Hosts和Users&quot;&gt;&lt;/a&gt;Hosts和Users&lt;/h3&gt;&lt;p&gt;playbook中的每一个play的目的都是为了让某个或某些主机以某个指定的用户身份执行任务。hosts用于指定要执行指定任务的主机，其可以是一个或多个由冒号分隔主机组；remote_user则用于指定远程主机上的执行任务的用户。如上面示例中的&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;-hosts: webnodes
- remote_user: root
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;不过，remote_user也可用于各task中。也可以通过指定其通过sudo的方式在远程主机上执行任务，其可用于play全局或某任务；此外，甚至可以在sudo时使用sudo_user指定sudo时切换的用户。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- hosts: webnodes
- remote_user: mageedu
- tasks:
-   - name: test connection
-     ping:
-     remote_user: mageedu
-     sudo: yes
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;比如写一个最简单的playbook，里面写了两个play，一个play是在nginx组的主机上都创建一个nginx组，nginx用户，另一个play是复制一个文件到mysql组的主机上：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim nginx.yml
-- hosts: nginx                                                                                                                                
-  remote_user: root
-  tasks:
-  - name: create nginx group
-    group: name=nginx system=yes gid=208
-  - name: create nginx user
-    user: name=nginx uid=208 group=nginx system=yes
-- hosts: mysql
-  remote_user: root
-  tasks:
-  - name: copy file to mysql hosts
-    copy: src=/etc/inittab dest=/tmp/inittab.ans
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看ansible-playbook的使用方法：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# man ansible-playbook
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行playbook：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-playbook nginx.yml 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/31.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;任务列表-Tasks-和action&quot;&gt;&lt;a href=&quot;#任务列表-Tasks-和action&quot; class=&quot;headerlink&quot; title=&quot;任务列表(Tasks)和action&quot;&gt;&lt;/a&gt;任务列表(Tasks)和action&lt;/h3&gt;&lt;p&gt;play的主体部分是task list。task list中的各任务按次序逐个在hosts中指定的所有主机上执行，即在所有主机上完成第一个任务后再开始第二个。在运行自下而下某playbook时，如果中途发生错误，所有已执行任务都可能回滚，因此，在更正playbook后重新执行一次即可。(因为具有幂等性)&lt;br&gt;task的目的是使用指定的参数执行模块，而在模块参数中可以使用变量。模块执行是幂等的，这意味着多次执行是安全的，因为其结果均一致。&lt;br&gt;每个task都应该有其name，用于playbook的执行结果输出，建议其内容尽可能清晰地描述任务执行步骤。如果未提供name，则action的结果将用于输出。&lt;br&gt;定义task的可以使用“action: module options”(这个在较新版本上才能执行)或“module: options”的格式，推荐使用后者以实现向后兼容。如果action一行的内容过多，也可以使用在行首使用几个空白字符进行换行。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;tasks:
-- name: make sure apache is running
-  service: name=httpd state=running
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在众多模块中，只有command和shell模块仅需要给定一个列表而无需使用“key=value”格式，例如：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;tasks:
-- name: disable selinux
-  command: /sbin/setenforce 0
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果命令或脚本的退出码不为零，可能会阻止playbook继续往下执行可以使用如下方式替代：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;tasks:
-- name: run this command and ignore the result
-  shell: /usr/bin/somecommand || /bin/true
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;也就是说这个命令失败也是要继续往下走的，就是失败了但不要影响下面的操作。或者使用ignore_errors来忽略错误信息：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;tasks:
-- name: run this command and ignore the result
-  shell: /usr/bin/somecommand
-  ignore_errors: True        
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;handlers&quot;&gt;&lt;a href=&quot;#handlers&quot; class=&quot;headerlink&quot; title=&quot;handlers&quot;&gt;&lt;/a&gt;handlers&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;用于当关注的资源发生变化时采取一定的操作。&lt;/strong&gt;&lt;br&gt;“notify”这个action可用于在每个play的最后被触发，这样可以避免多次有改变发生时每次都执行指定的操作，取而代之，仅在所有的变化发生完成后一次性地执行指定操作。在notify中列出的操作称为handler，也即notify中调用handler中定义的操作。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- name: template configuration file
-  template: src=template.j2 dest=/etc/foo.conf
-  notify:
-  - restart memcached
-  - restart apache    
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;handler是task列表，这些task与前述的task并没有本质上的不同。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;handlers:
-- name: restart memcached
-  service:  name=memcached state=restarted
-- name: restart apache
-  service: name=apache state=restarted
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【举例】：比如有个配置nginx的playbook，然后利用这个来说明handlers。&lt;br&gt;1.先创建一个apache.yml，里面定义play安装启动apache&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim apache.yml
-- hosts: mysql
-  remote_user: root
-  tasks:
-  - name: install httpd package
-    yum: name=httpd state=latest
-  - name: install configuration file for httpd
-    copy: src=/root/conf/httpd.conf dest=/etc/httpd/conf/httpd.conf 
-  - name: start httpd service 
-    service: enabled=true name=httpd state=started
-[root@node1 ~]# ansible-playbook apache.yml
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.假如说某个时刻httpd.conf发生改变了，比如说不再监听在80，而是监听在8080端口，其他没变。修改/root/conf/httpd.conf，把端口改成8080，再执行这个playbook：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-playbook apache.yml
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;到mysql组所在的主机172.16.7.153上查看端口，发现监听端口仍然是80：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node3 ~]# ss -tnlp
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/32.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;3.一个程序的配置文件发生了改变，那么程序应该重读配置文件才对。然而默认情况下，你多次唱同一个剧本，如果那个task此前执行过，为了保证幂等性，它是不会再被执行。handlers就是为了解决这种问题而生的。Handlers也是任务，但它不是上来就执行的，只有某个条件满足时才会执行。所以我们去修改apache.yml：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- hosts: mysql
-  remote_user: root
-  tasks:
-  - name: install httpd package
-    yum: name=httpd state=latest
-  - name: install configuration file for httpd
-    copy: src=/root/conf/httpd.conf dest=/etc/httpd/conf/httpd.conf 
-    notify:
-    - restart httpd
-  - name: start httpd service 
-    service: enabled=true name=httpd state=started
-  handlers:
-  - name: restart httpd
-    service: name=httpd state=restarted
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/33.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;修改/root/conf/httpd.conf，把端口改成8090，再执行这个playbook：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-playbook apache.yml
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/34.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;到mysql组所在的主机172.16.7.153上查看端口，发现监听端口改变了，变成了8090：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/35.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;playbook中使用变量&quot;&gt;&lt;a href=&quot;#playbook中使用变量&quot; class=&quot;headerlink&quot; title=&quot;playbook中使用变量&quot;&gt;&lt;/a&gt;playbook中使用变量&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;- hosts: mysql
-  remote_user: root
-  vars:
-  - package: httpd
-  tasks:
-  - name: install httpd package
-    yum: name={{ package }} state=latest                                                                                                      
-  - name: install configuration file for httpd
-    copy: src=/root/conf/httpd.conf dest=/etc/httpd/conf/httpd.conf 
-    notify:
-    - restart httpd
-  - name: start httpd service 
-    service: enabled=true name=httpd state=started
-  handlers:
-  - name: restart httpd
-    service: name=httpd state=restarted
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/36.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;【注意】：playbook中能使用的变量不仅仅是这里定义的变量，而是可以使用ansible中定义的所有变量。例如：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible 172.16.7.152 -m setup
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;另外，在inventory中定义的变量也可以在playbook中调用。例如：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim /etc/ansible/hosts
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/38.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;ansible-playbook介绍&quot;&gt;&lt;a href=&quot;#ansible-playbook介绍&quot; class=&quot;headerlink&quot; title=&quot;ansible playbook介绍&quot;&gt;&lt;/a&gt;ansible playbook介绍&lt;/h2&gt;&lt;p&gt;playbook是由一个或多个“play”组成的列表(剧本是由多出戏组成的)。play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联同起来按事先编排的机制同唱一台大戏。下面是一个简单示例。&lt;br&gt;
     
     </summary>
     
