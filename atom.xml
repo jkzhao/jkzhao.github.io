@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-25T04:18:29.000Z</updated>
+  <updated>2017-09-25T04:24:30.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,9 +20,9 @@
     <link href="http://yoursite.com/2017/09/25/%E5%9C%A8Kubernetes%E4%B8%8A%E4%BD%BF%E7%94%A8Traefik/"/>
     <id>http://yoursite.com/2017/09/25/在Kubernetes上使用Traefik/</id>
     <published>2017-09-25T03:30:01.000Z</published>
-    <updated>2017-09-25T04:18:29.000Z</updated>
+    <updated>2017-09-25T04:24:30.000Z</updated>
     
-    <content type="html">&lt;h2 id=&quot;Traefik介绍&quot;&gt;&lt;a href=&quot;#Traefik介绍&quot; class=&quot;headerlink&quot; title=&quot;Traefik介绍&quot;&gt;&lt;/a&gt;Traefik介绍&lt;/h2&gt;&lt;p&gt;traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等编排工具具有良好的支持；同 nginx 等相比，traefik 能够自动感知后端容器变化，从而实现自动服务发现。&lt;br&gt;由于微服务架构以及 Docker 技术和 kubernetes 编排工具最近几年才开始逐渐流行，所以一开始的反向代理服务器比如 nginx、apache 并未提供其支持，毕竟他们也不是先知；所以才会出现 Ingress Controller 这种东西来做 kubernetes 和前端负载均衡器如 nginx 之间做衔接；即 Ingress Controller 的存在就是为了能跟 kubernetes 交互，又能写 nginx 配置，还能 reload 它，这是一种折中方案；而 traefik 天生就是提供了对 kubernetes 的支持，也就是说 traefik 本身就能跟 kubernetes API 交互，感知后端变化，因此可以得知: 在使用 traefik 时，Ingress Controller 已经没什么用了，整体架构如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+    <content type="html">&lt;h2 id=&quot;Traefik介绍&quot;&gt;&lt;a href=&quot;#Traefik介绍&quot; class=&quot;headerlink&quot; title=&quot;Traefik介绍&quot;&gt;&lt;/a&gt;Traefik介绍&lt;/h2&gt;&lt;p&gt;traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等编排工具具有良好的支持；同 nginx 等相比，traefik 能够自动感知后端容器变化，从而实现自动服务发现。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;由于微服务架构以及 Docker 技术和 kubernetes 编排工具最近几年才开始逐渐流行，所以一开始的反向代理服务器比如 nginx、apache 并未提供其支持，毕竟他们也不是先知；所以才会出现 Ingress Controller 这种东西来做 kubernetes 和前端负载均衡器如 nginx 之间做衔接；即 Ingress Controller 的存在就是为了能跟 kubernetes 交互，又能写 nginx 配置，还能 reload 它，这是一种折中方案；而 traefik 天生就是提供了对 kubernetes 的支持，也就是说 traefik 本身就能跟 kubernetes API 交互，感知后端变化，因此可以得知: 在使用 traefik 时，Ingress Controller 已经没什么用了，整体架构如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h2 id=&quot;部署测试用的两个服务&quot;&gt;&lt;a href=&quot;#部署测试用的两个服务&quot; class=&quot;headerlink&quot; title=&quot;部署测试用的两个服务&quot;&gt;&lt;/a&gt;部署测试用的两个服务&lt;/h2&gt;&lt;p&gt;部署两个服务nginx1-7和nginx1-8，后面用Traefik去负载这两个服务：&lt;br&gt;nginx1-7.yaml：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;apiVersion: v1
 kind: Service
@@ -303,7 +303,7 @@ spec:
     
     <summary type="html">
     
-      &lt;h2 id=&quot;Traefik介绍&quot;&gt;&lt;a href=&quot;#Traefik介绍&quot; class=&quot;headerlink&quot; title=&quot;Traefik介绍&quot;&gt;&lt;/a&gt;Traefik介绍&lt;/h2&gt;&lt;p&gt;traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等
+      &lt;h2 id=&quot;Traefik介绍&quot;&gt;&lt;a href=&quot;#Traefik介绍&quot; class=&quot;headerlink&quot; title=&quot;Traefik介绍&quot;&gt;&lt;/a&gt;Traefik介绍&lt;/h2&gt;&lt;p&gt;traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等编排工具具有良好的支持；同 nginx 等相比，traefik 能够自动感知后端容器变化，从而实现自动服务发现。&lt;br&gt;
     
     </summary>
     
