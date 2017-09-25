@@ -112,7 +112,7 @@
 <meta property="og:site_name" content="jkzhao&#39;s blog">
 <meta property="og:description" content="服务发现与负载均衡在前面的安装部署kubernetes集群中已经简单用示例来演示了Pod和Service，Kubernetes通过Service资源在Kubernetes集群内针对容器实现了服务发现和负载均衡。而Service就是kubernetes服务发现与负载均衡中的一种。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-09-25T02:09:23.000Z">
+<meta property="og:updated_time" content="2017-09-25T02:21:07.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kubernetes Ingress实战">
 <meta name="twitter:description" content="服务发现与负载均衡在前面的安装部署kubernetes集群中已经简单用示例来演示了Pod和Service，Kubernetes通过Service资源在Kubernetes集群内针对容器实现了服务发现和负载均衡。而Service就是kubernetes服务发现与负载均衡中的一种。">
@@ -341,7 +341,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-09-25T10:09:23+08:00" content="2017-09-25">
+              <time itemprop="dateUpdated" datetime="2017-09-25T10:21:07+08:00" content="2017-09-25">
               2017-09-25
               </time>
               </span>
@@ -439,43 +439,6 @@
 <h3 id="创建Ingress"><a href="#创建Ingress" class="headerlink" title="创建Ingress"></a>创建Ingress</h3><p>假设这两个服务要暴露到集群外部。要创建一个ingress：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">[root@node1 nginx_ingress]# vim test-ingress.yaml</div><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: test</div><div class="line">spec:</div><div class="line">  rules:</div><div class="line">  - host: n17.my.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - backend:</div><div class="line">          serviceName: nginx1-7</div><div class="line">          servicePort: 80</div><div class="line">  - host: n18.my.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - backend:</div><div class="line">          serviceName: nginx1-8</div><div class="line">          servicePort: 80</div></pre></td></tr></table></figure></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@node1 nginx_ingress]# kubectl create -f test-ingress.yaml</div><div class="line">ingress &quot;test&quot; created</div><div class="line">[root@node1 nginx_ingress]# kubectl get ing</div><div class="line">NAME              HOSTS                                  ADDRESS   PORTS     AGE</div><div class="line">test              n17.my.com,n18.my.com                            80        52s</div></pre></td></tr></table></figure>
 <p>打开客户机的/etc/hosts，配置172.16.7.151和n17.my.com,n18.my.com的对应关系，然后在浏览器访问n17.my.com或n18.my.com就可以访问到对应的服务。<br>如果想修改访问规则，修改test-ingress.yaml，使用kubectl replace -f更新就可以了。</p>
-
-      
-    </div>
-
-    <div>
-      
-        
-<div class="my_post_copyright">
-  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
-  
-  <!-- JS库 sweetalert 可修改路径 -->
-  <script type="text/javascript" src="http://jslibs.wuxubj.cn/sweetalert_mini/jquery-1.7.1.min.js"></script>
-  <script src="http://jslibs.wuxubj.cn/sweetalert_mini/sweetalert.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="http://jslibs.wuxubj.cn/sweetalert_mini/sweetalert.mini.css">
-  <p><span>本文标题:</span><a href="/2017/09/24/Kubernetes-Ingress实战/">Kubernetes Ingress实战</a></p>
-  <p><span>文章作者:</span><a href="/" title="访问 Zhao Jiankai 的个人博客">Zhao Jiankai</a></p>
-  <p><span>发布时间:</span>2017年09月24日 - 16:09</p>
-  <p><span>最后更新:</span>2017年09月25日 - 10:09</p>
-  <p><span>原始链接:</span><a href="/2017/09/24/Kubernetes-Ingress实战/" title="Kubernetes Ingress实战">http://yoursite.com/2017/09/24/Kubernetes-Ingress实战/</a>
-    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://yoursite.com/2017/09/24/Kubernetes-Ingress实战/"  aria-label="复制成功！"></i></span>
-  </p>
-  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
-</div>
-<script> 
-    var clipboard = new Clipboard('.fa-clipboard');
-	clipboard.on('success', $(function(){
-	  $(".fa-clipboard").click(function(){
-		swal({   
-		  title: "",   
-		  text: '复制成功',   
-		  html: false,
-		  timer: 500,   
-		  showConfirmButton: false
-	    });
-	  });
-    }));  
-</script>
 
       
     </div>
