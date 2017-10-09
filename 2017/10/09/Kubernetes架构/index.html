@@ -1,0 +1,947 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="容器编排 Docker Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Kubernetes整体架构Kubernetes的整体架构如下图：">
+<meta name="keywords" content="容器编排 Docker Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes架构">
+<meta property="og:url" content="http://yoursite.com/2017/10/09/Kubernetes架构/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="Kubernetes整体架构Kubernetes的整体架构如下图：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/14.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/15.png">
+<meta property="og:updated_time" content="2017-10-09T07:04:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kubernetes架构">
+<meta name="twitter:description" content="Kubernetes整体架构Kubernetes的整体架构如下图：">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/14.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Kubernetes架构 | jkzhao's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Kubernetes架构
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-10-09T14:49:31+08:00" content="2017-10-09">
+              2017-10-09
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2017-10-09T15:04:30+08:00" content="2017-10-09">
+              2017-10-09
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/10/09/Kubernetes架构/" class="leancloud_visitors" data-flag-title="Kubernetes架构">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Kubernetes整体架构"><a href="#Kubernetes整体架构" class="headerlink" title="Kubernetes整体架构"></a>Kubernetes整体架构</h2><p>Kubernetes的整体架构如下图：<br><a id="more"></a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/14.png" alt=""><br>Kubernetes主要由以下几个核心组件组成:</p>
+<ul>
+<li>etcd保存了整个集群的状态; </li>
+<li>apiserver提供了资源操作的唯一入口,并提供认证、授权、访问控制、API注册和 发现等机制;</li>
+<li>controller manager负责维护集群的状态,比如故障检测、自动扩展、滚动更新等; - scheduler负责资源的调度,按照预定的调度策略将Pod调度到相应的机器上;</li>
+<li>kubelet负责维护容器的生命周期,同时也负责Volume(CVI)和网络(CNI)的管 理;</li>
+<li>Container runtime负责镜像管理以及Pod和容器的真正运行(CRI); </li>
+<li>kube-proxy负责为Service提供cluster内部的服务发现和负载均衡;</li>
+</ul>
+<p>除了核心组件,还有一些推荐的Add-ons:</p>
+<ul>
+<li>kube-dns负责为整个集群提供DNS服务 </li>
+<li>Ingress Controller为服务提供外网入口 </li>
+<li>Heapster提供资源监控 </li>
+<li>Dashboard提供GUI</li>
+<li>Federation提供跨可用区的集群 </li>
+<li>Fluentd-elasticsearch提供集群日志采集、存储与查询</li>
+</ul>
+<p>Kubernetes总体包含两种角色，一个是Master节点，负责集群调度、对外接口、访问控制、对象的生命周期维护等工作；另一个是Node节点，负责维护容器的生命周期，例如创建、删除、停止Docker容器，负责容器的服务抽象和负载均衡等工作。其中Master节点上，运行着三个核心组件：API Server, Scheduler, Controller Mananger。Node节点上运行两个核心组件：Kubelet， Kube-Proxy。API Server提供Kubernetes集群访问的统一接口，Scheduler, Controller Manager, Kubelet, Kube-Proxy等组件都通过API Server进行通信，API Server将Pod, Service, Replication Controller, Daemonset等对象存储在ETCD集群中。ETCD是CoreOS开发的高效、稳定的强一致性Key-Value数据库，ETCD本身可以搭建成集群对外服务，它负责存储Kubernetes所有对象的生命周期，是Kubernetes的最核心的组件。</p>
+<h2 id="核心组件介绍"><a href="#核心组件介绍" class="headerlink" title="核心组件介绍"></a>核心组件介绍</h2><p>下面先大概介绍一下Kubernetes的核心组件的功能：</p>
+<ul>
+<li>API Server: 提供了资源对象的唯一操作入口，其他所有的组件都必须通过它提供的API来操作资源对象。它以RESTful风格的API对外提供接口。所有Kubernetes资源对象的生命周期维护都是通过调用API Server的接口来完成，例如，用户通过kubectl创建一个Pod，即是通过调用API Server的接口创建一个Pod对象，并储存在ETCD集群中。</li>
+<li>Controller Manager: 集群内部的管理控制中心，主要目的是实现Kubernetes集群的故障检测和自动恢复等工作。它包含两个核心组件：Node Controller和Replication Controller。其中Node Controller负责计算节点的加入和退出，可以通过Node Controller实现计算节点的扩容和缩容。Replication Controller用于Kubernetes资源对象RC的管理，应用的扩容、缩容以及滚动升级都是有Replication Controller来实现。</li>
+<li>Scheduler: 集群中的调度器，负责Pod在集群的中的调度和分配。</li>
+<li>Kubelet: 负责本Node节点上的Pod的创建、修改、监控、删除等Pod的全生命周期管理，Kubelet实时向API Server发送所在计算节点（Node）的信息。</li>
+<li>Kube-Proxy: 实现Service的抽象，为一组Pod抽象的服务（Service）提供统一接口并提供负载均衡功能。</li>
+</ul>
+<h2 id="核心原理介绍"><a href="#核心原理介绍" class="headerlink" title="核心原理介绍"></a>核心原理介绍</h2><h3 id="API-Server"><a href="#API-Server" class="headerlink" title="API Server"></a>API Server</h3><p>1.如何访问Kubernetes API，Kubernetes API通过一个kube-apiserver的进程提供服务，该进程运行在Kubernetes Master节点上，默认的情况下，监听两个端口：</p>
+<ul>
+<li>本地端口: 默认值为8080，用于接收HTTP请求，非认证授权的HTTP请求通过该端口访问API Server。</li>
+<li>安全端口：默认值为6443，用于接收HTTPS请求，用于基于Token文件或者客户端证书及HTTP Base的认证，用于基于策略的授权，Kubernetes默认情况下不启动HTTPS安全访问机制。</li>
+</ul>
+<p>用户可以通过编程方式访问API接口，也可以通过curl命令来直接访问它，例如，我们在Master节点上访问API Server：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">[root@node1 ~]# curl http://172.16.7.151:8080/ap/</div><div class="line">&#123;</div><div class="line">  &quot;paths&quot;: [</div><div class="line">    &quot;/api&quot;,</div><div class="line">    &quot;/api/v1&quot;,</div><div class="line">    &quot;/apis&quot;,</div><div class="line">    &quot;/apis/apps&quot;,</div><div class="line">    &quot;/apis/apps/v1beta1&quot;,</div><div class="line">    &quot;/apis/authentication.k8s.io&quot;,</div><div class="line">    &quot;/apis/authentication.k8s.io/v1&quot;,</div><div class="line">    &quot;/apis/authentication.k8s.io/v1beta1&quot;,</div><div class="line">    &quot;/apis/authorization.k8s.io&quot;,</div><div class="line">    &quot;/apis/authorization.k8s.io/v1&quot;,</div><div class="line">    &quot;/apis/authorization.k8s.io/v1beta1&quot;,</div><div class="line">    &quot;/apis/autoscaling&quot;,</div><div class="line">    &quot;/apis/autoscaling/v1&quot;,</div><div class="line">    &quot;/apis/autoscaling/v2alpha1&quot;,</div><div class="line">    &quot;/apis/batch&quot;,</div><div class="line">    &quot;/apis/batch/v1&quot;,</div><div class="line">    &quot;/apis/batch/v2alpha1&quot;,</div><div class="line">    &quot;/apis/certificates.k8s.io&quot;,</div><div class="line">    &quot;/apis/certificates.k8s.io/v1beta1&quot;,</div><div class="line">    &quot;/apis/extensions&quot;,</div><div class="line">    &quot;/apis/extensions/v1beta1&quot;,</div><div class="line">    &quot;/apis/policy&quot;,</div><div class="line">    &quot;/apis/policy/v1beta1&quot;,</div><div class="line">    &quot;/apis/rbac.authorization.k8s.io&quot;,</div><div class="line">    &quot;/apis/rbac.authorization.k8s.io/v1alpha1&quot;,</div><div class="line">    &quot;/apis/rbac.authorization.k8s.io/v1beta1&quot;,</div><div class="line">    &quot;/apis/settings.k8s.io&quot;,</div><div class="line">    &quot;/apis/settings.k8s.io/v1alpha1&quot;,</div><div class="line">    &quot;/apis/storage.k8s.io&quot;,</div><div class="line">    &quot;/apis/storage.k8s.io/v1&quot;,</div><div class="line">    &quot;/apis/storage.k8s.io/v1beta1&quot;,</div><div class="line">    &quot;/healthz&quot;,</div><div class="line">    &quot;/healthz/ping&quot;,</div><div class="line">    &quot;/healthz/poststarthook/bootstrap-controller&quot;,</div><div class="line">    &quot;/healthz/poststarthook/ca-registration&quot;,</div><div class="line">    &quot;/healthz/poststarthook/extensions/third-party-resources&quot;,</div><div class="line">    &quot;/healthz/poststarthook/rbac/bootstrap-roles&quot;,</div><div class="line">    &quot;/logs&quot;,</div><div class="line">    &quot;/metrics&quot;,</div><div class="line">    &quot;/swagger-ui/&quot;,</div><div class="line">    &quot;/swaggerapi/&quot;,</div><div class="line">    &quot;/ui/&quot;,</div><div class="line">    &quot;/version&quot;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>Kubernetes还提供了一个代理程序——Kubectl Proxy，它既能作为API Server的反向代理，也能作为普通客户端访问API Server，使用方法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"># kubectl proxy --port=9090 &amp;</div><div class="line"># curl http://172.16.7.151:9090/api</div><div class="line">&#123;</div><div class="line">  &quot;kind&quot;: &quot;APIVersions&quot;,</div><div class="line">  &quot;versions&quot;: [</div><div class="line">    &quot;v1&quot;</div><div class="line">  ],</div><div class="line">  &quot;serverAddressByClientCIDRs&quot;: [</div><div class="line">    &#123;</div><div class="line">      &quot;clientCIDR&quot;: &quot;0.0.0.0/0&quot;,</div><div class="line">      &quot;serverAddress&quot;: &quot;172.16.7.151:6443&quot;</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>2.集群功能模块之间的通信<br>API Server是整个集群的核心，负责集群各个模块之间的通信。集群内部的功能模块通过API Server将信息存入ETCD，其他模块通过API Server读取这些信息，从而实现各模块之间的信息交互。比如，Node节点上的Kubelet每个一个时间周期，通过API Server报告自身状态，API Server接收这些信息后，将节点状态信息保存到ETCd中。Controller Manager中的Node Controller通过API Server定期读取这些节点状态信息，并做相应处理。Scheduler监听到某个Pod创建的信息后，检索所有符合该Pod要求的节点列表，并将Pod绑定到节点李彪中最符合要求的节点上：如果Scheduler监听到某个Pod被删除，则删除本节点上的相应Pod实例。<br>从上面的通信过程可以看出，API Server的访问压力很大，这也是限制（制约）Kubernetes集群规模的关键，缓解API Server的压力可以通过缓存来实现，通过watch/list操作，将资源对象的信息缓存到本地，这种方法在一定程度上缓解了API Server的压力，但是不是最好的解决办法。</p>
+<h3 id="Controller-Manager"><a href="#Controller-Manager" class="headerlink" title="Controller Manager"></a>Controller Manager</h3><p>Controller Manager作为集群的内部管理控制中心，负责集群内的Node，Pod，RC，服务端点（Endpoint），命名空间（Namespace），服务账号（ServiceAccount）、资源配额（ResourceQuota）等的管理并执行自动化修复流程，确保集群出处于预期的工作状态，比如，RC实现自动控制Pod活跃副本数，如果Pod出错退出，RC自动创建一个新的Pod，来保持活跃的Pod的个数。<br>Controller Manager包含Replication Controller、Node Controller、ResourceQuota Controller、Namespace Controller、ServiceAccount Controller、Token Controller、Server Controller以及Endpoint Controller等多个控制器，Controller Manager是这些Controller的管理者。</p>
+<h3 id="Scheduler"><a href="#Scheduler" class="headerlink" title="Scheduler"></a>Scheduler</h3><p>Kubernetes Scheduler负责Pod的调度管理，它负责将要创建的Pod按照一定的规则分配在某个适合的Node上。<br>Scheduler的默认调度流程分为以下两步：</p>
+<ul>
+<li>预选调度过程，即遍历所有目标Node，筛选出符合要求的候选节点。为此，Kubernetes内置了多种预选策略供用户选择。</li>
+<li>确定最优节点，在第一步的基础上，采用优选策略为每个候选节点打分，分值最高的胜出。</li>
+</ul>
+<p>Scheduler的调度流程是通过插件方式加载“调度算法提供者”具体实现的，一个调度算法提供者其实就是包括了一组预选策略与一组有限选择策略的结构体，注册算法插件的函数如下：</p>
+<pre><code>func RegisterAlgorithmProvider(name string, predicateKeys, priorityKeys util.StringSet)
+</code></pre><p>它包含3个参数：“name string”参数为算法名，“predicateKeys”为为算法用到的预选策略集合，”priorityKeys”为算法用到的优选策略集合。<br>Scheduler中可用的预算策略包含：NoDiskConflict,  PodFitResources, PodSelectorMatches,  PodFitHost,  CheckNodeLabelPresence,  CheckServiceAffinity和PodFitsPorts策略等。其默认的AlgorithmProvider加载的预选策略Predicates包括：PodFitsPorts,  PodFitsResources,  NoDiskConflict,  MatchNodeSelector和HostName，即每个节点只有通过前面的五个默认预选策略后，才能初步被选中，进入下一个流程。</p>
+<h3 id="kubelet"><a href="#kubelet" class="headerlink" title="kubelet"></a>kubelet</h3><p>在Kubernetes集群中，每个计算节点（Node）上会运行一个守护进程：Kubelet。它用于处理Master节点下发到本节点的任务，管理Pod以及Pod中的容器。每个Kubelet进程会在API Server上注册自身节点的信息，定期向API Server汇报节点资源的使用情况，并通过cAdvise监控容器和节点资源。<br>Kubelet主要功能：</p>
+<ul>
+<li>节点管理：kubelet可以自动向API Server注册自己，它可以采集所在计算节点的资源信息和使用情况并提交给API Server，通过启动/停止kubelet进程来实现计算节点的扩容、缩容。</li>
+<li>Pod管理：kubelet通过API Server监听ETCD目录，同步Pod清单，当发现有新的Pod绑定到所在的节点，则按照Pod清单的要求创建改清单。如果发现本地的Pod被删除，则kubelet通过docker client删除该容器。</li>
+<li>健康检查：Pod通过两类探针来检查容器的健康状态。一个是LivenessProbe探针，用于判断容器是否健康，如果LivenessProbe探针探测到容器不健康，则kubelet将删除该容器，并根据容器的重启策略做相应的处理。另一类是ReadnessProbe探针，用于判断容器是否启动完成，且准备接受请求，如果ReadnessProbe探针检测到失败，则Pod的状态被修改。Enpoint Controller将从Service的Endpoint中删除包含该容器的IP地址的Endpoint条目。kubelet定期调用LivenessProbe探针来诊断容器的健康状况，它目前支持三种探测：HTTP的方式发送GET请求; TCP方式执行Connect目的端口; Exec的方式，执行一个脚本。</li>
+<li>cAdvisor资源监控: 在Kubernetes集群中，应用程序的执行情况可以在不同的级别上检测到，这些级别包含Container，Pod，Service和整个集群。作为Kubernetes集群的一部分，Kubernetes希望提供给用户各个级别的资源使用信息，这将使用户能够更加深入地了解应用的执行情况，并找到可能的瓶颈。Heapster项目为Kubernetes提供了一个基本的监控平台，他是集群级别的监控和事件数据集成器。Heapster通过收集所有节点的资源使用情况，将监控信息实时推送至一个可配置的后端，用于存储和可视化展示。</li>
+</ul>
+<h3 id="kube-proxy"><a href="#kube-proxy" class="headerlink" title="kube-proxy"></a>kube-proxy</h3><p>每台机器上都运行一个kube-proxy服务,它监听API server中service和endpoint的变化 情况,并通过iptables等来为服务配置负载均衡(仅支持TCP和UDP)。<br>kube-proxy可以直接运行在物理机上,也可以以static pod或者daemonset的方式运行。 kube-proxy当前支持以下几种实现：</p>
+<ul>
+<li>userspace:最早的负载均衡方案,它在用户空间监听一个端口,所有服务通过 iptables转发到这个端口,然后在其内部负载均衡到实际的Pod。该方式最主要的问 题是效率低,有明显的性能瓶颈。 </li>
+<li>iptables:目前推荐的方案,完全以iptables规则的方式来实现service负载均衡。该 方式最主要的问题是在服务多的时候产生太多的iptables规则(社区有人提到过几万 条),大规模下也有性能问题 </li>
+<li>winuserspace:同userspace,但仅工作在windows上</li>
+</ul>
+<p>另外,基于ipvs的方案正在讨论中,大规模情况下可以大幅提升性 能,比如slide里面提供的示例将服务延迟从小时缩短到毫秒级。<br>kube-proxy目前仅支持TCP和UDP,不支持HTTP路由,并且也没有健康检查机制。这 些可以通过自定义Ingress Controller的方法来解决。</p>
+<h3 id="kube-dns"><a href="#kube-dns" class="headerlink" title="kube-dns"></a>kube-dns</h3><p>kube-dns为Kubernetes集群提供命名服务,一般通过addon的方式部署,从v1.3版本开 始,成为了一个内建的自启动服务。</p>
+<h2 id="Kubernetes应用部署模型"><a href="#Kubernetes应用部署模型" class="headerlink" title="Kubernetes应用部署模型"></a>Kubernetes应用部署模型</h2><p>主要包括Pod、Replication controller、Label和Service。</p>
+<h3 id="Pod"><a href="#Pod" class="headerlink" title="Pod"></a>Pod</h3><p>Kubernetes的最小部署单元是Pod而不是容器。作为First class API公民，Pods能被创建，调度和管理。简单地来说，像一个豌豆荚中的豌豆一样，一个Pod中的应用容器同享同一个上下文：</p>
+<ol>
+<li>PID 名字空间。但是在docker中不支持</li>
+<li>网络名字空间，在同一Pod中的多个容器访问同一个IP和端口空间。</li>
+<li>IPC名字空间，同一个Pod中的应用能够使用SystemV IPC和POSIX消息队列进行通信。</li>
+<li>UTS名字空间，同一个Pod中的应用共享一个主机名。</li>
+<li>Pod中的各个容器应用还可以访问Pod级别定义的共享卷。<br>从生命周期来说，Pod应该是短暂的而不是长久的应用。 Pods被调度到节点，保持在这个节点上直到被销毁。当节点死亡时，分配到这个节点的Pods将会被删掉。将来可能会实现Pod的迁移特性。在实际使用时，我们一般不直接创建Pods, 我们通过replication controller来负责Pods的创建，复制，监控和销毁。一个Pod可以包括多个容器，他们直接往往相互协作完成一个应用功能。</li>
+</ol>
+<h3 id="Replication-controller和ReplicaSet"><a href="#Replication-controller和ReplicaSet" class="headerlink" title="Replication controller和ReplicaSet"></a>Replication controller和ReplicaSet</h3><p>复制控制器确保Pod的一定数量的份数(replica)在运行。如果超过这个数量，控制器会杀死一些，如果少了，控制器会启动一些。控制器也会在节点失效、维护的时候来保证这个数量。所以强烈建议即使我们的份数是1，也要使用复制控制器，而不是直接创建Pod。<br>在生命周期上讲，复制控制器自己不会终止，但是跨度不会比Service强。Service能够横跨多个复制控制器管理的Pods。而且在一个Service的生命周期内，复制控制器能被删除和创建。Service和客户端程序是不知道复制控制器的存在的。<br>复制控制器创建的Pods应该是可以互相替换的和语义上相同的，这个对无状态服务特别合适。<br>在新版本的Kubernetes中建议使用ReplicaSet(也简称为rs)来取代 ReplicationController。ReplicaSet跟ReplicationController没有本质的不同,只是名字不 一样,并且ReplicaSet支持集合式的selector(ReplicationController仅支持等式)。<br>虽然也ReplicaSet可以独立使用,但建议使用 Deployment 来自动管理ReplicaSet,这 样就无需担心跟其他机制的不兼容问题(比如ReplicaSet不支持rolling-update但 Deployment支持),并且还支持版本记录、回滚、暂停升级等高级特性。<br>Pod是临时性的对象，被创建和销毁，而且不会恢复。复制器动态地创建和销毁Pod。虽然Pod会分配到IP地址，但是这个IP地址都不是持久的。这样就产生了一个疑问：外部如何消费Pod提供的服务呢？</p>
+<h3 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h3><p>Service定义了一个Pod的逻辑集合和访问这个集合的策略。集合是通过定义Service时提供的Label选择器完成的。举个例子，我们假定有3个Pod的备份来完成一个图像处理的后端。这些后端备份逻辑上是相同的，前端不关心哪个后端在给它提供服务。虽然组成这个后端的实际Pod可能变化，前端客户端不会意识到这个变化，也不会跟踪后端。Service就是用来实现这种分离的抽象。<br>对于Service，我们还可以定义Endpoint，Endpoint把Service和Pod动态地连接起来。</p>
+<h4 id="Service-Cluster-IP和-kuber-proxy"><a href="#Service-Cluster-IP和-kuber-proxy" class="headerlink" title="Service Cluster IP和 kuber proxy"></a>Service Cluster IP和 kuber proxy</h4><p>每个代理节点都运行了一个kube-proxy进程。这个进程从服务进程那边拿到Service和Endpoint对象的变化。 对每一个Service, 它在本地打开一个端口。 到这个端口的任意连接都会代理到后端Pod集合中的一个Pod IP和端口。在创建了服务后，服务Endpoint模型会体现后端Pod的 IP和端口列表，kube-proxy就是从这个endpoint维护的列表中选择服务后端的。另外Service对象的sessionAffinity属性也会帮助kube-proxy来选择哪个具体的后端。缺省情况下，后端Pod的选择是随机的。可以设置service.spec.sessionAffinity 成”ClientIP”来指定同一个ClientIP的流量代理到同一个后端。在实现上，kube-proxy会用IPtables规则把访问Service的Cluster IP和端口的流量重定向到这个本地端口。下面的部分会讲什么是service的Cluster IP。<br>注意：在0.18以前的版本中Cluster IP叫PortalNet IP。</p>
+<h4 id="Pod-IP-and-Service-Cluster-IP"><a href="#Pod-IP-and-Service-Cluster-IP" class="headerlink" title="Pod IP and Service Cluster IP"></a>Pod IP and Service Cluster IP</h4><p>Pod IP 地址是实际存在于某个网卡(可以是虚拟设备)上的，但Service Cluster IP就不一样了，没有网络设备为这个地址负责。它是由kube-proxy使用Iptables规则重新定向到其本地端口，再均衡到后端Pod的。我们前面说的Service环境变量和DNS都使用Service的Cluster IP和端口。<br>就拿上面我们提到的图像处理程序为例。当我们的Service被创建时，Kubernetes给它分配一个地址10.0.0.1。这个地址从我们启动API的service-cluster-ip-range参数(旧版本为portal_net参数)指定的地址池中分配，比如–service-cluster-ip-range=10.0.0.0/16。假设这个Service的端口是1234。集群内的所有kube-proxy都会注意到这个Service。当proxy发现一个新的service后，它会在本地节点打开一个任意端口，建相应的iptables规则，重定向服务的IP和port到这个新建的端口，开始接受到达这个服务的连接。<br>当一个客户端访问这个service时，这些iptable规则就开始起作用，客户端的流量被重定向到kube-proxy为这个service打开的端口上，kube-proxy随机选择一个后端pod来服务客户。这个流程如下图所示：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/15.png" alt=""><br>根据Kubernetes的网络模型，使用Service Cluster IP和Port访问Service的客户端可以坐落在任意代理节点上。外部要访问Service，我们就需要给Service外部访问IP。</p>
+<h4 id="外部访问Service"><a href="#外部访问Service" class="headerlink" title="外部访问Service"></a>外部访问Service</h4><p>Service对象在Cluster IP range池中分配到的IP只能在内部访问，如果服务作为一个应用程序内部的层次，还是很合适的。如果这个Service作为前端服务，准备为集群外的客户提供业务，我们就需要给这个服务提供公共IP了。<br>外部访问者是访问集群代理节点的访问者。为这些访问者提供服务，我们可以在定义Service时指定其spec.publicIPs，一般情况下publicIP 是代理节点的物理IP地址。和先前的Cluster IP range上分配到的虚拟的IP一样，kube-proxy同样会为这些publicIP提供Iptables 重定向规则，把流量转发到后端的Pod上。有了publicIP，我们就可以使用load balancer等常用的互联网技术来组织外部对服务的访问了。<br>spec.publicIPs在新的版本中标记为过时了，代替它的是spec.type=NodePort，这个类型的service，系统会给它在集群的各个代理节点上分配一个节点级别的端口，能访问到代理节点的客户端都能访问这个端口，从而访问到服务。</p>
+<h3 id="Label和Label-selector"><a href="#Label和Label-selector" class="headerlink" title="Label和Label selector"></a>Label和Label selector</h3><p>Label标签在Kubernetes模型中占着非常重要的作用。Label表现为key/value对，附加到Kubernetes管理的对象上，典型的就是Pods。它们定义了这些对象的识别属性，用来组织和选择这些对象。Label可以在对象创建时附加在对象上，也可以对象存在时通过API管理对象的Label。<br>在定义了对象的Label后，其它模型可以用Label 选择器（selector)来定义其作用的对象。<br>Label选择器有两种，分别是Equality-based和Set-based。<br>比如如下Equality-based选择器样例：</p>
+<pre><code>environment = production
+tier != frontend
+environment = production，tier != frontend
+</code></pre><p>对于上面的选择器，第一条匹配Label具有environment key且等于production的对象，第二条匹配具有tier key，但是值不等于frontend的对象。由于kubernetes使用AND逻辑，第三条匹配production但不是frontend的对象。<br>Set-based选择器样例：</p>
+<pre><code>environment in (production, qa)
+tier notin (frontend, backend)
+partition
+</code></pre><p>第一条选择具有environment key，而且值是production或者qa的label附加的对象。第二条选择具有tier key，但是其值不是frontend和backend。第三条选则具有partition key的对象，不对value进行校验。<br>replication controller复制控制器和Service都用label和label selctor来动态地配备作用对象。复制控制器在定义的时候就指定了其要创建Pod的Label和自己要匹配这个Pod的selector， API服务器应该校验这个定义。我们可以动态地修改replication controller创建的Pod的Label用于调式，数据恢复等。一旦某个Pod由于Label改变从replication controller移出来后，replication controller会马上启动一个新的Pod来确保复制池子中的份数。对于Service，Label selector可以用来选择一个Service的后端Pods。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/容器编排-Docker-Kubernetes/" rel="tag"><i class="fa fa-tag"></i>容器编排 Docker Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/30/Jenkins-Docker-持续集成/" rel="next" title="Jenkins + Docker 持续集成">
+                <i class="fa fa-chevron-left"></i> Jenkins + Docker 持续集成
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">45</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes整体架构"><span class="nav-number">1.</span> <span class="nav-text">Kubernetes整体架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#核心组件介绍"><span class="nav-number">2.</span> <span class="nav-text">核心组件介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#核心原理介绍"><span class="nav-number">3.</span> <span class="nav-text">核心原理介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#API-Server"><span class="nav-number">3.1.</span> <span class="nav-text">API Server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Controller-Manager"><span class="nav-number">3.2.</span> <span class="nav-text">Controller Manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Scheduler"><span class="nav-number">3.3.</span> <span class="nav-text">Scheduler</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kubelet"><span class="nav-number">3.4.</span> <span class="nav-text">kubelet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kube-proxy"><span class="nav-number">3.5.</span> <span class="nav-text">kube-proxy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kube-dns"><span class="nav-number">3.6.</span> <span class="nav-text">kube-dns</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes应用部署模型"><span class="nav-number">4.</span> <span class="nav-text">Kubernetes应用部署模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Pod"><span class="nav-number">4.1.</span> <span class="nav-text">Pod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Replication-controller和ReplicaSet"><span class="nav-number">4.2.</span> <span class="nav-text">Replication controller和ReplicaSet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Service"><span class="nav-number">4.3.</span> <span class="nav-text">Service</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Service-Cluster-IP和-kuber-proxy"><span class="nav-number">4.3.1.</span> <span class="nav-text">Service Cluster IP和 kuber proxy</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pod-IP-and-Service-Cluster-IP"><span class="nav-number">4.3.2.</span> <span class="nav-text">Pod IP and Service Cluster IP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#外部访问Service"><span class="nav-number">4.3.3.</span> <span class="nav-text">外部访问Service</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Label和Label-selector"><span class="nav-number">4.4.</span> <span class="nav-text">Label和Label selector</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共114.9k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+    <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+</body>
+</html>

@@ -162,7 +162,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/91.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/92.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/93.png">
-<meta property="og:updated_time" content="2017-10-09T04:19:56.000Z">
+<meta property="og:updated_time" content="2017-10-09T04:30:18.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Jenkins + Docker 持续集成">
 <meta name="twitter:description" content="Jenkins介绍Jenkins是一个开源软件项目，是基于Java开发的一种持续集成工具，用于监控持续重复的工作，旨在提供一个开放易用的软件平台，使软件的持续集成变成可能。">
@@ -392,7 +392,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-10-09T12:19:56+08:00" content="2017-10-09">
+              <time itemprop="dateUpdated" datetime="2017-10-09T12:30:18+08:00" content="2017-10-09">
               2017-10-09
               </time>
               </span>
@@ -690,17 +690,28 @@ sonar.web.port=9003
 </tr>
 </tbody>
 </table>
-<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>由于在172.16.206.30机器上docker是使用root用户运行的，而Jenkins是使用普通用户jenkins运行的，所以要先配置下jenkins用户可以使用docker命令。</p>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>由于在Jenkins机器上docker是使用root用户运行的，而Jenkins是使用普通用户jenkins运行的，所以要先配置下jenkins用户可以使用docker命令。</p>
 <pre><code>[root@osb30 ~]# visudo
 jenkins ALL=(root)      NOPASSWD: /usr/bin/docker
-</code></pre><p>另外配置：</p>
+</code></pre><p>另外在Jenkins机器上配置：</p>
 <pre><code># Disable &quot;ssh hostname sudo &lt;cmd&gt;&quot;, because it will show the password in clear.
 #         You have to run &quot;ssh -t hostname sudo &lt;cmd&gt;&quot;.
 #
 #Defaults    requiretty
 Defaults:jenkins !requiretty
 </code></pre><p>如果不配置这个，在执行下面脚本时，会报错误：</p>
-<pre><code>Error: Cannot perform an interactive login from a non TTY device
+<pre><code>+ cp -f /home/jenkins/.jenkins/workspace/godseyeBranchForNov/godseye-container/target/godseye-container-wisedu.war /home/jenkins/docker-file/godseye_war/godseye.war
++ sudo docker login -u jkzhao -p Wisedu123 -e 01115004@wisedu.com 172.16.206.32
+sudo: sorry, you must have a tty to run sudo
+</code></pre><p>在172.16.206.32机器上配置：</p>
+<pre><code># visudo
+#
+#Defaults    requiretty
+Defaults:root !requiretty
+</code></pre><p>否则在机器172.16.206.32机器上执行脚本时会报错：</p>
+<pre><code>[SSH] executing...
+sudo: sorry, you must have a tty to run sudo
+docker: invalid reference format.
 </code></pre><h3 id="安装插件"><a href="#安装插件" class="headerlink" title="安装插件"></a>安装插件</h3><p>登录Jenkins，点击“系统管理”，点击“管理插件”，搜索插件“SSH plugin”，进行安装。<br>登录Jenkins，点击“Credentials”，点击“Add domain”。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/88.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/89.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/90.png" alt=""><br>点击“系统管理”，“系统配置”，找到“<br>SSH remote hosts”。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/91.png" alt=""></p>
 <h3 id="配置Post-Steps"><a href="#配置Post-Steps" class="headerlink" title="配置Post Steps"></a>配置Post Steps</h3><p>项目其他的配置不变，见上面的章节。<br>【注意】：脚本中用到的仓库和认证的账号需要先在harbor新建好。</p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/92.png" alt=""></p>
@@ -804,6 +815,10 @@ docker run -d --name godseye_web -p 8080:8080 ${HARBOR_IP}/${REPOSITORIES}:${TAG
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2017/10/09/Kubernetes架构/" rel="prev" title="Kubernetes架构">
+                Kubernetes架构 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -872,7 +887,7 @@ docker run -d --name godseye_web -p 8080:8080 ${HARBOR_IP}/${REPOSITORIES}:${TAG
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">44</span>
+              <span class="site-state-item-count">45</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1005,7 +1020,7 @@ docker run -d --name godseye_web -p 8080:8080 ${HARBOR_IP}/${REPOSITORIES}:${TAG
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共109.5k字</span>
+  <span class="post-count">博客全站共114.9k字</span>
 </div>
 
         

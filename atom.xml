@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-10-09T04:19:56.000Z</updated>
+  <updated>2017-10-09T07:04:30.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,116 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Kubernetes架构</title>
+    <link href="http://yoursite.com/2017/10/09/Kubernetes%E6%9E%B6%E6%9E%84/"/>
+    <id>http://yoursite.com/2017/10/09/Kubernetes架构/</id>
+    <published>2017-10-09T06:49:31.000Z</published>
+    <updated>2017-10-09T07:04:30.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Kubernetes整体架构&quot;&gt;&lt;a href=&quot;#Kubernetes整体架构&quot; class=&quot;headerlink&quot; title=&quot;Kubernetes整体架构&quot;&gt;&lt;/a&gt;Kubernetes整体架构&lt;/h2&gt;&lt;p&gt;Kubernetes的整体架构如下图：&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/14.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;Kubernetes主要由以下几个核心组件组成:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;etcd保存了整个集群的状态; &lt;/li&gt;
+&lt;li&gt;apiserver提供了资源操作的唯一入口,并提供认证、授权、访问控制、API注册和 发现等机制;&lt;/li&gt;
+&lt;li&gt;controller manager负责维护集群的状态,比如故障检测、自动扩展、滚动更新等; - scheduler负责资源的调度,按照预定的调度策略将Pod调度到相应的机器上;&lt;/li&gt;
+&lt;li&gt;kubelet负责维护容器的生命周期,同时也负责Volume(CVI)和网络(CNI)的管 理;&lt;/li&gt;
+&lt;li&gt;Container runtime负责镜像管理以及Pod和容器的真正运行(CRI); &lt;/li&gt;
+&lt;li&gt;kube-proxy负责为Service提供cluster内部的服务发现和负载均衡;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;除了核心组件,还有一些推荐的Add-ons:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;kube-dns负责为整个集群提供DNS服务 &lt;/li&gt;
+&lt;li&gt;Ingress Controller为服务提供外网入口 &lt;/li&gt;
+&lt;li&gt;Heapster提供资源监控 &lt;/li&gt;
+&lt;li&gt;Dashboard提供GUI&lt;/li&gt;
+&lt;li&gt;Federation提供跨可用区的集群 &lt;/li&gt;
+&lt;li&gt;Fluentd-elasticsearch提供集群日志采集、存储与查询&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Kubernetes总体包含两种角色，一个是Master节点，负责集群调度、对外接口、访问控制、对象的生命周期维护等工作；另一个是Node节点，负责维护容器的生命周期，例如创建、删除、停止Docker容器，负责容器的服务抽象和负载均衡等工作。其中Master节点上，运行着三个核心组件：API Server, Scheduler, Controller Mananger。Node节点上运行两个核心组件：Kubelet， Kube-Proxy。API Server提供Kubernetes集群访问的统一接口，Scheduler, Controller Manager, Kubelet, Kube-Proxy等组件都通过API Server进行通信，API Server将Pod, Service, Replication Controller, Daemonset等对象存储在ETCD集群中。ETCD是CoreOS开发的高效、稳定的强一致性Key-Value数据库，ETCD本身可以搭建成集群对外服务，它负责存储Kubernetes所有对象的生命周期，是Kubernetes的最核心的组件。&lt;/p&gt;
+&lt;h2 id=&quot;核心组件介绍&quot;&gt;&lt;a href=&quot;#核心组件介绍&quot; class=&quot;headerlink&quot; title=&quot;核心组件介绍&quot;&gt;&lt;/a&gt;核心组件介绍&lt;/h2&gt;&lt;p&gt;下面先大概介绍一下Kubernetes的核心组件的功能：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;API Server: 提供了资源对象的唯一操作入口，其他所有的组件都必须通过它提供的API来操作资源对象。它以RESTful风格的API对外提供接口。所有Kubernetes资源对象的生命周期维护都是通过调用API Server的接口来完成，例如，用户通过kubectl创建一个Pod，即是通过调用API Server的接口创建一个Pod对象，并储存在ETCD集群中。&lt;/li&gt;
+&lt;li&gt;Controller Manager: 集群内部的管理控制中心，主要目的是实现Kubernetes集群的故障检测和自动恢复等工作。它包含两个核心组件：Node Controller和Replication Controller。其中Node Controller负责计算节点的加入和退出，可以通过Node Controller实现计算节点的扩容和缩容。Replication Controller用于Kubernetes资源对象RC的管理，应用的扩容、缩容以及滚动升级都是有Replication Controller来实现。&lt;/li&gt;
+&lt;li&gt;Scheduler: 集群中的调度器，负责Pod在集群的中的调度和分配。&lt;/li&gt;
+&lt;li&gt;Kubelet: 负责本Node节点上的Pod的创建、修改、监控、删除等Pod的全生命周期管理，Kubelet实时向API Server发送所在计算节点（Node）的信息。&lt;/li&gt;
+&lt;li&gt;Kube-Proxy: 实现Service的抽象，为一组Pod抽象的服务（Service）提供统一接口并提供负载均衡功能。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;核心原理介绍&quot;&gt;&lt;a href=&quot;#核心原理介绍&quot; class=&quot;headerlink&quot; title=&quot;核心原理介绍&quot;&gt;&lt;/a&gt;核心原理介绍&lt;/h2&gt;&lt;h3 id=&quot;API-Server&quot;&gt;&lt;a href=&quot;#API-Server&quot; class=&quot;headerlink&quot; title=&quot;API Server&quot;&gt;&lt;/a&gt;API Server&lt;/h3&gt;&lt;p&gt;1.如何访问Kubernetes API，Kubernetes API通过一个kube-apiserver的进程提供服务，该进程运行在Kubernetes Master节点上，默认的情况下，监听两个端口：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;本地端口: 默认值为8080，用于接收HTTP请求，非认证授权的HTTP请求通过该端口访问API Server。&lt;/li&gt;
+&lt;li&gt;安全端口：默认值为6443，用于接收HTTPS请求，用于基于Token文件或者客户端证书及HTTP Base的认证，用于基于策略的授权，Kubernetes默认情况下不启动HTTPS安全访问机制。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;用户可以通过编程方式访问API接口，也可以通过curl命令来直接访问它，例如，我们在Master节点上访问API Server：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;32&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;33&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;34&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;35&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;36&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;37&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;38&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;39&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;40&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;41&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;42&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;43&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;44&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;45&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;46&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;47&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;48&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@node1 ~]# curl http://172.16.7.151:8080/ap/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  &amp;quot;paths&amp;quot;: [&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/api&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/api/v1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/apps&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/apps/v1beta1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/authentication.k8s.io&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/authentication.k8s.io/v1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/authentication.k8s.io/v1beta1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/authorization.k8s.io&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/authorization.k8s.io/v1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/authorization.k8s.io/v1beta1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/autoscaling&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/autoscaling/v1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/autoscaling/v2alpha1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/batch&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/batch/v1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/batch/v2alpha1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/certificates.k8s.io&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/certificates.k8s.io/v1beta1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/extensions&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/extensions/v1beta1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/policy&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/policy/v1beta1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/rbac.authorization.k8s.io&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/rbac.authorization.k8s.io/v1alpha1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/rbac.authorization.k8s.io/v1beta1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/settings.k8s.io&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/settings.k8s.io/v1alpha1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/storage.k8s.io&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/storage.k8s.io/v1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/apis/storage.k8s.io/v1beta1&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/healthz&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/healthz/ping&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/healthz/poststarthook/bootstrap-controller&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/healthz/poststarthook/ca-registration&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/healthz/poststarthook/extensions/third-party-resources&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/healthz/poststarthook/rbac/bootstrap-roles&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/logs&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/metrics&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/swagger-ui/&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/swaggerapi/&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/ui/&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;/version&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  ]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;Kubernetes还提供了一个代理程序——Kubectl Proxy，它既能作为API Server的反向代理，也能作为普通客户端访问API Server，使用方法如下：&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# kubectl proxy --port=9090 &amp;amp;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# curl http://172.16.7.151:9090/api&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  &amp;quot;kind&amp;quot;: &amp;quot;APIVersions&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  &amp;quot;versions&amp;quot;: [&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;quot;v1&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  ],&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  &amp;quot;serverAddressByClientCIDRs&amp;quot;: [&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      &amp;quot;clientCIDR&amp;quot;: &amp;quot;0.0.0.0/0&amp;quot;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      &amp;quot;serverAddress&amp;quot;: &amp;quot;172.16.7.151:6443&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  ]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;2.集群功能模块之间的通信&lt;br&gt;API Server是整个集群的核心，负责集群各个模块之间的通信。集群内部的功能模块通过API Server将信息存入ETCD，其他模块通过API Server读取这些信息，从而实现各模块之间的信息交互。比如，Node节点上的Kubelet每个一个时间周期，通过API Server报告自身状态，API Server接收这些信息后，将节点状态信息保存到ETCd中。Controller Manager中的Node Controller通过API Server定期读取这些节点状态信息，并做相应处理。Scheduler监听到某个Pod创建的信息后，检索所有符合该Pod要求的节点列表，并将Pod绑定到节点李彪中最符合要求的节点上：如果Scheduler监听到某个Pod被删除，则删除本节点上的相应Pod实例。&lt;br&gt;从上面的通信过程可以看出，API Server的访问压力很大，这也是限制（制约）Kubernetes集群规模的关键，缓解API Server的压力可以通过缓存来实现，通过watch/list操作，将资源对象的信息缓存到本地，这种方法在一定程度上缓解了API Server的压力，但是不是最好的解决办法。&lt;/p&gt;
+&lt;h3 id=&quot;Controller-Manager&quot;&gt;&lt;a href=&quot;#Controller-Manager&quot; class=&quot;headerlink&quot; title=&quot;Controller Manager&quot;&gt;&lt;/a&gt;Controller Manager&lt;/h3&gt;&lt;p&gt;Controller Manager作为集群的内部管理控制中心，负责集群内的Node，Pod，RC，服务端点（Endpoint），命名空间（Namespace），服务账号（ServiceAccount）、资源配额（ResourceQuota）等的管理并执行自动化修复流程，确保集群出处于预期的工作状态，比如，RC实现自动控制Pod活跃副本数，如果Pod出错退出，RC自动创建一个新的Pod，来保持活跃的Pod的个数。&lt;br&gt;Controller Manager包含Replication Controller、Node Controller、ResourceQuota Controller、Namespace Controller、ServiceAccount Controller、Token Controller、Server Controller以及Endpoint Controller等多个控制器，Controller Manager是这些Controller的管理者。&lt;/p&gt;
+&lt;h3 id=&quot;Scheduler&quot;&gt;&lt;a href=&quot;#Scheduler&quot; class=&quot;headerlink&quot; title=&quot;Scheduler&quot;&gt;&lt;/a&gt;Scheduler&lt;/h3&gt;&lt;p&gt;Kubernetes Scheduler负责Pod的调度管理，它负责将要创建的Pod按照一定的规则分配在某个适合的Node上。&lt;br&gt;Scheduler的默认调度流程分为以下两步：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;预选调度过程，即遍历所有目标Node，筛选出符合要求的候选节点。为此，Kubernetes内置了多种预选策略供用户选择。&lt;/li&gt;
+&lt;li&gt;确定最优节点，在第一步的基础上，采用优选策略为每个候选节点打分，分值最高的胜出。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Scheduler的调度流程是通过插件方式加载“调度算法提供者”具体实现的，一个调度算法提供者其实就是包括了一组预选策略与一组有限选择策略的结构体，注册算法插件的函数如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;func RegisterAlgorithmProvider(name string, predicateKeys, priorityKeys util.StringSet)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;它包含3个参数：“name string”参数为算法名，“predicateKeys”为为算法用到的预选策略集合，”priorityKeys”为算法用到的优选策略集合。&lt;br&gt;Scheduler中可用的预算策略包含：NoDiskConflict,  PodFitResources, PodSelectorMatches,  PodFitHost,  CheckNodeLabelPresence,  CheckServiceAffinity和PodFitsPorts策略等。其默认的AlgorithmProvider加载的预选策略Predicates包括：PodFitsPorts,  PodFitsResources,  NoDiskConflict,  MatchNodeSelector和HostName，即每个节点只有通过前面的五个默认预选策略后，才能初步被选中，进入下一个流程。&lt;/p&gt;
+&lt;h3 id=&quot;kubelet&quot;&gt;&lt;a href=&quot;#kubelet&quot; class=&quot;headerlink&quot; title=&quot;kubelet&quot;&gt;&lt;/a&gt;kubelet&lt;/h3&gt;&lt;p&gt;在Kubernetes集群中，每个计算节点（Node）上会运行一个守护进程：Kubelet。它用于处理Master节点下发到本节点的任务，管理Pod以及Pod中的容器。每个Kubelet进程会在API Server上注册自身节点的信息，定期向API Server汇报节点资源的使用情况，并通过cAdvise监控容器和节点资源。&lt;br&gt;Kubelet主要功能：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;节点管理：kubelet可以自动向API Server注册自己，它可以采集所在计算节点的资源信息和使用情况并提交给API Server，通过启动/停止kubelet进程来实现计算节点的扩容、缩容。&lt;/li&gt;
+&lt;li&gt;Pod管理：kubelet通过API Server监听ETCD目录，同步Pod清单，当发现有新的Pod绑定到所在的节点，则按照Pod清单的要求创建改清单。如果发现本地的Pod被删除，则kubelet通过docker client删除该容器。&lt;/li&gt;
+&lt;li&gt;健康检查：Pod通过两类探针来检查容器的健康状态。一个是LivenessProbe探针，用于判断容器是否健康，如果LivenessProbe探针探测到容器不健康，则kubelet将删除该容器，并根据容器的重启策略做相应的处理。另一类是ReadnessProbe探针，用于判断容器是否启动完成，且准备接受请求，如果ReadnessProbe探针检测到失败，则Pod的状态被修改。Enpoint Controller将从Service的Endpoint中删除包含该容器的IP地址的Endpoint条目。kubelet定期调用LivenessProbe探针来诊断容器的健康状况，它目前支持三种探测：HTTP的方式发送GET请求; TCP方式执行Connect目的端口; Exec的方式，执行一个脚本。&lt;/li&gt;
+&lt;li&gt;cAdvisor资源监控: 在Kubernetes集群中，应用程序的执行情况可以在不同的级别上检测到，这些级别包含Container，Pod，Service和整个集群。作为Kubernetes集群的一部分，Kubernetes希望提供给用户各个级别的资源使用信息，这将使用户能够更加深入地了解应用的执行情况，并找到可能的瓶颈。Heapster项目为Kubernetes提供了一个基本的监控平台，他是集群级别的监控和事件数据集成器。Heapster通过收集所有节点的资源使用情况，将监控信息实时推送至一个可配置的后端，用于存储和可视化展示。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;kube-proxy&quot;&gt;&lt;a href=&quot;#kube-proxy&quot; class=&quot;headerlink&quot; title=&quot;kube-proxy&quot;&gt;&lt;/a&gt;kube-proxy&lt;/h3&gt;&lt;p&gt;每台机器上都运行一个kube-proxy服务,它监听API server中service和endpoint的变化 情况,并通过iptables等来为服务配置负载均衡(仅支持TCP和UDP)。&lt;br&gt;kube-proxy可以直接运行在物理机上,也可以以static pod或者daemonset的方式运行。 kube-proxy当前支持以下几种实现：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;userspace:最早的负载均衡方案,它在用户空间监听一个端口,所有服务通过 iptables转发到这个端口,然后在其内部负载均衡到实际的Pod。该方式最主要的问 题是效率低,有明显的性能瓶颈。 &lt;/li&gt;
+&lt;li&gt;iptables:目前推荐的方案,完全以iptables规则的方式来实现service负载均衡。该 方式最主要的问题是在服务多的时候产生太多的iptables规则(社区有人提到过几万 条),大规模下也有性能问题 &lt;/li&gt;
+&lt;li&gt;winuserspace:同userspace,但仅工作在windows上&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;另外,基于ipvs的方案正在讨论中,大规模情况下可以大幅提升性 能,比如slide里面提供的示例将服务延迟从小时缩短到毫秒级。&lt;br&gt;kube-proxy目前仅支持TCP和UDP,不支持HTTP路由,并且也没有健康检查机制。这 些可以通过自定义Ingress Controller的方法来解决。&lt;/p&gt;
+&lt;h3 id=&quot;kube-dns&quot;&gt;&lt;a href=&quot;#kube-dns&quot; class=&quot;headerlink&quot; title=&quot;kube-dns&quot;&gt;&lt;/a&gt;kube-dns&lt;/h3&gt;&lt;p&gt;kube-dns为Kubernetes集群提供命名服务,一般通过addon的方式部署,从v1.3版本开 始,成为了一个内建的自启动服务。&lt;/p&gt;
+&lt;h2 id=&quot;Kubernetes应用部署模型&quot;&gt;&lt;a href=&quot;#Kubernetes应用部署模型&quot; class=&quot;headerlink&quot; title=&quot;Kubernetes应用部署模型&quot;&gt;&lt;/a&gt;Kubernetes应用部署模型&lt;/h2&gt;&lt;p&gt;主要包括Pod、Replication controller、Label和Service。&lt;/p&gt;
+&lt;h3 id=&quot;Pod&quot;&gt;&lt;a href=&quot;#Pod&quot; class=&quot;headerlink&quot; title=&quot;Pod&quot;&gt;&lt;/a&gt;Pod&lt;/h3&gt;&lt;p&gt;Kubernetes的最小部署单元是Pod而不是容器。作为First class API公民，Pods能被创建，调度和管理。简单地来说，像一个豌豆荚中的豌豆一样，一个Pod中的应用容器同享同一个上下文：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;PID 名字空间。但是在docker中不支持&lt;/li&gt;
+&lt;li&gt;网络名字空间，在同一Pod中的多个容器访问同一个IP和端口空间。&lt;/li&gt;
+&lt;li&gt;IPC名字空间，同一个Pod中的应用能够使用SystemV IPC和POSIX消息队列进行通信。&lt;/li&gt;
+&lt;li&gt;UTS名字空间，同一个Pod中的应用共享一个主机名。&lt;/li&gt;
+&lt;li&gt;Pod中的各个容器应用还可以访问Pod级别定义的共享卷。&lt;br&gt;从生命周期来说，Pod应该是短暂的而不是长久的应用。 Pods被调度到节点，保持在这个节点上直到被销毁。当节点死亡时，分配到这个节点的Pods将会被删掉。将来可能会实现Pod的迁移特性。在实际使用时，我们一般不直接创建Pods, 我们通过replication controller来负责Pods的创建，复制，监控和销毁。一个Pod可以包括多个容器，他们直接往往相互协作完成一个应用功能。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&quot;Replication-controller和ReplicaSet&quot;&gt;&lt;a href=&quot;#Replication-controller和ReplicaSet&quot; class=&quot;headerlink&quot; title=&quot;Replication controller和ReplicaSet&quot;&gt;&lt;/a&gt;Replication controller和ReplicaSet&lt;/h3&gt;&lt;p&gt;复制控制器确保Pod的一定数量的份数(replica)在运行。如果超过这个数量，控制器会杀死一些，如果少了，控制器会启动一些。控制器也会在节点失效、维护的时候来保证这个数量。所以强烈建议即使我们的份数是1，也要使用复制控制器，而不是直接创建Pod。&lt;br&gt;在生命周期上讲，复制控制器自己不会终止，但是跨度不会比Service强。Service能够横跨多个复制控制器管理的Pods。而且在一个Service的生命周期内，复制控制器能被删除和创建。Service和客户端程序是不知道复制控制器的存在的。&lt;br&gt;复制控制器创建的Pods应该是可以互相替换的和语义上相同的，这个对无状态服务特别合适。&lt;br&gt;在新版本的Kubernetes中建议使用ReplicaSet(也简称为rs)来取代 ReplicationController。ReplicaSet跟ReplicationController没有本质的不同,只是名字不 一样,并且ReplicaSet支持集合式的selector(ReplicationController仅支持等式)。&lt;br&gt;虽然也ReplicaSet可以独立使用,但建议使用 Deployment 来自动管理ReplicaSet,这 样就无需担心跟其他机制的不兼容问题(比如ReplicaSet不支持rolling-update但 Deployment支持),并且还支持版本记录、回滚、暂停升级等高级特性。&lt;br&gt;Pod是临时性的对象，被创建和销毁，而且不会恢复。复制器动态地创建和销毁Pod。虽然Pod会分配到IP地址，但是这个IP地址都不是持久的。这样就产生了一个疑问：外部如何消费Pod提供的服务呢？&lt;/p&gt;
+&lt;h3 id=&quot;Service&quot;&gt;&lt;a href=&quot;#Service&quot; class=&quot;headerlink&quot; title=&quot;Service&quot;&gt;&lt;/a&gt;Service&lt;/h3&gt;&lt;p&gt;Service定义了一个Pod的逻辑集合和访问这个集合的策略。集合是通过定义Service时提供的Label选择器完成的。举个例子，我们假定有3个Pod的备份来完成一个图像处理的后端。这些后端备份逻辑上是相同的，前端不关心哪个后端在给它提供服务。虽然组成这个后端的实际Pod可能变化，前端客户端不会意识到这个变化，也不会跟踪后端。Service就是用来实现这种分离的抽象。&lt;br&gt;对于Service，我们还可以定义Endpoint，Endpoint把Service和Pod动态地连接起来。&lt;/p&gt;
+&lt;h4 id=&quot;Service-Cluster-IP和-kuber-proxy&quot;&gt;&lt;a href=&quot;#Service-Cluster-IP和-kuber-proxy&quot; class=&quot;headerlink&quot; title=&quot;Service Cluster IP和 kuber proxy&quot;&gt;&lt;/a&gt;Service Cluster IP和 kuber proxy&lt;/h4&gt;&lt;p&gt;每个代理节点都运行了一个kube-proxy进程。这个进程从服务进程那边拿到Service和Endpoint对象的变化。 对每一个Service, 它在本地打开一个端口。 到这个端口的任意连接都会代理到后端Pod集合中的一个Pod IP和端口。在创建了服务后，服务Endpoint模型会体现后端Pod的 IP和端口列表，kube-proxy就是从这个endpoint维护的列表中选择服务后端的。另外Service对象的sessionAffinity属性也会帮助kube-proxy来选择哪个具体的后端。缺省情况下，后端Pod的选择是随机的。可以设置service.spec.sessionAffinity 成”ClientIP”来指定同一个ClientIP的流量代理到同一个后端。在实现上，kube-proxy会用IPtables规则把访问Service的Cluster IP和端口的流量重定向到这个本地端口。下面的部分会讲什么是service的Cluster IP。&lt;br&gt;注意：在0.18以前的版本中Cluster IP叫PortalNet IP。&lt;/p&gt;
+&lt;h4 id=&quot;Pod-IP-and-Service-Cluster-IP&quot;&gt;&lt;a href=&quot;#Pod-IP-and-Service-Cluster-IP&quot; class=&quot;headerlink&quot; title=&quot;Pod IP and Service Cluster IP&quot;&gt;&lt;/a&gt;Pod IP and Service Cluster IP&lt;/h4&gt;&lt;p&gt;Pod IP 地址是实际存在于某个网卡(可以是虚拟设备)上的，但Service Cluster IP就不一样了，没有网络设备为这个地址负责。它是由kube-proxy使用Iptables规则重新定向到其本地端口，再均衡到后端Pod的。我们前面说的Service环境变量和DNS都使用Service的Cluster IP和端口。&lt;br&gt;就拿上面我们提到的图像处理程序为例。当我们的Service被创建时，Kubernetes给它分配一个地址10.0.0.1。这个地址从我们启动API的service-cluster-ip-range参数(旧版本为portal_net参数)指定的地址池中分配，比如–service-cluster-ip-range=10.0.0.0/16。假设这个Service的端口是1234。集群内的所有kube-proxy都会注意到这个Service。当proxy发现一个新的service后，它会在本地节点打开一个任意端口，建相应的iptables规则，重定向服务的IP和port到这个新建的端口，开始接受到达这个服务的连接。&lt;br&gt;当一个客户端访问这个service时，这些iptable规则就开始起作用，客户端的流量被重定向到kube-proxy为这个service打开的端口上，kube-proxy随机选择一个后端pod来服务客户。这个流程如下图所示：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/15.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;根据Kubernetes的网络模型，使用Service Cluster IP和Port访问Service的客户端可以坐落在任意代理节点上。外部要访问Service，我们就需要给Service外部访问IP。&lt;/p&gt;
+&lt;h4 id=&quot;外部访问Service&quot;&gt;&lt;a href=&quot;#外部访问Service&quot; class=&quot;headerlink&quot; title=&quot;外部访问Service&quot;&gt;&lt;/a&gt;外部访问Service&lt;/h4&gt;&lt;p&gt;Service对象在Cluster IP range池中分配到的IP只能在内部访问，如果服务作为一个应用程序内部的层次，还是很合适的。如果这个Service作为前端服务，准备为集群外的客户提供业务，我们就需要给这个服务提供公共IP了。&lt;br&gt;外部访问者是访问集群代理节点的访问者。为这些访问者提供服务，我们可以在定义Service时指定其spec.publicIPs，一般情况下publicIP 是代理节点的物理IP地址。和先前的Cluster IP range上分配到的虚拟的IP一样，kube-proxy同样会为这些publicIP提供Iptables 重定向规则，把流量转发到后端的Pod上。有了publicIP，我们就可以使用load balancer等常用的互联网技术来组织外部对服务的访问了。&lt;br&gt;spec.publicIPs在新的版本中标记为过时了，代替它的是spec.type=NodePort，这个类型的service，系统会给它在集群的各个代理节点上分配一个节点级别的端口，能访问到代理节点的客户端都能访问这个端口，从而访问到服务。&lt;/p&gt;
+&lt;h3 id=&quot;Label和Label-selector&quot;&gt;&lt;a href=&quot;#Label和Label-selector&quot; class=&quot;headerlink&quot; title=&quot;Label和Label selector&quot;&gt;&lt;/a&gt;Label和Label selector&lt;/h3&gt;&lt;p&gt;Label标签在Kubernetes模型中占着非常重要的作用。Label表现为key/value对，附加到Kubernetes管理的对象上，典型的就是Pods。它们定义了这些对象的识别属性，用来组织和选择这些对象。Label可以在对象创建时附加在对象上，也可以对象存在时通过API管理对象的Label。&lt;br&gt;在定义了对象的Label后，其它模型可以用Label 选择器（selector)来定义其作用的对象。&lt;br&gt;Label选择器有两种，分别是Equality-based和Set-based。&lt;br&gt;比如如下Equality-based选择器样例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;environment = production
+tier != frontend
+environment = production，tier != frontend
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;对于上面的选择器，第一条匹配Label具有environment key且等于production的对象，第二条匹配具有tier key，但是值不等于frontend的对象。由于kubernetes使用AND逻辑，第三条匹配production但不是frontend的对象。&lt;br&gt;Set-based选择器样例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;environment in (production, qa)
+tier notin (frontend, backend)
+partition
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;第一条选择具有environment key，而且值是production或者qa的label附加的对象。第二条选择具有tier key，但是其值不是frontend和backend。第三条选则具有partition key的对象，不对value进行校验。&lt;br&gt;replication controller复制控制器和Service都用label和label selctor来动态地配备作用对象。复制控制器在定义的时候就指定了其要创建Pod的Label和自己要匹配这个Pod的selector， API服务器应该校验这个定义。我们可以动态地修改replication controller创建的Pod的Label用于调式，数据恢复等。一旦某个Pod由于Label改变从replication controller移出来后，replication controller会马上启动一个新的Pod来确保复制池子中的份数。对于Service，Label selector可以用来选择一个Service的后端Pods。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Kubernetes整体架构&quot;&gt;&lt;a href=&quot;#Kubernetes整体架构&quot; class=&quot;headerlink&quot; title=&quot;Kubernetes整体架构&quot;&gt;&lt;/a&gt;Kubernetes整体架构&lt;/h2&gt;&lt;p&gt;Kubernetes的整体架构如下图：&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Kubernetes" scheme="http://yoursite.com/categories/Kubernetes/"/>
+    
+    
+      <category term="容器编排 Docker Kubernetes" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8%E7%BC%96%E6%8E%92-Docker-Kubernetes/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Jenkins + Docker 持续集成</title>
     <link href="http://yoursite.com/2017/09/30/Jenkins-Docker-%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/"/>
     <id>http://yoursite.com/2017/09/30/Jenkins-Docker-持续集成/</id>
     <published>2017-09-30T08:56:51.000Z</published>
-    <updated>2017-10-09T04:19:56.000Z</updated>
+    <updated>2017-10-09T04:30:18.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Jenkins介绍&quot;&gt;&lt;a href=&quot;#Jenkins介绍&quot; class=&quot;headerlink&quot; title=&quot;Jenkins介绍&quot;&gt;&lt;/a&gt;Jenkins介绍&lt;/h2&gt;&lt;p&gt;Jenkins是一个开源软件项目，是基于Java开发的一种持续集成工具，用于监控持续重复的工作，旨在提供一个开放易用的软件平台，使软件的持续集成变成可能。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;安装部署Jenkins&quot;&gt;&lt;a href=&quot;#安装部署Jenkins&quot; class=&quot;headerlink&quot; title=&quot;安装部署Jenkins&quot;&gt;&lt;/a&gt;安装部署Jenkins&lt;/h2&gt;&lt;p&gt;&lt;a href=&quot;https://jenkins.io/download/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://jenkins.io/download/&lt;/a&gt;&lt;br&gt;我这里下载war包安装，版本：1.642.3 LTS .war&lt;/p&gt;
@@ -260,17 +365,28 @@ sonar.web.port=9003
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h3 id=&quot;配置&quot;&gt;&lt;a href=&quot;#配置&quot; class=&quot;headerlink&quot; title=&quot;配置&quot;&gt;&lt;/a&gt;配置&lt;/h3&gt;&lt;p&gt;由于在172.16.206.30机器上docker是使用root用户运行的，而Jenkins是使用普通用户jenkins运行的，所以要先配置下jenkins用户可以使用docker命令。&lt;/p&gt;
+&lt;h3 id=&quot;配置&quot;&gt;&lt;a href=&quot;#配置&quot; class=&quot;headerlink&quot; title=&quot;配置&quot;&gt;&lt;/a&gt;配置&lt;/h3&gt;&lt;p&gt;由于在Jenkins机器上docker是使用root用户运行的，而Jenkins是使用普通用户jenkins运行的，所以要先配置下jenkins用户可以使用docker命令。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@osb30 ~]# visudo
 jenkins ALL=(root)      NOPASSWD: /usr/bin/docker
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;另外配置：&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;另外在Jenkins机器上配置：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# Disable &amp;quot;ssh hostname sudo &amp;lt;cmd&amp;gt;&amp;quot;, because it will show the password in clear.
 #         You have to run &amp;quot;ssh -t hostname sudo &amp;lt;cmd&amp;gt;&amp;quot;.
 #
 #Defaults    requiretty
 Defaults:jenkins !requiretty
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果不配置这个，在执行下面脚本时，会报错误：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;Error: Cannot perform an interactive login from a non TTY device
+&lt;pre&gt;&lt;code&gt;+ cp -f /home/jenkins/.jenkins/workspace/godseyeBranchForNov/godseye-container/target/godseye-container-wisedu.war /home/jenkins/docker-file/godseye_war/godseye.war
++ sudo docker login -u jkzhao -p Wisedu123 -e 01115004@wisedu.com 172.16.206.32
+sudo: sorry, you must have a tty to run sudo
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在172.16.206.32机器上配置：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# visudo
+#
+#Defaults    requiretty
+Defaults:root !requiretty
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;否则在机器172.16.206.32机器上执行脚本时会报错：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[SSH] executing...
+sudo: sorry, you must have a tty to run sudo
+docker: invalid reference format.
 &lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装插件&quot;&gt;&lt;a href=&quot;#安装插件&quot; class=&quot;headerlink&quot; title=&quot;安装插件&quot;&gt;&lt;/a&gt;安装插件&lt;/h3&gt;&lt;p&gt;登录Jenkins，点击“系统管理”，点击“管理插件”，搜索插件“SSH plugin”，进行安装。&lt;br&gt;登录Jenkins，点击“Credentials”，点击“Add domain”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/88.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/89.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/90.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击“系统管理”，“系统配置”，找到“&lt;br&gt;SSH remote hosts”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/91.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h3 id=&quot;配置Post-Steps&quot;&gt;&lt;a href=&quot;#配置Post-Steps&quot; class=&quot;headerlink&quot; title=&quot;配置Post Steps&quot;&gt;&lt;/a&gt;配置Post Steps&lt;/h3&gt;&lt;p&gt;项目其他的配置不变，见上面的章节。&lt;br&gt;【注意】：脚本中用到的仓库和认证的账号需要先在harbor新建好。&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/92.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
@@ -4795,113 +4911,6 @@ files  handlers  meta  tasks  templates  vars
     <summary type="html">
     
       &lt;h2 id=&quot;tags介绍&quot;&gt;&lt;a href=&quot;#tags介绍&quot; class=&quot;headerlink&quot; title=&quot;tags介绍&quot;&gt;&lt;/a&gt;tags介绍&lt;/h2&gt;&lt;p&gt;我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。&lt;br&gt;如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个task，你可以给这个task定义一个tags，例如：&lt;br&gt;
-    
-    </summary>
-    
-      <category term="运维自动化" scheme="http://yoursite.com/categories/%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
-    
-    
-      <category term="Ansible 运维自动化" scheme="http://yoursite.com/tags/Ansible-%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Ansible之迭代、模板</title>
-    <link href="http://yoursite.com/2017/07/20/Ansible%E4%B9%8B%E8%BF%AD%E4%BB%A3%E3%80%81%E6%A8%A1%E6%9D%BF/"/>
-    <id>http://yoursite.com/2017/07/20/Ansible之迭代、模板/</id>
-    <published>2017-07-20T07:05:29.000Z</published>
-    <updated>2017-07-20T09:13:27.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;迭代&quot;&gt;&lt;a href=&quot;#迭代&quot; class=&quot;headerlink&quot; title=&quot;迭代&quot;&gt;&lt;/a&gt;迭代&lt;/h2&gt;&lt;p&gt;当有需要重复性执行的任务时，可以使用迭代机制。其使用格式为将需要迭代的内容定义为item变量引用，并通过with_items语句来指明迭代的元素列表即可。例如：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- name: add several users
-  user: name={{ item }} state=present groups=wheel
-  with_items:
-        - testuser1
-        - testuser2
-&lt;/code&gt;&lt;/pre&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-&lt;p&gt;上面语句的功能等同于下面的语句：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- name: add user testuser1
-  user: name=testuser1 state=present groups=wheel
-- name: add user testuser2
-  user: name=testuser2 state=present groups=wheel
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;另外，with_items中使用的元素还可以是hashes，例如：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- name: add several users
-  user: name={{ item.name }} state=present groups={{ item.groups }}
-  with_items:
-        - { name: &amp;apos;testuser1&amp;apos;, groups: &amp;apos;wheel&amp;apos;}
-        - { name: &amp;apos;testuser2&amp;apos;, groups: &amp;apos;root&amp;apos;}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;【注意】：item是固定变量名。&lt;/strong&gt;&lt;/p&gt;
-&lt;h2 id=&quot;模板-JInjia2相关&quot;&gt;&lt;a href=&quot;#模板-JInjia2相关&quot; class=&quot;headerlink&quot; title=&quot;模板(JInjia2相关)&quot;&gt;&lt;/a&gt;模板(JInjia2相关)&lt;/h2&gt;&lt;p&gt;假如为两台webserver安装httpd，而他们的配置文件，172.16.7.152上的httpd需要监听80端口，172.16.7.153需要监听8080端口，ServerName也是不一样的，所以我们就需要两个配置文件，这管理起来极为不便。&lt;br&gt;在这种情况下，我们可以考虑在配置文件中使用变量来定义。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# mkdir templates
-[root@node1 ~]# cp conf/httpd.conf templates/
-[root@node1 ~]# mv templates/httpd.conf templates/httpd.conf.j2
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;后缀为j2表明是Jinja2模板。编辑这个模板：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim templates/httpd.conf.j2
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/39.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/40.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;这个模板复制到每台主机上时都应该将这文件里的变量换成对应的值。这个模板就是Jinjia2模板。&lt;/strong&gt;&lt;br&gt;设置每台主机使用的变量值：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim /etc/ansible/hosts
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/41.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;当然这http_port和maxClients也可以在playbook中定义。但是那样我们没法区别每台主机使用不同的值了。因此我们要想让每个主机变量名相同但值不同时只能使用主机变量来定义。下面定义playbook：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim apache.yml 
-- hosts: nginx
-  remote_user: root
-  vars:
-  - package: apache
-  tasks:
-  - name: install httpd package
-    yum: name={{ package }} state=latest
-  - name: install configuration file for httpd
-    template: src=/root/conf/httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf                                                                    
-    notify:
-    - restart httpd
-  - name: start httpd service 
-    service: enabled=true name=httpd state=started
-  handlers:
-  - name: restart httpd
-    service: name=httpd state=restarted
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/42.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ansible-playbook apache.yml 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;执行完成后，去查看两个节点的配置文件，发生变量都被替换了。&lt;/p&gt;
-&lt;h2 id=&quot;Jinja2相关&quot;&gt;&lt;a href=&quot;#Jinja2相关&quot; class=&quot;headerlink&quot; title=&quot;Jinja2相关&quot;&gt;&lt;/a&gt;Jinja2相关&lt;/h2&gt;&lt;h3 id=&quot;字面量&quot;&gt;&lt;a href=&quot;#字面量&quot; class=&quot;headerlink&quot; title=&quot;字面量&quot;&gt;&lt;/a&gt;字面量&lt;/h3&gt;&lt;p&gt;表达式最简单的形式就是字面量。字面量表示诸如字符串和数值的Python对象。下面的字面量是可用的：&lt;br&gt;1.字符串：“Hello World”&lt;br&gt;双引号或单引号中间的一切都是字符串，无论何时你需要在模板中使用一个字符串（比如函数引用、过滤器或只是包含或继承一个模板的参数），它们都是有用的。&lt;/p&gt;
-&lt;p&gt;2.整数和浮点数：42 / 42.23&lt;br&gt;直接写下数值就可以创建整数和浮点数。如果有小数点，则为浮点数，否则为整数。在Python里，42和42.0是不一样的。&lt;/p&gt;
-&lt;p&gt;3.列表：[‘list’, ‘of’, ‘object’]&lt;br&gt;一对中括号括起来的东西是一个列表。列表用于存储和迭代序列化的数据。例如你可以容易地在for循环中用列表和元组创建一个链接的列表：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;lt;ul&amp;gt;
-{% for href, caption in [(&#39;index.html&#39;, &#39;Index&#39;), (&#39;about.html&#39;, &#39;About&#39;), (&#39;download.html&#39;, &#39;Downloads&#39;)] %}
-            &lt;li&gt;&lt;a href=&quot;{{ href }}&quot;&gt;{{ caption }}&lt;/a&gt;&lt;/li&gt;
-        {% end for %}
-/ul&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.元组：(‘tuple’, ‘of’, ‘values’)&lt;br&gt;元组和列表类似，只是不能修改里面的元素。如果元组中只有一项，你需要使用逗号结尾它。元组通常用于表示两个或更多元素的项。&lt;/p&gt;
-&lt;p&gt;5.字典：{‘dict’: ‘of’, ‘key’: ‘and’, ‘value’: ‘pairs’}&lt;br&gt;Python中的字典是一种关联键和值的结构。键必须是唯一的，并且键必须只有一个值。&lt;/p&gt;
-&lt;p&gt;6.Boolen：true / false&lt;/p&gt;
-&lt;h3 id=&quot;算术运算&quot;&gt;&lt;a href=&quot;#算术运算&quot; class=&quot;headerlink&quot; title=&quot;算术运算&quot;&gt;&lt;/a&gt;算术运算&lt;/h3&gt;&lt;p&gt;Jinja2允许你用计算值。这在模板中很少使用，但为了完整性允许其存在，支持下面的运算符：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;+ 把两个对象加到一起，通常对象是整数或浮点数，但是如果两者是字符串或列表，你可以用这种方式来连接它们。无论如何这不是首选的连接字符串的方式。{{ 1 + 1 }}等于2。
-
-- 用第一个数减去第二个数，{{ 3 - 2 }}等于1.
-
-/ 对两个数做除法，返回值会是一个浮点数。{{ 1 / 2 }}等于{{ 0.5 }}。
-
-// 对两个手做除法，返回整数商，{{ 20 / 7 }}等于2。
-
-% 计算整数除法的余数。{{  11 % 7 }}等于4。
-
-* 用右边的数乘左边的操作数。{{ 2 * 2 }}会返回4，也可以用于重复一个字符串多次，{{ &#39;=&#39; * 80 }}会打印80个等号的横条。
-
-** 取左操作数的右操作数次幂，{{ 2**3 }}会返回8。
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;比较操作符&quot;&gt;&lt;a href=&quot;#比较操作符&quot; class=&quot;headerlink&quot; title=&quot;比较操作符&quot;&gt;&lt;/a&gt;比较操作符&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;== 比较两个对象是否相等。
-!= 比较两个对象是否不等。
-&amp;gt; 如果左边大于右边，返回true。
-&amp;lt; 如果左边小于右边，返回true。
-&amp;gt;= 如果左边大于等于右边，返回true。
-&amp;lt;= 如果左边小于等于右边，返回true。
-&lt;/code&gt;&lt;/pre&gt;</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;迭代&quot;&gt;&lt;a href=&quot;#迭代&quot; class=&quot;headerlink&quot; title=&quot;迭代&quot;&gt;&lt;/a&gt;迭代&lt;/h2&gt;&lt;p&gt;当有需要重复性执行的任务时，可以使用迭代机制。其使用格式为将需要迭代的内容定义为item变量引用，并通过with_items语句来指明迭代的元素列表即可。例如：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- name: add several users
-  user: name={{ item }} state=present groups=wheel
-  with_items:
-        - testuser1
-        - testuser2
-&lt;/code&gt;&lt;/pre&gt;
     
     </summary>
     
