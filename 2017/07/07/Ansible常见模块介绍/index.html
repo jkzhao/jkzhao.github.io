@@ -134,7 +134,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/26.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/27.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/28.png">
-<meta property="og:updated_time" content="2017-07-07T03:06:49.000Z">
+<meta property="og:updated_time" content="2017-09-28T06:03:33.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Ansible常见模块介绍">
 <meta name="twitter:description" content="ansible命令基础语法：ansible  [-f forks] [-m module_name] [-a args] [options]   host-pattern：这次的命令对哪些主机生效； -f forks：启动的并发线程数，就是一次并行处理多少主机； -m module_name：要使用的模块； -a args：模块特有的参数。">
@@ -364,8 +364,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-07-07T11:06:49+08:00" content="2017-07-07">
-              2017-07-07
+              <time itemprop="dateUpdated" datetime="2017-09-28T14:03:33+08:00" content="2017-09-28">
+              2017-09-28
               </time>
               </span>
             
@@ -447,7 +447,9 @@
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/8.png" alt=""></p>
 <pre><code>[root@node1 ~]# ansible mysql -m command -a &quot;tail -3 /etc/passwd&quot;
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/9.png" alt=""></p>
-<h3 id="cron模块"><a href="#cron模块" class="headerlink" title="cron模块"></a>cron模块</h3><p>cron模块可以让每一个被管理节点能够自动生成一个定期任务计划。查看cron模块的用法：<br>[root@node1 ~]# ansible-doc -s cron<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/10.png" alt=""><br>几个主要参数：</p>
+<h3 id="cron模块"><a href="#cron模块" class="headerlink" title="cron模块"></a>cron模块</h3><p>cron模块可以让每一个被管理节点能够自动生成一个定期任务计划。查看cron模块的用法：</p>
+<pre><code>[root@node1 ~]# ansible-doc -s cron
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/10.png" alt=""><br>几个主要参数：</p>
 <ul>
 <li>state：present表示安装crontab任务<pre><code>absent表示移除crontab任务
 </code></pre></li>
@@ -519,12 +521,12 @@
 <ul>
 <li>enabled=：是否开机自动启动，取值为true或false；</li>
 <li>name=：服务名字；</li>
-<li><p>state=：状态，取值有started，stoped    ，restarted。<br><strong>示例：</strong></p>
+<li><p>state=：状态，取值有started，stoped，restarted。<br><strong>示例：</strong></p>
 <pre><code>[root@node1 ~]# ansible 172.16.7.151 -m service -a &apos;enabled=true name=httpd state=stopped&apos;
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/23.png" alt=""></p>
 </li>
 </ul>
-<h3 id="shell模块"><a href="#shell模块" class="headerlink" title="shell模块"></a>shell模块</h3><p>shell模块：和command模块类似，但是可以使用变量。用于执行一些复杂的命令。查看shell模块的使用方法：</p>
+<h3 id="shell模块"><a href="#shell模块" class="headerlink" title="shell模块"></a>shell模块</h3><p>和command模块类似，但是可以使用变量。用于执行一些复杂的命令。查看shell模块的使用方法：</p>
 <pre><code>[root@node1 ~]# ansible-doc -s shell
 </code></pre><p><strong>示例：</strong></p>
 <pre><code>[root@node1 ~]# ansible mysql -m user -a &apos;name=&quot;test&quot;&apos;
@@ -666,7 +668,7 @@ echo &quot;hello world&quot; &gt;/tmp/nba.txt
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">43</span>
+              <span class="site-state-item-count">44</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -683,7 +685,7 @@ echo &quot;hello world&quot; &gt;/tmp/nba.txt
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -799,7 +801,7 @@ echo &quot;hello world&quot; &gt;/tmp/nba.txt
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共104.7k字</span>
+  <span class="post-count">博客全站共109.5k字</span>
 </div>
 
         

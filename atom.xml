@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-25T04:24:30.000Z</updated>
+  <updated>2017-10-09T04:19:56.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,342 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Jenkins + Docker 持续集成</title>
+    <link href="http://yoursite.com/2017/09/30/Jenkins-Docker-%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/"/>
+    <id>http://yoursite.com/2017/09/30/Jenkins-Docker-持续集成/</id>
+    <published>2017-09-30T08:56:51.000Z</published>
+    <updated>2017-10-09T04:19:56.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Jenkins介绍&quot;&gt;&lt;a href=&quot;#Jenkins介绍&quot; class=&quot;headerlink&quot; title=&quot;Jenkins介绍&quot;&gt;&lt;/a&gt;Jenkins介绍&lt;/h2&gt;&lt;p&gt;Jenkins是一个开源软件项目，是基于Java开发的一种持续集成工具，用于监控持续重复的工作，旨在提供一个开放易用的软件平台，使软件的持续集成变成可能。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;安装部署Jenkins&quot;&gt;&lt;a href=&quot;#安装部署Jenkins&quot; class=&quot;headerlink&quot; title=&quot;安装部署Jenkins&quot;&gt;&lt;/a&gt;安装部署Jenkins&lt;/h2&gt;&lt;p&gt;&lt;a href=&quot;https://jenkins.io/download/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://jenkins.io/download/&lt;/a&gt;&lt;br&gt;我这里下载war包安装，版本：1.642.3 LTS .war&lt;/p&gt;
+&lt;h3 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;安装软件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;osb30&lt;/td&gt;
+&lt;td&gt;Redhat 6.5&lt;/td&gt;
+&lt;td&gt;172.16.206.30&lt;/td&gt;
+&lt;td&gt;jenkins&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&quot;新建Jenkins用户&quot;&gt;&lt;a href=&quot;#新建Jenkins用户&quot; class=&quot;headerlink&quot; title=&quot;新建Jenkins用户&quot;&gt;&lt;/a&gt;新建Jenkins用户&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@osb30 ~]# groupadd jenkins
+[root@osb30 ~]# useradd -g jenkins jenkins
+[root@osb30 ~]# id jenkins
+uid=501(jenkins) gid=501(jenkins) groups=501(jenkins)
+[root@osb30 ~]# echo &amp;quot;wisedu&amp;quot; | passwd --stdin jenkins &amp;amp;&amp;gt; /dev/null
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;Jenkins安装方式&quot;&gt;&lt;a href=&quot;#Jenkins安装方式&quot; class=&quot;headerlink&quot; title=&quot;Jenkins安装方式&quot;&gt;&lt;/a&gt;Jenkins安装方式&lt;/h3&gt;&lt;p&gt;安装jenkins有两种方式，tomcat方式部署和java部署启动。本次实验我以tomcat下部署启动为例。&lt;/p&gt;
+&lt;h4 id=&quot;tomcat方式部署&quot;&gt;&lt;a href=&quot;#tomcat方式部署&quot; class=&quot;headerlink&quot; title=&quot;tomcat方式部署&quot;&gt;&lt;/a&gt;tomcat方式部署&lt;/h4&gt;&lt;p&gt;1.首先安装tomcat和JAVA，配置环境变量（此步骤不再讲述，java配置不可缺少）&lt;br&gt;我这里安装的是jdk 1.8.0_65。&lt;/p&gt;
+&lt;p&gt;2.将从官网下载下来的jenkins.war文件放入tomcat下的webapps目录下，进入tomcat的/bin目录下，启动tomcat即启动jenkins。&lt;br&gt;我这里用的是tomcat8。&lt;/p&gt;
+&lt;p&gt;3.启动jenkins时，会自动在webapps目录下建立jenkins目录，访问地址为：&lt;a href=&quot;http://localhost:8080/jenkins&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://localhost:8080/jenkins&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[jenkins@osb30 ~]$ tar zxf apache-tomcat-8.0.30.tar.gz
+[jenkins@osb30 ~]$ mv jenkins.war apache-tomcat-8.0.30/webapps/
+[jenkins@osb30 ~]$ cd apache-tomcat-8.0.30
+[jenkins@osb30 apache-tomcat-8.0.30]$ bin/startup.sh
+Jenkins home directory: /home/jenkins/.jenkins found at: $user.home/.jenkins
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果启动时报错：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Caused by:java.awt.AWTError: Can&amp;apos;t connect to X11 window server using &amp;apos;:0&amp;apos; as the value of the DISPLAY varible...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;解决：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[jenkins@osb30 ~]$ cd apache-tomcat-8.0.30/bin/
+[jenkins@osb30 bin]$ vim catalina.sh 
+JAVA_OPTS=&amp;quot;-Xms1024m -Xmx1024m -Djava.awt.headless=true&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.访问jenkins：&lt;br&gt;&lt;a href=&quot;http://172.16.206.30:8080/jenkins&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.30:8080/jenkins&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&quot;java部署启动jenkins&quot;&gt;&lt;a href=&quot;#java部署启动jenkins&quot; class=&quot;headerlink&quot; title=&quot;java部署启动jenkins&quot;&gt;&lt;/a&gt;java部署启动jenkins&lt;/h4&gt;&lt;p&gt;切换到jenkins.war存放的目录，输入如下命令：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ java -jar jenkins.war   
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可以修改启动端口&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ java -jar jenkins.war --httpPort=8000
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后在浏览器中（推荐用火狐、chrom）输入&lt;a href=&quot;http://localhost:8080，localhost可以是本机的ip，也可以是计算机名。就可以打开jenkins；修改端口后，访问地址的端口需同步变更。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://localhost:8080，localhost可以是本机的ip，也可以是计算机名。就可以打开jenkins；修改端口后，访问地址的端口需同步变更。&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;Jenkins授权和访问控制&quot;&gt;&lt;a href=&quot;#Jenkins授权和访问控制&quot; class=&quot;headerlink&quot; title=&quot;Jenkins授权和访问控制&quot;&gt;&lt;/a&gt;Jenkins授权和访问控制&lt;/h3&gt;&lt;p&gt;默认地Jenkins不包含任何的安全检查，任何人可以修改Jenkins设置，job和启动build等。显然地在大规模的公司需要多个部门一起协调工作的时候，没有任何安全检查会带来很多的问题。 我们可以通过下面的方式来增强Jenkins的安全：&lt;br&gt;访问jenkins：&lt;a href=&quot;http://172.16.206.30:8080/jenkins，&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.30:8080/jenkins，&lt;/a&gt;&lt;br&gt;点击系统管理—&amp;gt; Configure Global Security，点击”启用安全”，可以看到可以使用多种方式来增强Jenkins的授权和访问控制：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/44.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/45.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;如上图所示，默认是”任何用户可以做任何事情(没有任何限制)”。&lt;br&gt;我们在”安全域”选择”Jenkins专有用户数据库”，”允许用户注册”；并先在“授权策略”点击“任何用户可以做任何事情(没有任何限制)”， 防止注册之后无法再管理jenkins。此时就可以刷新一下jenkins的页面看到右上角有登录、注册的按钮。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/46.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h4 id=&quot;注册管理员账号&quot;&gt;&lt;a href=&quot;#注册管理员账号&quot; class=&quot;headerlink&quot; title=&quot;注册管理员账号&quot;&gt;&lt;/a&gt;注册管理员账号&lt;/h4&gt;&lt;p&gt;1.点击注册，首先注册一个管理员账号。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/47.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;2.点击系统管理—&amp;gt; Configure Global Security，在“授权策略”选择”安全矩阵”，添加用户/组——添加admin账户——为admin账户添加所有权限，为匿名用户勾选你希望对方了解的功能。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/48.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;【注意】：匿名用户一定要开启此处的可读权限，若不开启，后面github或者bitbucket的webhook自动构建会没有权限。&lt;br&gt;并且勾选上该项，点击保存。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/49.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;做完此部操作之后，即可用admin帐号登录，取消登录用户可以做任何事的权限。&lt;br&gt;以上操作，即可完成jenkins的授权和访问控制。&lt;/p&gt;
+&lt;h3 id=&quot;Jenkins系统配置&quot;&gt;&lt;a href=&quot;#Jenkins系统配置&quot; class=&quot;headerlink&quot; title=&quot;Jenkins系统配置&quot;&gt;&lt;/a&gt;Jenkins系统配置&lt;/h3&gt;&lt;p&gt;登录jenkins——系统管理——系统设置，为jenkins添加上需要的功能配置，有如下几个方面：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/50.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h4 id=&quot;jdk版本&quot;&gt;&lt;a href=&quot;#jdk版本&quot; class=&quot;headerlink&quot; title=&quot;jdk版本&quot;&gt;&lt;/a&gt;jdk版本&lt;/h4&gt;&lt;p&gt;在jdk的选项，点击”新增JDK”，取消自动安装，输入jdk别名（名称随意），JAVA_HOME大家应该都很了解，在此处填写jenkins所在服务器安装的java程序的HOME位置即可，根据不同操作系统填写不同路径，如win7 D:\Java\jdk1.8   linux /usr/lib/jvm/jdk1.7.0_51。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/51.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;设置完了请记得保存。&lt;/p&gt;
+&lt;h4 id=&quot;git-svn版本控制添加&quot;&gt;&lt;a href=&quot;#git-svn版本控制添加&quot; class=&quot;headerlink&quot; title=&quot;git/svn版本控制添加&quot;&gt;&lt;/a&gt;git/svn版本控制添加&lt;/h4&gt;&lt;p&gt;根据使用的版本选择控制版本的应用程序的路径，如jdk配置即可。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/52.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;【注意】:如果使用Git作为版本控制库，Jenkins默认情况下是没有安装Git的。我们需要到插件管理界面中选中Git，然后点击直接安装。&lt;br&gt;点击系统管理—&amp;gt;管理插件—&amp;gt;可选插件，在右上角”过滤”处输入git进行搜索：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/53.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;找到Git client plugin和Git plugin，在前面打上√，点击直接安装。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/54.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/55.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;安装成功后，重启jenkins。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[jenkins@osb30 ~]$ cd apache-tomcat-8.0.30
+[jenkins@osb30 apache-tomcat-8.0.30]$ bin/shutdown.sh
+[jenkins@osb30 apache-tomcat-8.0.30]$ bin/startup.sh ;tail -f logs/catalina.out
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;Jenkins添加maven配置&quot;&gt;&lt;a href=&quot;#Jenkins添加maven配置&quot; class=&quot;headerlink&quot; title=&quot;Jenkins添加maven配置&quot;&gt;&lt;/a&gt;Jenkins添加maven配置&lt;/h4&gt;&lt;p&gt;先判断jenkins所在主机是否安装了maven：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# mvn –version
+-bash: mvn: command not found
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果没有安装，请先安装maven。&lt;/p&gt;
+&lt;h5 id=&quot;CentOS-安装maven&quot;&gt;&lt;a href=&quot;#CentOS-安装maven&quot; class=&quot;headerlink&quot; title=&quot;CentOS 安装maven&quot;&gt;&lt;/a&gt;CentOS 安装maven&lt;/h5&gt;&lt;pre&gt;&lt;code&gt;[root@osb30 ~]# cd /usr/local/
+[root@osb30 local]# wget http://apache.opencas.org/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
+
+[root@osb30 local]# tar zxf apache-maven-3.3.9-bin.tar.gz
+[root@osb30 local]# ln -s apache-maven-3.3.9 maven
+[root@osb30 local]# vim /etc/profile
+# 添加如下配置：
+# Maven configuration.
+MAVEN_HOME=/usr/local/maven
+export PATH=$MAVEN_HOME/bin:$PATH
+[root@osb30 local]# source /etc/profile
+
+[root@osb30 local]# mvn -version
+Apache Maven 3.3.9 (bb52d8502b132ec0a5a3f4c09453c07478323dc5; 2015-11-11T00:41:47+08:00)
+Maven home: /usr/local/maven
+Java version: 1.8.0_65, vendor: Oracle Corporation
+Java home: /usr/java/jdk1.8.0_65/jre
+Default locale: en_US, platform encoding: UTF-8
+OS name: &amp;quot;linux&amp;quot;, version: &amp;quot;2.6.32-431.el6.x86_64&amp;quot;, arch: &amp;quot;amd64&amp;quot;, family: &amp;quot;unix&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&quot;Jenkins配置maven&quot;&gt;&lt;a href=&quot;#Jenkins配置maven&quot; class=&quot;headerlink&quot; title=&quot;Jenkins配置maven&quot;&gt;&lt;/a&gt;Jenkins配置maven&lt;/h5&gt;&lt;p&gt;安装完成后，登录jenkins。点击系统管理—&amp;gt;系统设置。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/56.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;Jenkins构建maven风格的job&quot;&gt;&lt;a href=&quot;#Jenkins构建maven风格的job&quot; class=&quot;headerlink&quot; title=&quot;Jenkins构建maven风格的job&quot;&gt;&lt;/a&gt;Jenkins构建maven风格的job&lt;/h2&gt;&lt;h3 id=&quot;新建maven任务&quot;&gt;&lt;a href=&quot;#新建maven任务&quot; class=&quot;headerlink&quot; title=&quot;新建maven任务&quot;&gt;&lt;/a&gt;新建maven任务&lt;/h3&gt;&lt;p&gt;登录jenkins，点击新建。输入Item名称，选择“构建一个maven项目”，点击OK。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/57.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;构建任务配置&quot;&gt;&lt;a href=&quot;#构建任务配置&quot; class=&quot;headerlink&quot; title=&quot;构建任务配置&quot;&gt;&lt;/a&gt;构建任务配置&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/58.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;源码管理配置&quot;&gt;&lt;a href=&quot;#源码管理配置&quot; class=&quot;headerlink&quot; title=&quot;源码管理配置&quot;&gt;&lt;/a&gt;源码管理配置&lt;/h3&gt;&lt;p&gt;进入配置页面，找到”源码管理”。我这里是svn，输入项目所在版本库的地址。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/59.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;构建触发器配置&quot;&gt;&lt;a href=&quot;#构建触发器配置&quot; class=&quot;headerlink&quot; title=&quot;构建触发器配置&quot;&gt;&lt;/a&gt;构建触发器配置&lt;/h3&gt;&lt;p&gt;在”源码管理”下面是”构建触发器”。&lt;br&gt;”构建触发器”是一个持续集成的触发器插件，可以根据已经完成构建的结果，触发新Job或者传递参数。默认的选项是Build whenever a SNAPSHOT dependency is built，意思是依赖于快照的构建，意思是依赖于快照的构建，当代码有更新时就构建项目。&lt;br&gt;Build periodically和Poll SCM可以设置定时自动构建。两者区别如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Poll SCM：定时检查源码变更（根据SCM软件的版本号），如果有更新就checkout最新code下来，然后执行构建动作。&lt;/li&gt;
+&lt;li&gt;Build periodically：定时进行项目构建（它不care源码是否发生变化）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;我这里设置为每12小时构建一次。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/60.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;Maven构建设置&quot;&gt;&lt;a href=&quot;#Maven构建设置&quot; class=&quot;headerlink&quot; title=&quot;Maven构建设置&quot;&gt;&lt;/a&gt;Maven构建设置&lt;/h3&gt;&lt;h4 id=&quot;Pre-Step&quot;&gt;&lt;a href=&quot;#Pre-Step&quot; class=&quot;headerlink&quot; title=&quot;Pre Step&quot;&gt;&lt;/a&gt;Pre Step&lt;/h4&gt;&lt;p&gt;Pre Steps选项用来配置构建前的工作，这里不作更改。&lt;/p&gt;
+&lt;h4 id=&quot;配置Root-POM和Goals-and-options&quot;&gt;&lt;a href=&quot;#配置Root-POM和Goals-and-options&quot; class=&quot;headerlink&quot; title=&quot;配置Root POM和Goals and options&quot;&gt;&lt;/a&gt;配置Root POM和Goals and options&lt;/h4&gt;&lt;p&gt;因为是Maven项目，所以Build选项有Root POM和Goals and options的设置。Root POM:填写你项目的pom.xml文件的位置，注意：是相对位置，如果该文件不存在，会有红色字提示。&lt;br&gt;比如我这里是：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/61.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h4 id=&quot;Post-Steps&quot;&gt;&lt;a href=&quot;#Post-Steps&quot; class=&quot;headerlink&quot; title=&quot;Post Steps&quot;&gt;&lt;/a&gt;Post Steps&lt;/h4&gt;&lt;p&gt;在maven项目创建完成后，我们还需要实现每次构建完成，将war发布到阿里云主机上，以实现自动发布。我们通过添加shell实现自动发布。&lt;/p&gt;
+&lt;p&gt;找到Post steps下有个Execute shell：&lt;br&gt;【注意】:Jenkins在执行该shell脚本的时候是以jenkins这个用户身份去执行。某些场景下请注意环境变量PATH。&lt;br&gt;将构建完成后，所要采取的动作，shell脚本脚本内容如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/bash
+
+# Stop tomcat.
+ssh root@114.55.29.246 &amp;apos;/usr/local/apache-tomcat-7.0.65/bin/shutdown.sh&amp;apos; &amp;amp;&amp;gt;/dev/null
+sleep 10
+
+# Check the stop is successful or not.
+if ssh root@114.55.29.246 &amp;apos;ps -ef|grep tomcat |grep -v &amp;quot;grep&amp;quot;&amp;apos; &amp;amp;&amp;gt;/dev/null; then
+  echo &amp;quot;Tomcat stop failed.Please check the problem.&amp;quot;
+  exit 5
+fi
+
+# Backup previous version and delete the war in the path /usr/local/apache-tomcat-7.0.65/webapps/.
+ssh root@114.55.29.246 &amp;apos;/usr/bin/cp -f /usr/local/apache-tomcat-7.0.65/webapps/*.war /backups/*war&amp;apos;
+ssh root@114.55.29.246 &amp;apos;rm -rf /usr/local/apache-tomcat-7.0.65/webapps/*&amp;apos;
+
+# Copy the newest war to aliyun ECS.
+scp /home/jenkins/.jenkins/workspace/godseye/godseye-parent/godseye-container/target/godseye-container-aliyun.war root@114.55.29.246:/usr/local/apache-tomcat-7.0.65/webapps/godseye.war &amp;amp;&amp;gt;/dev/null
+
+# Start the tomcat.
+ssh root@114.55.29.246 &amp;apos;/usr/local/apache-tomcat-7.0.65/bin/startup.sh&amp;apos; &amp;amp;&amp;gt;/dev/null
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;配置阿里云主机信任内网的这台jenkins主机：&lt;br&gt;由于是war包在内网服务器上，发布的环境是在阿里云主机上，所以要配置主机互信，防止scp war包时还需要输入密码。我这里内网服务器ip是172.16.206.30，外网是114.55.29.246。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[jenkins@osb30 ~]$ ssh-keygen -t rsa -f .ssh/id_rsa
+[jenkins@osb30 ~]$ ssh-copy-id -i .ssh/id_rsa.pub root@114.55.29.246
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;Jenkins邮件通知设置&quot;&gt;&lt;a href=&quot;#Jenkins邮件通知设置&quot; class=&quot;headerlink&quot; title=&quot;Jenkins邮件通知设置&quot;&gt;&lt;/a&gt;Jenkins邮件通知设置&lt;/h2&gt;&lt;h3 id=&quot;配置jenkins自带的邮件功能&quot;&gt;&lt;a href=&quot;#配置jenkins自带的邮件功能&quot; class=&quot;headerlink&quot; title=&quot;配置jenkins自带的邮件功能&quot;&gt;&lt;/a&gt;配置jenkins自带的邮件功能&lt;/h3&gt;&lt;p&gt;1.找到系统设置&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/62.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;2.填写系统管理员邮箱&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/63.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;3.找到邮件通知，输入SMTP服务器地址，点击高级，输入发件人帐号和密码&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/64.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;4.勾选上”通过发送测试邮件测试配置”，然后输入收件人帐号&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/65.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;此时我们已经可以发送邮件了。在具体job配置处，找到”构建设置”，输入收件人信箱，但是你会发现只能在构建失败时发邮件。可以安装插件Email Extension Plugin来自定义。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/66.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;安装使用插件Email-Extension-Plugin&quot;&gt;&lt;a href=&quot;#安装使用插件Email-Extension-Plugin&quot; class=&quot;headerlink&quot; title=&quot;安装使用插件Email Extension Plugin&quot;&gt;&lt;/a&gt;安装使用插件Email Extension Plugin&lt;/h3&gt;&lt;p&gt;1.安装插件Email Extension Plugin&lt;br&gt;该插件支持jenkins 1.5以上的版本。&lt;br&gt;在系统管理-插件管理-安装Email Extension Plugin。它可根据构建的结果，发送构建报告。该插件支持jenkins 1.5以上的版本。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/67.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;【注意】:安装完如果使用Email Extension Plugin，就可以弃用自带的那个邮件功能了。&lt;/p&gt;
+&lt;p&gt;2.配置使用插件Email Extension Plugin&lt;br&gt;点击”系统配置”—&amp;gt;”系统设置”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/68.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;找到Extended E-mail Notification处，输入如下的配置：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/69.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/70.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;构建通知：$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!
+
+&amp;lt;hr/&amp;gt;
+(本邮件是程序自动下发的，请勿回复！)&amp;lt;br/&amp;gt;&amp;lt;hr/&amp;gt;
+项目名称：$PROJECT_NAME&amp;lt;br/&amp;gt;&amp;lt;hr/&amp;gt;
+构建编号：$BUILD_NUMBER&amp;lt;br/&amp;gt;&amp;lt;hr/&amp;gt;
+svn版本号：${SVN_REVISION}&amp;lt;br/&amp;gt;&amp;lt;hr/&amp;gt;
+构建状态：$BUILD_STATUS&amp;lt;br/&amp;gt;&amp;lt;hr/&amp;gt;
+触发原因：${CAUSE}&amp;lt;br/&amp;gt;&amp;lt;hr/&amp;gt;
+构建日志地址：&amp;lt;a href=&amp;quot;${BUILD_URL}console&amp;quot;&amp;gt;${BUILD_URL}console&amp;lt;/a&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;hr/&amp;gt;
+构建地址：&amp;lt;a href=&amp;quot;$BUILD_URL&amp;quot;&amp;gt;$BUILD_URL&amp;lt;/a&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;hr/&amp;gt;
+变更集:${JELLY_SCRIPT,template=&amp;quot;html&amp;quot;}&amp;lt;br/&amp;gt;&amp;lt;hr/&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;点击下面的保存。&lt;br&gt;然后去job配置页面激活这个插件。找到需要发邮件的项目，点击进去。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/71.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击配置，点击”增加构建后操作步骤”，选择Editable Email Notification。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/72.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;附上构建日志，点击高级设置。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/73.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;配置Triggers：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/74.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;更详细的介绍：&lt;a href=&quot;http://www.cnblogs.com/zz0412/p/jenkins_jj_01.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://www.cnblogs.com/zz0412/p/jenkins_jj_01.html&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;sonar&quot;&gt;&lt;a href=&quot;#sonar&quot; class=&quot;headerlink&quot; title=&quot;sonar&quot;&gt;&lt;/a&gt;sonar&lt;/h2&gt;&lt;p&gt;官方文档：&lt;a href=&quot;http://docs.sonarqube.org/display/SONARQUBE45/Documentation&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://docs.sonarqube.org/display/SONARQUBE45/Documentation&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;sonar简介&quot;&gt;&lt;a href=&quot;#sonar简介&quot; class=&quot;headerlink&quot; title=&quot;sonar简介&quot;&gt;&lt;/a&gt;sonar简介&lt;/h3&gt;&lt;p&gt;Sonar是一个用于代码质量管理的开源平台，用于管理Java源代码的质量。通过插件机制，Sonar 可以集成不同的测试工具，代码分析工具，以及持续集成工具，比如pmd-cpd、checkstyle、findbugs、Jenkins。通过不同的插件对这些结果进行再加工处理，通过量化的方式度量代码质量的变化，从而可以方便地对不同规模和种类的工程进行代码质量管理。&lt;br&gt;与持续集成工具（例如 Hudson/Jenkins 等）不同，Sonar 并不是简单地把不同的代码检查工具结果（例如 FindBugs，PMD 等）直接显示在 Web 页面上，而是通过不同的插件对这些结果进行再加工处理，通过量化的方式度量代码质量的变化，从而可以方便地对不同规模和种类的工程进行代码质量管理。&lt;br&gt;在对其他工具的支持方面，Sonar 不仅提供了对 IDE 的支持，可以在 Eclipse 和 IntelliJ IDEA 这些工具里联机查看结果；同时 Sonar 还对大量的持续集成工具提供了接口支持，可以很方便地在持续集成中使用 Sonar。&lt;br&gt;此外，Sonar 的插件还可以对 Java 以外的其他编程语言提供支持，对国际化以及报告文档化也有良好的支持。&lt;/p&gt;
+&lt;h3 id=&quot;环境要求&quot;&gt;&lt;a href=&quot;#环境要求&quot; class=&quot;headerlink&quot; title=&quot;环境要求&quot;&gt;&lt;/a&gt;环境要求&lt;/h3&gt;&lt;p&gt;&lt;a href=&quot;http://docs.sonarqube.org/display/SONAR/Requirements&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://docs.sonarqube.org/display/SONAR/Requirements&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;新建用户&quot;&gt;&lt;a href=&quot;#新建用户&quot; class=&quot;headerlink&quot; title=&quot;新建用户&quot;&gt;&lt;/a&gt;新建用户&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@osb30 ~]# groupadd sonar
+[root@osb30 ~]# useradd -g sonar sonar
+[root@osb30 ~]# id sonar
+uid=502(sonar) gid=502(sonar) groups=502(sonar)
+[root@osb30 ~]# echo &amp;quot;wisedu&amp;quot; | passwd --stdin sonar &amp;amp;&amp;gt; /dev/null
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装jdk&quot;&gt;&lt;a href=&quot;#安装jdk&quot; class=&quot;headerlink&quot; title=&quot;安装jdk&quot;&gt;&lt;/a&gt;安装jdk&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[sonar@osb30 ~]$ java -version
+java version &amp;quot;1.8.0_65&amp;quot;
+Java(TM) SE Runtime Environment (build 1.8.0_65-b17)
+Java HotSpot(TM) 64-Bit Server VM (build 25.65-b01, mixed mode)
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装配置数据库&quot;&gt;&lt;a href=&quot;#安装配置数据库&quot; class=&quot;headerlink&quot; title=&quot;安装配置数据库&quot;&gt;&lt;/a&gt;安装配置数据库&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@osb30 ~]# mysql -uroot –p
+mysql&amp;gt; CREATE DATABASE sonar CHARACTER SET utf8 COLLATE utf8_general_ci;
+mysql&amp;gt; CREATE USER &amp;apos;sonar&amp;apos; IDENTIFIED BY &amp;apos;sonar&amp;apos;;
+mysql&amp;gt; GRANT ALL ON sonar.* TO &amp;apos;sonar&amp;apos;@&amp;apos;%&amp;apos; IDENTIFIED BY &amp;apos;wisedu&amp;apos;;
+mysql&amp;gt; GRANT ALL ON sonar.* TO &amp;apos;sonar&amp;apos;@&amp;apos;localhost&amp;apos; IDENTIFIED BY &amp;apos;wisedu&amp;apos;;
+mysql&amp;gt; FLUSH PRIVILEGES;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装sonar&quot;&gt;&lt;a href=&quot;#安装sonar&quot; class=&quot;headerlink&quot; title=&quot;安装sonar&quot;&gt;&lt;/a&gt;安装sonar&lt;/h3&gt;&lt;p&gt;我这里用的版本是SonarQube 4.5.7 (LTS *)，上传该软件到sonar用户的家目录下。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[sonar@osb30 ~]$ unzip -oq sonarqube-4.5.7.zip
+[sonar@osb30 ~]$ vim sonarqube-4.5.7/conf/sonar.properties
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;修改如下字段(就是配置数据库信息，其他不用动)：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;sonar.jdbc.username:                       sonar
+sonar.jdbc.password:                       wisedu
+sonar.jdbc.url:                            jdbc:mysql://localhost:3306/sonar?useUnicode=true&amp;amp;characterEncoding=utf8&amp;amp;rewriteBatchedStatements=true
+
+# Optional properties
+sonar.jdbc.driverClassName:                com.mysql.jdbc.Driver
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;启动sonar&quot;&gt;&lt;a href=&quot;#启动sonar&quot; class=&quot;headerlink&quot; title=&quot;启动sonar&quot;&gt;&lt;/a&gt;启动sonar&lt;/h3&gt;&lt;p&gt;Sonar默认集成了jetty容器，可以直接启动提供服务，也可以通过脚本构建为war包，部署在tomcat容器中。&lt;br&gt;Sonar默认的端口是”9000”、默认的上下文路径是”/”、默认的网络接口是”0.0.0.0”，默认的管理员帐号和密码为:admin/admin，这些参数都可以在配置文件sonar.properties中修改。我这里修改下port，因为本机的9000端口被其他程序占用了。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[sonar@osb30 ~]$ vim sonarqube-4.5.7/conf/sonar.properties
+sonar.web.port=9003
+[sonar@osb30 ~]$ sonarqube-4.5.7/bin/linux-x86-64/sonar.sh start
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看日志：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[sonar@osb30 ~]$ tail -f sonarqube-4.5.7/logs/sonar.log
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可以看到第一次启动时，初始化语句：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/75.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;关闭sonar&quot;&gt;&lt;a href=&quot;#关闭sonar&quot; class=&quot;headerlink&quot; title=&quot;关闭sonar&quot;&gt;&lt;/a&gt;关闭sonar&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[sonar@osb30 ~]$ sonarqube-4.5.7/bin/linux-x86-64/sonar.sh stop
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;访问sonar&quot;&gt;&lt;a href=&quot;#访问sonar&quot; class=&quot;headerlink&quot; title=&quot;访问sonar&quot;&gt;&lt;/a&gt;访问sonar&lt;/h3&gt;&lt;p&gt;浏览器输入&lt;a href=&quot;http://172.16.206.30:9003/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.30:9003/&lt;/a&gt;&lt;br&gt;默认的管理员帐号和密码为:admin/admin。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/76.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/77.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/78.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;sonar插件&quot;&gt;&lt;a href=&quot;#sonar插件&quot; class=&quot;headerlink&quot; title=&quot;sonar插件&quot;&gt;&lt;/a&gt;sonar插件&lt;/h3&gt;&lt;p&gt;Sonar支持多种插件，插件的下载地址为：&lt;a href=&quot;http://docs.codehaus.org/display/SONAR/Plugin+Library&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://docs.codehaus.org/display/SONAR/Plugin+Library&lt;/a&gt;&lt;br&gt;将下载后的插件上传到${SONAR_HOME}extensions\plugins目录下，重新启动sonar。&lt;/p&gt;
+&lt;p&gt;sonar默认集成了Java Ecosystem插件，该插件是一组插件的合集&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Java [sonar-java-plugin]：java源代码解析，计算指标等&lt;/li&gt;
+&lt;li&gt;Squid [sonar-squid-java-plugin]：检查违反Sonar定义规则的代码&lt;/li&gt;
+&lt;li&gt;Checkstyle [sonar-checkstyle-plugin]：使用CheckStyle检查违反统一代码编写风格的代码&lt;/li&gt;
+&lt;li&gt;FindBugs [sonar-findbugs-plugin]：使用FindBugs检查违反规则的缺陷代码&lt;/li&gt;
+&lt;li&gt;PMD [sonar-pmd-plugin]：使用pmd检查违反规则的代码&lt;/li&gt;
+&lt;li&gt;Surefire [sonar-surefire-plugin]：使用Surefire执行单元测试&lt;/li&gt;
+&lt;li&gt;Cobertura [sonar-cobertura-plugin]：使用Cobertura获取代码覆盖率&lt;/li&gt;
+&lt;li&gt;JaCoCo [sonar-jacoco-plugin]：使用JaCOCO获取代码覆盖率&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;与jenkins集成&quot;&gt;&lt;a href=&quot;#与jenkins集成&quot; class=&quot;headerlink&quot; title=&quot;与jenkins集成&quot;&gt;&lt;/a&gt;与jenkins集成&lt;/h3&gt;&lt;p&gt;可以通过maven集成，也可以直接与jenkins集成。我这里选择直接与jenkins集成。&lt;/p&gt;
+&lt;h4 id=&quot;通过maven集成&quot;&gt;&lt;a href=&quot;#通过maven集成&quot; class=&quot;headerlink&quot; title=&quot;通过maven集成&quot;&gt;&lt;/a&gt;通过maven集成&lt;/h4&gt;&lt;p&gt;修改maven的主配置文件（${MAVEN_HOME}/conf/settings.xml文件或者 ~/.m2/settings.xml文件），在其中增加访问Sonar数据库及Sonar服务地址，添加如下配置：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;profile&amp;gt;
+&amp;lt;id&amp;gt;sonar&amp;lt;/id&amp;gt;
+&amp;lt;properties&amp;gt;
+    &amp;lt;sonar.jdbc.url&amp;gt;jdbc:mysql://localhost:3306/sonar&amp;lt;/sonar.jdbc.url&amp;gt;
+    &amp;lt;sonar.jdbc.driver&amp;gt;com.mysql.jdbc.Driver&amp;lt;/sonar.jdbc.driver&amp;gt;
+    &amp;lt;sonar.jdbc.username&amp;gt;sonar&amp;lt;/sonar.jdbc.username&amp;gt;
+    &amp;lt;sonar.jdbc.password&amp;gt;sonar&amp;lt;/sonar.jdbc.password&amp;gt;
+    &amp;lt;sonar.host.url&amp;gt;http://localhost:9003&amp;lt;/sonar.host.url&amp;gt; &amp;lt;!-- Sonar服务器访问地址 --&amp;gt;
+&amp;lt;/properties&amp;gt;
+&amp;lt;/profile&amp;gt;
+
+&amp;lt;activeProfiles&amp;gt;
+  &amp;lt;activeProfile&amp;gt;sonar&amp;lt;/activeProfile&amp;gt;
+&amp;lt;/activeProfiles&amp;gt;
+
+...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这部分内容具体可参照网上&lt;a href=&quot;http://www.cnblogs.com/gao241/p/3190701.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://www.cnblogs.com/gao241/p/3190701.html&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&quot;直接与Jenkins集成&quot;&gt;&lt;a href=&quot;#直接与Jenkins集成&quot; class=&quot;headerlink&quot; title=&quot;直接与Jenkins集成&quot;&gt;&lt;/a&gt;直接与Jenkins集成&lt;/h4&gt;&lt;p&gt;在jenkins的插件管理中选择安装sonar jenkins plugin，该插件可以使项目每次构建都调用sonar进行代码度量。&lt;/p&gt;
+&lt;p&gt;1.安装插件&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/79.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;2.系统配置添加sonar的配置&lt;br&gt;进入系统配置页面对sonar插件进行配置，如下图：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/80.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/81.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;然后点击下面的保存。&lt;/p&gt;
+&lt;p&gt;3.配置构建项目，增加Post Build Action&lt;br&gt;点击要构建的项目，在点击左侧的配置。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/82.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;在页面的最下面找到”构建后操作”，选择SonarQube。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/83.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/84.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;It is no longer recommended to use SonarQube maven builder. It is preferable to set up SonarQube in the build environment and use a standard Jenkins maven target.&lt;br&gt;【解决】：&lt;br&gt;&lt;a href=&quot;http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner+for+Jenkins&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner+for+Jenkins&lt;/a&gt;&lt;br&gt;修改Build处：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/85.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;最后去jenkins构建项目，构建完查看sonar控制台：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/86.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;常见问题&quot;&gt;&lt;a href=&quot;#常见问题&quot; class=&quot;headerlink&quot; title=&quot;常见问题&quot;&gt;&lt;/a&gt;常见问题&lt;/h3&gt;&lt;p&gt;Jenkins构建完成后，sonar扫描代码报错：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/87.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;解决：&lt;br&gt;卸载sonar的JavaScript插件。&lt;/p&gt;
+&lt;h2 id=&quot;Jenkins与Docker结合&quot;&gt;&lt;a href=&quot;#Jenkins与Docker结合&quot; class=&quot;headerlink&quot; title=&quot;Jenkins与Docker结合&quot;&gt;&lt;/a&gt;Jenkins与Docker结合&lt;/h2&gt;&lt;p&gt;我这里没有使用Docker Pipeline，直接在构建完成后，执行shell脚本，这样更灵活。&lt;/p&gt;
+&lt;h3 id=&quot;部署流程&quot;&gt;&lt;a href=&quot;#部署流程&quot; class=&quot;headerlink&quot; title=&quot;部署流程&quot;&gt;&lt;/a&gt;部署流程&lt;/h3&gt;&lt;p&gt;1.研发push到svn代码库&lt;br&gt;2.Jenkins 构建，pull svn代码 使用maven进行编译打包&lt;br&gt;3.打包生成的代码，生成一个新版本的镜像，push到本地docker仓库harbor&lt;br&gt;4.发布，测试机器 pull 新版本的镜像，并删除原来的容器，重新运行新版本镜像。&lt;/p&gt;
+&lt;h3 id=&quot;环境说明&quot;&gt;&lt;a href=&quot;#环境说明&quot; class=&quot;headerlink&quot; title=&quot;环境说明&quot;&gt;&lt;/a&gt;环境说明&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;用途&lt;/th&gt;
+&lt;th&gt;安装软件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;osb30&lt;/td&gt;
+&lt;td&gt;Redhat 6.5&lt;/td&gt;
+&lt;td&gt;172.16.206.30&lt;/td&gt;
+&lt;td&gt;svn代码库、Jenkins、Docker&lt;/td&gt;
+&lt;td&gt;jenkins、svn、Docker 1.7.1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;spark32&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;172.16.206.32&lt;/td&gt;
+&lt;td&gt;本地docker仓库、业务部署测试环境&lt;/td&gt;
+&lt;td&gt;harbor、Docker 17.06.1-ce&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&quot;配置&quot;&gt;&lt;a href=&quot;#配置&quot; class=&quot;headerlink&quot; title=&quot;配置&quot;&gt;&lt;/a&gt;配置&lt;/h3&gt;&lt;p&gt;由于在172.16.206.30机器上docker是使用root用户运行的，而Jenkins是使用普通用户jenkins运行的，所以要先配置下jenkins用户可以使用docker命令。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@osb30 ~]# visudo
+jenkins ALL=(root)      NOPASSWD: /usr/bin/docker
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;另外配置：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# Disable &amp;quot;ssh hostname sudo &amp;lt;cmd&amp;gt;&amp;quot;, because it will show the password in clear.
+#         You have to run &amp;quot;ssh -t hostname sudo &amp;lt;cmd&amp;gt;&amp;quot;.
+#
+#Defaults    requiretty
+Defaults:jenkins !requiretty
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果不配置这个，在执行下面脚本时，会报错误：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Error: Cannot perform an interactive login from a non TTY device
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装插件&quot;&gt;&lt;a href=&quot;#安装插件&quot; class=&quot;headerlink&quot; title=&quot;安装插件&quot;&gt;&lt;/a&gt;安装插件&lt;/h3&gt;&lt;p&gt;登录Jenkins，点击“系统管理”，点击“管理插件”，搜索插件“SSH plugin”，进行安装。&lt;br&gt;登录Jenkins，点击“Credentials”，点击“Add domain”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/88.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/89.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/90.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击“系统管理”，“系统配置”，找到“&lt;br&gt;SSH remote hosts”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/91.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;配置Post-Steps&quot;&gt;&lt;a href=&quot;#配置Post-Steps&quot; class=&quot;headerlink&quot; title=&quot;配置Post Steps&quot;&gt;&lt;/a&gt;配置Post Steps&lt;/h3&gt;&lt;p&gt;项目其他的配置不变，见上面的章节。&lt;br&gt;【注意】：脚本中用到的仓库和认证的账号需要先在harbor新建好。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/92.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# Jenkins机器：编译完成后，build生成一个新版本的镜像，push到远程docker仓库
+
+# Variables
+JENKINS_WAR_HOME=&amp;apos;/home/jenkins/.jenkins/workspace/godseyeBranchForNov/godseye-container/target&amp;apos;
+DOCKERFILE_HOME=&amp;apos;/home/jenkins/docker-file/godseye_war&amp;apos;
+HARBOR_IP=&amp;apos;172.16.206.32&amp;apos;
+REPOSITORIES=&amp;apos;godseye_war/godseye&amp;apos;
+HARBOR_USER=&amp;apos;jkzhao&amp;apos;
+HARBOR_USER_PASSWD=&amp;apos;Wisedu123&amp;apos;
+HARBOR_USER_EMAIL=&amp;apos;01115004@wisedu.com&amp;apos;
+
+# Copy the newest war to docker-file directory.
+\cp -f ${JENKINS_WAR_HOME}/godseye-container-wisedu.war ${DOCKERFILE_HOME}/godseye.war 
+
+# Delete image early version.
+sudo docker login -u ${HARBOR_USER} -p ${HARBOR_USER_PASSWD} -e ${HARBOR_USER_EMAIL} ${HARBOR_IP}  
+IMAGE_ID=`sudo docker images | grep ${REPOSITORIES} | awk &amp;apos;{print $3}&amp;apos;`
+if [ -n &amp;quot;${IMAGE_ID}&amp;quot; ];then
+    sudo docker rmi ${IMAGE_ID}
+fi
+
+# Build image.
+cd ${DOCKERFILE_HOME}
+TAG=`date +%Y%m%d-%H%M%S`
+sudo docker build -t ${HARBOR_IP}/${REPOSITORIES}:${TAG} . &amp;amp;&amp;gt;/dev/null
+
+# Push to the harbor registry.
+sudo docker push ${HARBOR_IP}/${REPOSITORIES}:${TAG} &amp;amp;&amp;gt;/dev/null
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/93.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 拉取镜像，发布
+HARBOR_IP=&amp;apos;172.16.206.32&amp;apos;
+REPOSITORIES=&amp;apos;godseye_war/godseye&amp;apos;
+HARBOR_USER=&amp;apos;jkzhao&amp;apos;
+HARBOR_USER_PASSWD=&amp;apos;Wisedu123&amp;apos;
+
+# 登录harbor
+#docker login -u ${HARBOR_USER} -p ${HARBOR_USER_PASSWD} ${HARBOR_IP}
+
+# Stop container, and delete the container.
+CONTAINER_ID=`docker ps | grep &amp;quot;godseye_web&amp;quot; | awk &amp;apos;{print $1}&amp;apos;`
+if [ -n &amp;quot;$CONTAINER_ID&amp;quot; ]; then
+    docker stop $CONTAINER_ID
+    docker rm $CONTAINER_ID
+else #如果容器启动时失败了，就需要docker ps -a才能找到那个容器
+    CONTAINER_ID=`docker ps -a | grep &amp;quot;godseye_web&amp;quot; | awk &amp;apos;{print $1}&amp;apos;`
+    if [ -n &amp;quot;$CONTAINER_ID&amp;quot; ]; then  # 如果是第一次在这台机器上拉取运行容器，那么docker ps -a也是找不到这个容器的
+        docker rm $CONTAINER_ID
+    fi
+fi
+
+# Delete godseye_web image early version.
+IMAGE_ID=`sudo docker images | grep ${REPOSITORIES} | awk &amp;apos;{print $3}&amp;apos;`
+if [ -n &amp;quot;${IMAGE_ID}&amp;quot; ];then
+    docker rmi ${IMAGE_ID}
+fi
+
+# Pull image.
+TAG=`curl -s http://${HARBOR_IP}/api/repositories/${REPOSITORIES}/tags | jq &amp;apos;.[-1]&amp;apos; | sed &amp;apos;s/\&amp;quot;//g&amp;apos;` #最后的sed是为了去掉tag前后的双引号
+docker pull ${HARBOR_IP}/${REPOSITORIES}:${TAG} &amp;amp;&amp;gt;/dev/null
+
+# Run.
+docker run -d --name godseye_web -p 8080:8080 ${HARBOR_IP}/${REPOSITORIES}:${TAG}
+&lt;/code&gt;&lt;/pre&gt;</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Jenkins介绍&quot;&gt;&lt;a href=&quot;#Jenkins介绍&quot; class=&quot;headerlink&quot; title=&quot;Jenkins介绍&quot;&gt;&lt;/a&gt;Jenkins介绍&lt;/h2&gt;&lt;p&gt;Jenkins是一个开源软件项目，是基于Java开发的一种持续集成工具，用于监控持续重复的工作，旨在提供一个开放易用的软件平台，使软件的持续集成变成可能。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+    
+    
+      <category term="Docker 持续集成" scheme="http://yoursite.com/tags/Docker-%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/"/>
+    
+  </entry>
   
   <entry>
     <title>在Kubernetes上使用Traefik</title>
@@ -786,7 +1122,7 @@ To further debug and diagnose cluster problems, use &amp;apos;kubectl cluster-in
     <link href="http://yoursite.com/2017/09/15/%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%B9%E5%BC%8F%E9%83%A8%E7%BD%B2Kubernetes-1-6-0%E9%9B%86%E7%BE%A4-%E5%BC%80%E5%90%AFTLS/"/>
     <id>http://yoursite.com/2017/09/15/二进制方式部署Kubernetes-1-6-0集群-开启TLS/</id>
     <published>2017-09-15T06:06:09.000Z</published>
-    <updated>2017-09-21T01:48:27.000Z</updated>
+    <updated>2017-09-27T07:18:08.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Kubernetes简介&quot;&gt;&lt;a href=&quot;#Kubernetes简介&quot; class=&quot;headerlink&quot; title=&quot;Kubernetes简介&quot;&gt;&lt;/a&gt;Kubernetes简介&lt;/h2&gt;&lt;p&gt;Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本,主要功能包括:&lt;/p&gt;
 &lt;ul&gt;
@@ -1414,7 +1750,7 @@ e64edc68e5e81b55: name=node2 peerURLs=https://172.16.7.152:2380 clientURLs=https
 &lt;li&gt;kube-scheduler&lt;/li&gt;
 &lt;li&gt;kube-controller-manager&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;目前这三个组件需要部署在同一台机器上。&lt;br&gt;kube-scheduler、kube-controller-manager 和 kube-apiserver 三者的功能紧密相关；&lt;br&gt;同时只能有一个 kube-scheduler、kube-controller-manager 进程处于工作状态，如果运行多个，则需要通过选举产生一个 leader；&lt;br&gt;本文档记录部署一个三个节点的高可用 kubernetes master 集群步骤。（后续创建一个 load balancer 来代理访问 kube-apiserver 的请求）&lt;/p&gt;
+&lt;p&gt;目前这三个组件需要部署在同一台机器上。&lt;br&gt;kube-scheduler、kube-controller-manager 和 kube-apiserver 三者的功能紧密相关；&lt;br&gt;同时只能有一个 kube-scheduler、kube-controller-manager 进程处于工作状态，如果运行多个，则需要通过选举产生一个 leader；&lt;/p&gt;
 &lt;h3 id=&quot;TLS-证书文件&quot;&gt;&lt;a href=&quot;#TLS-证书文件&quot; class=&quot;headerlink&quot; title=&quot;TLS 证书文件&quot;&gt;&lt;/a&gt;TLS 证书文件&lt;/h3&gt;&lt;p&gt;检查之前生成的证书。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 kubernetes]# ls /etc/kubernetes/ssl
 admin-key.pem  admin.pem  ca-key.pem  ca.pem  kube-proxy-key.pem  kube-proxy.pem  kubernetes-key.pem  kubernetes.pem
@@ -2166,7 +2502,7 @@ PING kube-dns.kube-system.svc.cluster.local (10.254.0.2): 56 data bytes
     <link href="http://yoursite.com/2017/09/08/%E4%BC%81%E4%B8%9A%E7%BA%A7Docker-Registry-%E2%80%94%E2%80%94-Harbor%E6%90%AD%E5%BB%BA%E5%92%8C%E4%BD%BF%E7%94%A8/"/>
     <id>http://yoursite.com/2017/09/08/企业级Docker-Registry-——-Harbor搭建和使用/</id>
     <published>2017-09-08T08:38:52.000Z</published>
-    <updated>2017-09-09T01:41:42.000Z</updated>
+    <updated>2017-09-29T08:58:54.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Harbor介绍&quot;&gt;&lt;a href=&quot;#Harbor介绍&quot; class=&quot;headerlink&quot; title=&quot;Harbor介绍&quot;&gt;&lt;/a&gt;Harbor介绍&lt;/h2&gt;&lt;p&gt;Harbor是由VMWare公司开源的容器镜像仓库。事实上，Habor是在Docker Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制 ，AD/LDAP集成以及审计日志等。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;安装部署Harbor&quot;&gt;&lt;a href=&quot;#安装部署Harbor&quot; class=&quot;headerlink&quot; title=&quot;安装部署Harbor&quot;&gt;&lt;/a&gt;安装部署Harbor&lt;/h2&gt;&lt;p&gt;官方安装文档：&lt;br&gt;&lt;a href=&quot;https://github.com/vmware/harbor/blob/master/docs/installation_guide.md&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/vmware/harbor/blob/master/docs/installation_guide.md&lt;/a&gt;&lt;/p&gt;
@@ -2319,7 +2655,10 @@ Login Succeeded
 &lt;pre&gt;&lt;code&gt;[root@node3 ~]# docker tag centos:centos7 172.16.206.32/godseye/centos:latest
 [root@node3 ~]# docker push 172.16.206.32/godseye/centos:latest
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后到web ui上查看刚才push的镜像是否成功了：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/42.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;镜像删除和空间回收&quot;&gt;&lt;a href=&quot;#镜像删除和空间回收&quot; class=&quot;headerlink&quot; title=&quot;镜像删除和空间回收&quot;&gt;&lt;/a&gt;镜像删除和空间回收&lt;/h2&gt;&lt;p&gt;Docker命令没有提供Registry镜像删除功能，日积月累，将会产生许多无用的镜像，占用大量存储空间。若要删除镜像并回收空间，需要调用docker registry API来完成，比较麻烦。Harbor提供了可视化的镜像删除界面，可以逻辑删除镜像。在维护状态下可以回收垃圾镜像的空间。&lt;/p&gt;
+&lt;p&gt;【补充】：如果使用的docker客户端版本比较低，比如在centos6上安装了docker 1.7.1，那么同样需要先调整docker的配置：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@osb30 ~]# vim /etc/sysconfig/docker
+other_args=&amp;quot;--insecure-registry=172.16.206.32&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;镜像删除和空间回收&quot;&gt;&lt;a href=&quot;#镜像删除和空间回收&quot; class=&quot;headerlink&quot; title=&quot;镜像删除和空间回收&quot;&gt;&lt;/a&gt;镜像删除和空间回收&lt;/h2&gt;&lt;p&gt;Docker命令没有提供Registry镜像删除功能，日积月累，将会产生许多无用的镜像，占用大量存储空间。若要删除镜像并回收空间，需要调用docker registry API来完成，比较麻烦。Harbor提供了可视化的镜像删除界面，可以逻辑删除镜像。在维护状态下可以回收垃圾镜像的空间。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node3 ~]# docker images
 REPOSITORY                           TAG                    IMAGE ID            CREATED             SIZE
 java                                 openjdk-8-jre-alpine   d61ff40a5bf6        16 months ago       108.3 MB
@@ -2769,7 +3108,7 @@ docker-compose version 1.15.0, build e12f3b9
     <link href="http://yoursite.com/2017/08/28/CentOS%E5%AE%89%E8%A3%85Docker-CE/"/>
     <id>http://yoursite.com/2017/08/28/CentOS安装Docker-CE/</id>
     <published>2017-08-28T05:29:47.000Z</published>
-    <updated>2017-09-12T07:54:59.000Z</updated>
+    <updated>2017-09-29T08:43:11.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how registries are handled.”，并且建议我尝试较新的版本。在2017年4月份的DockerCon会议上，Docker公司直接将 Github 上原隶属于 Docker 组织的 Docker 项目，直接 transfer 到了一个新的、名叫 Moby 的组织下，并将其重命名为 Moby 项目。由此先来了解下这个Moby项目。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;Moby项目&quot;&gt;&lt;a href=&quot;#Moby项目&quot; class=&quot;headerlink&quot; title=&quot;Moby项目&quot;&gt;&lt;/a&gt;Moby项目&lt;/h2&gt;&lt;p&gt;为什么会产生Moby这个项目呢？可以看到最近几年里面，在2015年之后的Docker 1.17版本之后，引入了很多的新特性，比如Network、runC等，Docker的组件越来越多，提供支持的场景也越来越复杂，比如微服务、机器学习、物联网等，所以Docker镜像的下载量也呈现指数型上升，最终Docker运行的环境，也是越来越复杂，越来越多，比如在Linux，Windows，还有在嵌入式设备上。&lt;br&gt;所以Docker原本的发行版本已经不能适配于这些越来越复杂的场景了，举个例子，其实在IoT里面，树莓派的性能是比较好的，但是它去运行Docker的话，Docker就会占整个性能的一大部分，这样它上面就已经无法运行其他的一些自己的应用了，那用户要怎么去解决这些事情，难道自己去再写一个Docker容器引擎吗？这个成本是很高的，需要自己去造轮子。所以为了提供更加开放的生态，Docker公司把Docker项目中现在的一些组件抽象成Moby项目，这样系统构建者就可以通过Moby项目把现有的组件去进行组装，然后组装成自己所需要的一个容器引擎。&lt;br&gt;Moby项目现在有80多个组件，通过这些组件，用户可以避免重复地去造轮子。用户可以按照自己的需要去组装组件，做出自己的一个容器系统。这些组件有一个标准化的调用方式，他们之间通过gRPC通信，它的语言也是可以去定制的，不会像之前一样必须用Go语言去写。通过标准化的方式，通过Moby这个项目就可以把这些组件进行组合，成为自己所依赖的容器系统。&lt;br&gt;Docker项目现在改名成Moby项目，但是Docker会逐渐的从Moby项目中去抽象和剥离出来，作为Moby的一种组装方式，比如Docker依赖于这里面的一些库，它就特化成一种组装，组装成自己的Docker CE的版本，也就是Docker的社区版。Docker社区版后面也会继续做开源，所以用户和开发者不需要担心以后用Docker就会收费了，对于Docker用户来说，他也无须感知用户接口的变化，使用的命令还是Docker不是Moby，需要更多运维支持的可以选择Docker EE的版本，让Docker公司的工程师去替你去做运维和更复杂的线上支持，如果自己开发可以继续选择Docker社区版。对于架构师而言，现在就可以不强依赖于Docker项目，而是通过这些组件去拼装出来一个容器引擎去满足自己的需求。&lt;/p&gt;
@@ -2832,16 +3171,16 @@ Cgroup Driver: cgroupfs
 &lt;ul&gt;
 &lt;li&gt;阿里云加速器&lt;/li&gt;
 &lt;li&gt;DaoCloud 加速器&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;灵雀云加速器&lt;br&gt;以阿里云加速器为例&lt;br&gt;1.首先进入&lt;a href=&quot;https://dev.aliyun.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;阿里云docker库首页&lt;/a&gt;&lt;br&gt;注册用户并登录，点击右上角“管理中心”。如果第一次，会提示“您还没有开通服务”，点击“确定”，然后会出现弹窗“初始化设置”，设置docker登录时使用的密码。&lt;br&gt;2.点击左侧菜单“Docker Hub镜像站点”，可以看到“您的专属加速器地址：&lt;a href=&quot;https://6101v8g5.mirror.aliyuncs.com”，我们需要将其配置到Docker&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://6101v8g5.mirror.aliyuncs.com”，我们需要将其配置到Docker&lt;/a&gt; 引擎。&lt;br&gt;3.修改daemon配置文件/etc/docker/daemon.json来使用加速器：&lt;/p&gt;
+&lt;li&gt;灵雀云加速器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;以阿里云加速器为例&lt;br&gt;1.首先进入&lt;a href=&quot;https://dev.aliyun.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;阿里云docker库首页&lt;/a&gt;&lt;br&gt;注册用户并登录，点击右上角“管理中心”。如果第一次，会提示“您还没有开通服务”，点击“确定”，然后会出现弹窗“初始化设置”，设置docker登录时使用的密码。&lt;br&gt;2.点击左侧菜单“Docker Hub镜像站点”，可以看到“您的专属加速器地址：&lt;a href=&quot;https://6101v8g5.mirror.aliyuncs.com”，我们需要将其配置到Docker&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://6101v8g5.mirror.aliyuncs.com”，我们需要将其配置到Docker&lt;/a&gt; 引擎。&lt;br&gt;3.修改daemon配置文件/etc/docker/daemon.json来使用加速器：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@spark32 ~]# vim /etc/docker/daemon.json
 {
   &amp;quot;registry-mirrors&amp;quot;: [&amp;quot;https://6101v8g5.mirror.aliyuncs.com&amp;quot;]
 }
 [root@spark32 ~]# systemctl daemon-reload
 [root@spark32 ~]# systemctl restart docker
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;卸载Docker-CE&quot;&gt;&lt;a href=&quot;#卸载Docker-CE&quot; class=&quot;headerlink&quot; title=&quot;卸载Docker-CE&quot;&gt;&lt;/a&gt;卸载Docker-CE&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# yum remove docker-ce
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;卸载Docker-CE&quot;&gt;&lt;a href=&quot;#卸载Docker-CE&quot; class=&quot;headerlink&quot; title=&quot;卸载Docker-CE&quot;&gt;&lt;/a&gt;卸载Docker-CE&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# yum remove docker-ce
 # rm -rf /var/lib/docker
 &lt;/code&gt;&lt;/pre&gt;</content>
     
@@ -4563,47 +4902,6 @@ files  handlers  meta  tasks  templates  vars
         - testuser1
         - testuser2
 &lt;/code&gt;&lt;/pre&gt;
-    
-    </summary>
-    
-      <category term="运维自动化" scheme="http://yoursite.com/categories/%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
-    
-    
-      <category term="Ansible 运维自动化" scheme="http://yoursite.com/tags/Ansible-%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Ansible条件测试</title>
-    <link href="http://yoursite.com/2017/07/17/Ansible%E6%9D%A1%E4%BB%B6%E6%B5%8B%E8%AF%95/"/>
-    <id>http://yoursite.com/2017/07/17/Ansible条件测试/</id>
-    <published>2017-07-17T05:39:32.000Z</published>
-    <updated>2017-07-17T06:10:14.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;Ansible条件测试&quot;&gt;&lt;a href=&quot;#Ansible条件测试&quot; class=&quot;headerlink&quot; title=&quot;Ansible条件测试&quot;&gt;&lt;/a&gt;Ansible条件测试&lt;/h2&gt;&lt;p&gt;在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。&lt;/p&gt;
-&lt;h3 id=&quot;when语句&quot;&gt;&lt;a href=&quot;#when语句&quot; class=&quot;headerlink&quot; title=&quot;when语句&quot;&gt;&lt;/a&gt;when语句&lt;/h3&gt;&lt;p&gt;在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如：&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;tasks:
-- name: &amp;quot;shutdown Debian flavored systems&amp;quot;
-  command: /sbin/shutdown -h now
-  when: ansible_os_family == &amp;quot;Debian&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;when语句还可以使用Jinja2的大多“filter”，例如要忽略此前某语句额错误并基于其结果（failed或success）运行后面指定的语句，可使用类似如下形式：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;tasks:
-- command: /bin/false
-  register: result
-  ignore_errors: True
-- command: /bin/sonmething
-  when: result|failed
-- command: /bin/something_else
-  when: result|success
-- command: /bin/still/something_else
-  when: result|skipped
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;此外，when语句还可以使用facts或playbook中定义的变量。facts就是主机报告上来的变量。比如：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/37.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Ansible条件测试&quot;&gt;&lt;a href=&quot;#Ansible条件测试&quot; class=&quot;headerlink&quot; title=&quot;Ansible条件测试&quot;&gt;&lt;/a&gt;Ansible条件测试&lt;/h2&gt;&lt;p&gt;在ansible中还可以进行条件测试。如果需要根据变量、facts或此前任务的执行结果来做为某task执行与否的前提时要用到条件测试。&lt;/p&gt;
-&lt;h3 id=&quot;when语句&quot;&gt;&lt;a href=&quot;#when语句&quot; class=&quot;headerlink&quot; title=&quot;when语句&quot;&gt;&lt;/a&gt;when语句&lt;/h3&gt;&lt;p&gt;在task后添加when子句即可使用条件测试：when语句支持Jinja2表达式语法。例如：&lt;br&gt;
     
     </summary>
     

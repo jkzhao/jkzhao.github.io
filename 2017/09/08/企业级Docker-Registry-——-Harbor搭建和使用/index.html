@@ -120,7 +120,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/41.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/42.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/43.png">
-<meta property="og:updated_time" content="2017-09-09T01:41:42.000Z">
+<meta property="og:updated_time" content="2017-09-29T08:58:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="企业级Docker Registry —— Harbor搭建和使用">
 <meta name="twitter:description" content="Harbor介绍Harbor是由VMWare公司开源的容器镜像仓库。事实上，Habor是在Docker Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制 ，AD/LDAP集成以及审计日志等。">
@@ -350,8 +350,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-09-09T09:41:42+08:00" content="2017-09-09">
-              2017-09-09
+              <time itemprop="dateUpdated" datetime="2017-09-29T16:58:54+08:00" content="2017-09-29">
+              2017-09-29
               </time>
               </span>
             
@@ -561,7 +561,10 @@ Login Succeeded
 <pre><code>[root@node3 ~]# docker tag centos:centos7 172.16.206.32/godseye/centos:latest
 [root@node3 ~]# docker push 172.16.206.32/godseye/centos:latest
 </code></pre><p>然后到web ui上查看刚才push的镜像是否成功了：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/42.png" alt=""></p>
-<h2 id="镜像删除和空间回收"><a href="#镜像删除和空间回收" class="headerlink" title="镜像删除和空间回收"></a>镜像删除和空间回收</h2><p>Docker命令没有提供Registry镜像删除功能，日积月累，将会产生许多无用的镜像，占用大量存储空间。若要删除镜像并回收空间，需要调用docker registry API来完成，比较麻烦。Harbor提供了可视化的镜像删除界面，可以逻辑删除镜像。在维护状态下可以回收垃圾镜像的空间。</p>
+<p>【补充】：如果使用的docker客户端版本比较低，比如在centos6上安装了docker 1.7.1，那么同样需要先调整docker的配置：</p>
+<pre><code>[root@osb30 ~]# vim /etc/sysconfig/docker
+other_args=&quot;--insecure-registry=172.16.206.32&quot;
+</code></pre><h2 id="镜像删除和空间回收"><a href="#镜像删除和空间回收" class="headerlink" title="镜像删除和空间回收"></a>镜像删除和空间回收</h2><p>Docker命令没有提供Registry镜像删除功能，日积月累，将会产生许多无用的镜像，占用大量存储空间。若要删除镜像并回收空间，需要调用docker registry API来完成，比较麻烦。Harbor提供了可视化的镜像删除界面，可以逻辑删除镜像。在维护状态下可以回收垃圾镜像的空间。</p>
 <pre><code>[root@node3 ~]# docker images
 REPOSITORY                           TAG                    IMAGE ID            CREATED             SIZE
 java                                 openjdk-8-jre-alpine   d61ff40a5bf6        16 months ago       108.3 MB
@@ -706,7 +709,7 @@ vmware/registry     2.6.1-photon        0f6c96580032        3 months ago        
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">43</span>
+              <span class="site-state-item-count">44</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -723,7 +726,7 @@ vmware/registry     2.6.1-photon        0f6c96580032        3 months ago        
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -839,7 +842,7 @@ vmware/registry     2.6.1-photon        0f6c96580032        3 months ago        
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共104.7k字</span>
+  <span class="post-count">博客全站共109.5k字</span>
 </div>
 
         
