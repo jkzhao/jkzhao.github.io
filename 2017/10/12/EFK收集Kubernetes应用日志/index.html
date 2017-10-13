@@ -1,0 +1,1001 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="容器编排 Docker Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="EFK介绍 Logstash(或者Fluentd)负责收集日志  Elasticsearch存储日志并提供搜索  Kibana负责日志查询和展示  官方地址：https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch">
+<meta name="keywords" content="容器编排 Docker Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EFK收集Kubernetes应用日志">
+<meta property="og:url" content="http://yoursite.com/2017/10/12/EFK收集Kubernetes应用日志/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="EFK介绍 Logstash(或者Fluentd)负责收集日志  Elasticsearch存储日志并提供搜索  Kibana负责日志查询和展示  官方地址：https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/16.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/17.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/18.png">
+<meta property="og:updated_time" content="2017-10-13T05:45:11.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="EFK收集Kubernetes应用日志">
+<meta name="twitter:description" content="EFK介绍 Logstash(或者Fluentd)负责收集日志  Elasticsearch存储日志并提供搜索  Kibana负责日志查询和展示  官方地址：https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/16.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> EFK收集Kubernetes应用日志 | jkzhao's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                EFK收集Kubernetes应用日志
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-10-12T14:53:08+08:00" content="2017-10-12">
+              2017-10-12
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2017-10-13T13:45:11+08:00" content="2017-10-13">
+              2017-10-13
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/10/12/EFK收集Kubernetes应用日志/" class="leancloud_visitors" data-flag-title="EFK收集Kubernetes应用日志">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="EFK介绍"><a href="#EFK介绍" class="headerlink" title="EFK介绍"></a>EFK介绍</h2><ul>
+<li>Logstash(或者Fluentd)负责收集日志 </li>
+<li>Elasticsearch存储日志并提供搜索 </li>
+<li>Kibana负责日志查询和展示</li>
+</ul>
+<p>官方地址：<a href="https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch" target="_blank" rel="external">https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch</a><br><a id="more"></a></p>
+<p>通过在每台node上部署一个以DaemonSet方式运行的fluentd来收集每台node上的日志。Fluentd将docker日志目录/var/lib/docker/containers和/var/log目录挂载到Pod中，然后Pod会在node节点的/var/log/pods目录中创建新的目录，可以区别不同的容器日志输出，该目录下有一个日志文件链接到/var/lib/docker/contianers目录下的容器日志输出。</p>
+<h2 id="配置efk-rbac-yaml文件"><a href="#配置efk-rbac-yaml文件" class="headerlink" title="配置efk-rbac.yaml文件"></a>配置efk-rbac.yaml文件</h2><p>EFK服务也需要一个efk-rbac.yaml文件，配置serviceaccount为efk。</p>
+<pre><code>[root@node1 opt]# mkdir efk
+[root@node1 opt]# cd efk
+[root@node1 efk]# vim efk-rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: efk
+  namespace: kube-system
+
+---
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: efk
+subjects:
+  - kind: ServiceAccount
+    name: efk
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+</code></pre><h2 id="配置-es-controller-yaml"><a href="#配置-es-controller-yaml" class="headerlink" title="配置 es-controller.yaml"></a>配置 es-controller.yaml</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">[root@node1 efk]# vim es-controller.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: ReplicationController</div><div class="line">metadata:</div><div class="line">  name: elasticsearch-logging-v1</div><div class="line">  namespace: kube-system</div><div class="line">  labels:</div><div class="line">    k8s-app: elasticsearch-logging</div><div class="line">    version: v1</div><div class="line">    kubernetes.io/cluster-service: &quot;true&quot;</div><div class="line">    addonmanager.kubernetes.io/mode: Reconcile</div><div class="line">spec:</div><div class="line">  replicas: 2</div><div class="line">  selector:</div><div class="line">    k8s-app: elasticsearch-logging</div><div class="line">    version: v1</div><div class="line">  template:</div><div class="line">    metadata:</div><div class="line">      labels:</div><div class="line">        k8s-app: elasticsearch-logging</div><div class="line">        version: v1</div><div class="line">        kubernetes.io/cluster-service: &quot;true&quot;</div><div class="line">    spec:</div><div class="line">      serviceAccountName: efk</div><div class="line">      containers:</div><div class="line">      - image: index.tenxcloud.com/jimmy/elasticsearch:v2.4.1-2</div><div class="line">        name: elasticsearch-logging</div><div class="line">        resources:</div><div class="line">          # need more cpu upon initialization, therefore burstable class</div><div class="line">          limits:</div><div class="line">            cpu: 1000m</div><div class="line">          requests:</div><div class="line">            cpu: 100m</div><div class="line">        ports:</div><div class="line">        - containerPort: 9200</div><div class="line">          name: db</div><div class="line">          protocol: TCP</div><div class="line">        - containerPort: 9300</div><div class="line">          name: transport</div><div class="line">          protocol: TCP</div><div class="line">        volumeMounts:</div><div class="line">        - name: es-persistent-storage</div><div class="line">          mountPath: /data</div><div class="line">        env:</div><div class="line">        - name: &quot;NAMESPACE&quot;</div><div class="line">          valueFrom:</div><div class="line">            fieldRef:</div><div class="line">              fieldPath: metadata.namespace</div><div class="line">      volumes:</div><div class="line">      - name: es-persistent-storage</div><div class="line">        emptyDir: &#123;&#125;</div></pre></td></tr></table></figure>
+<h2 id="配置-es-service-yaml"><a href="#配置-es-service-yaml" class="headerlink" title="配置 es-service.yaml"></a>配置 es-service.yaml</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">[root@node1 efk]# vim es-service.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Service</div><div class="line">metadata:</div><div class="line">  name: elasticsearch-logging</div><div class="line">  namespace: kube-system</div><div class="line">  labels:</div><div class="line">    k8s-app: elasticsearch-logging</div><div class="line">    kubernetes.io/cluster-service: &quot;true&quot;</div><div class="line">    addonmanager.kubernetes.io/mode: Reconcile</div><div class="line">    kubernetes.io/name: &quot;Elasticsearch&quot;</div><div class="line">spec:</div><div class="line">  ports:</div><div class="line">  - port: 9200</div><div class="line">    protocol: TCP</div><div class="line">    targetPort: db</div><div class="line">  selector:</div><div class="line">    k8s-app: elasticsearch-logging</div></pre></td></tr></table></figure>
+<h2 id="配置-fluentd-es-ds-yaml"><a href="#配置-fluentd-es-ds-yaml" class="headerlink" title="配置 fluentd-es-ds.yaml"></a>配置 fluentd-es-ds.yaml</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: DaemonSet</div><div class="line">metadata:</div><div class="line">  name: fluentd-es-v1.22</div><div class="line">  namespace: kube-system</div><div class="line">  labels:</div><div class="line">    k8s-app: fluentd-es</div><div class="line">    kubernetes.io/cluster-service: &quot;true&quot;</div><div class="line">    addonmanager.kubernetes.io/mode: Reconcile</div><div class="line">    version: v1.22</div><div class="line">spec:</div><div class="line">  template:</div><div class="line">    metadata:</div><div class="line">      labels:</div><div class="line">        k8s-app: fluentd-es</div><div class="line">        kubernetes.io/cluster-service: &quot;true&quot;</div><div class="line">        version: v1.22</div><div class="line">      # This annotation ensures that fluentd does not get evicted if the node</div><div class="line">      # supports critical pod annotation based priority scheme.</div><div class="line">      # Note that this does not guarantee admission on the nodes (#40573).</div><div class="line">      annotations:</div><div class="line">        scheduler.alpha.kubernetes.io/critical-pod: &apos;&apos;</div><div class="line">    spec:  </div><div class="line">      serviceAccountName: efk</div><div class="line">      containers:</div><div class="line">      - name: fluentd-es</div><div class="line">        image: index.tenxcloud.com/jimmy/fluentd-elasticsearch:1.22</div><div class="line">        command:</div><div class="line">          - &apos;/bin/sh&apos;</div><div class="line">          - &apos;-c&apos;</div><div class="line">          - &apos;/usr/sbin/td-agent 2&gt;&amp;1 &gt;&gt; /var/log/fluentd.log&apos;</div><div class="line">        resources:</div><div class="line">          limits:</div><div class="line">            memory: 200Mi</div><div class="line">          requests:</div><div class="line">            cpu: 100m</div><div class="line">            memory: 200Mi</div><div class="line">        volumeMounts:</div><div class="line">        - name: varlog</div><div class="line">          mountPath: /var/log</div><div class="line">        - name: varlibdockercontainers</div><div class="line">          mountPath: /var/lib/docker/containers</div><div class="line">          readOnly: true</div><div class="line">      nodeSelector:</div><div class="line">        beta.kubernetes.io/fluentd-ds-ready: &quot;true&quot;</div><div class="line">      tolerations:</div><div class="line">      - key : &quot;node.alpha.kubernetes.io/ismaster&quot;</div><div class="line">        effect: &quot;NoSchedule&quot;</div><div class="line">      terminationGracePeriodSeconds: 30</div><div class="line">      volumes:</div><div class="line">      - name: varlog</div><div class="line">        hostPath:</div><div class="line">          path: /var/log</div><div class="line">      - name: varlibdockercontainers</div><div class="line">        hostPath:</div><div class="line">          path: /var/lib/docker/containers</div></pre></td></tr></table></figure>
+<h2 id="配置-kibana-controller-yaml"><a href="#配置-kibana-controller-yaml" class="headerlink" title="配置 kibana-controller.yaml"></a>配置 kibana-controller.yaml</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Deployment</div><div class="line">metadata:</div><div class="line">  name: kibana-logging</div><div class="line">  namespace: kube-system</div><div class="line">  labels:</div><div class="line">    k8s-app: kibana-logging</div><div class="line">    kubernetes.io/cluster-service: &quot;true&quot;</div><div class="line">    addonmanager.kubernetes.io/mode: Reconcile</div><div class="line">spec:</div><div class="line">  replicas: 1</div><div class="line">  selector:</div><div class="line">    matchLabels:</div><div class="line">      k8s-app: kibana-logging</div><div class="line">  template:</div><div class="line">    metadata:</div><div class="line">      labels:</div><div class="line">        k8s-app: kibana-logging</div><div class="line">    spec:</div><div class="line">      serviceAccountName: efk</div><div class="line">      containers:</div><div class="line">      - name: kibana-logging</div><div class="line">        image: index.tenxcloud.com/jimmy/kibana:v4.6.1-1</div><div class="line">        resources:</div><div class="line">          # keep request = limit to keep this container in guaranteed class</div><div class="line">          limits:</div><div class="line">            cpu: 100m</div><div class="line">          requests:</div><div class="line">            cpu: 100m</div><div class="line">        env:</div><div class="line">          - name: &quot;ELASTICSEARCH_URL&quot;</div><div class="line">            value: &quot;http://elasticsearch-logging:9200&quot;</div><div class="line">          - name: &quot;KIBANA_BASE_URL&quot;</div><div class="line">            value: &quot;/api/v1/proxy/namespaces/kube-system/services/kibana-logging&quot;</div><div class="line">        ports:</div><div class="line">        - containerPort: 5601</div><div class="line">          name: ui</div><div class="line">          protocol: TCP</div></pre></td></tr></table></figure>
+<h2 id="配置-kibana-service-yaml"><a href="#配置-kibana-service-yaml" class="headerlink" title="配置 kibana-service.yaml"></a>配置 kibana-service.yaml</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">apiVersion: v1</div><div class="line">kind: Service</div><div class="line">metadata:</div><div class="line">  name: kibana-logging</div><div class="line">  namespace: kube-system</div><div class="line">  labels:</div><div class="line">    k8s-app: kibana-logging</div><div class="line">    kubernetes.io/cluster-service: &quot;true&quot;</div><div class="line">    addonmanager.kubernetes.io/mode: Reconcile</div><div class="line">    kubernetes.io/name: &quot;Kibana&quot;</div><div class="line">spec:</div><div class="line">  ports:</div><div class="line">  - port: 5601</div><div class="line">    protocol: TCP</div><div class="line">    targetPort: ui</div><div class="line">  selector:</div><div class="line">    k8s-app: kibana-logging</div></pre></td></tr></table></figure>
+<pre><code>[root@node1 efk]# ls
+efk-rbac.yaml  es-controller.yaml  es-service.yaml  fluentd-es-ds.yaml  kibana-controller.yaml  kibana-service.yaml
+</code></pre><h2 id="给-Node-设置标签"><a href="#给-Node-设置标签" class="headerlink" title="给 Node 设置标签"></a>给 Node 设置标签</h2><p>定义 DaemonSet fluentd-es-v1.22 时设置了 nodeSelector beta.kubernetes.io/fluentd-ds-ready=true ，所以需要在期望运行 fluentd 的 Node 上设置该标签；</p>
+<pre><code>[root@node1 efk]# kubectl label nodes 172.16.7.151 beta.kubernetes.io/fluentd-ds-ready=true
+node &quot;172.16.7.151&quot; labeled
+[root@node1 efk]# kubectl label nodes 172.16.7.152 beta.kubernetes.io/fluentd-ds-ready=true
+node &quot;172.16.7.152&quot; labeled
+[root@node1 efk]# kubectl label nodes 172.16.7.153 beta.kubernetes.io/fluentd-ds-ready=true
+node &quot;172.16.7.153&quot; labeled
+</code></pre><h2 id="执行定义文件"><a href="#执行定义文件" class="headerlink" title="执行定义文件"></a>执行定义文件</h2><pre><code>[root@node1 efk]# kubectl create -f .
+</code></pre><h2 id="检查执行结果"><a href="#检查执行结果" class="headerlink" title="检查执行结果"></a>检查执行结果</h2><pre><code>[root@node1 efk]# kubectl get deployment -n kube-system|grep kibana
+kibana-logging         1         1         1            1           1h
+
+[root@node1 efk]# kubectl get pods -n kube-system|grep -E &apos;elasticsearch|fluentd|kibana&apos;
+elasticsearch-logging-v1-nw3p3          1/1       Running   0          43m
+elasticsearch-logging-v1-pp89h          1/1       Running   0          43m
+fluentd-es-v1.22-cqd1s                  1/1       Running   0          15m
+fluentd-es-v1.22-f5ljr                  0/1       Error     6          15m
+fluentd-es-v1.22-x24jx                  1/1       Running   0          15m
+kibana-logging-4293390753-kg8kx         1/1       Running   0          1h
+
+[root@node1 efk]# kubectl get service  -n kube-system|grep -E &apos;elasticsearch|kibana&apos;
+elasticsearch-logging   10.254.50.63     &lt;none&gt;        9200/TCP                        1h
+kibana-logging          10.254.169.159   &lt;none&gt;        5601/TCP                        1h
+</code></pre><p>kibana Pod 第一次启动时会用<strong>较长时间(10-20分钟)</strong>来优化和 Cache 状态页面，可以 tailf 该 Pod 的日志观察进度。</p>
+<pre><code>[root@node1 efk]# kubectl logs kibana-logging-4293390753-86h5d -n kube-system -f
+ELASTICSEARCH_URL=http://elasticsearch-logging:9200
+server.basePath: /api/v1/proxy/namespaces/kube-system/services/kibana-logging
+{&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T00:51:31Z&quot;,&quot;tags&quot;:[&quot;info&quot;,&quot;optimize&quot;],&quot;pid&quot;:5,&quot;message&quot;:&quot;Optimizing and caching bundles for kibana and statusPage. This may take a few minutes&quot;}
+{&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:36Z&quot;,&quot;tags&quot;:[&quot;info&quot;,&quot;optimize&quot;],&quot;pid&quot;:5,&quot;message&quot;:&quot;Optimization of bundles for kibana and statusPage complete in 1324.64 seconds&quot;}
+{&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:37Z&quot;,&quot;tags&quot;:[&quot;status&quot;,&quot;plugin:kibana@1.0.0&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;state&quot;:&quot;green&quot;,&quot;message&quot;:&quot;Status changed from uninitialized to green - Ready&quot;,&quot;prevState&quot;:&quot;uninitialized&quot;,&quot;prevMsg&quot;:&quot;uninitialized&quot;}
+{&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:38Z&quot;,&quot;tags&quot;:[&quot;status&quot;,&quot;plugin:elasticsearch@1.0.0&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;state&quot;:&quot;yellow&quot;,&quot;message&quot;:&quot;Status changed from uninitialized to yellow - Waiting for Elasticsearch&quot;,&quot;prevState&quot;:&quot;uninitialized&quot;,&quot;prevMsg&quot;:&quot;uninitialized&quot;}
+{&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:39Z&quot;,&quot;tags&quot;:[&quot;status&quot;,&quot;plugin:kbn_vislib_vis_types@1.0.0&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;state&quot;:&quot;green&quot;,&quot;message&quot;:&quot;Status changed from uninitialized to green - Ready&quot;,&quot;prevState&quot;:&quot;uninitialized&quot;,&quot;prevMsg&quot;:&quot;uninitialized&quot;}
+{&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:39Z&quot;,&quot;tags&quot;:[&quot;status&quot;,&quot;plugin:markdown_vis@1.0.0&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;state&quot;:&quot;green&quot;,&quot;message&quot;:&quot;Status changed from uninitialized to green - Ready&quot;,&quot;prevState&quot;:&quot;uninitialized&quot;,&quot;prevMsg&quot;:&quot;uninitialized&quot;}
+{&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:39Z&quot;,&quot;tags&quot;:[&quot;status&quot;,&quot;plugin:metric_vis@1.0.0&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;state&quot;:&quot;green&quot;,&quot;message&quot;:&quot;Status changed from uninitialized to green - Ready&quot;,&quot;prevState&quot;:&quot;uninitialized&quot;,&quot;prevMsg&quot;:&quot;uninitialized&quot;}
+{&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:39Z&quot;,&quot;tags&quot;:[&quot;status&quot;,&quot;plugin:spyModes@1.0.0&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;state&quot;:&quot;green&quot;,&quot;message&quot;:&quot;Status changed from uninitialized to green - Ready&quot;,&quot;prevState&quot;:&quot;uninitialized&quot;,&quot;prevMsg&quot;:&quot;uninitialized&quot;}
+{&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:40Z&quot;,&quot;tags&quot;:[&quot;status&quot;,&quot;plugin:statusPage@1.0.0&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;state&quot;:&quot;green&quot;,&quot;message&quot;:&quot;Status changed from uninitialized to green - Ready&quot;,&quot;prevState&quot;:&quot;uninitialized&quot;,&quot;prevMsg&quot;:&quot;uninitialized&quot;}
+{&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:40Z&quot;,&quot;tags&quot;:[&quot;status&quot;,&quot;plugin:table_vis@1.0.0&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;state&quot;:&quot;green&quot;,&quot;message&quot;:&quot;Status changed from uninitialized to green - Ready&quot;,&quot;prevState&quot;:&quot;uninitialized&quot;,&quot;prevMsg&quot;:&quot;uninitialized&quot;}
+{&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:40Z&quot;,&quot;tags&quot;:[&quot;listening&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;message&quot;:&quot;Server running at http://0.0.0.0:5601&quot;}
+{&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:45Z&quot;,&quot;tags&quot;:[&quot;status&quot;,&quot;plugin:elasticsearch@1.0.0&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;state&quot;:&quot;yellow&quot;,&quot;message&quot;:&quot;Status changed from yellow to yellow - No existing Kibana index found&quot;,&quot;prevState&quot;:&quot;yellow&quot;,&quot;prevMsg&quot;:&quot;Waiting for Elasticsearch&quot;}
+{&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:49Z&quot;,&quot;tags&quot;:[&quot;status&quot;,&quot;plugin:elasticsearch@1.0.0&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;state&quot;:&quot;green&quot;,&quot;message&quot;:&quot;Status changed from yellow to green - Kibana index ready&quot;,&quot;prevState&quot;:&quot;yellow&quot;,&quot;prevMsg&quot;:&quot;No existing Kibana index found&quot;}
+</code></pre><h2 id="访问-kibana"><a href="#访问-kibana" class="headerlink" title="访问 kibana"></a>访问 kibana</h2><h3 id="通过-kube-apiserver-访问：获取-monitoring-grafana-服务-URL"><a href="#通过-kube-apiserver-访问：获取-monitoring-grafana-服务-URL" class="headerlink" title="通过 kube-apiserver 访问：获取 monitoring-grafana 服务 URL"></a>通过 kube-apiserver 访问：获取 monitoring-grafana 服务 URL</h3><pre><code>[root@node1 efk]# kubectl cluster-info
+Kubernetes master is running at https://172.16.7.151:6443
+Elasticsearch is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/elasticsearch-logging
+Heapster is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/heapster
+Kibana is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kibana-logging
+KubeDNS is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kube-dns
+kubernetes-dashboard is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard
+monitoring-grafana is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/monitoring-grafana
+monitoring-influxdb is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/monitoring-influxdb
+
+To further debug and diagnose cluster problems, use &apos;kubectl cluster-info dump&apos;.
+</code></pre><p>浏览器访问 URL： <a href="https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kibana-logging/app/kibana" target="_blank" rel="external">https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kibana-logging/app/kibana</a></p>
+<h3 id="通过-kubectl-proxy-访问：创建代理"><a href="#通过-kubectl-proxy-访问：创建代理" class="headerlink" title="通过 kubectl proxy 访问：创建代理"></a>通过 kubectl proxy 访问：创建代理</h3><pre><code>[root@node1 efk]# kubectl proxy --address=&apos;172.16.7.151&apos; --port=8086 --accept-hosts=&apos;^*$&apos; &amp;        
+</code></pre><p>浏览器访问 URL：<a href="http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kibana-logging" target="_blank" rel="external">http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kibana-logging</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/16.png" alt=""></p>
+<p>如果你在这里发现Create按钮是灰色的无法点击，且Time-filed name中没有选项，fluentd要读取/var/log/containers/目录下的log日志，这些日志是从/var/lib/docker/containers/${CONTAINER_ID}/${CONTAINER_ID}-json.log链接过来的，查看你的docker配置，—-log-driver需要设置为json-file格式，默认的可能是journald。</p>
+<p>查看当前的–log-driver:</p>
+<pre><code>[root@node1 ~]# docker version
+Client:
+ Version:         1.12.6
+ API version:     1.24
+ Package version: docker-1.12.6-32.git88a4867.el7.centos.x86_64
+ Go version:      go1.7.4
+ Git commit:      88a4867/1.12.6
+ Built:           Mon Jul  3 16:02:02 2017
+ OS/Arch:         linux/amd64
+
+Server:
+ Version:         1.12.6
+ API version:     1.24
+ Package version: docker-1.12.6-32.git88a4867.el7.centos.x86_64
+ Go version:      go1.7.4
+ Git commit:      88a4867/1.12.6
+ Built:           Mon Jul  3 16:02:02 2017
+ OS/Arch:         linux/amd64   
+[root@node1 efk]# docker info |grep &apos;Logging Driver&apos;
+ WARNING: Usage of loopback devices is strongly discouraged for production use. Use `--storage-opt dm.thinpooldev` to specify a custom block storage device.
+WARNING: bridge-nf-call-ip6tables is disabled
+Logging Driver: journald
+</code></pre><p>修改当前版本docker的–log-driver:</p>
+<pre><code>[root@node1 ~]# vim /etc/sysconfig/docker
+OPTIONS=&apos;--selinux-enabled --log-driver=json-file --signature-verification=false&apos;
+[root@node1 efk]# systemctl restart docker
+</code></pre><p>【注意】：本来修改这个参数应该在在/etc/docker/daemon.json文件中添加<br>    {<br>      “log-driver”: “json-file”,<br>    }<br>但是在该版本中，–log-driver是在文件/etc/sysconfig/docker中定义的。<br>在docker-ce版本中，默认的–log-driver是json-file。</p>
+<p><strong>遇到的问题：</strong><br>由于之前在/etc/docker/daemon.json中配置–log-driver，重启导致docker程序启动失败，等到后来在/etc/sysconfig/docker配置文件中配置好后，启动docker却发现当前node变成NotReady状态，所有的Pod也变为Unknown状态。查看kubelet状态，发现kubelet程序已经挂掉了。</p>
+<pre><code>[root@node1 ~]# kubectl get nodes
+NAME           STATUS     AGE       VERSION
+172.16.7.151   NotReady   28d       v1.6.0
+172.16.7.152   Ready      28d       v1.6.0
+172.16.7.153   Ready      28d       v1.6.0
+</code></pre><p>启动kubelet：</p>
+<pre><code>[root@node1 ~]# systemctl start kubelet
+[root@node1 ~]# kubectl get nodes
+NAME           STATUS    AGE       VERSION
+172.16.7.151   Ready     28d       v1.6.0
+172.16.7.152   Ready     28d       v1.6.0
+172.16.7.153   Ready     28d       v1.6.0
+</code></pre><p>浏览器再次访问 kibana URL：<a href="http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kibana-logging" target="_blank" rel="external">http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kibana-logging</a><br>此时就会发现有Create按钮了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/17.png" alt=""></p>
+<p>在 Settings -&gt; Indices 页面创建一个 index（相当于 mysql 中的一个 database），选中 <strong>Index contains time-based events</strong>，使用默认的 <strong>logstash-*</strong> pattern，点击 Create ;<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/18.png" alt=""></p>
+<p>创建Index后，可以在 Discover 下看到 ElasticSearch logging 中汇聚的日志。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/容器编排-Docker-Kubernetes/" rel="tag"><i class="fa fa-tag"></i>容器编排 Docker Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/09/Kubernetes架构/" rel="next" title="Kubernetes架构">
+                <i class="fa fa-chevron-left"></i> Kubernetes架构
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">46</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#EFK介绍"><span class="nav-number">1.</span> <span class="nav-text">EFK介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置efk-rbac-yaml文件"><span class="nav-number">2.</span> <span class="nav-text">配置efk-rbac.yaml文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-es-controller-yaml"><span class="nav-number">3.</span> <span class="nav-text">配置 es-controller.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-es-service-yaml"><span class="nav-number">4.</span> <span class="nav-text">配置 es-service.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-fluentd-es-ds-yaml"><span class="nav-number">5.</span> <span class="nav-text">配置 fluentd-es-ds.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-kibana-controller-yaml"><span class="nav-number">6.</span> <span class="nav-text">配置 kibana-controller.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-kibana-service-yaml"><span class="nav-number">7.</span> <span class="nav-text">配置 kibana-service.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#给-Node-设置标签"><span class="nav-number">8.</span> <span class="nav-text">给 Node 设置标签</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#执行定义文件"><span class="nav-number">9.</span> <span class="nav-text">执行定义文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检查执行结果"><span class="nav-number">10.</span> <span class="nav-text">检查执行结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问-kibana"><span class="nav-number">11.</span> <span class="nav-text">访问 kibana</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过-kube-apiserver-访问：获取-monitoring-grafana-服务-URL"><span class="nav-number">11.1.</span> <span class="nav-text">通过 kube-apiserver 访问：获取 monitoring-grafana 服务 URL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过-kubectl-proxy-访问：创建代理"><span class="nav-number">11.2.</span> <span class="nav-text">通过 kubectl proxy 访问：创建代理</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共117.3k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+    <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+</body>
+</html>
