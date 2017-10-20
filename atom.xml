@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-10-13T07:18:02.000Z</updated>
+  <updated>2017-10-20T14:23:42.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,282 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>ELK实战</title>
+    <link href="http://yoursite.com/2017/10/20/ELK%E5%AE%9E%E6%88%98/"/>
+    <id>http://yoursite.com/2017/10/20/ELK实战/</id>
+    <published>2017-10-20T01:33:57.000Z</published>
+    <updated>2017-10-20T14:23:42.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;ELK介绍&quot;&gt;&lt;a href=&quot;#ELK介绍&quot; class=&quot;headerlink&quot; title=&quot;ELK介绍&quot;&gt;&lt;/a&gt;ELK介绍&lt;/h2&gt;&lt;p&gt;ELK由Elasticsearch、Logstash和Kibana三部分组件组成。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Elasticsearch是个开源分布式搜索引擎，它的特点有：分布式，零配置，自动发现，索引自动分片，索引副本机制，restful风格接口，多数据源，自动搜索负载等。&lt;/li&gt;
+&lt;li&gt;Logstash是一个完全开源的工具，它可以对你的日志进行收集、分析，并将其存储供以后使用。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;kibana 是一个开源和免费的工具，它可以为 Logstash 和 ElasticSearch 提供的日志分析友好的 Web 界面，可以帮助您汇总、分析和搜索重要数据日志。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;Elasticsearch&quot;&gt;&lt;a href=&quot;#Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;Elasticsearch&quot;&gt;&lt;/a&gt;Elasticsearch&lt;/h3&gt;&lt;p&gt;Elasticsearch是一个基于Lucene实现的开源、分布式、Restful的全文本搜索引擎。（仅支持文本搜索）此外，它还是一个分布式实时文档存储，其中每个文档的每个field均是被索引的数据，且可被搜索；也是一个带实时分析功能的分布式搜索引擎，能够扩展至数以百计的节点实时处理PB级的数据。&lt;br&gt;Elasticsearch借助于Lucene的API，在Lucene之外又重新封装了一层实现构建搜索引擎中的搜索组件。除此之外，Elasticsearch还新增了更强大的功能。比如把自己构建为分布式，分布式地将Lucene所提供的索引组建成shard形式，分布于多个节点之上，从而构建成分布式实时查询的组件。&lt;/p&gt;
+&lt;h3 id=&quot;Logstash&quot;&gt;&lt;a href=&quot;#Logstash&quot; class=&quot;headerlink&quot; title=&quot;Logstash&quot;&gt;&lt;/a&gt;Logstash&lt;/h3&gt;&lt;p&gt;支持多数据获取机制，通过TCP/UDP协议、文件、syslog、windows EventLogs及STDIN等。获取到数据后，它支持对数据执行过滤、修改等操作。&lt;/p&gt;
+&lt;p&gt;logstash配置框架：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;input {
+  ...
+}
+
+filter {
+  ...
+}
+
+output {
+  ...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Logstash是高度插件化的，支持4种类型的插件(每一类都有数10种具体的实现)：&lt;br&gt;input、filter、codec、output  &lt;/p&gt;
+&lt;h4 id=&quot;input插件&quot;&gt;&lt;a href=&quot;#input插件&quot; class=&quot;headerlink&quot; title=&quot;input插件&quot;&gt;&lt;/a&gt;input插件&lt;/h4&gt;&lt;p&gt;下面介绍input插件几种常见的实现。&lt;br&gt;&lt;strong&gt;1.File：&lt;/strong&gt;&lt;br&gt;从指定的文件中读取事件流；其工作特性类似于tail -1，不断将文件的最后一行读出来；不过第一次读取文件时是从第1行开始的；文件中的每一行都被识别为一个事件。对于Logstash而言，每一个独立的信息就是一个事件，而对于文本文件来讲，每一个事件是用一行来表示的，如果期望将多行识别为一个事件的话，就需要codec插件。logstash使用FileWatch(Ruby Gem库)机制来监听文件的变化，FileWatch是Linux内核中提供的一个功能。可以一下子监听多个文件。文件状态记录在.sincedb数据库中。另外，FIle插件还能够自动识别你的日志滚动操作，日志一般达到某个体积、或者满足多少天后会滚动，File也能识别。它会按照上一次那个日志文件所在的位置读取，自动进行滚动，读到最新的文件。&lt;br&gt;&lt;strong&gt;2.udp插件:&lt;/strong&gt;&lt;br&gt;如果我们安装的某个程序，它能够通过udp的某个端口输出自己相关日志信息或者事件。Logstash通过udp协议从网络连接来读取Message。其必备参数为port，用于指明自己监听的端口，别的主机向这个端口发事件，host则用来指明自己监听的地址。&lt;br&gt;&lt;strong&gt;3.redis插件：&lt;/strong&gt;&lt;br&gt;允许Logstash从redis读数据。支持redis channel和lists两种方式来获取数据。&lt;/p&gt;
+&lt;h4 id=&quot;filter插件&quot;&gt;&lt;a href=&quot;#filter插件&quot; class=&quot;headerlink&quot; title=&quot;filter插件&quot;&gt;&lt;/a&gt;filter插件&lt;/h4&gt;&lt;p&gt;filter插件主要用于将event通过output发出之前，对其实现某些处理功能。&lt;br&gt;&lt;strong&gt;1.grok：&lt;/strong&gt;用于分析并结构化文本数据。把每一个事件字段切好，做成结构化的形式。使得我们后续可以分析。目前能处理syslog、apache、nginx的日志等。目前Logstash提供120种grok模式，因为我们要分析文本，必须提供模式。&lt;br&gt;简单举个例子说明下什么是模式：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;55.3.244.1 GET /index.html 15824 0.043
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;比如对于上面一条日志，我们定义如下的模式：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;%{IP:client} %{WORD:method} %{URIPATHPARAM:request} %{NUMBER:bytes} %{NUMBER:duration}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;那么经过grok过滤后，这个事件后将会加有分析后的字段：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;client =&amp;gt; 55.3.244.1
+method =&amp;gt; GET
+request =&amp;gt; /index.html
+bytes =&amp;gt; 15824
+duration =&amp;gt; 0.043
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Logstash中默认自带了很多pattern，但是如果没有你需要的，就需要自己在文件中定义你需要的模式。&lt;br&gt;&lt;strong&gt;grok语法格式：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;%{SYNTAX:SEMANTIC}
+    SYNTAX表示预定义模式名称。就是Logstash解压后pattern相关文件里已经定义好的模式，如果没有的，可以自己写在上面那个文件里，名字得全大写。具体的文件在下面的实战中会讲到。
+    SEMANTIC表示匹配到的文本的自定义的标识符。比如识别处理的ip可能是clientip也可能是server端的ip，我们可以自定义名字。
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;output插件&quot;&gt;&lt;a href=&quot;#output插件&quot; class=&quot;headerlink&quot; title=&quot;output插件&quot;&gt;&lt;/a&gt;output插件&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;1.stdout：&lt;/strong&gt;标准输出插件。&lt;br&gt;&lt;strong&gt;2.elasticsearch：&lt;/strong&gt;将结果输出到Elasticsearch中。&lt;br&gt;elasticsearch插件常见配置参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;index：数据存储在ES中的哪个索引中。默认“logstash-%{+YYYY.MM.dd}”，每天使用一个单独的索引。&lt;/li&gt;
+&lt;li&gt;workers：执行output的线程数。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;3.redis插件：&lt;/strong&gt;将结果输出到redis中。&lt;br&gt;Logstash使用redis作为输入或输出插件时，尤其是输出插件时，它有两种数据类型可以用来保存Logstash输出的数据。一种是list，一种是channel。一般使用list，list比较简单。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;【注意】：Logstash版本不同，每种插件支持的参数也不同，具体看&lt;a href=&quot;https://www.elastic.co/guide/en/logstash/current/index.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;官方文档&lt;/a&gt;。&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h2&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;安装软件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;hadoop16&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;172.16.206.16&lt;/td&gt;
+&lt;td&gt;elasticsearch-5.6.3.zip、kibana-5.6.3-linux-x86_64.tar.gz&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;spark32&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;172.16.206.32&lt;/td&gt;
+&lt;td&gt;logstash-5.6.3.tar.gz&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&quot;Elasticsearch-1&quot;&gt;&lt;a href=&quot;#Elasticsearch-1&quot; class=&quot;headerlink&quot; title=&quot;Elasticsearch&quot;&gt;&lt;/a&gt;Elasticsearch&lt;/h2&gt;&lt;h3 id=&quot;安装JDK8&quot;&gt;&lt;a href=&quot;#安装JDK8&quot; class=&quot;headerlink&quot; title=&quot;安装JDK8&quot;&gt;&lt;/a&gt;安装JDK8&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
+# vim /etc/profile
+export JAVA_HOME=/usr/java/jdk1.8.0_73
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+# source /etc/profile
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;新建用户&quot;&gt;&lt;a href=&quot;#新建用户&quot; class=&quot;headerlink&quot; title=&quot;新建用户&quot;&gt;&lt;/a&gt;新建用户&lt;/h3&gt;&lt;p&gt;【注意】:elasticsearch不能使用root用户去启动。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# groupadd -g 510 es
+# useradd -g 510 -u 510 es
+# echo &amp;quot;wisedu123&amp;quot; | passwd --stdin es &amp;amp;&amp;gt; /dev/null
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装配置Elasticsearch&quot;&gt;&lt;a href=&quot;#安装配置Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;安装配置Elasticsearch&quot;&gt;&lt;/a&gt;安装配置Elasticsearch&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop16 opt]# unzip -oq elasticsearch-5.6.3.zip
+[root@hadoop16 opt]# vim elasticsearch-5.6.3/config/elasticsearch.yml 
+cluster.name: loges
+node.name: hadoop16
+network.host: 172.16.206.16
+bootstrap.memory_lock: true
+[root@hadoop16 opt]# vim /etc/security/limits.conf
+es - memlock -1
+[root@hadoop16 opt]# chown -R es.es elasticsearch-5.6.3
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;配置说明：&lt;br&gt;bootstrap.memory_lock: true&lt;br&gt;这个配置的作用是保护Elasticsearch使用的内存防止其被swapped。&lt;/p&gt;
+&lt;h3 id=&quot;优化Elasticsearch&quot;&gt;&lt;a href=&quot;#优化Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;优化Elasticsearch&quot;&gt;&lt;/a&gt;优化Elasticsearch&lt;/h3&gt;&lt;p&gt;1.配置操作系统文件描述符数&lt;br&gt;输入下面的命令进行查看：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ ulimit -a
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;找到open files那行：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;open files                      (-n) 1024
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;设置需要修改：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# vim /etc/security/limits.conf
+es               -       nofile          65536
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.增大虚拟内存mmap count配置&lt;br&gt;备注：如果你以.deb或.rpm包安装，则默认不需要设置此项，因为已经被自动设置，查看方式为：&lt;br&gt;sysctl vm.max_map_count&lt;br&gt;如果是手动安装，以root身份执行如下命令：&lt;br&gt;sysctl vm.max_map_count=262144&lt;br&gt;并修改文件使设置永久生效：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# vim /etc/sysctl.conf    
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;加一行：vm.max_map_count = 262144&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# sysctl -p
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;改完后，重启elasticsearch。&lt;br&gt;如果需要需改JVM大小，请修改 jvm.options 配置文件。&lt;/p&gt;
+&lt;h3 id=&quot;启动Elasticsearch&quot;&gt;&lt;a href=&quot;#启动Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;启动Elasticsearch&quot;&gt;&lt;/a&gt;启动Elasticsearch&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop16 opt]# su - es
+[es@hadoop16 ~]$ /opt/elasticsearch-5.6.3/bin/elasticsearch -d
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;检验bootstrap.mlockall: true是否生效：&lt;br&gt;curl &lt;a href=&quot;http://172.16.206.16:9200/_nodes/process?pretty&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.16:9200/_nodes/process?pretty&lt;/a&gt;&lt;br&gt;关注这个这个请求返回数据中的mlockall的值，如果为false，则说明锁定内存失败，这可能由于运行elasticsearch的用户不具备这样的权限。解决该问题的方法是：&lt;br&gt;在运行elasticsearch之前，以root身份执行&lt;br&gt;ulimit -l unlimited&lt;br&gt;然后再次重启elasticsearch。并查看上面的请求中的mlockall的值是否为true。&lt;br&gt;【注意】:这时候需要在root执行ulimit -l unlimited的shell终端上su - es，然后重启elasticsearch。因为这是命令行设置的ulimit -l unlimited，只对当前会话生效。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# ulimit -l unlimited
+# su - es
+$ ps -ef|grep elasticsearch
+$ kill -9 27189
+$ /usr/local/elasticsearch/bin/elasticsearch -d
+$ curl http://172.16.206.16:9200/_nodes/process?pretty
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;要想永久修改锁定内存大小无限制，需修改/etc/security/limits.conf，添加下面的内容，改完不需要重启系统，但是需要重新打开一个shell建立会话。&lt;br&gt;es - memlock -1&lt;br&gt;其中，es代表运行elasticsearch的用户，-表示同时设置了soft和hard，memlock代表设置的是”锁定内存”这个类型，-1(unlimited或者infinity)代表没限制。&lt;br&gt;【补充】: 要使 /etc/security/limits.conf 文件配置生效，必须要确保 pam_limits.so 文件被加入到相关的启动文件中，启动文件位于/etc/pam.d路径下，如该路径下sshd、login、system-auth等，一般是system-auth文件负责加载该so文件。只要加载了pam_limits.so，则配置就会生效，无需重启系统。&lt;/p&gt;
+&lt;h3 id=&quot;安装配置head插件&quot;&gt;&lt;a href=&quot;#安装配置head插件&quot; class=&quot;headerlink&quot; title=&quot;安装配置head插件&quot;&gt;&lt;/a&gt;安装配置head插件&lt;/h3&gt;&lt;p&gt;项目地址：&lt;a href=&quot;https://github.com/mobz/elasticsearch-head&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/mobz/elasticsearch-head&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&quot;安装head插件&quot;&gt;&lt;a href=&quot;#安装head插件&quot; class=&quot;headerlink&quot; title=&quot;安装head插件&quot;&gt;&lt;/a&gt;安装head插件&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop16 opt]# git clone git://github.com/mobz/elasticsearch-head.git
+[root@hadoop16 opt]# yum -y install epel-release
+[root@hadoop16 opt]# yum install nodejs -y
+[root@hadoop16 opt]# cd elasticsearch-head/
+[root@hadoop16 elasticsearch-head]# npm install
+npm: relocation error: npm: symbol SSL_set_cert_cb, version libssl.so.10 not defined in file libssl.so.10 with link time reference
+[root@hadoop16 elasticsearch-head]# yum update openssl -y
+[root@hadoop16 elasticsearch-head]# npm install 
+ # 如果下载速度太慢，可以如下方式安装
+ [root@hadoop16 elasticsearch-head]# npm install -gd express --registry=http://registry.npm.taobao.org
+# 为了避免每次安装都需要--registry参数，可以使用如下命令进行永久设置：
+[root@hadoop16 elasticsearch-head]# npm config set registry http://registry.npm.taobao.org 
+[root@hadoop16 elasticsearch-head]# npm install grunt --save-dev
+[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-clean 
+[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-concat 
+[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-watch 
+[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-connect 
+[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-copy 
+[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-jasmine 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;奇怪的是最后一个没有安装成功，是因为该模块依赖了phantomjs。但是配置之后，依然无法安装。直接启动就可以了：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@hadoop16 elasticsearch-head]# grunt server 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;以后安装head插件的步骤太过复杂，我们可以将下载下来的elasticsearch-head包放入tomcat中，直接启动tomcat就可以访问head插件了。&lt;/p&gt;
+&lt;h4 id=&quot;配置&quot;&gt;&lt;a href=&quot;#配置&quot; class=&quot;headerlink&quot; title=&quot;配置&quot;&gt;&lt;/a&gt;配置&lt;/h4&gt;&lt;p&gt;1.修改Elasticsearch的配置文件elasticsearch.yml，增加跨域的配置(需要重启es才能生效)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;http.cors.enabled: true
+http.cors.allow-origin: &amp;quot;*&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.编辑head/Gruntfile.js，修改服务器监听地址，增加hostname属性，将其值设置为*。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@hadoop16 elasticsearch-head]# pwd
+/opt/apache-tomcat-8.5.23/webapps/elasticsearch-head
+[root@hadoop16 elasticsearch-head]# vim Gruntfile.js
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;以下两种配置都是可以的：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# Type1
+connect: {
+        hostname: &amp;apos;*&amp;apos;,
+        server: {
+                options: {
+                        port: 9100,
+                        base: &amp;apos;.&amp;apos;,
+                        keepalive: true
+                }
+        }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;　　&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# Type 2
+connect: {
+        server: {
+                options: {
+                        hostname: &amp;apos;*&amp;apos;,
+                        port: 9100,
+                        base: &amp;apos;.&amp;apos;,
+                        keepalive: true
+                }
+        }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.编辑head/_site/app.js，修改head连接es的地址，将localhost修改为es的IP地址&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@hadoop16 elasticsearch-head]# pwd
+/opt/apache-tomcat-8.5.23/webapps/elasticsearch-head
+[root@hadoop16 elasticsearch-head]# vim _site/app.js
+# 原配置
+this.base_uri = this.config.base_uri || this.prefs.get(&amp;quot;app-base_uri&amp;quot;) || &amp;quot;http://localhost:9200&amp;quot;;
+# 将localhost修改为ES的IP地址
+this.base_uri = this.config.base_uri || this.prefs.get(&amp;quot;app-base_uri&amp;quot;) || &amp;quot;http://YOUR-ES-IP:9200&amp;quot;;
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;启动&quot;&gt;&lt;a href=&quot;#启动&quot; class=&quot;headerlink&quot; title=&quot;启动&quot;&gt;&lt;/a&gt;启动&lt;/h4&gt;&lt;p&gt;[root@hadoop16 elasticsearch-head]# cd /opt/apache-tomcat-8.5.23/&lt;br&gt;[root@hadoop16 apache-tomcat-8.5.23]# bin/startup.sh &lt;/p&gt;
+&lt;h2 id=&quot;Logstash-1&quot;&gt;&lt;a href=&quot;#Logstash-1&quot; class=&quot;headerlink&quot; title=&quot;Logstash&quot;&gt;&lt;/a&gt;Logstash&lt;/h2&gt;&lt;h3 id=&quot;安装JDK8-1&quot;&gt;&lt;a href=&quot;#安装JDK8-1&quot; class=&quot;headerlink&quot; title=&quot;安装JDK8&quot;&gt;&lt;/a&gt;安装JDK8&lt;/h3&gt;&lt;p&gt;Logstash是jruby研发的，需要跑在JVM上，所以需要安装JDK。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
+# vim /etc/profile
+export JAVA_HOME=/usr/java/jdk1.8.0_73
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+# source /etc/profile
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装配置Logstash&quot;&gt;&lt;a href=&quot;#安装配置Logstash&quot; class=&quot;headerlink&quot; title=&quot;安装配置Logstash&quot;&gt;&lt;/a&gt;安装配置Logstash&lt;/h3&gt;&lt;p&gt;我这里选择二进制包安装。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 opt]# tar zxf logstash-5.6.3.tar.gz 
+[root@spark32 opt]# cd logstash-5.6.3/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;由于我这里选择是二进制安装，pattern文件位置在：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 logstash-5.6.3]# ls /opt/logstash-5.6.3/vendor/bundle/jruby/1.9/gems/logstash-patterns-core-4.1.2/patterns/grok-patterns
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;收集Nginx-access日志&quot;&gt;&lt;a href=&quot;#收集Nginx-access日志&quot; class=&quot;headerlink&quot; title=&quot;收集Nginx access日志&quot;&gt;&lt;/a&gt;收集Nginx access日志&lt;/h3&gt;&lt;p&gt;Logstash收集Nginx日志，输出到Elasticsearch中。&lt;/p&gt;
+&lt;h4 id=&quot;创建Nginx-pattern&quot;&gt;&lt;a href=&quot;#创建Nginx-pattern&quot; class=&quot;headerlink&quot; title=&quot;创建Nginx pattern&quot;&gt;&lt;/a&gt;创建Nginx pattern&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# vim /opt/logstash-5.6.3/vendor/bundle/jruby/1.9/gems/logstash-patterns-core-4.1.2/patterns/grok-patterns
+# Nginx log
+NGUSERNAME [a-zA-Z\.\@\-\+_%]+
+NGUSER %{NGUSERNAME}
+NGINXACCESS %{IPORHOST:clientip} - %{NOTSPACE:remote_user} \[%{HTTPDATE:timestamp}\] \&amp;quot;(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\&amp;quot; %{NUMBER:response} (?:%{NUMBER:bytes}|-) %{QS:referrer} %{QS:agent} %{NOTSPACE:http_x_forwarded_for}
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;创建Logstash配置文件&quot;&gt;&lt;a href=&quot;#创建Logstash配置文件&quot; class=&quot;headerlink&quot; title=&quot;创建Logstash配置文件&quot;&gt;&lt;/a&gt;创建Logstash配置文件&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@spark32 logstash-5.6.3]# cd /opt/logstash-5.6.3
+[root@spark32 logstash-5.6.3]# mkdir conf
+[root@spark32 logstash-5.6.3]# cd conf
+[root@spark32 conf]# vim logstash_nginx.conf
+input {
+  file {
+    path  =&amp;gt;  [&amp;quot;/usr/local/openresty/nginx/logs/host.access.log&amp;quot;]
+    type  =&amp;gt;  &amp;quot;nginxlog&amp;quot;
+    start_position  =&amp;gt;  &amp;quot;beginning&amp;quot;
+  }
+}
+
+filter {
+  grok {
+    match =&amp;gt; { &amp;quot;message&amp;quot; =&amp;gt; &amp;quot;%{NGINXACCESS}&amp;quot; }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts    =&amp;gt;  [&amp;quot;172.16.206.16:9200&amp;quot;]
+    action   =&amp;gt;  &amp;quot;index&amp;quot;
+    index    =&amp;gt;  &amp;quot;logstash-%{+YYYY.MM.dd}&amp;quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;启动Logstash&quot;&gt;&lt;a href=&quot;#启动Logstash&quot; class=&quot;headerlink&quot; title=&quot;启动Logstash&quot;&gt;&lt;/a&gt;启动Logstash&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@spark32 logstash-5.6.3]# bin/logstash -f /opt/logstash-5.6.3/conf/logstash_nginx.conf -t
+Sending Logstash&amp;apos;s logs to /opt/logstash-5.6.3/logs which is now configured via log4j2.properties
+[2017-10-20T17:07:14,793][INFO ][logstash.modules.scaffold] Initializing module {:module_name=&amp;gt;&amp;quot;fb_apache&amp;quot;, :directory=&amp;gt;&amp;quot;/opt/logstash-5.6.3/modules/fb_apache/configuration&amp;quot;}
+[2017-10-20T17:07:14,797][INFO ][logstash.modules.scaffold] Initializing module {:module_name=&amp;gt;&amp;quot;netflow&amp;quot;, :directory=&amp;gt;&amp;quot;/opt/logstash-5.6.3/modules/netflow/configuration&amp;quot;}
+[2017-10-20T17:07:14,803][INFO ][logstash.setting.writabledirectory] Creating directory {:setting=&amp;gt;&amp;quot;path.queue&amp;quot;, :path=&amp;gt;&amp;quot;/opt/logstash-5.6.3/data/queue&amp;quot;}
+[2017-10-20T17:07:14,804][INFO ][logstash.setting.writabledirectory] Creating directory {:setting=&amp;gt;&amp;quot;path.dead_letter_queue&amp;quot;, :path=&amp;gt;&amp;quot;/opt/logstash-5.6.3/data/dead_letter_queue&amp;quot;}
+Configuration OK
+[2017-10-20T17:07:14,999][INFO ][logstash.runner          ] Using config.test_and_exit mode. Config Validation Result: OK. Exiting Logstash
+[root@spark32 logstash-5.6.3]# bin/logstash -f /opt/logstash-5.6.3/conf/logstash_nginx.conf &amp;amp; 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;记录收集到日志的文件位置在:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@spark32 file]# ls -a
+.  ..  .sincedb_650663ba19529187a32a8b9dc99049f8
+[root@spark32 file]# pwd
+/opt/logstash-5.6.3/data/plugins/inputs/file
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看Elasticsearch索引：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[es@hadoop16 elasticsearch-5.6.3]$ curl -XGET &amp;apos;172.16.206.16:9200/_cat/indices&amp;apos;
+yellow open logstash-2017.10.20 DVARGYZ2R9CfT-xyLrhyAQ 5 1 7 0 49.9kb 49.9kb
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;Kibana&quot;&gt;&lt;a href=&quot;#Kibana&quot; class=&quot;headerlink&quot; title=&quot;Kibana&quot;&gt;&lt;/a&gt;Kibana&lt;/h2&gt;&lt;h3 id=&quot;安装配置kibana&quot;&gt;&lt;a href=&quot;#安装配置kibana&quot; class=&quot;headerlink&quot; title=&quot;安装配置kibana&quot;&gt;&lt;/a&gt;安装配置kibana&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop16 opt]# tar zxf kibana-5.6.3-linux-x86_64.tar.gz 
+[root@hadoop16 opt]# ln -sv kibana-5.6.3-linux-x86_64 kibana
+‘kibana’ -&amp;gt; ‘kibana-5.6.3-linux-x86_64’
+[root@hadoop16 opt]# cd kibana
+[root@hadoop16 kibana]# cd config/
+[root@hadoop16 config]# vim kibana.yml 
+server.host: &amp;quot;172.16.206.16&amp;quot;
+elasticsearch.url: &amp;quot;http://172.16.206.16:9200&amp;quot;
+[root@hadoop16 config]# cd ..
+[root@hadoop16 kibana]# bin/kibana &amp;amp;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;访问&quot;&gt;&lt;a href=&quot;#访问&quot; class=&quot;headerlink&quot; title=&quot;访问&quot;&gt;&lt;/a&gt;访问&lt;/h3&gt;&lt;p&gt;浏览器输入：&lt;a href=&quot;http://172.16.206.16:5601/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.16:5601/&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击左侧菜单的Discover：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;比如我用curl访问下nginx，然后去kibana中搜索。要稍微等一下，等日志进到Elasticsearch中。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@hadoop16 kibana]# curl http://172.16.206.32:808
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/5.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;总结：&lt;/strong&gt;&lt;br&gt;1.Logstash 主要的特点就是它的灵活性，因为它有很多插件。然后它清楚的文档已经直白的配置格式让它可以再多种场景下应用。这样的良性循环让我们可以在网上找到很多资源，几乎可以处理任何问题。&lt;br&gt;2.Logstash不支持缓存，当然我们可以使用redis或者kafka作为中心缓冲池，架构如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;3.Logstash是在jvm跑的，资源消耗比较大，太重量级了。后来作者又用golang写了一个功能较少但是资源消耗也小的轻量级的logstash-forwarder。后来这个人加入了elastic公司。因为elastic公司本身还收购了另一个开源项目packetbeat，而这个项目专门就是用golang写的，有整个团队，所以elastic公司干脆把logstash-forwarder的开发工作也合并到同一个golang团队来搞，于是新的项目就叫filebeat了。当然也可以自己写agent，用go、python都可以写。这样我们就可以使用轻量的日志传输工具，将数据从服务器端经由一个或多个 Logstash 中心服务器传输到 Elasticsearch。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/7.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;ELK介绍&quot;&gt;&lt;a href=&quot;#ELK介绍&quot; class=&quot;headerlink&quot; title=&quot;ELK介绍&quot;&gt;&lt;/a&gt;ELK介绍&lt;/h2&gt;&lt;p&gt;ELK由Elasticsearch、Logstash和Kibana三部分组件组成。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Elasticsearch是个开源分布式搜索引擎，它的特点有：分布式，零配置，自动发现，索引自动分片，索引副本机制，restful风格接口，多数据源，自动搜索负载等。&lt;/li&gt;
+&lt;li&gt;Logstash是一个完全开源的工具，它可以对你的日志进行收集、分析，并将其存储供以后使用。
+    
+    </summary>
+    
+      <category term="日志" scheme="http://yoursite.com/categories/%E6%97%A5%E5%BF%97/"/>
+    
+    
+      <category term="日志 ELK" scheme="http://yoursite.com/tags/%E6%97%A5%E5%BF%97-ELK/"/>
+    
+  </entry>
+  
+  <entry>
     <title>EFK收集Kubernetes应用日志</title>
     <link href="http://yoursite.com/2017/10/12/EFK%E6%94%B6%E9%9B%86Kubernetes%E5%BA%94%E7%94%A8%E6%97%A5%E5%BF%97/"/>
     <id>http://yoursite.com/2017/10/12/EFK收集Kubernetes应用日志/</id>
     <published>2017-10-12T06:53:08.000Z</published>
-    <updated>2017-10-13T07:18:02.000Z</updated>
+    <updated>2017-10-13T07:47:57.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;EFK介绍&quot;&gt;&lt;a href=&quot;#EFK介绍&quot; class=&quot;headerlink&quot; title=&quot;EFK介绍&quot;&gt;&lt;/a&gt;EFK介绍&lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;Logstash(或者Fluentd)负责收集日志 &lt;/li&gt;
@@ -4337,11 +4608,11 @@ export PATH=$SPARK_HOME/bin:$PATH
     <link href="http://yoursite.com/2017/07/27/Ansible%E5%AE%9E%E6%88%98%EF%BC%9A%E9%83%A8%E7%BD%B2%E5%88%86%E5%B8%83%E5%BC%8F%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/"/>
     <id>http://yoursite.com/2017/07/27/Ansible实战：部署分布式日志系统/</id>
     <published>2017-07-27T12:30:05.000Z</published>
-    <updated>2017-07-28T09:11:52.000Z</updated>
+    <updated>2017-10-16T12:47:03.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;分布式日志系统架构图&quot;&gt;&lt;a href=&quot;#分布式日志系统架构图&quot; class=&quot;headerlink&quot; title=&quot;分布式日志系统架构图&quot;&gt;&lt;/a&gt;分布式日志系统架构图&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/48.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;创建roles&quot;&gt;&lt;a href=&quot;#创建roles&quot; class=&quot;headerlink&quot; title=&quot;创建roles&quot;&gt;&lt;/a&gt;创建roles&lt;/h2&gt;&lt;p&gt;每一个软件或集群都创建一个单独的角色。&lt;/p&gt;
+&lt;h2 id=&quot;创建和使用roles&quot;&gt;&lt;a href=&quot;#创建和使用roles&quot; class=&quot;headerlink&quot; title=&quot;创建和使用roles&quot;&gt;&lt;/a&gt;创建和使用roles&lt;/h2&gt;&lt;p&gt;每一个软件或集群都创建一个单独的角色。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# mkdir -pv ansible_playbooks/roles/{db_server,web_server,redis_server,zk_server,kafka_server,es_server,tomcat_server,flume_agent,hadoop,spark,hbase,hive,jdk7,jdk8}/{tasks,files,templates,meta,handlers,vars} 
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/49.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h3 id=&quot;JDK7-role&quot;&gt;&lt;a href=&quot;#JDK7-role&quot; class=&quot;headerlink&quot; title=&quot;JDK7 role&quot;&gt;&lt;/a&gt;JDK7 role&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 jdk7]# pwd
@@ -4547,7 +4818,7 @@ files  handlers  meta  tasks  templates  vars
   #become_user: es
   tags:
   - start
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates-2&quot;&gt;&lt;a href=&quot;#编写templates-2&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;p&gt;将模板elasticsearch.in.sh.j2和elasticsearch.yml.j2放入templates目录下&lt;br&gt;&lt;strong&gt;注意模板里的变量名中间不能用。比如：这样的变量名是不合法的。&lt;/strong&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates-2&quot;&gt;&lt;a href=&quot;#编写templates-2&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;p&gt;将模板elasticsearch.in.sh.j2和elasticsearch.yml.j2放入templates目录下&lt;br&gt;&lt;strong&gt;注意模板里的变量名中间不能用.。比如：这样的变量名是不合法的。&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;配置文件内容过多，具体见github，地址是&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/a&gt;&lt;/p&gt;
 &lt;h4 id=&quot;编写vars-4&quot;&gt;&lt;a href=&quot;#编写vars-4&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 es_server]# vim vars/main.yml
 ES_MEM: 2g
@@ -4920,115 +5191,6 @@ SLAVE2_HOSTNAME: node3
     <summary type="html">
     
       &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="运维自动化" scheme="http://yoursite.com/categories/%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
-    
-    
-      <category term="Ansible 运维自动化" scheme="http://yoursite.com/tags/Ansible-%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Ansible之roles介绍</title>
-    <link href="http://yoursite.com/2017/07/24/Ansible%E4%B9%8Broles%E4%BB%8B%E7%BB%8D/"/>
-    <id>http://yoursite.com/2017/07/24/Ansible之roles介绍/</id>
-    <published>2017-07-24T01:09:22.000Z</published>
-    <updated>2017-07-24T02:52:44.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;什么场景下会用roles？&quot;&gt;&lt;a href=&quot;#什么场景下会用roles？&quot; class=&quot;headerlink&quot; title=&quot;什么场景下会用roles？&quot;&gt;&lt;/a&gt;什么场景下会用roles？&lt;/h2&gt;&lt;p&gt;假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？&lt;br&gt;第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不利于多次调。比如说后来又加进来一个主机，这个第4个主机既是httpd服务器，又是php服务器，我们只能写第4个play，上面写上安装httpd和php。这样playbook中的代码就重复了。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;为了避免代码重复，roles能够实现代码重复被调用。定义一个角色叫websrvs，第二个角色叫phpappsrvs，第三个角色叫dbsrvs。那么调用时如下来调用：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;hosts: host1
-role:
-- websrvs
-
-hosts: host2
-role:
-- phpappsrvs
-
-hosts: host3
-role:
-- dbsrvs
-
-hosts: host4
-role:
-- websrvs
-- phpappsrvs
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这样代码就可以重复利用了,每个角色可以被独立重复调用。下面举例说明使用方式。&lt;/p&gt;
-&lt;h2 id=&quot;roles示例&quot;&gt;&lt;a href=&quot;#roles示例&quot; class=&quot;headerlink&quot; title=&quot;roles示例&quot;&gt;&lt;/a&gt;roles示例&lt;/h2&gt;&lt;p&gt;假设有3台主机，172.16.7.151主机上安装MySQL，172.16.7.152上安装httpd，172.16.7.153上安装MySQL和httpd。我们建立两个角色websrvs和dbsrvs，然后应用到这几个主机上。&lt;/p&gt;
-&lt;h3 id=&quot;创建roles的必需目录&quot;&gt;&lt;a href=&quot;#创建roles的必需目录&quot; class=&quot;headerlink&quot; title=&quot;创建roles的必需目录&quot;&gt;&lt;/a&gt;创建roles的必需目录&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 opt]# mkdir -pv ansible_playbooks/roles/{websrvs,dbsrvs}/{tasks,files,templates,meta,handlers,vars}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/44.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/45.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;每个role下面有个目录叫meta，在里面可以新建文件main.yml，在文件中可以设置该role和其它role之前的关联关系。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/46.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;配置角色&quot;&gt;&lt;a href=&quot;#配置角色&quot; class=&quot;headerlink&quot; title=&quot;配置角色&quot;&gt;&lt;/a&gt;配置角色&lt;/h3&gt;&lt;h4 id=&quot;配置角色websrvs&quot;&gt;&lt;a href=&quot;#配置角色websrvs&quot; class=&quot;headerlink&quot; title=&quot;配置角色websrvs&quot;&gt;&lt;/a&gt;配置角色websrvs&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 opt]# cd ansible_playbooks/roles/
-[root@node1 roles]# cd websrvs/
-[root@node1 websrvs]# ls
-files  handlers  meta  tasks  templates  vars
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;1.将httpd配置文件上传到files目录下，我这里假设httpd.conf每台主机都是一样的，实际上应该用模板，先用一样的配置文件举例&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 websrvs]# cp /etc/httpd/conf/httpd.conf files/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;直接复制的静态文件都放在files目录下。打算用模板文件的都放在templates目录下。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;2.编写任务列表tasks&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 websrvs]# vim tasks/main.yml
-- name: install httpd package
-  yum: name=httpd
-- name: install configuration file
-  copy: src=httpd.conf dest=/etc/httpd/conf
-  tags:
-  - conf
-  notify:
-  - restart httpd
-- name: start httpd
-  service: name=httpd state=started
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/47.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;3.由于上面的tasks中定义了notify，所以要定义handlers&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 websrvs]# vim handlers/main.yml
-- name: restart httpd
-  service: name=httpd state=restarted
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果需要定义变量，则在vars目录下创建main.yml文件，在文件中写入变量，以key:value的形式定义，比如：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;http_port: 8080
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;配置角色dbsrvs&quot;&gt;&lt;a href=&quot;#配置角色dbsrvs&quot; class=&quot;headerlink&quot; title=&quot;配置角色dbsrvs&quot;&gt;&lt;/a&gt;配置角色dbsrvs&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 roles]# cd dbsrvs/
-[root@node1 dbsrvs]# ls
-files  handlers  meta  tasks  templates  vars
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;1.将MySQL配置文件上传到files目录下。&lt;br&gt;2.编写任务列表tasks&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 dbsrvs]# vim tasks/main.yml
-- name: install mysql-server package
-  yum: name=mysql-server state=latest
-- name: install configuration file
-  copy: src=my.cnf dest/etc/my.cnf
-  tags:
-  - conf
-  notify:
-  - restart mysqld
-- name:
-  service: name=mysqld enabled=true state=started
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.定义handlers&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 dbsrvs]# vim handlers/main.yml
-- name: restart mysqld
-  service: name=mysqld state=restarted
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;定义playbook&quot;&gt;&lt;a href=&quot;#定义playbook&quot; class=&quot;headerlink&quot; title=&quot;定义playbook&quot;&gt;&lt;/a&gt;定义playbook&lt;/h4&gt;&lt;p&gt;【注意】：要在roles目录同级创建playbook。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim web.yml
-- hosts: 172.16.7.152
-  roles:
-  - websrvs 
-
-[root@node1 ansible_playbooks]# vim db.yml
-- hosts: 172.16.7.151
-  roles:
-  - dbsrvs 
-
-[root@node1 ansible_playbooks]# vim site.yml
-- hosts: 172.16.7.153
-  roles:
-  - websrvs
-  - dbsrvs 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# ansible-playbook web.yml
-[root@node1 ansible_playbooks]# ansible-playbook db.yml
-[root@node1 ansible_playbooks]# ansible-playbook site.yml
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;当然也可以把这些内容写入同一个playbook中。playbook的名字可以自定义。&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;什么场景下会用roles？&quot;&gt;&lt;a href=&quot;#什么场景下会用roles？&quot; class=&quot;headerlink&quot; title=&quot;什么场景下会用roles？&quot;&gt;&lt;/a&gt;什么场景下会用roles？&lt;/h2&gt;&lt;p&gt;假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？&lt;br&gt;第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不利于多次调。比如说后来又加进来一个主机，这个第4个主机既是httpd服务器，又是php服务器，我们只能写第4个play，上面写上安装httpd和php。这样playbook中的代码就重复了。&lt;br&gt;
     
     </summary>
     

@@ -1,0 +1,1115 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="日志 ELK," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="ELK介绍ELK由Elasticsearch、Logstash和Kibana三部分组件组成。  Elasticsearch是个开源分布式搜索引擎，它的特点有：分布式，零配置，自动发现，索引自动分片，索引副本机制，restful风格接口，多数据源，自动搜索负载等。 Logstash是一个完全开源的工具，它可以对你的日志进行收集、分析，并将其存储供以后使用。">
+<meta name="keywords" content="日志 ELK">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ELK实战">
+<meta property="og:url" content="http://yoursite.com/2017/10/20/ELK实战/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="ELK介绍ELK由Elasticsearch、Logstash和Kibana三部分组件组成。  Elasticsearch是个开源分布式搜索引擎，它的特点有：分布式，零配置，自动发现，索引自动分片，索引副本机制，restful风格接口，多数据源，自动搜索负载等。 Logstash是一个完全开源的工具，它可以对你的日志进行收集、分析，并将其存储供以后使用。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/6.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/7.png">
+<meta property="og:updated_time" content="2017-10-20T14:23:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ELK实战">
+<meta name="twitter:description" content="ELK介绍ELK由Elasticsearch、Logstash和Kibana三部分组件组成。  Elasticsearch是个开源分布式搜索引擎，它的特点有：分布式，零配置，自动发现，索引自动分片，索引副本机制，restful风格接口，多数据源，自动搜索负载等。 Logstash是一个完全开源的工具，它可以对你的日志进行收集、分析，并将其存储供以后使用。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> ELK实战 | jkzhao's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                ELK实战
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-10-20T09:33:57+08:00" content="2017-10-20">
+              2017-10-20
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2017-10-20T22:23:42+08:00" content="2017-10-20">
+              2017-10-20
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/日志/" itemprop="url" rel="index">
+                    <span itemprop="name">日志</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/10/20/ELK实战/" class="leancloud_visitors" data-flag-title="ELK实战">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="ELK介绍"><a href="#ELK介绍" class="headerlink" title="ELK介绍"></a>ELK介绍</h2><p>ELK由Elasticsearch、Logstash和Kibana三部分组件组成。</p>
+<ul>
+<li>Elasticsearch是个开源分布式搜索引擎，它的特点有：分布式，零配置，自动发现，索引自动分片，索引副本机制，restful风格接口，多数据源，自动搜索负载等。</li>
+<li>Logstash是一个完全开源的工具，它可以对你的日志进行收集、分析，并将其存储供以后使用。<a id="more"></a></li>
+<li>kibana 是一个开源和免费的工具，它可以为 Logstash 和 ElasticSearch 提供的日志分析友好的 Web 界面，可以帮助您汇总、分析和搜索重要数据日志。</li>
+</ul>
+<h3 id="Elasticsearch"><a href="#Elasticsearch" class="headerlink" title="Elasticsearch"></a>Elasticsearch</h3><p>Elasticsearch是一个基于Lucene实现的开源、分布式、Restful的全文本搜索引擎。（仅支持文本搜索）此外，它还是一个分布式实时文档存储，其中每个文档的每个field均是被索引的数据，且可被搜索；也是一个带实时分析功能的分布式搜索引擎，能够扩展至数以百计的节点实时处理PB级的数据。<br>Elasticsearch借助于Lucene的API，在Lucene之外又重新封装了一层实现构建搜索引擎中的搜索组件。除此之外，Elasticsearch还新增了更强大的功能。比如把自己构建为分布式，分布式地将Lucene所提供的索引组建成shard形式，分布于多个节点之上，从而构建成分布式实时查询的组件。</p>
+<h3 id="Logstash"><a href="#Logstash" class="headerlink" title="Logstash"></a>Logstash</h3><p>支持多数据获取机制，通过TCP/UDP协议、文件、syslog、windows EventLogs及STDIN等。获取到数据后，它支持对数据执行过滤、修改等操作。</p>
+<p>logstash配置框架：</p>
+<pre><code>input {
+  ...
+}
+
+filter {
+  ...
+}
+
+output {
+  ...
+}
+</code></pre><p>Logstash是高度插件化的，支持4种类型的插件(每一类都有数10种具体的实现)：<br>input、filter、codec、output  </p>
+<h4 id="input插件"><a href="#input插件" class="headerlink" title="input插件"></a>input插件</h4><p>下面介绍input插件几种常见的实现。<br><strong>1.File：</strong><br>从指定的文件中读取事件流；其工作特性类似于tail -1，不断将文件的最后一行读出来；不过第一次读取文件时是从第1行开始的；文件中的每一行都被识别为一个事件。对于Logstash而言，每一个独立的信息就是一个事件，而对于文本文件来讲，每一个事件是用一行来表示的，如果期望将多行识别为一个事件的话，就需要codec插件。logstash使用FileWatch(Ruby Gem库)机制来监听文件的变化，FileWatch是Linux内核中提供的一个功能。可以一下子监听多个文件。文件状态记录在.sincedb数据库中。另外，FIle插件还能够自动识别你的日志滚动操作，日志一般达到某个体积、或者满足多少天后会滚动，File也能识别。它会按照上一次那个日志文件所在的位置读取，自动进行滚动，读到最新的文件。<br><strong>2.udp插件:</strong><br>如果我们安装的某个程序，它能够通过udp的某个端口输出自己相关日志信息或者事件。Logstash通过udp协议从网络连接来读取Message。其必备参数为port，用于指明自己监听的端口，别的主机向这个端口发事件，host则用来指明自己监听的地址。<br><strong>3.redis插件：</strong><br>允许Logstash从redis读数据。支持redis channel和lists两种方式来获取数据。</p>
+<h4 id="filter插件"><a href="#filter插件" class="headerlink" title="filter插件"></a>filter插件</h4><p>filter插件主要用于将event通过output发出之前，对其实现某些处理功能。<br><strong>1.grok：</strong>用于分析并结构化文本数据。把每一个事件字段切好，做成结构化的形式。使得我们后续可以分析。目前能处理syslog、apache、nginx的日志等。目前Logstash提供120种grok模式，因为我们要分析文本，必须提供模式。<br>简单举个例子说明下什么是模式：</p>
+<pre><code>55.3.244.1 GET /index.html 15824 0.043
+</code></pre><p>比如对于上面一条日志，我们定义如下的模式：</p>
+<pre><code>%{IP:client} %{WORD:method} %{URIPATHPARAM:request} %{NUMBER:bytes} %{NUMBER:duration}
+</code></pre><p>那么经过grok过滤后，这个事件后将会加有分析后的字段：</p>
+<pre><code>client =&gt; 55.3.244.1
+method =&gt; GET
+request =&gt; /index.html
+bytes =&gt; 15824
+duration =&gt; 0.043
+</code></pre><p>Logstash中默认自带了很多pattern，但是如果没有你需要的，就需要自己在文件中定义你需要的模式。<br><strong>grok语法格式：</strong></p>
+<pre><code>%{SYNTAX:SEMANTIC}
+    SYNTAX表示预定义模式名称。就是Logstash解压后pattern相关文件里已经定义好的模式，如果没有的，可以自己写在上面那个文件里，名字得全大写。具体的文件在下面的实战中会讲到。
+    SEMANTIC表示匹配到的文本的自定义的标识符。比如识别处理的ip可能是clientip也可能是server端的ip，我们可以自定义名字。
+</code></pre><h4 id="output插件"><a href="#output插件" class="headerlink" title="output插件"></a>output插件</h4><p><strong>1.stdout：</strong>标准输出插件。<br><strong>2.elasticsearch：</strong>将结果输出到Elasticsearch中。<br>elasticsearch插件常见配置参数：</p>
+<ul>
+<li>index：数据存储在ES中的哪个索引中。默认“logstash-%{+YYYY.MM.dd}”，每天使用一个单独的索引。</li>
+<li>workers：执行output的线程数。</li>
+</ul>
+<p><strong>3.redis插件：</strong>将结果输出到redis中。<br>Logstash使用redis作为输入或输出插件时，尤其是输出插件时，它有两种数据类型可以用来保存Logstash输出的数据。一种是list，一种是channel。一般使用list，list比较简单。</p>
+<p><strong>【注意】：Logstash版本不同，每种插件支持的参数也不同，具体看<a href="https://www.elastic.co/guide/en/logstash/current/index.html" target="_blank" rel="external">官方文档</a>。</strong></p>
+<h2 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h2><table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>操作系统版本</th>
+<th>IP地址</th>
+<th>安装软件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hadoop16</td>
+<td>CentOS 7.0</td>
+<td>172.16.206.16</td>
+<td>elasticsearch-5.6.3.zip、kibana-5.6.3-linux-x86_64.tar.gz</td>
+</tr>
+<tr>
+<td>spark32</td>
+<td>CentOS 7.0</td>
+<td>172.16.206.32</td>
+<td>logstash-5.6.3.tar.gz</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Elasticsearch-1"><a href="#Elasticsearch-1" class="headerlink" title="Elasticsearch"></a>Elasticsearch</h2><h3 id="安装JDK8"><a href="#安装JDK8" class="headerlink" title="安装JDK8"></a>安装JDK8</h3><pre><code># tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
+# vim /etc/profile
+export JAVA_HOME=/usr/java/jdk1.8.0_73
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+# source /etc/profile
+</code></pre><h3 id="新建用户"><a href="#新建用户" class="headerlink" title="新建用户"></a>新建用户</h3><p>【注意】:elasticsearch不能使用root用户去启动。</p>
+<pre><code># groupadd -g 510 es
+# useradd -g 510 -u 510 es
+# echo &quot;wisedu123&quot; | passwd --stdin es &amp;&gt; /dev/null
+</code></pre><h3 id="安装配置Elasticsearch"><a href="#安装配置Elasticsearch" class="headerlink" title="安装配置Elasticsearch"></a>安装配置Elasticsearch</h3><pre><code>[root@hadoop16 opt]# unzip -oq elasticsearch-5.6.3.zip
+[root@hadoop16 opt]# vim elasticsearch-5.6.3/config/elasticsearch.yml 
+cluster.name: loges
+node.name: hadoop16
+network.host: 172.16.206.16
+bootstrap.memory_lock: true
+[root@hadoop16 opt]# vim /etc/security/limits.conf
+es - memlock -1
+[root@hadoop16 opt]# chown -R es.es elasticsearch-5.6.3
+</code></pre><p>配置说明：<br>bootstrap.memory_lock: true<br>这个配置的作用是保护Elasticsearch使用的内存防止其被swapped。</p>
+<h3 id="优化Elasticsearch"><a href="#优化Elasticsearch" class="headerlink" title="优化Elasticsearch"></a>优化Elasticsearch</h3><p>1.配置操作系统文件描述符数<br>输入下面的命令进行查看：</p>
+<pre><code>$ ulimit -a
+</code></pre><p>找到open files那行：</p>
+<pre><code>open files                      (-n) 1024
+</code></pre><p>设置需要修改：</p>
+<pre><code># vim /etc/security/limits.conf
+es               -       nofile          65536
+</code></pre><p>2.增大虚拟内存mmap count配置<br>备注：如果你以.deb或.rpm包安装，则默认不需要设置此项，因为已经被自动设置，查看方式为：<br>sysctl vm.max_map_count<br>如果是手动安装，以root身份执行如下命令：<br>sysctl vm.max_map_count=262144<br>并修改文件使设置永久生效：</p>
+<pre><code># vim /etc/sysctl.conf    
+</code></pre><p>加一行：vm.max_map_count = 262144</p>
+<pre><code># sysctl -p
+</code></pre><p>改完后，重启elasticsearch。<br>如果需要需改JVM大小，请修改 jvm.options 配置文件。</p>
+<h3 id="启动Elasticsearch"><a href="#启动Elasticsearch" class="headerlink" title="启动Elasticsearch"></a>启动Elasticsearch</h3><pre><code>[root@hadoop16 opt]# su - es
+[es@hadoop16 ~]$ /opt/elasticsearch-5.6.3/bin/elasticsearch -d
+</code></pre><p>检验bootstrap.mlockall: true是否生效：<br>curl <a href="http://172.16.206.16:9200/_nodes/process?pretty" target="_blank" rel="external">http://172.16.206.16:9200/_nodes/process?pretty</a><br>关注这个这个请求返回数据中的mlockall的值，如果为false，则说明锁定内存失败，这可能由于运行elasticsearch的用户不具备这样的权限。解决该问题的方法是：<br>在运行elasticsearch之前，以root身份执行<br>ulimit -l unlimited<br>然后再次重启elasticsearch。并查看上面的请求中的mlockall的值是否为true。<br>【注意】:这时候需要在root执行ulimit -l unlimited的shell终端上su - es，然后重启elasticsearch。因为这是命令行设置的ulimit -l unlimited，只对当前会话生效。</p>
+<pre><code># ulimit -l unlimited
+# su - es
+$ ps -ef|grep elasticsearch
+$ kill -9 27189
+$ /usr/local/elasticsearch/bin/elasticsearch -d
+$ curl http://172.16.206.16:9200/_nodes/process?pretty
+</code></pre><p>要想永久修改锁定内存大小无限制，需修改/etc/security/limits.conf，添加下面的内容，改完不需要重启系统，但是需要重新打开一个shell建立会话。<br>es - memlock -1<br>其中，es代表运行elasticsearch的用户，-表示同时设置了soft和hard，memlock代表设置的是”锁定内存”这个类型，-1(unlimited或者infinity)代表没限制。<br>【补充】: 要使 /etc/security/limits.conf 文件配置生效，必须要确保 pam_limits.so 文件被加入到相关的启动文件中，启动文件位于/etc/pam.d路径下，如该路径下sshd、login、system-auth等，一般是system-auth文件负责加载该so文件。只要加载了pam_limits.so，则配置就会生效，无需重启系统。</p>
+<h3 id="安装配置head插件"><a href="#安装配置head插件" class="headerlink" title="安装配置head插件"></a>安装配置head插件</h3><p>项目地址：<a href="https://github.com/mobz/elasticsearch-head" target="_blank" rel="external">https://github.com/mobz/elasticsearch-head</a></p>
+<h4 id="安装head插件"><a href="#安装head插件" class="headerlink" title="安装head插件"></a>安装head插件</h4><pre><code>[root@hadoop16 opt]# git clone git://github.com/mobz/elasticsearch-head.git
+[root@hadoop16 opt]# yum -y install epel-release
+[root@hadoop16 opt]# yum install nodejs -y
+[root@hadoop16 opt]# cd elasticsearch-head/
+[root@hadoop16 elasticsearch-head]# npm install
+npm: relocation error: npm: symbol SSL_set_cert_cb, version libssl.so.10 not defined in file libssl.so.10 with link time reference
+[root@hadoop16 elasticsearch-head]# yum update openssl -y
+[root@hadoop16 elasticsearch-head]# npm install 
+ # 如果下载速度太慢，可以如下方式安装
+ [root@hadoop16 elasticsearch-head]# npm install -gd express --registry=http://registry.npm.taobao.org
+# 为了避免每次安装都需要--registry参数，可以使用如下命令进行永久设置：
+[root@hadoop16 elasticsearch-head]# npm config set registry http://registry.npm.taobao.org 
+[root@hadoop16 elasticsearch-head]# npm install grunt --save-dev
+[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-clean 
+[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-concat 
+[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-watch 
+[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-connect 
+[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-copy 
+[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-jasmine 
+</code></pre><p>奇怪的是最后一个没有安装成功，是因为该模块依赖了phantomjs。但是配置之后，依然无法安装。直接启动就可以了：</p>
+<pre><code>[root@hadoop16 elasticsearch-head]# grunt server 
+</code></pre><p>以后安装head插件的步骤太过复杂，我们可以将下载下来的elasticsearch-head包放入tomcat中，直接启动tomcat就可以访问head插件了。</p>
+<h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><p>1.修改Elasticsearch的配置文件elasticsearch.yml，增加跨域的配置(需要重启es才能生效)</p>
+<pre><code>http.cors.enabled: true
+http.cors.allow-origin: &quot;*&quot;
+</code></pre><p>2.编辑head/Gruntfile.js，修改服务器监听地址，增加hostname属性，将其值设置为*。</p>
+<pre><code>[root@hadoop16 elasticsearch-head]# pwd
+/opt/apache-tomcat-8.5.23/webapps/elasticsearch-head
+[root@hadoop16 elasticsearch-head]# vim Gruntfile.js
+</code></pre><p>以下两种配置都是可以的：</p>
+<pre><code># Type1
+connect: {
+        hostname: &apos;*&apos;,
+        server: {
+                options: {
+                        port: 9100,
+                        base: &apos;.&apos;,
+                        keepalive: true
+                }
+        }
+}
+</code></pre><p>　　</p>
+<pre><code># Type 2
+connect: {
+        server: {
+                options: {
+                        hostname: &apos;*&apos;,
+                        port: 9100,
+                        base: &apos;.&apos;,
+                        keepalive: true
+                }
+        }
+}
+</code></pre><p>3.编辑head/_site/app.js，修改head连接es的地址，将localhost修改为es的IP地址</p>
+<pre><code>[root@hadoop16 elasticsearch-head]# pwd
+/opt/apache-tomcat-8.5.23/webapps/elasticsearch-head
+[root@hadoop16 elasticsearch-head]# vim _site/app.js
+# 原配置
+this.base_uri = this.config.base_uri || this.prefs.get(&quot;app-base_uri&quot;) || &quot;http://localhost:9200&quot;;
+# 将localhost修改为ES的IP地址
+this.base_uri = this.config.base_uri || this.prefs.get(&quot;app-base_uri&quot;) || &quot;http://YOUR-ES-IP:9200&quot;;
+</code></pre><h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><p>[root@hadoop16 elasticsearch-head]# cd /opt/apache-tomcat-8.5.23/<br>[root@hadoop16 apache-tomcat-8.5.23]# bin/startup.sh </p>
+<h2 id="Logstash-1"><a href="#Logstash-1" class="headerlink" title="Logstash"></a>Logstash</h2><h3 id="安装JDK8-1"><a href="#安装JDK8-1" class="headerlink" title="安装JDK8"></a>安装JDK8</h3><p>Logstash是jruby研发的，需要跑在JVM上，所以需要安装JDK。</p>
+<pre><code># tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
+# vim /etc/profile
+export JAVA_HOME=/usr/java/jdk1.8.0_73
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+# source /etc/profile
+</code></pre><h3 id="安装配置Logstash"><a href="#安装配置Logstash" class="headerlink" title="安装配置Logstash"></a>安装配置Logstash</h3><p>我这里选择二进制包安装。</p>
+<pre><code>[root@spark32 opt]# tar zxf logstash-5.6.3.tar.gz 
+[root@spark32 opt]# cd logstash-5.6.3/
+</code></pre><p>由于我这里选择是二进制安装，pattern文件位置在：</p>
+<pre><code>[root@spark32 logstash-5.6.3]# ls /opt/logstash-5.6.3/vendor/bundle/jruby/1.9/gems/logstash-patterns-core-4.1.2/patterns/grok-patterns
+</code></pre><h3 id="收集Nginx-access日志"><a href="#收集Nginx-access日志" class="headerlink" title="收集Nginx access日志"></a>收集Nginx access日志</h3><p>Logstash收集Nginx日志，输出到Elasticsearch中。</p>
+<h4 id="创建Nginx-pattern"><a href="#创建Nginx-pattern" class="headerlink" title="创建Nginx pattern"></a>创建Nginx pattern</h4><pre><code>[root@spark32 ~]# vim /opt/logstash-5.6.3/vendor/bundle/jruby/1.9/gems/logstash-patterns-core-4.1.2/patterns/grok-patterns
+# Nginx log
+NGUSERNAME [a-zA-Z\.\@\-\+_%]+
+NGUSER %{NGUSERNAME}
+NGINXACCESS %{IPORHOST:clientip} - %{NOTSPACE:remote_user} \[%{HTTPDATE:timestamp}\] \&quot;(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\&quot; %{NUMBER:response} (?:%{NUMBER:bytes}|-) %{QS:referrer} %{QS:agent} %{NOTSPACE:http_x_forwarded_for}
+</code></pre><h4 id="创建Logstash配置文件"><a href="#创建Logstash配置文件" class="headerlink" title="创建Logstash配置文件"></a>创建Logstash配置文件</h4><pre><code>[root@spark32 logstash-5.6.3]# cd /opt/logstash-5.6.3
+[root@spark32 logstash-5.6.3]# mkdir conf
+[root@spark32 logstash-5.6.3]# cd conf
+[root@spark32 conf]# vim logstash_nginx.conf
+input {
+  file {
+    path  =&gt;  [&quot;/usr/local/openresty/nginx/logs/host.access.log&quot;]
+    type  =&gt;  &quot;nginxlog&quot;
+    start_position  =&gt;  &quot;beginning&quot;
+  }
+}
+
+filter {
+  grok {
+    match =&gt; { &quot;message&quot; =&gt; &quot;%{NGINXACCESS}&quot; }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts    =&gt;  [&quot;172.16.206.16:9200&quot;]
+    action   =&gt;  &quot;index&quot;
+    index    =&gt;  &quot;logstash-%{+YYYY.MM.dd}&quot;
+  }
+}
+</code></pre><h4 id="启动Logstash"><a href="#启动Logstash" class="headerlink" title="启动Logstash"></a>启动Logstash</h4><pre><code>[root@spark32 logstash-5.6.3]# bin/logstash -f /opt/logstash-5.6.3/conf/logstash_nginx.conf -t
+Sending Logstash&apos;s logs to /opt/logstash-5.6.3/logs which is now configured via log4j2.properties
+[2017-10-20T17:07:14,793][INFO ][logstash.modules.scaffold] Initializing module {:module_name=&gt;&quot;fb_apache&quot;, :directory=&gt;&quot;/opt/logstash-5.6.3/modules/fb_apache/configuration&quot;}
+[2017-10-20T17:07:14,797][INFO ][logstash.modules.scaffold] Initializing module {:module_name=&gt;&quot;netflow&quot;, :directory=&gt;&quot;/opt/logstash-5.6.3/modules/netflow/configuration&quot;}
+[2017-10-20T17:07:14,803][INFO ][logstash.setting.writabledirectory] Creating directory {:setting=&gt;&quot;path.queue&quot;, :path=&gt;&quot;/opt/logstash-5.6.3/data/queue&quot;}
+[2017-10-20T17:07:14,804][INFO ][logstash.setting.writabledirectory] Creating directory {:setting=&gt;&quot;path.dead_letter_queue&quot;, :path=&gt;&quot;/opt/logstash-5.6.3/data/dead_letter_queue&quot;}
+Configuration OK
+[2017-10-20T17:07:14,999][INFO ][logstash.runner          ] Using config.test_and_exit mode. Config Validation Result: OK. Exiting Logstash
+[root@spark32 logstash-5.6.3]# bin/logstash -f /opt/logstash-5.6.3/conf/logstash_nginx.conf &amp; 
+</code></pre><p>记录收集到日志的文件位置在:</p>
+<pre><code>[root@spark32 file]# ls -a
+.  ..  .sincedb_650663ba19529187a32a8b9dc99049f8
+[root@spark32 file]# pwd
+/opt/logstash-5.6.3/data/plugins/inputs/file
+</code></pre><p>查看Elasticsearch索引：</p>
+<pre><code>[es@hadoop16 elasticsearch-5.6.3]$ curl -XGET &apos;172.16.206.16:9200/_cat/indices&apos;
+yellow open logstash-2017.10.20 DVARGYZ2R9CfT-xyLrhyAQ 5 1 7 0 49.9kb 49.9kb
+</code></pre><h2 id="Kibana"><a href="#Kibana" class="headerlink" title="Kibana"></a>Kibana</h2><h3 id="安装配置kibana"><a href="#安装配置kibana" class="headerlink" title="安装配置kibana"></a>安装配置kibana</h3><pre><code>[root@hadoop16 opt]# tar zxf kibana-5.6.3-linux-x86_64.tar.gz 
+[root@hadoop16 opt]# ln -sv kibana-5.6.3-linux-x86_64 kibana
+‘kibana’ -&gt; ‘kibana-5.6.3-linux-x86_64’
+[root@hadoop16 opt]# cd kibana
+[root@hadoop16 kibana]# cd config/
+[root@hadoop16 config]# vim kibana.yml 
+server.host: &quot;172.16.206.16&quot;
+elasticsearch.url: &quot;http://172.16.206.16:9200&quot;
+[root@hadoop16 config]# cd ..
+[root@hadoop16 kibana]# bin/kibana &amp;
+</code></pre><h3 id="访问"><a href="#访问" class="headerlink" title="访问"></a>访问</h3><p>浏览器输入：<a href="http://172.16.206.16:5601/" target="_blank" rel="external">http://172.16.206.16:5601/</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/1.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/2.png" alt=""><br>点击左侧菜单的Discover：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/3.png" alt=""><br>比如我用curl访问下nginx，然后去kibana中搜索。要稍微等一下，等日志进到Elasticsearch中。</p>
+<pre><code>[root@hadoop16 kibana]# curl http://172.16.206.32:808
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/4.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/5.png" alt=""></p>
+<p><strong>总结：</strong><br>1.Logstash 主要的特点就是它的灵活性，因为它有很多插件。然后它清楚的文档已经直白的配置格式让它可以再多种场景下应用。这样的良性循环让我们可以在网上找到很多资源，几乎可以处理任何问题。<br>2.Logstash不支持缓存，当然我们可以使用redis或者kafka作为中心缓冲池，架构如下：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/6.png" alt=""><br>3.Logstash是在jvm跑的，资源消耗比较大，太重量级了。后来作者又用golang写了一个功能较少但是资源消耗也小的轻量级的logstash-forwarder。后来这个人加入了elastic公司。因为elastic公司本身还收购了另一个开源项目packetbeat，而这个项目专门就是用golang写的，有整个团队，所以elastic公司干脆把logstash-forwarder的开发工作也合并到同一个golang团队来搞，于是新的项目就叫filebeat了。当然也可以自己写agent，用go、python都可以写。这样我们就可以使用轻量的日志传输工具，将数据从服务器端经由一个或多个 Logstash 中心服务器传输到 Elasticsearch。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/7.png" alt=""></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/日志-ELK/" rel="tag"><i class="fa fa-tag"></i>日志 ELK</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/12/EFK收集Kubernetes应用日志/" rel="next" title="EFK收集Kubernetes应用日志">
+                <i class="fa fa-chevron-left"></i> EFK收集Kubernetes应用日志
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">47</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ELK介绍"><span class="nav-number">1.</span> <span class="nav-text">ELK介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Elasticsearch"><span class="nav-number">1.1.</span> <span class="nav-text">Elasticsearch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Logstash"><span class="nav-number">1.2.</span> <span class="nav-text">Logstash</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#input插件"><span class="nav-number">1.2.1.</span> <span class="nav-text">input插件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#filter插件"><span class="nav-number">1.2.2.</span> <span class="nav-text">filter插件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#output插件"><span class="nav-number">1.2.3.</span> <span class="nav-text">output插件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境信息"><span class="nav-number">2.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-1"><span class="nav-number">3.</span> <span class="nav-text">Elasticsearch</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装JDK8"><span class="nav-number">3.1.</span> <span class="nav-text">安装JDK8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#新建用户"><span class="nav-number">3.2.</span> <span class="nav-text">新建用户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装配置Elasticsearch"><span class="nav-number">3.3.</span> <span class="nav-text">安装配置Elasticsearch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化Elasticsearch"><span class="nav-number">3.4.</span> <span class="nav-text">优化Elasticsearch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动Elasticsearch"><span class="nav-number">3.5.</span> <span class="nav-text">启动Elasticsearch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装配置head插件"><span class="nav-number">3.6.</span> <span class="nav-text">安装配置head插件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装head插件"><span class="nav-number">3.6.1.</span> <span class="nav-text">安装head插件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置"><span class="nav-number">3.6.2.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动"><span class="nav-number">3.6.3.</span> <span class="nav-text">启动</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Logstash-1"><span class="nav-number">4.</span> <span class="nav-text">Logstash</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装JDK8-1"><span class="nav-number">4.1.</span> <span class="nav-text">安装JDK8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装配置Logstash"><span class="nav-number">4.2.</span> <span class="nav-text">安装配置Logstash</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#收集Nginx-access日志"><span class="nav-number">4.3.</span> <span class="nav-text">收集Nginx access日志</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建Nginx-pattern"><span class="nav-number">4.3.1.</span> <span class="nav-text">创建Nginx pattern</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建Logstash配置文件"><span class="nav-number">4.3.2.</span> <span class="nav-text">创建Logstash配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动Logstash"><span class="nav-number">4.3.3.</span> <span class="nav-text">启动Logstash</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kibana"><span class="nav-number">5.</span> <span class="nav-text">Kibana</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装配置kibana"><span class="nav-number">5.1.</span> <span class="nav-text">安装配置kibana</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问"><span class="nav-number">5.2.</span> <span class="nav-text">访问</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共120.9k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+    <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+</body>
+</html>
