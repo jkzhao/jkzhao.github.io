@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="监控 zabbix," />
+  <meta name="keywords" content="日志 ELK," />
 
 
 
@@ -104,33 +104,31 @@
 
 
 
-<meta name="description" content="https://nginx.org/en/docs/http/ngx_http_stub_status_module.html在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。">
-<meta name="keywords" content="监控 zabbix">
+<meta name="description" content="Beats工具Beats是elastic公司的一款轻量级数据采集产品，它是从packetbeat发展出来的数据收集器系统，它包含了几个子产品：  Packetbeat(用于监控网络流量) Filebeat(用于监听日志数据)">
+<meta name="keywords" content="日志 ELK">
 <meta property="og:type" content="article">
-<meta property="og:title" content="zabbix监控Nginx">
-<meta property="og:url" content="http://yoursite.com/2017/05/16/zabbix监控Nginx/index.html">
+<meta property="og:title" content="Filebeat日志收集器">
+<meta property="og:url" content="http://yoursite.com/2017/10/24/Filebeat日志收集器/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="https://nginx.org/en/docs/http/ngx_http_stub_status_module.html在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。">
+<meta property="og:description" content="Beats工具Beats是elastic公司的一款轻量级数据采集产品，它是从packetbeat发展出来的数据收集器系统，它包含了几个子产品：  Packetbeat(用于监控网络流量) Filebeat(用于监听日志数据)">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/66.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/67.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/68.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/69.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/70.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/71.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/72.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/73.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/74.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/75.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/76.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/77.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/78.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/79.png">
-<meta property="og:updated_time" content="2017-06-12T07:56:15.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/8.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/9.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/10.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/12.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/13.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/14.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/15.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/16.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/17.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/18.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/19.png">
+<meta property="og:updated_time" content="2017-10-24T02:28:06.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zabbix监控Nginx">
-<meta name="twitter:description" content="https://nginx.org/en/docs/http/ngx_http_stub_status_module.html在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/66.png">
+<meta name="twitter:title" content="Filebeat日志收集器">
+<meta name="twitter:description" content="Beats工具Beats是elastic公司的一款轻量级数据采集产品，它是从packetbeat发展出来的数据收集器系统，它包含了几个子产品：  Packetbeat(用于监控网络流量) Filebeat(用于监听日志数据)">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/8.png">
 
 
 
@@ -148,7 +146,7 @@
   };
 </script>
 
-  <title> zabbix监控Nginx | jkzhao's blog </title>
+  <title> Filebeat日志收集器 | jkzhao's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -338,7 +336,7 @@
             
             
               
-                zabbix监控Nginx
+                Filebeat日志收集器
               
             
           </h1>
@@ -350,14 +348,14 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-05-16T11:04:58+08:00" content="2017-05-16">
-              2017-05-16
+            <time itemprop="dateCreated" datetime="2017-10-24T10:26:16+08:00" content="2017-10-24">
+              2017-10-24
             </time>
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-06-12T15:56:15+08:00" content="2017-06-12">
-              2017-06-12
+              <time itemprop="dateUpdated" datetime="2017-10-24T10:28:06+08:00" content="2017-10-24">
+              2017-10-24
               </time>
               </span>
             
@@ -372,8 +370,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Zabbix/" itemprop="url" rel="index">
-                    <span itemprop="name">Zabbix</span>
+                  <a href="/categories/日志/" itemprop="url" rel="index">
+                    <span itemprop="name">日志</span>
                   </a>
                 </span>
 
@@ -392,7 +390,7 @@
 
           
           
-             <span id="/2017/05/16/zabbix监控Nginx/" class="leancloud_visitors" data-flag-title="zabbix监控Nginx">
+             <span id="/2017/10/24/Filebeat日志收集器/" class="leancloud_visitors" data-flag-title="Filebeat日志收集器">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -416,49 +414,134 @@
       
 
       
-        <p><a href="https://nginx.org/en/docs/http/ngx_http_stub_status_module.html" target="_blank" rel="external">https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</a><br>在编译Nginx的时候，需要加上参数–with-http_stub_status_module，然后在配置文件中配置开启状态页面查询。<br>Nginx1.9.11版本之后才支持动态加载模块，因此对于之前的版本，你都需要重新编译。<br><a id="more"></a></p>
-<h1 id="启用nginx-status配置"><a href="#启用nginx-status配置" class="headerlink" title="启用nginx status配置"></a>启用nginx status配置</h1><p>在http段加入如下配置：</p>
-<pre><code>server {
-        listen  80;
-        server_name localhost;
-        location /status {
-            stub_status;
-            access_log off;
-            allow 114.55.29.246;
-            deny all;
-        }
+        <h2 id="Beats工具"><a href="#Beats工具" class="headerlink" title="Beats工具"></a>Beats工具</h2><p>Beats是elastic公司的一款轻量级数据采集产品，它是从packetbeat发展出来的数据收集器系统，它包含了几个子产品：</p>
+<ul>
+<li>Packetbeat(用于监控网络流量)</li>
+<li>Filebeat(用于监听日志数据)<a id="more"></a></li>
+<li>Metricbeat(用于搜集CPU、内存、磁盘的信息以及Nginx、Redis等服务的数据)</li>
+<li>Winlogbeat(用于搜集windows事件日志)</li>
+<li>Heartbeat(用于监控服务的可用性)</li>
+</ul>
+<p>Beats可以直接把数据发送给Elasticsearch或者发送给Logstash，然后Logstash发送给Elasticsearch，然后进行后续的数据分析活动。<br>由于他们都是基于libbeat写出来的，提供了统一的数据发送方法，输入配置解析，日志记录框架等功能。所有的beat工具，在配置上基本相同，只是input输入的地方各有差异。<br>如果有其他特殊需求，可以使用Go语言借助libbeat库方便地开发自己的Beat工具，社区中有很多工具可以参考。</p>
+<h2 id="Logstash和Filebeat"><a href="#Logstash和Filebeat" class="headerlink" title="Logstash和Filebeat"></a>Logstash和Filebeat</h2><p>上一篇文章中介绍过，Logstash是跑在JVM上的，需要消耗较多的系统资源，而Filebeat则是一个轻量级的日志采集工具，占用资源更少。我们完全可以在每台机器上安装启动个Filebeat，由Filebeat来采集日志，将数据传输给Redis或者Kafka，然后logstash去获取，利用filter功能过滤分析，然后存储到elasticsearch中。架构图如下：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/8.png" alt=""></p>
+<h2 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h2><table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>操作系统版本</th>
+<th>IP地址</th>
+<th>安装软件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hadoop16</td>
+<td>CentOS 7.0</td>
+<td>172.16.206.16</td>
+<td>elasticsearch-5.6.3.zip、kibana-5.6.3-linux-x86_64.tar.gz</td>
+</tr>
+<tr>
+<td>spark32</td>
+<td>CentOS 7.0</td>
+<td>172.16.206.32</td>
+<td>logstash-5.6.3.tar.gz、filebeat-5.6.3-linux-x86_64.tar.gz、Nginx</td>
+</tr>
+<tr>
+<td>osb30</td>
+<td>Redhat 6.5</td>
+<td>172.16.206.30</td>
+<td>redis-3.2.2.tar.gz</td>
+</tr>
+</tbody>
+</table>
+<h2 id="安装配置Redis"><a href="#安装配置Redis" class="headerlink" title="安装配置Redis"></a>安装配置Redis</h2><h3 id="安装Redis"><a href="#安装Redis" class="headerlink" title="安装Redis"></a>安装Redis</h3><pre><code># yum install readline-devel pcre-devel openssl-devel -y
+# cd /usr/local/
+# tar zxf redis-3.2.2.tar.gz 
+# cd redis-3.2.2/
+# make
+# make install
+</code></pre><h3 id="配置Redis"><a href="#配置Redis" class="headerlink" title="配置Redis"></a>配置Redis</h3><pre><code># cd /usr/local/redis-3.2.2/
+# cp redis.conf /etc/
+# vim /etc/redis.conf
+</code></pre><p>1.打开/etc/redis.conf，将daemonize处修改为yes。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/9.png" alt=""></p>
+<p>2.配置Redis持久化策略<br>使用RDB和AOF双持久化策略：其中默认开启了RDB持久化，我们只需要开启AOF持久化。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/10.png" alt=""></p>
+<p>3.配置redis日志文件<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/11.png" alt=""></p>
+<p>4.配置数据文件存放路径，在/目录下面创建/RedisData目录</p>
+<pre><code># mkdir /RedisData
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/12.png" alt=""></p>
+<p>5.修改Redis监听地址<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/13.png" alt=""></p>
+<p>6.修改Redis监听端口<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/14.png" alt=""></p>
+<p>7.在redis3.2之后，redis增加了protected-mode，在这个模式下，即使注释掉了bind 127.0.0.1，再访问redis的时候还是报错，所以要如下设置<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/15.png" alt=""></p>
+<h3 id="启动-停止Redis"><a href="#启动-停止Redis" class="headerlink" title="启动/停止Redis"></a>启动/停止Redis</h3><p>启动：</p>
+<pre><code># /usr/local/bin/redis-server /etc/redis.conf
+</code></pre><p>停止：</p>
+<pre><code># /usr/local/redis-3.2.2/src/redis-cli -p 6400 shutdown
+</code></pre><h2 id="安装配置Filebeat"><a href="#安装配置Filebeat" class="headerlink" title="安装配置Filebeat"></a>安装配置Filebeat</h2><p>filebeat的工作流程：当开启filebeat程序的时候，它会启动一个或多个探测器（prospectors）去检测指定的日志目录或文件，对于探测器找出的每一个日志文件，filebeat启动收割进程（harvester），每一个收割进程读取一个日志文件的新内容，并发送这些新的日志数据到处理程序（spooler），处理程序会集合这些事件，最后filebeat会发送集合的数据到你指定的地点（Elasticsearch、Logstash、Kafka或者Redis）。</p>
+<h3 id="安装Filebeat"><a href="#安装Filebeat" class="headerlink" title="安装Filebeat"></a>安装Filebeat</h3><pre><code>[root@spark32 opt]# wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-5.6.3-linux-x86_64.tar.gz
+[root@spark32 opt]# ln -sv filebeat-5.6.3-linux-x86_64 filebeat
+‘filebeat’ -&gt; ‘filebeat-5.6.3-linux-x86_64’
+[root@spark32 opt]# cd filebeat
+</code></pre><h3 id="配置Filebeat"><a href="#配置Filebeat" class="headerlink" title="配置Filebeat"></a>配置Filebeat</h3><p>1.定义你的日志文件的路径（一个或多个）<br>对于大多数的基本filebeat配置，可以定义一个单一探测器针对一个单一的路径，例如：<br>filebeat.prospectors:</p>
+<pre><code>- input_type: log
+  paths:
+    - /usr/local/openresty/nginx/logs/host.access.log
+  #json.keys_under_root: true 若收取日志格式为json的log，请开启此配置
+</code></pre><p>2.定义输出日志，我这里输出到redis中</p>
+<pre><code>output.redis:
+  hosts: [&quot;172.16.206.30:6400&quot;]
+  #password: &quot;my_password&quot;
+  key: &quot;filebeat&quot;
+  db: 0
+  timeout: 5
+</code></pre><h3 id="启动Filebeat"><a href="#启动Filebeat" class="headerlink" title="启动Filebeat"></a>启动Filebeat</h3><p>测试配置文件语法：</p>
+<pre><code># cd /opt/filebeat/
+# ./filebeat -configtest -e
+</code></pre><p>启动：</p>
+<pre><code># ./filebeat &amp;
+</code></pre><p>查看数据是否进入redis：</p>
+<pre><code>[root@osb30 src]# ./redis-cli -p 6400 
+127.0.0.1:6400&gt; help @LIST
+127.0.0.1:6400&gt; LLEN filebeat
+(integer) 15
+127.0.0.1:6400&gt; LINDEX filebeat 1
+&quot;{\&quot;@timestamp\&quot;:\&quot;2017-10-23T07:13:37.551Z\&quot;,\&quot;beat\&quot;:{\&quot;hostname\&quot;:\&quot;spark32\&quot;,\&quot;name\&quot;:\&quot;spark32\&quot;,\&quot;version\&quot;:\&quot;5.6.3\&quot;},\&quot;input_type\&quot;:\&quot;log\&quot;,\&quot;message\&quot;:\&quot;172.16.4.81 - - [19/Oct/2017:09:47:17 +0800] \\\&quot;GET /favicon.ico HTTP/1.1\\\&quot; 404 576 \\\&quot;http://172.16.206.32:808/\\\&quot; \\\&quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36\\\&quot; \\\&quot;-\\\&quot;\&quot;,\&quot;offset\&quot;:439,\&quot;source\&quot;:\&quot;/usr/local/openresty/nginx/logs/host.access.log\&quot;,\&quot;type\&quot;:\&quot;log\&quot;}&quot;
+</code></pre><p>浏览器访问下nginx，再次查看redis数据：</p>
+<pre><code>127.0.0.1:6400&gt; LLEN filebeat
+(integer) 16
+</code></pre><h2 id="安装配置Elasticsearch"><a href="#安装配置Elasticsearch" class="headerlink" title="安装配置Elasticsearch"></a>安装配置Elasticsearch</h2><p>关于Elasticsearch的安装部署详见上一篇博客<a href="http://jkzhao.github.io/2017/10/20/ELK%E5%AE%9E%E6%88%98/#more" target="_blank" rel="external">《ELK实战》</a>。</p>
+<h2 id="安装配置Logstash"><a href="#安装配置Logstash" class="headerlink" title="安装配置Logstash"></a>安装配置Logstash</h2><p>Logstash从redis中取数据，输出结果到Elasticsearch中。关于Logstash的安装部署详见上一篇博客<a href="http://jkzhao.github.io/2017/10/20/ELK%E5%AE%9E%E6%88%98/#more" target="_blank" rel="external">《ELK实战》</a>。</p>
+<h3 id="配置Logstash"><a href="#配置Logstash" class="headerlink" title="配置Logstash"></a>配置Logstash</h3><pre><code># cd /opt/logstash-5.6.3/conf
+# vim logstash_redis.conf
+input {
+  redis {
+    host  =&gt;  &quot;172.16.206.30&quot;
+    port  =&gt;  &quot;6400&quot;
+    data_type  =&gt;  &quot;list&quot;
+    key  =&gt;  &quot;filebeat&quot;
+  }
 }
-</code></pre><p>重载Nginx。</p>
-<h1 id="zabbix-agent端配置"><a href="#zabbix-agent端配置" class="headerlink" title="zabbix agent端配置"></a>zabbix agent端配置</h1><pre><code># cd /usr/local/zabbix-3.0.1/etc/zabbix_agentd.conf.d/
-# vim nginx_userparams.conf
-</code></pre><p>把下面的内容贴进去：</p>
-<pre><code>UserParameter=Nginx.active[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | awk &apos;/^Active/ {print $NF}&apos;
-UserParameter=Nginx.reading[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | grep &apos;Reading&apos; | cut -d&quot; &quot; -f2
-UserParameter=Nginx.writing[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | grep &apos;Writing&apos; | cut -d&quot; &quot; -f4
-UserParameter=Nginx.waiting[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | grep &apos;Waiting&apos; | cut -d&quot; &quot; -f6
-UserParameter=Nginx.accepted[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | awk &apos;/^[ \t]+[0-9]+[ \t]+[0-9]+[ \t]+[0-9]+/ {print $$1}&apos;
-UserParameter=Nginx.handled[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | awk &apos;/^[ \t]+[0-9]+[ \t]+[0-9]+[ \t]+[0-9]+/ {print $$2}&apos;
-UserParameter=Nginx.requests[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot; | awk &apos;/^[ \t]+[0-9]+[ \t]+[0-9]+[ \t]+[0-9]+/ {print $$3}&apos;
-</code></pre><p>重启zabbix agent：</p>
-<pre><code># killall -9 zabbix_agentd
-# /usr/local/zabbix-3.0.1/sbin/zabbix_agentd
-</code></pre><p>测试，在zabbix server上使用zabbix_get获取数据：</p>
-<pre><code># cd /usr/local/zabbix-3.0.1/bin/
-# ./zabbix_get -s 114.55.29.241 -k &quot;Nginx.active[114.55.29.241,80]&quot;
-</code></pre><h1 id="zabbix-web-gui配置监控项"><a href="#zabbix-web-gui配置监控项" class="headerlink" title="zabbix web gui配置监控项"></a>zabbix web gui配置监控项</h1><h2 id="创建Nginx-Template"><a href="#创建Nginx-Template" class="headerlink" title="创建Nginx Template"></a>创建Nginx Template</h2><p>点击Configuration—&gt;Templates，点击右上角的Create template。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/66.png" alt=""><br>填写模板的信息，点击Add。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/67.png" alt=""></p>
-<h2 id="创建Application"><a href="#创建Application" class="headerlink" title="创建Application"></a>创建Application</h2><p><strong>生产环境下只需要把我写好的模板文件import进去就可以了，不需要像下面那样再去创建模板，下面只是介绍下创建模板的过程。</strong></p>
-<p>点击Configuration—&gt;Templates，找到刚才创建的Nginx template，点击所在行的Applications列。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/68.png" alt=""><br>点击右上角的Create application。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/69.png" alt=""><br>输入application的名字Nginx running status，点击Add。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/70.png" alt=""></p>
-<h2 id="创建Items"><a href="#创建Items" class="headerlink" title="创建Items"></a>创建Items</h2><p>点击Configuration—&gt;Templates，找到刚才创建的Nginx template，点击所在行的Items列。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/71.png" alt=""><br>点击右上角的Create item。分别创建8个监控项，如下图：</p>
-<ol>
-<li>当前 Nginx 正处理的活动连接数（包括等待着的连接数）<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/72.png" alt=""></li>
-<li>Nginx一共处理了的连接数<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/73.png" alt=""></li>
-<li>Nginx一共处理了的连接数(包括失败了的，因为某些限制会导致连接被拒绝，比如the worker_connections limit)<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/74.png" alt=""></li>
-<li>Nginx一共处理了的请求的个数(连接和请求是两码事，一个长连接可能会处理多个请求)<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/75.png" alt=""></li>
-<li>Nginx正在读取到客户端的Header信息数<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/76.png" alt=""></li>
-<li>Nginx正在向客户端发送响应的个数<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/77.png" alt=""></li>
-<li>开启keep-alive 的情况下，这个值等于active – (reading + writing)，意思就是 Nginx 已经处理完正在等候下一次请求指令的驻留连接<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/78.png" alt=""></li>
-<li>Nginx服务可用性<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/zabbix/79.png" alt=""></li>
-</ol>
+
+filter {
+  grok {
+    match =&gt; { &quot;message&quot; =&gt; &quot;%{NGINXACCESS}&quot; }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts    =&gt;  [&quot;172.16.206.16:9200&quot;]
+    action   =&gt;  &quot;index&quot;
+    index    =&gt;  &quot;filebeat-%{+YYYY.MM.dd}&quot;
+  }
+}
+</code></pre><h3 id="启动Logstash"><a href="#启动Logstash" class="headerlink" title="启动Logstash"></a>启动Logstash</h3><pre><code>[root@spark32 logstash-5.6.3]# bin/logstash -f /opt/logstash-5.6.3/conf/logstash_redis.conf &amp;
+</code></pre><p>查看redis中的数据，发现已经全部被消费了：</p>
+<pre><code>127.0.0.1:6400&gt; LLEN filebeat
+(integer) 0
+</code></pre><p>查看Elasticsearch中的索引：</p>
+<pre><code># curl -XGET &apos;172.16.206.16:9200/_cat/indices&apos;
+yellow open filebeat-2017.10.23 PQe6qyVfSSG7GHQJUOPWtA 5 1 18 0 92.8kb 92.8kb
+</code></pre><h2 id="安装配置Kibana"><a href="#安装配置Kibana" class="headerlink" title="安装配置Kibana"></a>安装配置Kibana</h2><p>关于Kibana的安装部署详见上一篇博客<a href="http://jkzhao.github.io/2017/10/20/ELK%E5%AE%9E%E6%88%98/#more" target="_blank" rel="external">《ELK实战》</a>。<br>浏览器访问：<a href="http://172.16.206.16:5601/" target="_blank" rel="external">http://172.16.206.16:5601/</a><br>1.左侧菜单点击“Management”，点击“Index Patterns”。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/16.png" alt=""><br>2.点击“Create Index Pattern”。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/17.png" alt=""><br>3.输入索引名字，点击“Create”<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/18.png" alt=""><br>4.点击Discover，选择上一步创建的索引。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/19.png" alt=""></p>
 
       
     </div>
@@ -480,7 +563,7 @@ UserParameter=Nginx.requests[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot
       
         <div class="post-tags">
           
-            <a href="/tags/监控-zabbix/" rel="tag"><i class="fa fa-tag"></i>监控 zabbix</a>
+            <a href="/tags/日志-ELK/" rel="tag"><i class="fa fa-tag"></i>日志 ELK</a>
           
         </div>
       
@@ -489,17 +572,13 @@ UserParameter=Nginx.requests[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/05/14/zabbix监控实例/" rel="next" title="zabbix监控实例">
-                <i class="fa fa-chevron-left"></i> zabbix监控实例
+              <a href="/2017/10/20/ELK实战/" rel="next" title="ELK实战">
+                <i class="fa fa-chevron-left"></i> ELK实战
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/05/23/zabbix监控websphere和weblogic/" rel="prev" title="zabbix监控websphere和weblogic">
-                zabbix监控websphere和weblogic <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -656,7 +735,7 @@ UserParameter=Nginx.requests[*], /usr/bin/curl -s &quot;http://$1:$2/status&quot
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#启用nginx-status配置"><span class="nav-number">1.</span> <span class="nav-text">启用nginx status配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#zabbix-agent端配置"><span class="nav-number">2.</span> <span class="nav-text">zabbix agent端配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#zabbix-web-gui配置监控项"><span class="nav-number">3.</span> <span class="nav-text">zabbix web gui配置监控项</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Nginx-Template"><span class="nav-number">3.1.</span> <span class="nav-text">创建Nginx Template</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Application"><span class="nav-number">3.2.</span> <span class="nav-text">创建Application</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Items"><span class="nav-number">3.3.</span> <span class="nav-text">创建Items</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Beats工具"><span class="nav-number">1.</span> <span class="nav-text">Beats工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Logstash和Filebeat"><span class="nav-number">2.</span> <span class="nav-text">Logstash和Filebeat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境信息"><span class="nav-number">3.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置Redis"><span class="nav-number">4.</span> <span class="nav-text">安装配置Redis</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Redis"><span class="nav-number">4.1.</span> <span class="nav-text">安装Redis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Redis"><span class="nav-number">4.2.</span> <span class="nav-text">配置Redis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动-停止Redis"><span class="nav-number">4.3.</span> <span class="nav-text">启动/停止Redis</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置Filebeat"><span class="nav-number">5.</span> <span class="nav-text">安装配置Filebeat</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Filebeat"><span class="nav-number">5.1.</span> <span class="nav-text">安装Filebeat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Filebeat"><span class="nav-number">5.2.</span> <span class="nav-text">配置Filebeat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动Filebeat"><span class="nav-number">5.3.</span> <span class="nav-text">启动Filebeat</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置Elasticsearch"><span class="nav-number">6.</span> <span class="nav-text">安装配置Elasticsearch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置Logstash"><span class="nav-number">7.</span> <span class="nav-text">安装配置Logstash</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Logstash"><span class="nav-number">7.1.</span> <span class="nav-text">配置Logstash</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动Logstash"><span class="nav-number">7.2.</span> <span class="nav-text">启动Logstash</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置Kibana"><span class="nav-number">8.</span> <span class="nav-text">安装配置Kibana</span></a></li></ol></div>
             
           </div>
         </section>

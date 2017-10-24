@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-10-20T14:23:42.000Z</updated>
+  <updated>2017-10-24T02:28:06.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,164 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Filebeat日志收集器</title>
+    <link href="http://yoursite.com/2017/10/24/Filebeat%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86%E5%99%A8/"/>
+    <id>http://yoursite.com/2017/10/24/Filebeat日志收集器/</id>
+    <published>2017-10-24T02:26:16.000Z</published>
+    <updated>2017-10-24T02:28:06.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;Beats工具&quot;&gt;&lt;a href=&quot;#Beats工具&quot; class=&quot;headerlink&quot; title=&quot;Beats工具&quot;&gt;&lt;/a&gt;Beats工具&lt;/h2&gt;&lt;p&gt;Beats是elastic公司的一款轻量级数据采集产品，它是从packetbeat发展出来的数据收集器系统，它包含了几个子产品：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Packetbeat(用于监控网络流量)&lt;/li&gt;
+&lt;li&gt;Filebeat(用于监听日志数据)&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Metricbeat(用于搜集CPU、内存、磁盘的信息以及Nginx、Redis等服务的数据)&lt;/li&gt;
+&lt;li&gt;Winlogbeat(用于搜集windows事件日志)&lt;/li&gt;
+&lt;li&gt;Heartbeat(用于监控服务的可用性)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Beats可以直接把数据发送给Elasticsearch或者发送给Logstash，然后Logstash发送给Elasticsearch，然后进行后续的数据分析活动。&lt;br&gt;由于他们都是基于libbeat写出来的，提供了统一的数据发送方法，输入配置解析，日志记录框架等功能。所有的beat工具，在配置上基本相同，只是input输入的地方各有差异。&lt;br&gt;如果有其他特殊需求，可以使用Go语言借助libbeat库方便地开发自己的Beat工具，社区中有很多工具可以参考。&lt;/p&gt;
+&lt;h2 id=&quot;Logstash和Filebeat&quot;&gt;&lt;a href=&quot;#Logstash和Filebeat&quot; class=&quot;headerlink&quot; title=&quot;Logstash和Filebeat&quot;&gt;&lt;/a&gt;Logstash和Filebeat&lt;/h2&gt;&lt;p&gt;上一篇文章中介绍过，Logstash是跑在JVM上的，需要消耗较多的系统资源，而Filebeat则是一个轻量级的日志采集工具，占用资源更少。我们完全可以在每台机器上安装启动个Filebeat，由Filebeat来采集日志，将数据传输给Redis或者Kafka，然后logstash去获取，利用filter功能过滤分析，然后存储到elasticsearch中。架构图如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/8.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h2&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;安装软件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;hadoop16&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;172.16.206.16&lt;/td&gt;
+&lt;td&gt;elasticsearch-5.6.3.zip、kibana-5.6.3-linux-x86_64.tar.gz&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;spark32&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;172.16.206.32&lt;/td&gt;
+&lt;td&gt;logstash-5.6.3.tar.gz、filebeat-5.6.3-linux-x86_64.tar.gz、Nginx&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;osb30&lt;/td&gt;
+&lt;td&gt;Redhat 6.5&lt;/td&gt;
+&lt;td&gt;172.16.206.30&lt;/td&gt;
+&lt;td&gt;redis-3.2.2.tar.gz&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&quot;安装配置Redis&quot;&gt;&lt;a href=&quot;#安装配置Redis&quot; class=&quot;headerlink&quot; title=&quot;安装配置Redis&quot;&gt;&lt;/a&gt;安装配置Redis&lt;/h2&gt;&lt;h3 id=&quot;安装Redis&quot;&gt;&lt;a href=&quot;#安装Redis&quot; class=&quot;headerlink&quot; title=&quot;安装Redis&quot;&gt;&lt;/a&gt;安装Redis&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# yum install readline-devel pcre-devel openssl-devel -y
+# cd /usr/local/
+# tar zxf redis-3.2.2.tar.gz 
+# cd redis-3.2.2/
+# make
+# make install
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置Redis&quot;&gt;&lt;a href=&quot;#配置Redis&quot; class=&quot;headerlink&quot; title=&quot;配置Redis&quot;&gt;&lt;/a&gt;配置Redis&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# cd /usr/local/redis-3.2.2/
+# cp redis.conf /etc/
+# vim /etc/redis.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;1.打开/etc/redis.conf，将daemonize处修改为yes。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/9.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;2.配置Redis持久化策略&lt;br&gt;使用RDB和AOF双持久化策略：其中默认开启了RDB持久化，我们只需要开启AOF持久化。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/10.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;3.配置redis日志文件&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/11.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;4.配置数据文件存放路径，在/目录下面创建/RedisData目录&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# mkdir /RedisData
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;5.修改Redis监听地址&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/13.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;6.修改Redis监听端口&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/14.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;7.在redis3.2之后，redis增加了protected-mode，在这个模式下，即使注释掉了bind 127.0.0.1，再访问redis的时候还是报错，所以要如下设置&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/15.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;启动-停止Redis&quot;&gt;&lt;a href=&quot;#启动-停止Redis&quot; class=&quot;headerlink&quot; title=&quot;启动/停止Redis&quot;&gt;&lt;/a&gt;启动/停止Redis&lt;/h3&gt;&lt;p&gt;启动：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# /usr/local/bin/redis-server /etc/redis.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;停止：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# /usr/local/redis-3.2.2/src/redis-cli -p 6400 shutdown
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装配置Filebeat&quot;&gt;&lt;a href=&quot;#安装配置Filebeat&quot; class=&quot;headerlink&quot; title=&quot;安装配置Filebeat&quot;&gt;&lt;/a&gt;安装配置Filebeat&lt;/h2&gt;&lt;p&gt;filebeat的工作流程：当开启filebeat程序的时候，它会启动一个或多个探测器（prospectors）去检测指定的日志目录或文件，对于探测器找出的每一个日志文件，filebeat启动收割进程（harvester），每一个收割进程读取一个日志文件的新内容，并发送这些新的日志数据到处理程序（spooler），处理程序会集合这些事件，最后filebeat会发送集合的数据到你指定的地点（Elasticsearch、Logstash、Kafka或者Redis）。&lt;/p&gt;
+&lt;h3 id=&quot;安装Filebeat&quot;&gt;&lt;a href=&quot;#安装Filebeat&quot; class=&quot;headerlink&quot; title=&quot;安装Filebeat&quot;&gt;&lt;/a&gt;安装Filebeat&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@spark32 opt]# wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-5.6.3-linux-x86_64.tar.gz
+[root@spark32 opt]# ln -sv filebeat-5.6.3-linux-x86_64 filebeat
+‘filebeat’ -&amp;gt; ‘filebeat-5.6.3-linux-x86_64’
+[root@spark32 opt]# cd filebeat
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置Filebeat&quot;&gt;&lt;a href=&quot;#配置Filebeat&quot; class=&quot;headerlink&quot; title=&quot;配置Filebeat&quot;&gt;&lt;/a&gt;配置Filebeat&lt;/h3&gt;&lt;p&gt;1.定义你的日志文件的路径（一个或多个）&lt;br&gt;对于大多数的基本filebeat配置，可以定义一个单一探测器针对一个单一的路径，例如：&lt;br&gt;filebeat.prospectors:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;- input_type: log
+  paths:
+    - /usr/local/openresty/nginx/logs/host.access.log
+  #json.keys_under_root: true 若收取日志格式为json的log，请开启此配置
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.定义输出日志，我这里输出到redis中&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;output.redis:
+  hosts: [&amp;quot;172.16.206.30:6400&amp;quot;]
+  #password: &amp;quot;my_password&amp;quot;
+  key: &amp;quot;filebeat&amp;quot;
+  db: 0
+  timeout: 5
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;启动Filebeat&quot;&gt;&lt;a href=&quot;#启动Filebeat&quot; class=&quot;headerlink&quot; title=&quot;启动Filebeat&quot;&gt;&lt;/a&gt;启动Filebeat&lt;/h3&gt;&lt;p&gt;测试配置文件语法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /opt/filebeat/
+# ./filebeat -configtest -e
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# ./filebeat &amp;amp;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看数据是否进入redis：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@osb30 src]# ./redis-cli -p 6400 
+127.0.0.1:6400&amp;gt; help @LIST
+127.0.0.1:6400&amp;gt; LLEN filebeat
+(integer) 15
+127.0.0.1:6400&amp;gt; LINDEX filebeat 1
+&amp;quot;{\&amp;quot;@timestamp\&amp;quot;:\&amp;quot;2017-10-23T07:13:37.551Z\&amp;quot;,\&amp;quot;beat\&amp;quot;:{\&amp;quot;hostname\&amp;quot;:\&amp;quot;spark32\&amp;quot;,\&amp;quot;name\&amp;quot;:\&amp;quot;spark32\&amp;quot;,\&amp;quot;version\&amp;quot;:\&amp;quot;5.6.3\&amp;quot;},\&amp;quot;input_type\&amp;quot;:\&amp;quot;log\&amp;quot;,\&amp;quot;message\&amp;quot;:\&amp;quot;172.16.4.81 - - [19/Oct/2017:09:47:17 +0800] \\\&amp;quot;GET /favicon.ico HTTP/1.1\\\&amp;quot; 404 576 \\\&amp;quot;http://172.16.206.32:808/\\\&amp;quot; \\\&amp;quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36\\\&amp;quot; \\\&amp;quot;-\\\&amp;quot;\&amp;quot;,\&amp;quot;offset\&amp;quot;:439,\&amp;quot;source\&amp;quot;:\&amp;quot;/usr/local/openresty/nginx/logs/host.access.log\&amp;quot;,\&amp;quot;type\&amp;quot;:\&amp;quot;log\&amp;quot;}&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;浏览器访问下nginx，再次查看redis数据：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;127.0.0.1:6400&amp;gt; LLEN filebeat
+(integer) 16
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装配置Elasticsearch&quot;&gt;&lt;a href=&quot;#安装配置Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;安装配置Elasticsearch&quot;&gt;&lt;/a&gt;安装配置Elasticsearch&lt;/h2&gt;&lt;p&gt;关于Elasticsearch的安装部署详见上一篇博客&lt;a href=&quot;http://jkzhao.github.io/2017/10/20/ELK%E5%AE%9E%E6%88%98/#more&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;《ELK实战》&lt;/a&gt;。&lt;/p&gt;
+&lt;h2 id=&quot;安装配置Logstash&quot;&gt;&lt;a href=&quot;#安装配置Logstash&quot; class=&quot;headerlink&quot; title=&quot;安装配置Logstash&quot;&gt;&lt;/a&gt;安装配置Logstash&lt;/h2&gt;&lt;p&gt;Logstash从redis中取数据，输出结果到Elasticsearch中。关于Logstash的安装部署详见上一篇博客&lt;a href=&quot;http://jkzhao.github.io/2017/10/20/ELK%E5%AE%9E%E6%88%98/#more&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;《ELK实战》&lt;/a&gt;。&lt;/p&gt;
+&lt;h3 id=&quot;配置Logstash&quot;&gt;&lt;a href=&quot;#配置Logstash&quot; class=&quot;headerlink&quot; title=&quot;配置Logstash&quot;&gt;&lt;/a&gt;配置Logstash&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# cd /opt/logstash-5.6.3/conf
+# vim logstash_redis.conf
+input {
+  redis {
+    host  =&amp;gt;  &amp;quot;172.16.206.30&amp;quot;
+    port  =&amp;gt;  &amp;quot;6400&amp;quot;
+    data_type  =&amp;gt;  &amp;quot;list&amp;quot;
+    key  =&amp;gt;  &amp;quot;filebeat&amp;quot;
+  }
+}
+
+filter {
+  grok {
+    match =&amp;gt; { &amp;quot;message&amp;quot; =&amp;gt; &amp;quot;%{NGINXACCESS}&amp;quot; }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts    =&amp;gt;  [&amp;quot;172.16.206.16:9200&amp;quot;]
+    action   =&amp;gt;  &amp;quot;index&amp;quot;
+    index    =&amp;gt;  &amp;quot;filebeat-%{+YYYY.MM.dd}&amp;quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;启动Logstash&quot;&gt;&lt;a href=&quot;#启动Logstash&quot; class=&quot;headerlink&quot; title=&quot;启动Logstash&quot;&gt;&lt;/a&gt;启动Logstash&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@spark32 logstash-5.6.3]# bin/logstash -f /opt/logstash-5.6.3/conf/logstash_redis.conf &amp;amp;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看redis中的数据，发现已经全部被消费了：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;127.0.0.1:6400&amp;gt; LLEN filebeat
+(integer) 0
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看Elasticsearch中的索引：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# curl -XGET &amp;apos;172.16.206.16:9200/_cat/indices&amp;apos;
+yellow open filebeat-2017.10.23 PQe6qyVfSSG7GHQJUOPWtA 5 1 18 0 92.8kb 92.8kb
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装配置Kibana&quot;&gt;&lt;a href=&quot;#安装配置Kibana&quot; class=&quot;headerlink&quot; title=&quot;安装配置Kibana&quot;&gt;&lt;/a&gt;安装配置Kibana&lt;/h2&gt;&lt;p&gt;关于Kibana的安装部署详见上一篇博客&lt;a href=&quot;http://jkzhao.github.io/2017/10/20/ELK%E5%AE%9E%E6%88%98/#more&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;《ELK实战》&lt;/a&gt;。&lt;br&gt;浏览器访问：&lt;a href=&quot;http://172.16.206.16:5601/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.16:5601/&lt;/a&gt;&lt;br&gt;1.左侧菜单点击“Management”，点击“Index Patterns”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/16.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;2.点击“Create Index Pattern”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/17.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;3.输入索引名字，点击“Create”&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/18.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;4.点击Discover，选择上一步创建的索引。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/19.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Beats工具&quot;&gt;&lt;a href=&quot;#Beats工具&quot; class=&quot;headerlink&quot; title=&quot;Beats工具&quot;&gt;&lt;/a&gt;Beats工具&lt;/h2&gt;&lt;p&gt;Beats是elastic公司的一款轻量级数据采集产品，它是从packetbeat发展出来的数据收集器系统，它包含了几个子产品：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Packetbeat(用于监控网络流量)&lt;/li&gt;
+&lt;li&gt;Filebeat(用于监听日志数据)
+    
+    </summary>
+    
+      <category term="日志" scheme="http://yoursite.com/categories/%E6%97%A5%E5%BF%97/"/>
+    
+    
+      <category term="日志 ELK" scheme="http://yoursite.com/tags/%E6%97%A5%E5%BF%97-ELK/"/>
+    
+  </entry>
+  
+  <entry>
     <title>ELK实战</title>
     <link href="http://yoursite.com/2017/10/20/ELK%E5%AE%9E%E6%88%98/"/>
     <id>http://yoursite.com/2017/10/20/ELK实战/</id>
     <published>2017-10-20T01:33:57.000Z</published>
-    <updated>2017-10-20T14:23:42.000Z</updated>
+    <updated>2017-10-23T01:35:46.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;ELK介绍&quot;&gt;&lt;a href=&quot;#ELK介绍&quot; class=&quot;headerlink&quot; title=&quot;ELK介绍&quot;&gt;&lt;/a&gt;ELK介绍&lt;/h2&gt;&lt;p&gt;ELK由Elasticsearch、Logstash和Kibana三部分组件组成。&lt;/p&gt;
 &lt;ul&gt;
@@ -123,14 +276,18 @@ es               -       nofile          65536
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;改完后，重启elasticsearch。&lt;br&gt;如果需要需改JVM大小，请修改 jvm.options 配置文件。&lt;/p&gt;
 &lt;h3 id=&quot;启动Elasticsearch&quot;&gt;&lt;a href=&quot;#启动Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;启动Elasticsearch&quot;&gt;&lt;/a&gt;启动Elasticsearch&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop16 opt]# su - es
 [es@hadoop16 ~]$ /opt/elasticsearch-5.6.3/bin/elasticsearch -d
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;检验bootstrap.mlockall: true是否生效：&lt;br&gt;curl &lt;a href=&quot;http://172.16.206.16:9200/_nodes/process?pretty&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.16:9200/_nodes/process?pretty&lt;/a&gt;&lt;br&gt;关注这个这个请求返回数据中的mlockall的值，如果为false，则说明锁定内存失败，这可能由于运行elasticsearch的用户不具备这样的权限。解决该问题的方法是：&lt;br&gt;在运行elasticsearch之前，以root身份执行&lt;br&gt;ulimit -l unlimited&lt;br&gt;然后再次重启elasticsearch。并查看上面的请求中的mlockall的值是否为true。&lt;br&gt;【注意】:这时候需要在root执行ulimit -l unlimited的shell终端上su - es，然后重启elasticsearch。因为这是命令行设置的ulimit -l unlimited，只对当前会话生效。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;检验bootstrap.mlockall: true是否生效：&lt;br&gt;curl &lt;a href=&quot;http://172.16.206.16:9200/_nodes/process?pretty&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.16:9200/_nodes/process?pretty&lt;/a&gt;&lt;br&gt;关注这个这个请求返回数据中的mlockall的值，如果为false，则说明锁定内存失败，这可能由于运行elasticsearch的用户不具备这样的权限。解决该问题的方法是：&lt;br&gt;在运行elasticsearch之前，以root身份执行&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;ulimit -l unlimited
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后再次重启elasticsearch。并查看上面的请求中的mlockall的值是否为true。&lt;br&gt;【注意】:这时候需要在root执行ulimit -l unlimited的shell终端上su - es，然后重启elasticsearch。因为这是命令行设置的ulimit -l unlimited，只对当前会话生效。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# ulimit -l unlimited
 # su - es
 $ ps -ef|grep elasticsearch
 $ kill -9 27189
 $ /usr/local/elasticsearch/bin/elasticsearch -d
 $ curl http://172.16.206.16:9200/_nodes/process?pretty
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;要想永久修改锁定内存大小无限制，需修改/etc/security/limits.conf，添加下面的内容，改完不需要重启系统，但是需要重新打开一个shell建立会话。&lt;br&gt;es - memlock -1&lt;br&gt;其中，es代表运行elasticsearch的用户，-表示同时设置了soft和hard，memlock代表设置的是”锁定内存”这个类型，-1(unlimited或者infinity)代表没限制。&lt;br&gt;【补充】: 要使 /etc/security/limits.conf 文件配置生效，必须要确保 pam_limits.so 文件被加入到相关的启动文件中，启动文件位于/etc/pam.d路径下，如该路径下sshd、login、system-auth等，一般是system-auth文件负责加载该so文件。只要加载了pam_limits.so，则配置就会生效，无需重启系统。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;要想永久修改锁定内存大小无限制，需修改/etc/security/limits.conf，添加下面的内容，改完不需要重启系统，但是需要重新打开一个shell建立会话。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;es - memlock -1
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中，es代表运行elasticsearch的用户，-表示同时设置了soft和hard，memlock代表设置的是”锁定内存”这个类型，-1(unlimited或者infinity)代表没限制。&lt;br&gt;【补充】: 要使 /etc/security/limits.conf 文件配置生效，必须要确保 pam_limits.so 文件被加入到相关的启动文件中，启动文件位于/etc/pam.d路径下，如该路径下sshd、login、system-auth等，一般是system-auth文件负责加载该so文件。只要加载了pam_limits.so，则配置就会生效，无需重启系统。&lt;/p&gt;
 &lt;h3 id=&quot;安装配置head插件&quot;&gt;&lt;a href=&quot;#安装配置head插件&quot; class=&quot;headerlink&quot; title=&quot;安装配置head插件&quot;&gt;&lt;/a&gt;安装配置head插件&lt;/h3&gt;&lt;p&gt;项目地址：&lt;a href=&quot;https://github.com/mobz/elasticsearch-head&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/mobz/elasticsearch-head&lt;/a&gt;&lt;/p&gt;
 &lt;h4 id=&quot;安装head插件&quot;&gt;&lt;a href=&quot;#安装head插件&quot; class=&quot;headerlink&quot; title=&quot;安装head插件&quot;&gt;&lt;/a&gt;安装head插件&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop16 opt]# git clone git://github.com/mobz/elasticsearch-head.git
 [root@hadoop16 opt]# yum -y install epel-release
@@ -140,8 +297,8 @@ $ curl http://172.16.206.16:9200/_nodes/process?pretty
 npm: relocation error: npm: symbol SSL_set_cert_cb, version libssl.so.10 not defined in file libssl.so.10 with link time reference
 [root@hadoop16 elasticsearch-head]# yum update openssl -y
 [root@hadoop16 elasticsearch-head]# npm install 
- # 如果下载速度太慢，可以如下方式安装
- [root@hadoop16 elasticsearch-head]# npm install -gd express --registry=http://registry.npm.taobao.org
+# 如果下载速度太慢，可以如下方式安装
+[root@hadoop16 elasticsearch-head]# npm install -gd express --registry=http://registry.npm.taobao.org
 # 为了避免每次安装都需要--registry参数，可以使用如下命令进行永久设置：
 [root@hadoop16 elasticsearch-head]# npm config set registry http://registry.npm.taobao.org 
 [root@hadoop16 elasticsearch-head]# npm install grunt --save-dev
@@ -153,7 +310,7 @@ npm: relocation error: npm: symbol SSL_set_cert_cb, version libssl.so.10 not def
 [root@hadoop16 elasticsearch-head]# npm install grunt-contrib-jasmine 
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;奇怪的是最后一个没有安装成功，是因为该模块依赖了phantomjs。但是配置之后，依然无法安装。直接启动就可以了：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@hadoop16 elasticsearch-head]# grunt server 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;以后安装head插件的步骤太过复杂，我们可以将下载下来的elasticsearch-head包放入tomcat中，直接启动tomcat就可以访问head插件了。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;以上安装head插件的步骤太过复杂，我们可以将下载下来的elasticsearch-head包放入tomcat中，直接启动tomcat就可以访问head插件了。本实验环境下是采用将head插件放入tomcat中运行。&lt;/p&gt;
 &lt;h4 id=&quot;配置&quot;&gt;&lt;a href=&quot;#配置&quot; class=&quot;headerlink&quot; title=&quot;配置&quot;&gt;&lt;/a&gt;配置&lt;/h4&gt;&lt;p&gt;1.修改Elasticsearch的配置文件elasticsearch.yml，增加跨域的配置(需要重启es才能生效)&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;http.cors.enabled: true
 http.cors.allow-origin: &amp;quot;*&amp;quot;
@@ -193,8 +350,9 @@ connect: {
 this.base_uri = this.config.base_uri || this.prefs.get(&amp;quot;app-base_uri&amp;quot;) || &amp;quot;http://localhost:9200&amp;quot;;
 # 将localhost修改为ES的IP地址
 this.base_uri = this.config.base_uri || this.prefs.get(&amp;quot;app-base_uri&amp;quot;) || &amp;quot;http://YOUR-ES-IP:9200&amp;quot;;
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;启动&quot;&gt;&lt;a href=&quot;#启动&quot; class=&quot;headerlink&quot; title=&quot;启动&quot;&gt;&lt;/a&gt;启动&lt;/h4&gt;&lt;p&gt;[root@hadoop16 elasticsearch-head]# cd /opt/apache-tomcat-8.5.23/&lt;br&gt;[root@hadoop16 apache-tomcat-8.5.23]# bin/startup.sh &lt;/p&gt;
-&lt;h2 id=&quot;Logstash-1&quot;&gt;&lt;a href=&quot;#Logstash-1&quot; class=&quot;headerlink&quot; title=&quot;Logstash&quot;&gt;&lt;/a&gt;Logstash&lt;/h2&gt;&lt;h3 id=&quot;安装JDK8-1&quot;&gt;&lt;a href=&quot;#安装JDK8-1&quot; class=&quot;headerlink&quot; title=&quot;安装JDK8&quot;&gt;&lt;/a&gt;安装JDK8&lt;/h3&gt;&lt;p&gt;Logstash是jruby研发的，需要跑在JVM上，所以需要安装JDK。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;启动&quot;&gt;&lt;a href=&quot;#启动&quot; class=&quot;headerlink&quot; title=&quot;启动&quot;&gt;&lt;/a&gt;启动&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop16 elasticsearch-head]# cd /opt/apache-tomcat-8.5.23/
+[root@hadoop16 apache-tomcat-8.5.23]# bin/startup.sh 
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;Logstash-1&quot;&gt;&lt;a href=&quot;#Logstash-1&quot; class=&quot;headerlink&quot; title=&quot;Logstash&quot;&gt;&lt;/a&gt;Logstash&lt;/h2&gt;&lt;h3 id=&quot;安装JDK8-1&quot;&gt;&lt;a href=&quot;#安装JDK8-1&quot; class=&quot;headerlink&quot; title=&quot;安装JDK8&quot;&gt;&lt;/a&gt;安装JDK8&lt;/h3&gt;&lt;p&gt;Logstash是jruby研发的，需要跑在JVM上，所以需要安装JDK。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
 # vim /etc/profile
 export JAVA_HOME=/usr/java/jdk1.8.0_73
@@ -4091,7 +4249,7 @@ test2.txt
     <link href="http://yoursite.com/2017/08/16/Docker%E9%95%9C%E5%83%8F%E5%92%8C%E5%AE%B9%E5%99%A8/"/>
     <id>http://yoursite.com/2017/08/16/Docker镜像和容器/</id>
     <published>2017-08-16T01:03:56.000Z</published>
-    <updated>2017-09-12T07:59:45.000Z</updated>
+    <updated>2017-10-24T02:06:10.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;安装Docker&quot;&gt;&lt;a href=&quot;#安装Docker&quot; class=&quot;headerlink&quot; title=&quot;安装Docker&quot;&gt;&lt;/a&gt;安装Docker&lt;/h2&gt;&lt;p&gt;Docker 对 Linux 内核版本的最低要求是3.10，如果内核版本低于 3.10 会缺少一些运行 Docker 容器的功能。这些比较旧的内核，在一定条件下会导致数据丢失和频繁恐慌错误。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;CentOS 6：&lt;br&gt;操作系统需要升级下内核，升级内核后安装Docker：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# yum install -y docker-io
@@ -4110,13 +4268,13 @@ test2.txt
 &lt;/ul&gt;
 &lt;p&gt;&lt;strong&gt;1.获取镜像&lt;/strong&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# docker pull centos
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;默认是去 docker.io/library/centos 仓库中拉取centos镜像，镜像资源都在国外，所以在国内要获取docker镜像，速度有时会很慢。为了快速访问 Docker 官方镜像都会配置三方加速器，目前常用三方加速器有：网易、USTC、DaoCloud、阿里云。&lt;br&gt;现在 Docker 官方针对中国区推出了镜像加速服务。通过 Docker 官方镜像加速，国内用户能够以更快的下载速度和更强的稳定性访问最流行的 Docker 镜像。&lt;br&gt;Docker 中国官方镜像加速可通过 registry.docker-cn.com 访问。目前该镜像库只包含流行的公有镜像，而私有镜像仍需要从美国镜像库中拉取。&lt;br&gt;可以使用以下命令直接从该镜像加速地址进行拉取&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ docker pull registry.docker-cn.com/myname/myrepo:mytag
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;默认是去 docker.io/library/centos 仓库中拉取centos镜像，镜像资源都在国外，所以在国内要获取docker镜像，速度有时会很慢。为了快速访问 Docker 官方镜像都会配置三方加速器，目前常用三方加速器有：网易、USTC、DaoCloud、阿里云。&lt;br&gt;现在 Docker 官方针对中国区推出了镜像加速服务。通过 Docker 官方镜像加速，国内用户能够以更快的下载速度和更强的稳定性访问最流行的 Docker 镜像。&lt;br&gt;Docker 中国官方镜像加速可通过 registry.docker-cn.com 访问。目前该镜像库只包含流行的公有镜像，而私有镜像仍需要从美国镜像库中拉取。&lt;br&gt;可以使用以下命令直接从该镜像加速地址进行拉取：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# docker pull registry.docker-cn.com/myname/myrepo:mytag
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;例如:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# docker pull registry.docker-cn.com/library/centos:latest
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;注意: 除非修改了 Docker 守护进程的 –registry-mirror 参数 , 否则您将需要完整地指定官方镜像的名称。例如，library/ubuntu、library/redis、library/nginx。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;给Docker守护进程配置加速器&lt;/strong&gt;&lt;br&gt;如果要配置 Docker 守护进程默认使用 Docker 官方镜像加速。您可以在 Docker 守护进程启动时配置 –registry-mirror参数。&lt;br&gt;（1）通过命令行启动Docker&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ docker --registry-mirror=https://registry.docker-cn.com daemon
+&lt;pre&gt;&lt;code&gt;# docker --registry-mirror=https://registry.docker-cn.com daemon
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;（2）通过配置文件启动Docker&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;Docker版本在 1.12 或更高&lt;br&gt;修改 /etc/docker/daemon.json 文件并添加上 registry-mirrors 键值。&lt;/p&gt;
@@ -4216,11 +4374,11 @@ fb316d4c0719        centos              &amp;quot;/bin/bash&amp;quot;           
 &lt;h4 id=&quot;方式一&quot;&gt;&lt;a href=&quot;#方式一&quot; class=&quot;headerlink&quot; title=&quot;方式一&quot;&gt;&lt;/a&gt;方式一&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# docker run -i -t IMAGE /bin/bash
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Ctrl+P Ctrl +Q退出交互式容器的bash，这样容器就会在后台运行&lt;/p&gt;
 &lt;h4 id=&quot;方式二&quot;&gt;&lt;a href=&quot;#方式二&quot; class=&quot;headerlink&quot; title=&quot;方式二&quot;&gt;&lt;/a&gt;方式二&lt;/h4&gt;&lt;p&gt;docker run -d 镜像名 [COMMAND] [ARG…]&lt;br&gt;     -d 启动容器时用后台的方式&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -d -i -t --name=test2 centos /bin/bash -c &amp;quot;while true; do echo hello world; sleep 5; done&amp;quot;
+&lt;pre&gt;&lt;code&gt;    [root@node1 ~]# docker run -d -i -t --name=test2 centos /bin/bash -c &amp;quot;while true; do echo hello world; sleep 5; done&amp;quot;
 6678e5462d023e2ecc90f5bac887326b0b10ed034e51884176028ddcee24d249
-[root@node1 ~]# docker ps
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
-6678e5462d02        centos              &amp;quot;/bin/bash -c &amp;apos;while &amp;quot;   5 seconds ago       Up 4 seconds                            test2
+    [root@node1 ~]# docker ps
+    CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+    6678e5462d02        centos              &amp;quot;/bin/bash -c &amp;apos;while &amp;quot;   5 seconds ago       Up 4 seconds                            test2
 &lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;进入容器&quot;&gt;&lt;a href=&quot;#进入容器&quot; class=&quot;headerlink&quot; title=&quot;进入容器&quot;&gt;&lt;/a&gt;进入容器&lt;/h4&gt;&lt;p&gt;docker attach 容器名  &lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
@@ -4261,16 +4419,16 @@ You will enter the docker containter: d985fe8622f7.
 &lt;ul&gt;
 &lt;li&gt;-f –follows=true|false  默认是false    一直跟踪日志的变化，并返回结果&lt;/li&gt;
 &lt;li&gt;-t –timestamps=true|false  默认是false  在返回的结果上加上时间戳&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;–tail=”all”  返回结尾处多少数量的日志&lt;br&gt;如果不指定，logs将会返回所有的日志&lt;/p&gt;
+&lt;li&gt;–tail=”all”  返回结尾处多少数量的日志&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如果不指定，logs将会返回所有的日志&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 d985fe8622f7        centos              &amp;quot;/bin/bash&amp;quot;         3 hours ago         Up 4 minutes                            test
 [root@node1 ~]# docker logs -tf d985fe8622f7
 2017-08-17T03:50:39.127155000Z [root@d985fe8622f7 /]# exit
 2017-08-17T03:50:39.127493000Z exit
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;查看容器内的进程&quot;&gt;&lt;a href=&quot;#查看容器内的进程&quot; class=&quot;headerlink&quot; title=&quot;查看容器内的进程&quot;&gt;&lt;/a&gt;查看容器内的进程&lt;/h3&gt;&lt;p&gt;docker top 容器名&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;查看容器内的进程&quot;&gt;&lt;a href=&quot;#查看容器内的进程&quot; class=&quot;headerlink&quot; title=&quot;查看容器内的进程&quot;&gt;&lt;/a&gt;查看容器内的进程&lt;/h3&gt;&lt;p&gt;docker top 容器名&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker top d985fe8622f7
 UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD
 root                14526               14506               0                   03:12               pts/1               00:00:00            /bin/bash
@@ -4600,604 +4758,6 @@ export PATH=$SPARK_HOME/bin:$PATH
     
     
       <category term="大数据 实时处理 Spark" scheme="http://yoursite.com/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE-%E5%AE%9E%E6%97%B6%E5%A4%84%E7%90%86-Spark/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Ansible实战：部署分布式日志系统</title>
-    <link href="http://yoursite.com/2017/07/27/Ansible%E5%AE%9E%E6%88%98%EF%BC%9A%E9%83%A8%E7%BD%B2%E5%88%86%E5%B8%83%E5%BC%8F%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/"/>
-    <id>http://yoursite.com/2017/07/27/Ansible实战：部署分布式日志系统/</id>
-    <published>2017-07-27T12:30:05.000Z</published>
-    <updated>2017-10-16T12:47:03.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;分布式日志系统架构图&quot;&gt;&lt;a href=&quot;#分布式日志系统架构图&quot; class=&quot;headerlink&quot; title=&quot;分布式日志系统架构图&quot;&gt;&lt;/a&gt;分布式日志系统架构图&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/48.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;创建和使用roles&quot;&gt;&lt;a href=&quot;#创建和使用roles&quot; class=&quot;headerlink&quot; title=&quot;创建和使用roles&quot;&gt;&lt;/a&gt;创建和使用roles&lt;/h2&gt;&lt;p&gt;每一个软件或集群都创建一个单独的角色。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# mkdir -pv ansible_playbooks/roles/{db_server,web_server,redis_server,zk_server,kafka_server,es_server,tomcat_server,flume_agent,hadoop,spark,hbase,hive,jdk7,jdk8}/{tasks,files,templates,meta,handlers,vars} 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/49.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;JDK7-role&quot;&gt;&lt;a href=&quot;#JDK7-role&quot; class=&quot;headerlink&quot; title=&quot;JDK7 role&quot;&gt;&lt;/a&gt;JDK7 role&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 jdk7]# pwd
-/root/ansible_playbooks/roles/jdk7
-[root@node1 jdk7]# ls
-files  handlers  meta  tasks  templates  vars
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;上传安装包&quot;&gt;&lt;a href=&quot;#上传安装包&quot; class=&quot;headerlink&quot; title=&quot;上传安装包&quot;&gt;&lt;/a&gt;上传安装包&lt;/h4&gt;&lt;p&gt;将jdk-7u80-linux-x64.gz上传到files目录下。&lt;/p&gt;
-&lt;h4 id=&quot;编写tasks&quot;&gt;&lt;a href=&quot;#编写tasks&quot; class=&quot;headerlink&quot; title=&quot;编写tasks&quot;&gt;&lt;/a&gt;编写tasks&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 jdk7]# vim tasks/main.yml 
-- name: mkdir necessary catalog                                                                                                               
-  file: path=/usr/java state=directory mode=0755
-- name: copy and unzip jdk 
-  unarchive: src={{jdk_package_name}} dest=/usr/java/
-- name: set env 
-  lineinfile: dest={{env_file}} insertafter=&amp;quot;{{item.position}}&amp;quot; line=&amp;quot;{{item.value}}&amp;quot; state=present
-  with_items:
-  - {position: EOF, value: &amp;quot;\n&amp;quot;}
-  - {position: EOF, value: &amp;quot;export JAVA_HOME=/usr/java/{{jdk_version}}&amp;quot;}
-  - {position: EOF, value: &amp;quot;export PATH=$JAVA_HOME/bin:$PATH&amp;quot;}
-  - {position: EOF, value: &amp;quot;export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar&amp;quot;}
-- name: enforce env 
-  shell: source {{env_file}}
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写vars&quot;&gt;&lt;a href=&quot;#编写vars&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 jdk7]# vim vars/main.yml 
-jdk_package_name: jdk-7u80-linux-x64.gz                                                                                                       
-env_file: /etc/profile
-jdk_version: jdk1.7.0_80
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;使用角色&quot;&gt;&lt;a href=&quot;#使用角色&quot; class=&quot;headerlink&quot; title=&quot;使用角色&quot;&gt;&lt;/a&gt;使用角色&lt;/h4&gt;&lt;p&gt;在roles同级目录，创建一个jdk.yml文件，里面定义好你的playbook。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim jdk.yml 
-- hosts: jdk
-  remote_user: root
-  roles:
-  - jdk7
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行playbook安装JDK7：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# ansible-playbook jdk.yml 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;使用jdk7 role可以需要根据实际环境修改vars/main.yml里的变量以及/etc/ansible/hosts文件里定义的主机。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;JDK8-role&quot;&gt;&lt;a href=&quot;#JDK8-role&quot; class=&quot;headerlink&quot; title=&quot;JDK8 role&quot;&gt;&lt;/a&gt;JDK8 role&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 jdk8]# pwd
-/root/ansible_playbooks/roles/jdk8
-[root@node1 jdk8]# ls
-files  handlers  meta  tasks  templates  vars
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;上传安装包-1&quot;&gt;&lt;a href=&quot;#上传安装包-1&quot; class=&quot;headerlink&quot; title=&quot;上传安装包&quot;&gt;&lt;/a&gt;上传安装包&lt;/h4&gt;&lt;p&gt;将jdk-8u73-linux-x64.gz上传到files目录下。&lt;/p&gt;
-&lt;h4 id=&quot;编写tasks-1&quot;&gt;&lt;a href=&quot;#编写tasks-1&quot; class=&quot;headerlink&quot; title=&quot;编写tasks&quot;&gt;&lt;/a&gt;编写tasks&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 jdk8]# vim tasks/main.yml 
-- name: mkdir necessary catalog                                                                                                               
-  file: path=/usr/java state=directory mode=0755
-- name: copy and unzip jdk 
-  unarchive: src={{jdk_package_name}} dest=/usr/java/
-- name: set env 
-  lineinfile: dest={{env_file}} insertafter=&amp;quot;{{item.position}}&amp;quot; line=&amp;quot;{{item.value}}&amp;quot; state=present
-  with_items:
-  - {position: EOF, value: &amp;quot;\n&amp;quot;}
-  - {position: EOF, value: &amp;quot;export JAVA_HOME=/usr/java/{{jdk_version}}&amp;quot;}
-  - {position: EOF, value: &amp;quot;export PATH=$JAVA_HOME/bin:$PATH&amp;quot;}
-  - {position: EOF, value: &amp;quot;export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar&amp;quot;}
-- name: enforce env 
-  shell: source {{env_file}}
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写vars-1&quot;&gt;&lt;a href=&quot;#编写vars-1&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 jdk8]# vim vars/main.yml 
-jdk_package_name: jdk-8u73-linux-x64.gz                                                                                                       
-env_file: /etc/profile
-jdk_version: jdk1.8.0_73
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;使用角色-1&quot;&gt;&lt;a href=&quot;#使用角色-1&quot; class=&quot;headerlink&quot; title=&quot;使用角色&quot;&gt;&lt;/a&gt;使用角色&lt;/h4&gt;&lt;p&gt;在roles同级目录，创建一个jdk.yml文件，里面定义好你的playbook。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim jdk.yml 
-- hosts: jdk
-  remote_user: root
-  roles:
-  - jdk8
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行playbook安装JDK8：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# ansible-playbook jdk.yml 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;使用jdk8 role可以需要根据实际环境修改vars/main.yml里的变量以及/etc/ansible/hosts文件里定义的主机。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;Zookeeper-role&quot;&gt;&lt;a href=&quot;#Zookeeper-role&quot; class=&quot;headerlink&quot; title=&quot;Zookeeper role&quot;&gt;&lt;/a&gt;Zookeeper role&lt;/h3&gt;&lt;p&gt;Zookeeper集群节点配置好/etc/hosts文件，配置集群各节点主机名和ip地址的对应关系。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 zk_server]# pwd
-/root/ansible_playbooks/roles/zk_server
-[root@node1 zk_server]# ls
-files  handlers  meta  tasks  templates  vars
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;上传安装包-2&quot;&gt;&lt;a href=&quot;#上传安装包-2&quot; class=&quot;headerlink&quot; title=&quot;上传安装包&quot;&gt;&lt;/a&gt;上传安装包&lt;/h4&gt;&lt;p&gt;将zookeeper-3.4.6.tar.gz和clean_zklog.sh上传到files目录。clean_zklog.sh是清理Zookeeper日志的脚本。&lt;/p&gt;
-&lt;h4 id=&quot;编写tasks-2&quot;&gt;&lt;a href=&quot;#编写tasks-2&quot; class=&quot;headerlink&quot; title=&quot;编写tasks&quot;&gt;&lt;/a&gt;编写tasks&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 zk_server]# vim tasks/main.yml 
-- name: install zookeeper                                                                                                                     
-  unarchive: src=zookeeper-3.4.6.tar.gz dest=/usr/local/
-- name: install configuration file for zookeeper
-  template: src=zoo.cfg.j2 dest=/usr/local/zookeeper-3.4.6/conf/zoo.cfg
-- name: add myid file
-  shell: echo {{ myid }} &amp;gt; /usr/local/zookeeper-3.4.6/dataDir/myid
-- name: copy script to clear zookeeper logs.
-  copy: src=clean_zklog.sh dest=/usr/local/zookeeper-3.4.6/clean_zklog.sh mode=755
-- name: crontab task
-  cron: name=&amp;quot;clear zk logs&amp;quot; weekday=&amp;quot;0&amp;quot; hour=&amp;quot;0&amp;quot; minute=&amp;quot;0&amp;quot; job=&amp;quot;/usr/local/zookeeper-3.4.6/clean_zklog.sh&amp;quot;
-- name: start zookeeper
-  shell: /usr/local/zookeeper-3.4.6/bin/zkServer.sh start
-  tags:
-  - start
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates&quot;&gt;&lt;a href=&quot;#编写templates&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;p&gt;将zookeeper-3.4.6.tar.gz包中的默认配置文件重命名为zoo.cfg.j2，并修改其中的内容。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim roles/zk_server/templates/zoo.cfg.j2
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;配置文件内容过多，具体见github，地址是&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。配置文件内容也不在解释，在前面博客中的文章中都已写明。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。配置文件内容也不在解释，在前面博客中的文章中都已写明。&lt;/a&gt;&lt;/p&gt;
-&lt;h4 id=&quot;编写vars-2&quot;&gt;&lt;a href=&quot;#编写vars-2&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 zk_server]# vim vars/main.yml 
-server1_hostname: hadoop27                                                                                                                    
-server2_hostname: hadoop28
-server3_hostname: hadoop29
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;另外在tasks中还使用了个变量，该变量每台主机的值是不一样的，所以定义在了/etc/ansible/hosts文件中:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[zk_servers]
-172.16.206.27 myid=1
-172.16.206.28 myid=2
-172.16.206.29 myid=3
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;设置主机组&quot;&gt;&lt;a href=&quot;#设置主机组&quot; class=&quot;headerlink&quot; title=&quot;设置主机组&quot;&gt;&lt;/a&gt;设置主机组&lt;/h4&gt;&lt;p&gt;/etc/ansible/hosts文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[zk_servers]
-172.16.206.27 myid=1
-172.16.206.28 myid=2
-172.16.206.29 myid=3
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;使用角色-2&quot;&gt;&lt;a href=&quot;#使用角色-2&quot; class=&quot;headerlink&quot; title=&quot;使用角色&quot;&gt;&lt;/a&gt;使用角色&lt;/h4&gt;&lt;p&gt;在roles同级目录，创建一个zk.yml文件，里面定义好你的playbook。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim zk.yml 
-- hosts: zk_servers
-  remote_user: root
-  roles:
-  - zk_server
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行playbook安装Zookeeper集群：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# ansible-playbook zk.yml 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;使用zk_server role需要根据实际环境修改vars/main.yml里的变量以及/etc/ansible/hosts文件里定义的主机。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;Kafka-role&quot;&gt;&lt;a href=&quot;#Kafka-role&quot; class=&quot;headerlink&quot; title=&quot;Kafka role&quot;&gt;&lt;/a&gt;Kafka role&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 kafka_server]# pwd
-/root/ansible_playbooks/roles/kafka_server
-[root@node1 kafka_server]# ls
-files  handlers  meta  tasks  templates  vars
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;上传安装包-3&quot;&gt;&lt;a href=&quot;#上传安装包-3&quot; class=&quot;headerlink&quot; title=&quot;上传安装包&quot;&gt;&lt;/a&gt;上传安装包&lt;/h4&gt;&lt;p&gt;将kafka_2.11-0.9.0.1.tar.gz、kafka-manager-1.3.0.6.zip和clean_kafkalog.sh上传到files目录。clean_kafkalog.sh是清理kafka日志的脚本。&lt;/p&gt;
-&lt;h4 id=&quot;编写tasks-3&quot;&gt;&lt;a href=&quot;#编写tasks-3&quot; class=&quot;headerlink&quot; title=&quot;编写tasks&quot;&gt;&lt;/a&gt;编写tasks&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 kafka_server]# vim tasks/main.yml 
-- name: copy and unzip kafka
-  unarchive: src=kafka_2.11-0.9.0.1.tgz dest=/usr/local/
-- name: install configuration file for kafka
-  template: src=server.properties.j2 dest=/usr/local/kafka_2.11-0.9.0.1/config/server.properties
-- name: copy script to clear kafka logs.
-  copy: src=clean_kafkalog.sh dest=/usr/local/kafka_2.11-0.9.0.1/clean_kafkalog.sh mode=755                                                   
-- name: crontab task                                                         
-  cron: name=&amp;quot;clear kafka logs&amp;quot; weekday=&amp;quot;0&amp;quot; hour=&amp;quot;0&amp;quot; minute=&amp;quot;0&amp;quot; job=&amp;quot;/usr/local/kafka_2.11-0.9.0.1/clean_kafkalog.sh&amp;quot;
-- name: start kafka                            
-  shell: JMX_PORT=9997 /usr/local/kafka_2.11-0.9.0.1/bin/kafka-server-start.sh -daemon /usr/local/kafka_2.11-0.9.0.1/config/server.properties &amp;amp;                                              
-  tags:                                        
-  - start                                      
-- name: copy and unizp kafka-manager           
-  unarchive: src=kafka-manager-1.3.0.6.zip dest=/usr/local/
-  when: ansible_default_ipv4[&amp;apos;address&amp;apos;] == &amp;quot;{{kafka_manager_ip}}&amp;quot;
-- name: install configuration file for kafka-manager
-  template: src=application.conf.j2 dest=/usr/local/kafka-manager-1.3.0.6/conf/application.conf
-  when: ansible_default_ipv4[&amp;apos;address&amp;apos;] == &amp;quot;{{kafka_manager_ip}}&amp;quot;
-- name: start kafka-manager                    
-  shell: nohup /usr/local/kafka-manager-1.3.0.6/bin/kafka-manager &amp;amp;
-  when: ansible_default_ipv4[&amp;apos;address&amp;apos;] == &amp;quot;{{kafka_manager_ip}}&amp;quot;
-  tags:                                        
-  - kafkaManagerStart
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates-1&quot;&gt;&lt;a href=&quot;#编写templates-1&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 kafka_server]# vim templates/server.properties.j2 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;配置文件内容过多，具体见github，地址是&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/a&gt;&lt;/p&gt;
-&lt;h4 id=&quot;编写vars-3&quot;&gt;&lt;a href=&quot;#编写vars-3&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 kafka_server]# vim vars/main.yml
-zk_cluster: 172.16.7.151:2181,172.16.7.152:2181,172.16.7.153:2181
-kafka_manager_ip: 172.16.7.151 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;另外在template的文件中还使用了个变量，该变量每台主机的值是不一样的，所以定义在了/etc/ansible/hosts文件中:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[kafka_servers]
-172.16.206.17 broker_id=0
-172.16.206.31 broker_id=1
-172.16.206.32 broker_id=2
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;设置主机组-1&quot;&gt;&lt;a href=&quot;#设置主机组-1&quot; class=&quot;headerlink&quot; title=&quot;设置主机组&quot;&gt;&lt;/a&gt;设置主机组&lt;/h4&gt;&lt;p&gt;/etc/ansible/hosts文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[kafka_servers]
-172.16.206.17 broker_id=0
-172.16.206.31 broker_id=1
-172.16.206.32 broker_id=2
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;使用角色-3&quot;&gt;&lt;a href=&quot;#使用角色-3&quot; class=&quot;headerlink&quot; title=&quot;使用角色&quot;&gt;&lt;/a&gt;使用角色&lt;/h4&gt;&lt;p&gt;在roles同级目录，创建一个kafka.yml文件，里面定义好你的playbook。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim kafka.yml 
-- hosts: kafka_servers
-  remote_user: root
-  roles:
-  - kafka_server
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行playbook安装kafka集群：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# ansible-playbook kafka.yml 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;使用kafka_server role需要根据实际环境修改vars/main.yml里的变量以及/etc/ansible/hosts文件里定义的主机。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;Elasticsearch-role&quot;&gt;&lt;a href=&quot;#Elasticsearch-role&quot; class=&quot;headerlink&quot; title=&quot;Elasticsearch role&quot;&gt;&lt;/a&gt;Elasticsearch role&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 es_server]# pwd
-/root/ansible_playbooks/roles/es_server
-[root@node1 es_server]# ls
-files  handlers  meta  tasks  templates  vars
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;上传安装包-4&quot;&gt;&lt;a href=&quot;#上传安装包-4&quot; class=&quot;headerlink&quot; title=&quot;上传安装包&quot;&gt;&lt;/a&gt;上传安装包&lt;/h4&gt;&lt;p&gt;将elasticsearch-2.3.3.tar.gz  elasticsearch-analysis-ik-1.9.3.zip上传到files目录。&lt;/p&gt;
-&lt;h4 id=&quot;编写tasks-4&quot;&gt;&lt;a href=&quot;#编写tasks-4&quot; class=&quot;headerlink&quot; title=&quot;编写tasks&quot;&gt;&lt;/a&gt;编写tasks&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 es_server]# vim tasks/main.yml
-- name: create es user
-  user: name=es password={{password}}
-  vars:
-    # created with:
-    # python -c &amp;apos;import crypt; print crypt.crypt(&amp;quot;This is my Password&amp;quot;, &amp;quot;$1$SomeSalt$&amp;quot;)&amp;apos;
-    # &amp;gt;&amp;gt;&amp;gt; import crypt
-    # &amp;gt;&amp;gt;&amp;gt; crypt.crypt(&amp;apos;wisedu123&amp;apos;, &amp;apos;$1$bigrandomsalt$&amp;apos;)
-    # &amp;apos;$1$bigrando$wzfZ2ifoHJPvaMuAelsBq0&amp;apos;
-    password: $1$bigrando$wzfZ2ifoHJPvaMuAelsBq0
-- name: mkdir directory for elasticsearch data
-  file: dest=/esdata mode=0755 state=directory owner=es group=es
-- name: copy and unzip es
-  #unarchive module owner and group only effect on directory.
-  unarchive: src=elasticsearch-2.3.3.tar.gz dest=/usr/local/
-- name: install memory configuration file for es
-  template: src=elasticsearch.in.sh.j2 dest=/usr/local/elasticsearch-2.3.3/bin/elasticsearch.in.sh owner=es group=es
-- name: install configuration file for es
-  template: src=elasticsearch.yml.j2 dest=/usr/local/elasticsearch-2.3.3/config/elasticsearch.yml owner=es group=es
-- name: mkdir directory for elasticsearch-analysis-ik plugin
-  file: dest=/usr/local/elasticsearch-2.3.3/plugins/ik mode=0755 state=directory owner=es group=es
-- name: copy and unizp elasticsearch-analysis-ik plugin
-  unarchive: src=elasticsearch-analysis-ik-1.9.3.zip dest=/usr/local/elasticsearch-2.3.3/plugins/ik
-- name: change owner and group
-  #recurse=yes make all files in a directory changed.
-  file: path=/usr/local/elasticsearch-2.3.3 owner=es group=es recurse=yes
-- name: start es
-  shell: su - es -c &amp;apos;/usr/local/elasticsearch-2.3.3/bin/elasticsearch -d&amp;apos;
-  #command: /usr/local/elasticsearch-2.3.3/bin/elasticsearch -d
-  #become: true
-  #become_method: su
-  #become_user: es
-  tags:
-  - start
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates-2&quot;&gt;&lt;a href=&quot;#编写templates-2&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;p&gt;将模板elasticsearch.in.sh.j2和elasticsearch.yml.j2放入templates目录下&lt;br&gt;&lt;strong&gt;注意模板里的变量名中间不能用.。比如：这样的变量名是不合法的。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;配置文件内容过多，具体见github，地址是&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/a&gt;&lt;/p&gt;
-&lt;h4 id=&quot;编写vars-4&quot;&gt;&lt;a href=&quot;#编写vars-4&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 es_server]# vim vars/main.yml
-ES_MEM: 2g
-cluster_name: wisedu
-master_ip: 172.16.7.151 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;另外在template的文件中还使用了个变量，该变量每台主机的值是不一样的，所以定义在了/etc/ansible/hosts文件中:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es_servers]
-172.16.7.151 node_master=true
-172.16.7.152 node_master=false
-172.16.7.153 node_master=false 
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;设置主机组-2&quot;&gt;&lt;a href=&quot;#设置主机组-2&quot; class=&quot;headerlink&quot; title=&quot;设置主机组&quot;&gt;&lt;/a&gt;设置主机组&lt;/h4&gt;&lt;p&gt;/etc/ansible/hosts文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es_servers]
-172.16.7.151 node_master=true
-172.16.7.152 node_master=false
-172.16.7.153 node_master=false 
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;使用角色-4&quot;&gt;&lt;a href=&quot;#使用角色-4&quot; class=&quot;headerlink&quot; title=&quot;使用角色&quot;&gt;&lt;/a&gt;使用角色&lt;/h4&gt;&lt;p&gt;在roles同级目录，创建一个es.yml文件，里面定义好你的playbook。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim es.yml 
-- hosts: es_servers
-  remote_user: root
-  roles:
-  - es_server
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行playbook安装Elasticsearch集群：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# ansible-playbook es.yml 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;使用es_server role需要根据实际环境修改vars/main.yml里的变量以及/etc/ansible/hosts文件里定义的主机。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;MySQL-role&quot;&gt;&lt;a href=&quot;#MySQL-role&quot; class=&quot;headerlink&quot; title=&quot;MySQL role&quot;&gt;&lt;/a&gt;MySQL role&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 db_server]# pwd
-/root/ansible_playbooks/roles/db_server
-[root@node1 db_server]# ls
-files  handlers  meta  tasks  templates  vars
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;上传安装包-5&quot;&gt;&lt;a href=&quot;#上传安装包-5&quot; class=&quot;headerlink&quot; title=&quot;上传安装包&quot;&gt;&lt;/a&gt;上传安装包&lt;/h4&gt;&lt;p&gt;将制作好的rpm包mysql-5.6.27-1.x86_64.rpm放到/root/ansible_playbooks/roles/db_server/files/目录下。&lt;br&gt;&lt;strong&gt;【注意】:这个rpm包是自己打包制作的，打包成rpm会使得部署的效率提高。关于如何打包成rpm见之前的博客《速成RPM包制作》。&lt;/strong&gt;&lt;/p&gt;
-&lt;h4 id=&quot;编写tasks-5&quot;&gt;&lt;a href=&quot;#编写tasks-5&quot; class=&quot;headerlink&quot; title=&quot;编写tasks&quot;&gt;&lt;/a&gt;编写tasks&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 db_server]# vim tasks/main.yml
-- name: install dependency package
-  yum: name={{ item }} state=present
-  with_items:
-  - libaio
-  - libaio-devel
-- name: copy mysql rpm
-  copy: src=mysql-5.6.27-1.x86_64.rpm dest=/tmp/
-- name: install mysql
-  yum: name=/tmp/mysql-5.6.27-1.x86_64.rpm state=present
-- name: start mysql
-  shell: /etc/init.d/mysqld start
-  tags:
-  - start
-- name: set up root password
-  shell: /usr/local/mysql/bin/mysql -uroot -e &amp;quot;UPDATE mysql.user SET Password=PASSWORD(&amp;apos;wisedu123&amp;apos;) where USER=&amp;apos;root&amp;apos;&amp;quot; &amp;amp;&amp;gt;/dev/null
-- name: delete anonymous account1
-  shell: /usr/local/mysql/bin/mysql -uroot -Dmysql -pwisedu123 -e &amp;quot;DROP USER &amp;apos;&amp;apos;@localhost&amp;quot; &amp;amp;&amp;gt;/dev/null
-- name: delete anonymous account2
-  shell: /usr/local/mysql/bin/mysql -uroot -Dmysql -pwisedu123 -e &amp;quot;grant all on *.* to root@&amp;apos;%.%.%.%&amp;apos; identified by &amp;apos;wisedu123&amp;apos;&amp;quot; &amp;amp;&amp;gt;/dev/null
-- name: flush privileges
-  shell: /usr/local/mysql/bin/mysql -uroot -Dmysql -pwisedu123 -e &amp;quot;flush privileges&amp;quot; &amp;amp;&amp;gt;/dev/null
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;设置主机组-3&quot;&gt;&lt;a href=&quot;#设置主机组-3&quot; class=&quot;headerlink&quot; title=&quot;设置主机组&quot;&gt;&lt;/a&gt;设置主机组&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# vim /etc/ansible/hosts 
-[db_servers]
-172.16.7.152 
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;使用角色-5&quot;&gt;&lt;a href=&quot;#使用角色-5&quot; class=&quot;headerlink&quot; title=&quot;使用角色&quot;&gt;&lt;/a&gt;使用角色&lt;/h4&gt;&lt;p&gt;在roles同级目录，创建一个db.yml文件，里面定义好你的playbook。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim db.yml 
-- hosts: mysql_server
-  remote_user: root
-  roles:
-  - db_server
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行playbook安装MySQL：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# ansible-playbook db.yml 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;使用db_server role需要根据实际环境修改/etc/ansible/hosts文件里定义的主机。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;Nginx-role&quot;&gt;&lt;a href=&quot;#Nginx-role&quot; class=&quot;headerlink&quot; title=&quot;Nginx role&quot;&gt;&lt;/a&gt;Nginx role&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 web_server]# pwd
-/root/ansible_playbooks/roles/web_server
-[root@node1 web_server]# ls
-files  handlers  meta  tasks  templates  vars
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;上传安装包-6&quot;&gt;&lt;a href=&quot;#上传安装包-6&quot; class=&quot;headerlink&quot; title=&quot;上传安装包&quot;&gt;&lt;/a&gt;上传安装包&lt;/h4&gt;&lt;p&gt;将制作好的rpm包openresty-for-godseye-1.9.7.3-1.x86_64.rpm放到/root/ansible_playbooks/roles/web_server/files/目录下。&lt;br&gt;&lt;strong&gt;【注意】:做成rpm包，在安装时省去了编译nginx的过程，提升了部署效率。这个包里面打包了很多与我们系统相关的文件。&lt;/strong&gt;&lt;/p&gt;
-&lt;h4 id=&quot;编写tasks-6&quot;&gt;&lt;a href=&quot;#编写tasks-6&quot; class=&quot;headerlink&quot; title=&quot;编写tasks&quot;&gt;&lt;/a&gt;编写tasks&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 web_server]# vim tasks/main.yml 
-- name: install dependency package
-  yum: name={{ item }} state=present
-  with_items:
-  - openssl-devel
-  - readline-devel
-  - pcre-devel
-  - gcc
-- name: copy nginx
-  copy: src=openresty-for-godseye-1.9.7.3-1.x86_64.rpm dest=/tmp/
-- name: install nginx
-  yum: name=/tmp/openresty-for-godseye-1.9.7.3-1.x86_64.rpm state=present
-- name: install configuration file for nginx
-  template: src=nginx.conf.j2 dest=/usr/local/openresty/nginx/conf/nginx.conf
-- name: crontab task
-  cron: name=&amp;quot;clear nginx logs&amp;quot; weekday=&amp;quot;0&amp;quot; hour=&amp;quot;0&amp;quot; minute=&amp;quot;0&amp;quot; job=&amp;quot;/usr/local/openresty/clrnginxlog.sh&amp;quot;
-- name: start nginx
-  shell: systemctl start nginx.service
-  tags:
-  - start
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates-3&quot;&gt;&lt;a href=&quot;#编写templates-3&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;p&gt;将模板nginx.conf.j2放入templates目录下&lt;/p&gt;
-&lt;p&gt;配置文件内容过多，具体见github，地址是&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/a&gt;&lt;/p&gt;
-&lt;h4 id=&quot;编写vars-5&quot;&gt;&lt;a href=&quot;#编写vars-5&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 web_server]# vim vars/main.yml 
-elasticsearch_cluster: server 172.16.7.151:9200;server 172.16.7.152:9200;server 172.16.7.153:9200;
-kafka_server1: 172.16.7.151
-kafka_server2: 172.16.7.152
-kafka_server3: 172.16.7.153   
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;经过测试，变量里面不能有逗号。 &lt;/strong&gt;&lt;/p&gt;
-&lt;h4 id=&quot;设置主机组-4&quot;&gt;&lt;a href=&quot;#设置主机组-4&quot; class=&quot;headerlink&quot; title=&quot;设置主机组&quot;&gt;&lt;/a&gt;设置主机组&lt;/h4&gt;&lt;p&gt;/etc/ansible/hosts文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# vim /etc/ansible/hosts 
-[nginx_servers]
-172.16.7.153 
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;使用角色-6&quot;&gt;&lt;a href=&quot;#使用角色-6&quot; class=&quot;headerlink&quot; title=&quot;使用角色&quot;&gt;&lt;/a&gt;使用角色&lt;/h4&gt;&lt;p&gt;在roles同级目录，创建一个nginx.yml文件，里面定义好你的playbook。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim nginx.yml 
-- hosts: nginx_servers
-  remote_user: root
-  roles:
-  - web_server  
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行playbook安装Nginx：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# ansible-playbook nginx.yml 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;使用web_server role需要根据实际环境修改vars/main.yml里的变量以及/etc/ansible/hosts文件里定义的主机。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;Redis-role&quot;&gt;&lt;a href=&quot;#Redis-role&quot; class=&quot;headerlink&quot; title=&quot;Redis role&quot;&gt;&lt;/a&gt;Redis role&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 redis_server]# pwd
-/root/ansible_playbooks/roles/redis_server
-[root@node1 redis_server]# ls
-files  handlers  meta  tasks  templates  vars
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;上传安装包-7&quot;&gt;&lt;a href=&quot;#上传安装包-7&quot; class=&quot;headerlink&quot; title=&quot;上传安装包&quot;&gt;&lt;/a&gt;上传安装包&lt;/h4&gt;&lt;p&gt;将制作好的rpm包redis-3.2.2-1.x86_64.rpm放到/root/ansible_playbooks/roles/redis_server/files/目录下。&lt;/p&gt;
-&lt;h4 id=&quot;编写tasks-7&quot;&gt;&lt;a href=&quot;#编写tasks-7&quot; class=&quot;headerlink&quot; title=&quot;编写tasks&quot;&gt;&lt;/a&gt;编写tasks&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 redis_server]# vim tasks/main.yml
-- name: install dependency package
-  yum: name={{ item }} state=present
-  with_items:
-  - openssl-devel
-  - readline-devel
-  - pcre-devel
-- name: copy redis
-  copy: src=redis-3.2.2-1.x86_64.rpm dest=/tmp/
-- name: install redis
-  yum: name=/tmp/redis-3.2.2-1.x86_64.rpm state=present
-- name: start redis
-  shell: /usr/local/bin/redis-server /etc/redis.conf
-  tags:
-  - start
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;设置主机组-5&quot;&gt;&lt;a href=&quot;#设置主机组-5&quot; class=&quot;headerlink&quot; title=&quot;设置主机组&quot;&gt;&lt;/a&gt;设置主机组&lt;/h4&gt;&lt;p&gt;/etc/ansible/hosts文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# vim /etc/ansible/hosts 
-[redis_servers]
-172.16.7.152 
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;使用角色-7&quot;&gt;&lt;a href=&quot;#使用角色-7&quot; class=&quot;headerlink&quot; title=&quot;使用角色&quot;&gt;&lt;/a&gt;使用角色&lt;/h4&gt;&lt;p&gt;在roles同级目录，创建一个redis.yml文件，里面定义好你的playbook。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim redis.yml 
-- hosts: redis_servers
-  remote_user: root
-  roles:
-  - redis_server 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行playbook安装redis：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# ansible-playbook redis.yml 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;使用redis_server role需要根据实际环境修改vars/main.yml里的变量以及/etc/ansible/hosts文件里定义的主机。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;Hadoop-role&quot;&gt;&lt;a href=&quot;#Hadoop-role&quot; class=&quot;headerlink&quot; title=&quot;Hadoop role&quot;&gt;&lt;/a&gt;Hadoop role&lt;/h3&gt;&lt;p&gt;完全分布式集群部署，NameNode和ResourceManager高可用。&lt;br&gt;提前配置集群节点的/etc/hosts文件、节点时间同步、某些集群主节点登录其他节点不需要输入密码。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 hadoop]# pwd
-/root/ansible_playbooks/roles/hadoop
-[root@node1 hadoop]# ls
-files  handlers  meta  tasks  templates  vars
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;上传安装包-8&quot;&gt;&lt;a href=&quot;#上传安装包-8&quot; class=&quot;headerlink&quot; title=&quot;上传安装包&quot;&gt;&lt;/a&gt;上传安装包&lt;/h4&gt;&lt;p&gt;将hadoop-2.7.2.tar.gz放到/root/ansible_playbooks/roles/hadoop/files/目录下。&lt;/p&gt;
-&lt;h4 id=&quot;编写tasks-8&quot;&gt;&lt;a href=&quot;#编写tasks-8&quot; class=&quot;headerlink&quot; title=&quot;编写tasks&quot;&gt;&lt;/a&gt;编写tasks&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 hadoop]# cat tasks/main.yml 
-- name: install dependency package
-  yum: name={{ item }} state=present
-  with_items:
-  - openssh
-  - rsync
-- name: create hadoop user
-  user: name=hadoop password={{password}}
-  vars:
-    # created with:
-    # python -c &amp;apos;import crypt; print crypt.crypt(&amp;quot;This is my Password&amp;quot;, &amp;quot;$1$SomeSalt$&amp;quot;)&amp;apos;
-    # &amp;gt;&amp;gt;&amp;gt; import crypt
-    # &amp;gt;&amp;gt;&amp;gt; crypt.crypt(&amp;apos;wisedu123&amp;apos;, &amp;apos;$1$bigrandomsalt$&amp;apos;)
-    # &amp;apos;$1$bigrando$wzfZ2ifoHJPvaMuAelsBq0&amp;apos;
-    password: $1$bigrando$wzfZ2ifoHJPvaMuAelsBq0
-- name: copy and unzip hadoop
-  #unarchive module owner and group only effect on directory.
-  unarchive: src=hadoop-2.7.2.tar.gz dest=/usr/local/
-- name: create hadoop soft link
-  file: src=/usr/local/hadoop-2.7.2 dest=/usr/local/hadoop state=link
-- name: create hadoop logs directory
-  file: dest=/usr/local/hadoop/logs mode=0775 state=directory
-- name: change hadoop soft link owner and group
-  #recurse=yes make all files in a directory changed.
-  file: path=/usr/local/hadoop owner=hadoop group=hadoop recurse=yes
-- name: change hadoop-2.7.2 directory owner and group
-  #recurse=yes make all files in a directory changed.
-  file: path=/usr/local/hadoop-2.7.2 owner=hadoop group=hadoop recurse=yes
-- name: set hadoop env
-  lineinfile: dest={{env_file}} insertafter=&amp;quot;{{item.position}}&amp;quot; line=&amp;quot;{{item.value}}&amp;quot; state=present
-  with_items:
-  - {position: EOF, value: &amp;quot;\n&amp;quot;}
-  - {position: EOF, value: &amp;quot;# Hadoop environment&amp;quot;}
-  - {position: EOF, value: &amp;quot;export HADOOP_HOME=/usr/local/hadoop&amp;quot;}
-  - {position: EOF, value: &amp;quot;export PATH=$PATH:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin&amp;quot;}
-- name: enforce env
-  shell: source {{env_file}}
-- name: install configuration file hadoop-env.sh.j2 for hadoop
-  template: src=hadoop-env.sh.j2 dest=/usr/local/hadoop/etc/hadoop/hadoop-env.sh owner=hadoop group=hadoop
-- name: install configuration file core-site.xml.j2 for hadoop
-  template: src=core-site.xml.j2 dest=/usr/local/hadoop/etc/hadoop/core-site.xml owner=hadoop group=hadoop
-- name: install configuration file hdfs-site.xml.j2 for hadoop
-  template: src=hdfs-site.xml.j2 dest=/usr/local/hadoop/etc/hadoop/hdfs-site.xml owner=hadoop group=hadoop
-- name: install configuration file mapred-site.xml.j2 for hadoop
-  template: src=mapred-site.xml.j2 dest=/usr/local/hadoop/etc/hadoop/mapred-site.xml owner=hadoop group=hadoop
-- name: install configuration file yarn-site.xml.j2 for hadoop
-  template: src=yarn-site.xml.j2 dest=/usr/local/hadoop/etc/hadoop/yarn-site.xml owner=hadoop group=hadoop
-- name: install configuration file slaves.j2 for hadoop
-  template: src=slaves.j2 dest=/usr/local/hadoop/etc/hadoop/slaves owner=hadoop group=hadoop
-- name: install configuration file hadoop-daemon.sh.j2 for hadoop
-  template: src=hadoop-daemon.sh.j2 dest=/usr/local/hadoop/sbin/hadoop-daemon.sh owner=hadoop group=hadoop
-- name: install configuration file yarn-daemon.sh.j2 for hadoop
-  template: src=yarn-daemon.sh.j2 dest=/usr/local/hadoop/sbin/yarn-daemon.sh owner=hadoop group=hadoop
-# make sure zookeeper started, and then start hadoop.
-# start journalnode
-- name: start journalnode
-  shell: /usr/local/hadoop/sbin/hadoop-daemon.sh start journalnode
-  become: true
-  become_method: su
-  become_user: hadoop
-  when: datanode == &amp;quot;true&amp;quot;
-# format namenode
-- name: format active namenode hdfs
-  shell: /usr/local/hadoop/bin/hdfs namenode -format
-  become: true
-  become_method: su
-  become_user: hadoop
-  when: namenode_active == &amp;quot;true&amp;quot;
-- name: start active namenode hdfs
-  shell: /usr/local/hadoop/sbin/hadoop-daemon.sh start namenode
-  become: true
-  become_method: su
-  become_user: hadoop
-  when: namenode_active == &amp;quot;true&amp;quot;
-- name: format standby namenode hdfs
-  shell: /usr/local/hadoop/bin/hdfs namenode -bootstrapStandby
-  become: true
-  become_method: su
-  become_user: hadoop
-  when: namenode_standby == &amp;quot;true&amp;quot;
-- name: stop active namenode hdfs
-  shell: /usr/local/hadoop/sbin/hadoop-daemon.sh stop namenode
-  become: true
-  become_method: su
-  become_user: hadoop
-  when: namenode_active == &amp;quot;true&amp;quot;
-# format ZKFC
-- name: format ZKFC
-  shell: /usr/local/hadoop/bin/hdfs zkfc -formatZK
-  become: true
-  become_method: su
-  become_user: hadoop
-  when: namenode_active == &amp;quot;true&amp;quot;
-# start hadoop cluster
-- name: start namenode
-  shell: /usr/local/hadoop/sbin/start-dfs.sh
-  become: true
-  become_method: su
-  become_user: hadoop
-  when: namenode_active == &amp;quot;true&amp;quot;
-- name: start yarn
-  shell: /usr/local/hadoop/sbin/start-yarn.sh
-  become: true
-  become_method: su
-  become_user: hadoop
-  when: namenode_active == &amp;quot;true&amp;quot;
-- name: start standby rm
-  shell: /usr/local/hadoop/sbin/yarn-daemon.sh start resourcemanager
-  become: true
-  become_method: su
-  become_user: hadoop
-  when: namenode_standby == &amp;quot;true&amp;quot; 
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates-4&quot;&gt;&lt;a href=&quot;#编写templates-4&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;p&gt;将模板core-site.xml.j2、hadoop-daemon.sh.j2、hadoop-env.sh.j2、hdfs-site.xml.j2、mapred-site.xml.j2、slaves.j2、yarn-daemon.sh.j2、yarn-site.xml.j2放入templates目录下。&lt;/p&gt;
-&lt;p&gt;配置文件内容过多，具体见github，地址是&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/a&gt;&lt;/p&gt;
-&lt;h4 id=&quot;编写vars-6&quot;&gt;&lt;a href=&quot;#编写vars-6&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 hadoop]# vim vars/main.yml 
-env_file: /etc/profile
-# hadoop-env.sh.j2 file variables.
-JAVA_HOME: /usr/java/jdk1.8.0_73
-# core-site.xml.j2 file variables.
-ZK_NODE1: node1:2181
-ZK_NODE2: node2:2181
-ZK_NODE3: node3:2181
-# hdfs-site.xml.j2 file variables.
-NAMENODE1_HOSTNAME: node1
-NAMENODE2_HOSTNAME: node2
-DATANODE1_HOSTNAME: node3
-DATANODE2_HOSTNAME: node4
-DATANODE3_HOSTNAME: node5
-# mapred-site.xml.j2 file variables.
-MR_MODE: yarn
-# yarn-site.xml.j2 file variables.
-RM1_HOSTNAME: node1
-RM2_HOSTNAME: node2
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;设置主机组-6&quot;&gt;&lt;a href=&quot;#设置主机组-6&quot; class=&quot;headerlink&quot; title=&quot;设置主机组&quot;&gt;&lt;/a&gt;设置主机组&lt;/h4&gt;&lt;p&gt;/etc/ansible/hosts文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# vim /etc/ansible/hosts 
-[hadoop]
-172.16.7.151 namenode_active=true namenode_standby=false datanode=false
-172.16.7.152 namenode_active=false namenode_standby=true datanode=false
-172.16.7.153 namenode_active=false namenode_standby=false datanode=true
-172.16.7.154 namenode_active=false namenode_standby=false datanode=true
-172.16.7.155 namenode_active=false namenode_standby=false datanode=true
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;使用角色-8&quot;&gt;&lt;a href=&quot;#使用角色-8&quot; class=&quot;headerlink&quot; title=&quot;使用角色&quot;&gt;&lt;/a&gt;使用角色&lt;/h4&gt;&lt;p&gt;在roles同级目录，创建一个hadoop.yml文件，里面定义好你的playbook。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim hadoop.yml 
-- hosts: hadoop
-  remote_user: root
-  roles:
-  - jdk8
-  - hadoop  
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行playbook安装hadoop集群：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# ansible-playbook hadoop.yml 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;使用hadoop role需要根据实际环境修改vars/main.yml里的变量以及/etc/ansible/hosts文件里定义的主机。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;Spark-role&quot;&gt;&lt;a href=&quot;#Spark-role&quot; class=&quot;headerlink&quot; title=&quot;Spark role&quot;&gt;&lt;/a&gt;Spark role&lt;/h3&gt;&lt;p&gt;Standalone模式部署spark (无HA)&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 spark]# pwd
-/root/ansible_playbooks/roles/spark
-[root@node1 spark]# ls
-files  handlers  meta  tasks  templates  vars
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;上传安装包-9&quot;&gt;&lt;a href=&quot;#上传安装包-9&quot; class=&quot;headerlink&quot; title=&quot;上传安装包&quot;&gt;&lt;/a&gt;上传安装包&lt;/h4&gt;&lt;p&gt;将scala-2.10.6.tgz和spark-1.6.1-bin-hadoop2.6.tgz放到/root/ansible_playbooks/roles/hadoop/files/目录下。&lt;/p&gt;
-&lt;h4 id=&quot;编写tasks-9&quot;&gt;&lt;a href=&quot;#编写tasks-9&quot; class=&quot;headerlink&quot; title=&quot;编写tasks&quot;&gt;&lt;/a&gt;编写tasks&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 spark]# cat tasks/main.yml 
-- name: copy and unzip scala
-  unarchive: src=scala-2.10.6.tgz dest=/usr/local/
-- name: set scala env
-  lineinfile: dest={{env_file}} insertafter=&amp;quot;{{item.position}}&amp;quot; line=&amp;quot;{{item.value}}&amp;quot; state=present
-  with_items:
-  - {position: EOF, value: &amp;quot;\n&amp;quot;}
-  - {position: EOF, value: &amp;quot;# Scala environment&amp;quot;}
-  - {position: EOF, value: &amp;quot;export SCALA_HOME=/usr/local/scala-2.10.6&amp;quot;}
-  - {position: EOF, value: &amp;quot;export PATH=$SCALA_HOME/bin:$PATH&amp;quot;}
-- name: copy and unzip spark
-  unarchive: src=spark-1.6.1-bin-hadoop2.6.tgz dest=/usr/local/
-- name: rename spark directory
-  command: mv /usr/local/spark-1.6.1-bin-hadoop2.6 /usr/local/spark-1.6.1
-- name: set spark env
-  lineinfile: dest={{env_file}} insertafter=&amp;quot;{{item.position}}&amp;quot; line=&amp;quot;{{item.value}}&amp;quot; state=present
-  with_items:
-  - {position: EOF, value: &amp;quot;\n&amp;quot;}
-  - {position: EOF, value: &amp;quot;# Spark environment&amp;quot;}
-  - {position: EOF, value: &amp;quot;export SPARK_HOME=/usr/local/spark-1.6.1&amp;quot;}
-  - {position: EOF, value: &amp;quot;export PATH=$SPARK_HOME/bin:$PATH&amp;quot;}
-- name: enforce env
-  shell: source {{env_file}}
-- name: install configuration file for spark
-  template: src=slaves.j2 dest=/usr/local/spark-1.6.1/conf/slaves
-- name: install configuration file for spark
-  template: src=spark-env.sh.j2 dest=/usr/local/spark-1.6.1/conf/spark-env.sh
-- name: start spark cluster
-  shell: /usr/local/spark-1.6.1/sbin/start-all.sh
-  tags:
-  - start
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;编写templates-5&quot;&gt;&lt;a href=&quot;#编写templates-5&quot; class=&quot;headerlink&quot; title=&quot;编写templates&quot;&gt;&lt;/a&gt;编写templates&lt;/h4&gt;&lt;p&gt;将模板slaves.j2和spark-env.sh.j2放到/root/ansible_playbooks/roles/spark/templates/目录下。&lt;/p&gt;
-&lt;p&gt;配置文件内容过多，具体见github，地址是&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。配置文件内容也不再解释，在前面博客中的文章中都已写明。&lt;/a&gt;&lt;/p&gt;
-&lt;h4 id=&quot;编写vars-7&quot;&gt;&lt;a href=&quot;#编写vars-7&quot; class=&quot;headerlink&quot; title=&quot;编写vars&quot;&gt;&lt;/a&gt;编写vars&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 spark]# vim vars/main.yml
-env_file: /etc/profile
-# spark-env.sh.j2 file variables
-JAVA_HOME: /usr/java/jdk1.8.0_73
-SCALA_HOME: /usr/local/scala-2.10.6
-SPARK_MASTER_HOSTNAME: node1
-SPARK_HOME: /usr/local/spark-1.6.1
-SPARK_WORKER_MEMORY: 256M
-HIVE_HOME: /usr/local/apache-hive-2.1.0-bin
-HADOOP_CONF_DIR: /usr/local/hadoop/etc/hadoop/
-# slave.j2 file variables
-SLAVE1_HOSTNAME: node2
-SLAVE2_HOSTNAME: node3
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;设置主机组-7&quot;&gt;&lt;a href=&quot;#设置主机组-7&quot; class=&quot;headerlink&quot; title=&quot;设置主机组&quot;&gt;&lt;/a&gt;设置主机组&lt;/h4&gt;&lt;p&gt;/etc/ansible/hosts文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# vim /etc/ansible/hosts 
-[spark]
-172.16.7.151
-172.16.7.152
-172.16.7.153 
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;使用角色-9&quot;&gt;&lt;a href=&quot;#使用角色-9&quot; class=&quot;headerlink&quot; title=&quot;使用角色&quot;&gt;&lt;/a&gt;使用角色&lt;/h4&gt;&lt;p&gt;在roles同级目录，创建一个spark.yml文件，里面定义好你的playbook。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# vim spark.yml 
-- hosts: spark
-  remote_user: root
-  roles:
-  - spark  
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行playbook安装spark集群：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ansible_playbooks]# ansible-playbook spark.yml 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;使用spark role需要根据实际环境修改vars/main.yml里的变量以及/etc/ansible/hosts文件里定义的主机。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;所有的文件都在github上，&lt;a href=&quot;https://github.com/jkzhao/ansible-godseye。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/jkzhao/ansible-godseye。&lt;/a&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;产品组在开发一个分布式日志系统，用的组件较多，单独手工部署一各个个软件比较繁琐，花的时间比较长，于是就想到了使用ansible playbook + roles进行部署，效率大大提高。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="运维自动化" scheme="http://yoursite.com/categories/%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
-    
-    
-      <category term="Ansible 运维自动化" scheme="http://yoursite.com/tags/Ansible-%E8%BF%90%E7%BB%B4%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
     
   </entry>
   
