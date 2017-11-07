@@ -118,7 +118,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/14.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/15.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/16.png">
-<meta property="og:updated_time" content="2017-08-23T03:44:51.000Z">
+<meta property="og:updated_time" content="2017-10-27T01:14:00.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Docker网络和存储">
 <meta name="twitter:description" content="Docker网络访问docker自带的网络 docker network ls：列出当前docker中已有的网络 docker network inspect：查看网络详情，比如查看网络中有哪些容器 docker run –network=：指定运行容器时使用哪个网络">
@@ -348,8 +348,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-08-23T11:44:51+08:00" content="2017-08-23">
-              2017-08-23
+              <time itemprop="dateUpdated" datetime="2017-10-27T09:14:00+08:00" content="2017-10-27">
+              2017-10-27
               </time>
               </span>
             
@@ -430,8 +430,13 @@
 172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &quot;GET / HTTP/1.1&quot; 200 612 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&quot; &quot;-&quot;
 2017/08/22 09:20:25 [error] 5#5: *1 open() &quot;/usr/share/nginx/html/favicon.ico&quot; failed (2: No such file or directory), client: 172.16.4.81, server: localhost, request: &quot;GET /favicon.ico HTTP/1.1&quot;, host: &quot;172.16.7.151:32768&quot;, referrer: &quot;http://172.16.7.151:32768/&quot;
 172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &quot;GET /favicon.ico HTTP/1.1&quot; 404 571 &quot;http://172.16.7.151:32768/&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&quot; &quot;-&quot;
-</code></pre><h3 id="指定端口映射"><a href="#指定端口映射" class="headerlink" title="指定端口映射"></a>指定端口映射</h3><p>docker run -p hostPort:containerPort<br>docker run -p ip:hostPort:containerPort<br>docker run -p ip::containerPort<br>docker run -p hostPort:containerPort:udp<br>-p 指定端口映射，前面的是主机端口，后面的是容器端口。</p>
-<pre><code>[root@node1 ~]# docker run -d -p 81:80 nginx
+</code></pre><h3 id="指定端口映射"><a href="#指定端口映射" class="headerlink" title="指定端口映射"></a>指定端口映射</h3><pre><code>docker run -p hostPort:containerPort
+docker run -p ip:hostPort:containerPort
+docker run -p ip::containerPort
+docker run -p hostPort:containerPort:udp
+    -p 指定端口映射，前面的是主机端口，后面的是容器端口。
+
+    [root@node1 ~]# docker run -d -p 81:80 nginx
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/15.png" alt=""></p>
 <h2 id="数据管理"><a href="#数据管理" class="headerlink" title="数据管理"></a>数据管理</h2><p>两种方式：</p>
 <ul>
@@ -459,7 +464,6 @@ total 0
 [root@node1 _data]# touch test.txt
 </code></pre><p>回到容器中，查看/data目录下是否有刚才创建的文件：</p>
 <pre><code>[root@5d485979254b /]# ls -l /data 
-total 0
 -rw-r--r--. 1 root root 0 Aug 23 02:07 test.txt
 </code></pre><p><strong>【示例2】:指定宿主机目录挂载</strong></p>
 <pre><code>[root@node1 ~]# docker run -it -v /opt:/opt centos
@@ -620,7 +624,7 @@ test2.txt
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

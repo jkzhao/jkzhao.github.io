@@ -3421,7 +3421,7 @@ vmware/registry     2.6.1-photon        0f6c96580032        3 months ago        
     <link href="http://yoursite.com/2017/09/05/overlay%E5%AE%9E%E7%8E%B0%E5%AE%B9%E5%99%A8%E8%B7%A8%E4%B8%BB%E6%9C%BA%E9%80%9A%E4%BF%A1/"/>
     <id>http://yoursite.com/2017/09/05/overlay实现容器跨主机通信/</id>
     <published>2017-09-05T05:42:06.000Z</published>
-    <updated>2017-09-07T01:44:59.000Z</updated>
+    <updated>2017-10-24T04:19:13.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;a href=&quot;#Docker容器跨主机通信方案&quot; class=&quot;headerlink&quot; title=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;/a&gt;Docker容器跨主机通信方案&lt;/h2&gt;&lt;p&gt;实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。&lt;br&gt;Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是docker 1.11版本，这是我以前做的一个方案，现整理出来。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h2&gt;&lt;table&gt;
@@ -3459,8 +3459,11 @@ vmware/registry     2.6.1-photon        0f6c96580032        3 months ago        
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# yum --enablerepo=elrepo-kernel install  kernel-ml-devel kernel-ml -y
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.修改内核启动顺序，默认启动的顺序应该为1,升级以后内核是往前面插入，为0&lt;br&gt;由于CentOS 7使用grub2作为引导程序 ，所以和CentOS 6有所不同，并不是修改/etc/grub.conf来修改启动项，需要如下操作：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# cat /boot/grub2/grub.cfg |grep menuentry   #查看有哪些内核选项
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/21.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;        [root@node1 ~]# grub2-editenv list&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/22.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;        [root@node1 ~]# grub2-set-default 0&lt;/p&gt;
-&lt;p&gt;5.重启系统&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/21.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# grub2-editenv list
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/22.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# grub2-set-default 0
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.重启系统&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# shutdown -r now
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;6.查看 内核版本&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# uname -r
@@ -3816,7 +3819,7 @@ docker-compose version 1.15.0, build e12f3b9
     <link href="http://yoursite.com/2017/08/28/CentOS%E5%AE%89%E8%A3%85Docker-CE/"/>
     <id>http://yoursite.com/2017/08/28/CentOS安装Docker-CE/</id>
     <published>2017-08-28T05:29:47.000Z</published>
-    <updated>2017-09-29T08:43:11.000Z</updated>
+    <updated>2017-11-06T01:41:49.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how registries are handled.”，并且建议我尝试较新的版本。在2017年4月份的DockerCon会议上，Docker公司直接将 Github 上原隶属于 Docker 组织的 Docker 项目，直接 transfer 到了一个新的、名叫 Moby 的组织下，并将其重命名为 Moby 项目。由此先来了解下这个Moby项目。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;Moby项目&quot;&gt;&lt;a href=&quot;#Moby项目&quot; class=&quot;headerlink&quot; title=&quot;Moby项目&quot;&gt;&lt;/a&gt;Moby项目&lt;/h2&gt;&lt;p&gt;为什么会产生Moby这个项目呢？可以看到最近几年里面，在2015年之后的Docker 1.17版本之后，引入了很多的新特性，比如Network、runC等，Docker的组件越来越多，提供支持的场景也越来越复杂，比如微服务、机器学习、物联网等，所以Docker镜像的下载量也呈现指数型上升，最终Docker运行的环境，也是越来越复杂，越来越多，比如在Linux，Windows，还有在嵌入式设备上。&lt;br&gt;所以Docker原本的发行版本已经不能适配于这些越来越复杂的场景了，举个例子，其实在IoT里面，树莓派的性能是比较好的，但是它去运行Docker的话，Docker就会占整个性能的一大部分，这样它上面就已经无法运行其他的一些自己的应用了，那用户要怎么去解决这些事情，难道自己去再写一个Docker容器引擎吗？这个成本是很高的，需要自己去造轮子。所以为了提供更加开放的生态，Docker公司把Docker项目中现在的一些组件抽象成Moby项目，这样系统构建者就可以通过Moby项目把现有的组件去进行组装，然后组装成自己所需要的一个容器引擎。&lt;br&gt;Moby项目现在有80多个组件，通过这些组件，用户可以避免重复地去造轮子。用户可以按照自己的需要去组装组件，做出自己的一个容器系统。这些组件有一个标准化的调用方式，他们之间通过gRPC通信，它的语言也是可以去定制的，不会像之前一样必须用Go语言去写。通过标准化的方式，通过Moby这个项目就可以把这些组件进行组合，成为自己所依赖的容器系统。&lt;br&gt;Docker项目现在改名成Moby项目，但是Docker会逐渐的从Moby项目中去抽象和剥离出来，作为Moby的一种组装方式，比如Docker依赖于这里面的一些库，它就特化成一种组装，组装成自己的Docker CE的版本，也就是Docker的社区版。Docker社区版后面也会继续做开源，所以用户和开发者不需要担心以后用Docker就会收费了，对于Docker用户来说，他也无须感知用户接口的变化，使用的命令还是Docker不是Moby，需要更多运维支持的可以选择Docker EE的版本，让Docker公司的工程师去替你去做运维和更复杂的线上支持，如果自己开发可以继续选择Docker社区版。对于架构师而言，现在就可以不强依赖于Docker项目，而是通过这些组件去拼装出来一个容器引擎去满足自己的需求。&lt;/p&gt;
@@ -3888,7 +3891,7 @@ Cgroup Driver: cgroupfs
 }
 [root@spark32 ~]# systemctl daemon-reload
 [root@spark32 ~]# systemctl restart docker
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;卸载Docker-CE&quot;&gt;&lt;a href=&quot;#卸载Docker-CE&quot; class=&quot;headerlink&quot; title=&quot;卸载Docker-CE&quot;&gt;&lt;/a&gt;卸载Docker-CE&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# yum remove docker-ce
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;卸载Docker-CE&quot;&gt;&lt;a href=&quot;#卸载Docker-CE&quot; class=&quot;headerlink&quot; title=&quot;卸载Docker CE&quot;&gt;&lt;/a&gt;卸载Docker CE&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# yum remove docker-ce
 # rm -rf /var/lib/docker
 &lt;/code&gt;&lt;/pre&gt;</content>
     
@@ -3910,7 +3913,7 @@ Cgroup Driver: cgroupfs
     <link href="http://yoursite.com/2017/08/25/Dockerfile%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/"/>
     <id>http://yoursite.com/2017/08/25/Dockerfile构建镜像/</id>
     <published>2017-08-25T02:55:41.000Z</published>
-    <updated>2017-08-28T03:38:51.000Z</updated>
+    <updated>2017-11-02T07:13:44.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Dockerfile介绍&quot;&gt;&lt;a href=&quot;#Dockerfile介绍&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile介绍&quot;&gt;&lt;/a&gt;Dockerfile介绍&lt;/h2&gt;&lt;p&gt;dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。&lt;br&gt;若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;ul&gt;
@@ -3932,9 +3935,9 @@ Cgroup Driver: cgroupfs
 &lt;li&gt;ENTRYPOINT&lt;/li&gt;
 &lt;li&gt;CMD&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h3 id=&quot;RUN指令&quot;&gt;&lt;a href=&quot;#RUN指令&quot; class=&quot;headerlink&quot; title=&quot;RUN指令&quot;&gt;&lt;/a&gt;RUN指令&lt;/h3&gt;&lt;p&gt;会在前一条命令创建的镜像的基础上启动一个容器，并在容器中运行指令的命令。在该命令结束后，会提交容器为新的镜像。新镜像会被dockerfile中的下一条指令所使用。&lt;br&gt;默认情况下，RUN指令会以shell的形式去执行命令。当然我们也可以使用exec格式的RUN指令。在exec方式中，我们使用一个数组来指定要运行的命令和传递给该命令的参数。exec中的参数会当成什么数组被docker解析，因此必须使用双引号，而不能使用单引号。&lt;br&gt;&lt;strong&gt;shell形式&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&quot;RUN指令&quot;&gt;&lt;a href=&quot;#RUN指令&quot; class=&quot;headerlink&quot; title=&quot;RUN指令&quot;&gt;&lt;/a&gt;RUN指令&lt;/h3&gt;&lt;p&gt;RUN指令会在前一条命令创建的镜像的基础上启动一个容器，并在容器中运行指令的命令。在该命令结束后，会提交容器为新的镜像。新镜像会被dockerfile中的下一条指令所使用。&lt;br&gt;默认情况下，RUN指令会以shell的形式去执行命令。当然我们也可以使用exec格式的RUN指令。在exec方式中，我们使用一个数组来指定要运行的命令和传递给该命令的参数。exec中的参数会当成什么数组被docker解析，因此必须使用双引号，而不能使用单引号。&lt;br&gt;&lt;strong&gt;shell形式：&lt;/strong&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;RUN yum install -y nginx
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;exec形式&lt;/strong&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;exec形式：&lt;/strong&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;RUN [&amp;quot;yum&amp;quot;, &amp;quot;install&amp;quot;, &amp;quot;-y&amp;quot;, &amp;quot;nginx&amp;quot;]
 &lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;EXPOSE指令&quot;&gt;&lt;a href=&quot;#EXPOSE指令&quot; class=&quot;headerlink&quot; title=&quot;EXPOSE指令&quot;&gt;&lt;/a&gt;EXPOSE指令&lt;/h3&gt;&lt;p&gt;告诉docker该容器内的应用程序将会指定端口，但是这并不意味着我们可以自动访问该容器内服务的端口。出于安全的原因，docker并不会自动打开该端口。而是需要我们在使用docker run的时候通过-p参数指定需要打开哪些端口。我们可以使用多个EXPOSE指令向外部暴露多个端口。注意不可以在dockerfile中指定端口映射关系。比如EXPOSE 80，这条指令是对的，而EXPOSE 8080:80这条指令就是错的。&lt;br&gt;【注意】:这会影响docker的可移植性。我们应该在docker run命令中使用-p参数实现端口映射。&lt;/p&gt;
 &lt;h3 id=&quot;CMD指令&quot;&gt;&lt;a href=&quot;#CMD指令&quot; class=&quot;headerlink&quot; title=&quot;CMD指令&quot;&gt;&lt;/a&gt;CMD指令&lt;/h3&gt;&lt;p&gt;CMD 指令允许用户指定容器启动的默认执行的命令。此命令会在容器启动且 docker run 没有指定其他命令时运行。&lt;/p&gt;
@@ -4139,7 +4142,7 @@ docker.io/nginx                         latest              b8efb18f159b        
     <link href="http://yoursite.com/2017/08/18/Docker%E7%BD%91%E7%BB%9C%E5%92%8C%E5%AD%98%E5%82%A8/"/>
     <id>http://yoursite.com/2017/08/18/Docker网络和存储/</id>
     <published>2017-08-18T09:17:19.000Z</published>
-    <updated>2017-08-23T03:44:51.000Z</updated>
+    <updated>2017-10-27T01:14:00.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Docker网络访问&quot;&gt;&lt;a href=&quot;#Docker网络访问&quot; class=&quot;headerlink&quot; title=&quot;Docker网络访问&quot;&gt;&lt;/a&gt;Docker网络访问&lt;/h2&gt;&lt;h3 id=&quot;docker自带的网络&quot;&gt;&lt;a href=&quot;#docker自带的网络&quot; class=&quot;headerlink&quot; title=&quot;docker自带的网络&quot;&gt;&lt;/a&gt;docker自带的网络&lt;/h3&gt;&lt;ul&gt;
 &lt;li&gt;docker network ls：列出当前docker中已有的网络&lt;/li&gt;
@@ -4163,8 +4166,13 @@ docker.io/nginx                         latest              b8efb18f159b        
 172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &amp;quot;GET / HTTP/1.1&amp;quot; 200 612 &amp;quot;-&amp;quot; &amp;quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&amp;quot; &amp;quot;-&amp;quot;
 2017/08/22 09:20:25 [error] 5#5: *1 open() &amp;quot;/usr/share/nginx/html/favicon.ico&amp;quot; failed (2: No such file or directory), client: 172.16.4.81, server: localhost, request: &amp;quot;GET /favicon.ico HTTP/1.1&amp;quot;, host: &amp;quot;172.16.7.151:32768&amp;quot;, referrer: &amp;quot;http://172.16.7.151:32768/&amp;quot;
 172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &amp;quot;GET /favicon.ico HTTP/1.1&amp;quot; 404 571 &amp;quot;http://172.16.7.151:32768/&amp;quot; &amp;quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&amp;quot; &amp;quot;-&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;指定端口映射&quot;&gt;&lt;a href=&quot;#指定端口映射&quot; class=&quot;headerlink&quot; title=&quot;指定端口映射&quot;&gt;&lt;/a&gt;指定端口映射&lt;/h3&gt;&lt;p&gt;docker run -p hostPort:containerPort&lt;br&gt;docker run -p ip:hostPort:containerPort&lt;br&gt;docker run -p ip::containerPort&lt;br&gt;docker run -p hostPort:containerPort:udp&lt;br&gt;-p 指定端口映射，前面的是主机端口，后面的是容器端口。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -d -p 81:80 nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;指定端口映射&quot;&gt;&lt;a href=&quot;#指定端口映射&quot; class=&quot;headerlink&quot; title=&quot;指定端口映射&quot;&gt;&lt;/a&gt;指定端口映射&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;docker run -p hostPort:containerPort
+docker run -p ip:hostPort:containerPort
+docker run -p ip::containerPort
+docker run -p hostPort:containerPort:udp
+    -p 指定端口映射，前面的是主机端口，后面的是容器端口。
+
+    [root@node1 ~]# docker run -d -p 81:80 nginx
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/15.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h2 id=&quot;数据管理&quot;&gt;&lt;a href=&quot;#数据管理&quot; class=&quot;headerlink&quot; title=&quot;数据管理&quot;&gt;&lt;/a&gt;数据管理&lt;/h2&gt;&lt;p&gt;两种方式：&lt;/p&gt;
 &lt;ul&gt;
@@ -4192,7 +4200,6 @@ total 0
 [root@node1 _data]# touch test.txt
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;回到容器中，查看/data目录下是否有刚才创建的文件：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@5d485979254b /]# ls -l /data 
-total 0
 -rw-r--r--. 1 root root 0 Aug 23 02:07 test.txt
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;【示例2】:指定宿主机目录挂载&lt;/strong&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it -v /opt:/opt centos

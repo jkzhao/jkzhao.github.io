@@ -113,7 +113,7 @@
 <meta property="og:description" content="Dockerfile介绍dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/20.png">
-<meta property="og:updated_time" content="2017-08-28T03:38:51.000Z">
+<meta property="og:updated_time" content="2017-11-02T07:13:44.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dockerfile构建镜像">
 <meta name="twitter:description" content="Dockerfile介绍dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：">
@@ -343,8 +343,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-08-28T11:38:51+08:00" content="2017-08-28">
-              2017-08-28
+              <time itemprop="dateUpdated" datetime="2017-11-02T15:13:44+08:00" content="2017-11-02">
+              2017-11-02
               </time>
               </span>
             
@@ -423,9 +423,9 @@
 <li>ENTRYPOINT</li>
 <li>CMD</li>
 </ul>
-<h3 id="RUN指令"><a href="#RUN指令" class="headerlink" title="RUN指令"></a>RUN指令</h3><p>会在前一条命令创建的镜像的基础上启动一个容器，并在容器中运行指令的命令。在该命令结束后，会提交容器为新的镜像。新镜像会被dockerfile中的下一条指令所使用。<br>默认情况下，RUN指令会以shell的形式去执行命令。当然我们也可以使用exec格式的RUN指令。在exec方式中，我们使用一个数组来指定要运行的命令和传递给该命令的参数。exec中的参数会当成什么数组被docker解析，因此必须使用双引号，而不能使用单引号。<br><strong>shell形式</strong></p>
+<h3 id="RUN指令"><a href="#RUN指令" class="headerlink" title="RUN指令"></a>RUN指令</h3><p>RUN指令会在前一条命令创建的镜像的基础上启动一个容器，并在容器中运行指令的命令。在该命令结束后，会提交容器为新的镜像。新镜像会被dockerfile中的下一条指令所使用。<br>默认情况下，RUN指令会以shell的形式去执行命令。当然我们也可以使用exec格式的RUN指令。在exec方式中，我们使用一个数组来指定要运行的命令和传递给该命令的参数。exec中的参数会当成什么数组被docker解析，因此必须使用双引号，而不能使用单引号。<br><strong>shell形式：</strong></p>
 <pre><code>RUN yum install -y nginx
-</code></pre><p><strong>exec形式</strong></p>
+</code></pre><p><strong>exec形式：</strong></p>
 <pre><code>RUN [&quot;yum&quot;, &quot;install&quot;, &quot;-y&quot;, &quot;nginx&quot;]
 </code></pre><h3 id="EXPOSE指令"><a href="#EXPOSE指令" class="headerlink" title="EXPOSE指令"></a>EXPOSE指令</h3><p>告诉docker该容器内的应用程序将会指定端口，但是这并不意味着我们可以自动访问该容器内服务的端口。出于安全的原因，docker并不会自动打开该端口。而是需要我们在使用docker run的时候通过-p参数指定需要打开哪些端口。我们可以使用多个EXPOSE指令向外部暴露多个端口。注意不可以在dockerfile中指定端口映射关系。比如EXPOSE 80，这条指令是对的，而EXPOSE 8080:80这条指令就是错的。<br>【注意】:这会影响docker的可移植性。我们应该在docker run命令中使用-p参数实现端口映射。</p>
 <h3 id="CMD指令"><a href="#CMD指令" class="headerlink" title="CMD指令"></a>CMD指令</h3><p>CMD 指令允许用户指定容器启动的默认执行的命令。此命令会在容器启动且 docker run 没有指定其他命令时运行。</p>
@@ -681,7 +681,7 @@ CMD [ &quot;irb&quot; ]
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

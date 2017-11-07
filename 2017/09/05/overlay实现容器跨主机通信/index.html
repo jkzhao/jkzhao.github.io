@@ -127,7 +127,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/33.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/34.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/35.png">
-<meta property="og:updated_time" content="2017-09-07T01:44:59.000Z">
+<meta property="og:updated_time" content="2017-10-24T04:19:13.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="overlay实现容器跨主机通信">
 <meta name="twitter:description" content="Docker容器跨主机通信方案实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是doc">
@@ -357,8 +357,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-09-07T09:44:59+08:00" content="2017-09-07">
-              2017-09-07
+              <time itemprop="dateUpdated" datetime="2017-10-24T12:19:13+08:00" content="2017-10-24">
+              2017-10-24
               </time>
               </span>
             
@@ -453,8 +453,11 @@
 <pre><code>[root@node1 ~]# yum --enablerepo=elrepo-kernel install  kernel-ml-devel kernel-ml -y
 </code></pre><p>4.修改内核启动顺序，默认启动的顺序应该为1,升级以后内核是往前面插入，为0<br>由于CentOS 7使用grub2作为引导程序 ，所以和CentOS 6有所不同，并不是修改/etc/grub.conf来修改启动项，需要如下操作：</p>
 <pre><code>[root@node1 ~]# cat /boot/grub2/grub.cfg |grep menuentry   #查看有哪些内核选项
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/21.png" alt=""><br>        [root@node1 ~]# grub2-editenv list<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/22.png" alt=""><br>        [root@node1 ~]# grub2-set-default 0</p>
-<p>5.重启系统</p>
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/21.png" alt=""></p>
+<pre><code>[root@node1 ~]# grub2-editenv list
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/22.png" alt=""></p>
+<pre><code>[root@node1 ~]# grub2-set-default 0
+</code></pre><p>5.重启系统</p>
 <pre><code>[root@node1 ~]# shutdown -r now
 </code></pre><p>6.查看 内核版本</p>
 <pre><code>[root@node1 ~]# uname -r
@@ -670,7 +673,7 @@ ca0c50dd3a49             net1                    overlay
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
