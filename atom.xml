@@ -3210,7 +3210,7 @@ PING kube-dns.kube-system.svc.cluster.local (10.254.0.2): 56 data bytes
     <link href="http://yoursite.com/2017/09/08/%E4%BC%81%E4%B8%9A%E7%BA%A7Docker-Registry-%E2%80%94%E2%80%94-Harbor%E6%90%AD%E5%BB%BA%E5%92%8C%E4%BD%BF%E7%94%A8/"/>
     <id>http://yoursite.com/2017/09/08/企业级Docker-Registry-——-Harbor搭建和使用/</id>
     <published>2017-09-08T08:38:52.000Z</published>
-    <updated>2017-09-29T08:58:54.000Z</updated>
+    <updated>2017-11-07T07:48:12.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Harbor介绍&quot;&gt;&lt;a href=&quot;#Harbor介绍&quot; class=&quot;headerlink&quot; title=&quot;Harbor介绍&quot;&gt;&lt;/a&gt;Harbor介绍&lt;/h2&gt;&lt;p&gt;Harbor是由VMWare公司开源的容器镜像仓库。事实上，Habor是在Docker Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制 ，AD/LDAP集成以及审计日志等。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;安装部署Harbor&quot;&gt;&lt;a href=&quot;#安装部署Harbor&quot; class=&quot;headerlink&quot; title=&quot;安装部署Harbor&quot;&gt;&lt;/a&gt;安装部署Harbor&lt;/h2&gt;&lt;p&gt;官方安装文档：&lt;br&gt;&lt;a href=&quot;https://github.com/vmware/harbor/blob/master/docs/installation_guide.md&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/vmware/harbor/blob/master/docs/installation_guide.md&lt;/a&gt;&lt;/p&gt;
@@ -3409,10 +3409,10 @@ vmware/registry     2.6.1-photon        0f6c96580032        3 months ago        
     
     </summary>
     
-      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
     
     
-      <category term="容器 Docker Registry" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker-Registry/"/>
+      <category term="Docker Registry" scheme="http://yoursite.com/tags/Docker-Registry/"/>
     
   </entry>
   
@@ -3421,7 +3421,7 @@ vmware/registry     2.6.1-photon        0f6c96580032        3 months ago        
     <link href="http://yoursite.com/2017/09/05/overlay%E5%AE%9E%E7%8E%B0%E5%AE%B9%E5%99%A8%E8%B7%A8%E4%B8%BB%E6%9C%BA%E9%80%9A%E4%BF%A1/"/>
     <id>http://yoursite.com/2017/09/05/overlay实现容器跨主机通信/</id>
     <published>2017-09-05T05:42:06.000Z</published>
-    <updated>2017-10-24T04:19:13.000Z</updated>
+    <updated>2017-11-07T07:47:34.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;a href=&quot;#Docker容器跨主机通信方案&quot; class=&quot;headerlink&quot; title=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;/a&gt;Docker容器跨主机通信方案&lt;/h2&gt;&lt;p&gt;实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。&lt;br&gt;Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是docker 1.11版本，这是我以前做的一个方案，现整理出来。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h2&gt;&lt;table&gt;
@@ -3560,10 +3560,10 @@ ca0c50dd3a49             net1                    overlay
     
     </summary>
     
-      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
     
     
-      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
+      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
     
   </entry>
   
@@ -3572,7 +3572,7 @@ ca0c50dd3a49             net1                    overlay
     <link href="http://yoursite.com/2017/09/01/Registry%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA%E5%8F%8A%E8%AE%A4%E8%AF%81/"/>
     <id>http://yoursite.com/2017/09/01/Registry私有仓库搭建及认证/</id>
     <published>2017-09-01T09:44:19.000Z</published>
-    <updated>2017-09-08T08:39:54.000Z</updated>
+    <updated>2017-11-07T07:50:01.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Registry相关概念&quot;&gt;&lt;a href=&quot;#Registry相关概念&quot; class=&quot;headerlink&quot; title=&quot;Registry相关概念&quot;&gt;&lt;/a&gt;Registry相关概念&lt;/h2&gt;&lt;p&gt;前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。&lt;br&gt;image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。可以很容易和本地源代码以及远端Git服务的关系相对应。&lt;br&gt;Docker hub是Docker公司提供的一些存储镜像的空间，这部分空间是有限的。我们一般会自主建设Docker私有仓库Registry。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;Registry-V1和V2&quot;&gt;&lt;a href=&quot;#Registry-V1和V2&quot; class=&quot;headerlink&quot; title=&quot;Registry V1和V2&quot;&gt;&lt;/a&gt;Registry V1和V2&lt;/h2&gt;&lt;p&gt;Docker Registry 2.0版本在安全性和性能上做了诸多优化，并重新设计了镜像的存储的格式。Docker目前1.6之后支持V2。&lt;/p&gt;
@@ -3807,10 +3807,10 @@ docker-compose version 1.15.0, build e12f3b9
     
     </summary>
     
-      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
     
     
-      <category term="容器 Docker Registry" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker-Registry/"/>
+      <category term="Docker Registry" scheme="http://yoursite.com/tags/Docker-Registry/"/>
     
   </entry>
   
@@ -3819,7 +3819,7 @@ docker-compose version 1.15.0, build e12f3b9
     <link href="http://yoursite.com/2017/08/28/CentOS%E5%AE%89%E8%A3%85Docker-CE/"/>
     <id>http://yoursite.com/2017/08/28/CentOS安装Docker-CE/</id>
     <published>2017-08-28T05:29:47.000Z</published>
-    <updated>2017-11-06T01:41:49.000Z</updated>
+    <updated>2017-11-07T07:46:34.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how registries are handled.”，并且建议我尝试较新的版本。在2017年4月份的DockerCon会议上，Docker公司直接将 Github 上原隶属于 Docker 组织的 Docker 项目，直接 transfer 到了一个新的、名叫 Moby 的组织下，并将其重命名为 Moby 项目。由此先来了解下这个Moby项目。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;Moby项目&quot;&gt;&lt;a href=&quot;#Moby项目&quot; class=&quot;headerlink&quot; title=&quot;Moby项目&quot;&gt;&lt;/a&gt;Moby项目&lt;/h2&gt;&lt;p&gt;为什么会产生Moby这个项目呢？可以看到最近几年里面，在2015年之后的Docker 1.17版本之后，引入了很多的新特性，比如Network、runC等，Docker的组件越来越多，提供支持的场景也越来越复杂，比如微服务、机器学习、物联网等，所以Docker镜像的下载量也呈现指数型上升，最终Docker运行的环境，也是越来越复杂，越来越多，比如在Linux，Windows，还有在嵌入式设备上。&lt;br&gt;所以Docker原本的发行版本已经不能适配于这些越来越复杂的场景了，举个例子，其实在IoT里面，树莓派的性能是比较好的，但是它去运行Docker的话，Docker就会占整个性能的一大部分，这样它上面就已经无法运行其他的一些自己的应用了，那用户要怎么去解决这些事情，难道自己去再写一个Docker容器引擎吗？这个成本是很高的，需要自己去造轮子。所以为了提供更加开放的生态，Docker公司把Docker项目中现在的一些组件抽象成Moby项目，这样系统构建者就可以通过Moby项目把现有的组件去进行组装，然后组装成自己所需要的一个容器引擎。&lt;br&gt;Moby项目现在有80多个组件，通过这些组件，用户可以避免重复地去造轮子。用户可以按照自己的需要去组装组件，做出自己的一个容器系统。这些组件有一个标准化的调用方式，他们之间通过gRPC通信，它的语言也是可以去定制的，不会像之前一样必须用Go语言去写。通过标准化的方式，通过Moby这个项目就可以把这些组件进行组合，成为自己所依赖的容器系统。&lt;br&gt;Docker项目现在改名成Moby项目，但是Docker会逐渐的从Moby项目中去抽象和剥离出来，作为Moby的一种组装方式，比如Docker依赖于这里面的一些库，它就特化成一种组装，组装成自己的Docker CE的版本，也就是Docker的社区版。Docker社区版后面也会继续做开源，所以用户和开发者不需要担心以后用Docker就会收费了，对于Docker用户来说，他也无须感知用户接口的变化，使用的命令还是Docker不是Moby，需要更多运维支持的可以选择Docker EE的版本，让Docker公司的工程师去替你去做运维和更复杂的线上支持，如果自己开发可以继续选择Docker社区版。对于架构师而言，现在就可以不强依赖于Docker项目，而是通过这些组件去拼装出来一个容器引擎去满足自己的需求。&lt;/p&gt;
@@ -3901,10 +3901,10 @@ Cgroup Driver: cgroupfs
     
     </summary>
     
-      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
     
     
-      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
+      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
     
   </entry>
   
@@ -3913,7 +3913,7 @@ Cgroup Driver: cgroupfs
     <link href="http://yoursite.com/2017/08/25/Dockerfile%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/"/>
     <id>http://yoursite.com/2017/08/25/Dockerfile构建镜像/</id>
     <published>2017-08-25T02:55:41.000Z</published>
-    <updated>2017-11-02T07:13:44.000Z</updated>
+    <updated>2017-11-07T07:46:49.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Dockerfile介绍&quot;&gt;&lt;a href=&quot;#Dockerfile介绍&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile介绍&quot;&gt;&lt;/a&gt;Dockerfile介绍&lt;/h2&gt;&lt;p&gt;dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。&lt;br&gt;若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;ul&gt;
@@ -4074,10 +4074,10 @@ CMD [ &amp;quot;irb&amp;quot; ]
     
     </summary>
     
-      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
     
     
-      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
+      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
     
   </entry>
   
@@ -4086,7 +4086,7 @@ CMD [ &amp;quot;irb&amp;quot; ]
     <link href="http://yoursite.com/2017/08/23/%E6%89%8B%E5%8A%A8%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/"/>
     <id>http://yoursite.com/2017/08/23/手动构建镜像/</id>
     <published>2017-08-23T03:15:08.000Z</published>
-    <updated>2017-08-23T06:22:18.000Z</updated>
+    <updated>2017-11-07T07:46:11.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;创建docker镜像的方法&quot;&gt;&lt;a href=&quot;#创建docker镜像的方法&quot; class=&quot;headerlink&quot; title=&quot;创建docker镜像的方法&quot;&gt;&lt;/a&gt;创建docker镜像的方法&lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;使用”docker commit”命令&lt;/li&gt;
@@ -4130,10 +4130,10 @@ docker.io/nginx                         latest              b8efb18f159b        
     
     </summary>
     
-      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
     
     
-      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
+      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
     
   </entry>
   
@@ -4142,7 +4142,7 @@ docker.io/nginx                         latest              b8efb18f159b        
     <link href="http://yoursite.com/2017/08/18/Docker%E7%BD%91%E7%BB%9C%E5%92%8C%E5%AD%98%E5%82%A8/"/>
     <id>http://yoursite.com/2017/08/18/Docker网络和存储/</id>
     <published>2017-08-18T09:17:19.000Z</published>
-    <updated>2017-10-27T01:14:00.000Z</updated>
+    <updated>2017-11-07T07:47:08.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Docker网络访问&quot;&gt;&lt;a href=&quot;#Docker网络访问&quot; class=&quot;headerlink&quot; title=&quot;Docker网络访问&quot;&gt;&lt;/a&gt;Docker网络访问&lt;/h2&gt;&lt;h3 id=&quot;docker自带的网络&quot;&gt;&lt;a href=&quot;#docker自带的网络&quot; class=&quot;headerlink&quot; title=&quot;docker自带的网络&quot;&gt;&lt;/a&gt;docker自带的网络&lt;/h3&gt;&lt;ul&gt;
 &lt;li&gt;docker network ls：列出当前docker中已有的网络&lt;/li&gt;
@@ -4244,10 +4244,10 @@ test2.txt
     
     </summary>
     
-      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
     
     
-      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
+      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
     
   </entry>
   
@@ -4256,7 +4256,7 @@ test2.txt
     <link href="http://yoursite.com/2017/08/16/Docker%E9%95%9C%E5%83%8F%E5%92%8C%E5%AE%B9%E5%99%A8/"/>
     <id>http://yoursite.com/2017/08/16/Docker镜像和容器/</id>
     <published>2017-08-16T01:03:56.000Z</published>
-    <updated>2017-10-24T02:06:10.000Z</updated>
+    <updated>2017-11-07T07:47:17.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;安装Docker&quot;&gt;&lt;a href=&quot;#安装Docker&quot; class=&quot;headerlink&quot; title=&quot;安装Docker&quot;&gt;&lt;/a&gt;安装Docker&lt;/h2&gt;&lt;p&gt;Docker 对 Linux 内核版本的最低要求是3.10，如果内核版本低于 3.10 会缺少一些运行 Docker 容器的功能。这些比较旧的内核，在一定条件下会导致数据丢失和频繁恐慌错误。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;CentOS 6：&lt;br&gt;操作系统需要升级下内核，升级内核后安装Docker：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# yum install -y docker-io
@@ -4452,10 +4452,10 @@ Hello world
     
     </summary>
     
-      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
     
     
-      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
+      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
     
   </entry>
   
@@ -4464,7 +4464,7 @@ Hello world
     <link href="http://yoursite.com/2017/08/14/Docker%E4%BB%8B%E7%BB%8D/"/>
     <id>http://yoursite.com/2017/08/14/Docker介绍/</id>
     <published>2017-08-14T01:17:58.000Z</published>
-    <updated>2017-09-05T11:25:17.000Z</updated>
+    <updated>2017-11-07T07:46:59.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Docker的诞生&quot;&gt;&lt;a href=&quot;#Docker的诞生&quot; class=&quot;headerlink&quot; title=&quot;Docker的诞生&quot;&gt;&lt;/a&gt;Docker的诞生&lt;/h2&gt;&lt;p&gt;dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。&lt;br&gt;Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;容器技术其实早在2000年早起的UNIX系统上就出现了，直到2007年才加入Linux。容器的行为表现与虚拟机非常类似。现在人们提起容器，基本上指的都是Docker容器了。Docker极大地简化了容器的使用方法，将基于Linux内核隔离机制的容器实现细节统统隐藏在一条简单的命令：docker run之后。另外，Docker提供了一种容器格式，允许将应用和服务打包成一个理论上可以运行在任何安装了Docker Daemon的Linux系统上的容器。&lt;/p&gt;
 &lt;h2 id=&quot;Hypervisor与Docker&quot;&gt;&lt;a href=&quot;#Hypervisor与Docker&quot; class=&quot;headerlink&quot; title=&quot;Hypervisor与Docker&quot;&gt;&lt;/a&gt;Hypervisor与Docker&lt;/h2&gt;&lt;h3 id=&quot;Hypervisor&quot;&gt;&lt;a href=&quot;#Hypervisor&quot; class=&quot;headerlink&quot; title=&quot;Hypervisor&quot;&gt;&lt;/a&gt;Hypervisor&lt;/h3&gt;&lt;p&gt;Hypervisor是一种运行在物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享一套基础物理硬件，因此也可以看作是虚拟环境中的“元”操作系统，它可以协调访问服务器上的所有物理设备和虚拟机，也叫虚拟机监视器（Virtual Machine Monitor）。Hypervisor是所有虚拟化技术的核心。&lt;br&gt;Hypervisor是一种运行在基础物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享硬件。也可叫做VMM（ virtual machine monitor ），即虚拟机监视器。 Hypervisors是一种在虚拟环境中的“元”操作系统。他们可以访问服务器上包括磁盘和内存在内的所有物理设备。Hypervisors不但协调着这些硬件资源的访问，也同时在各个虚拟机之间施加防护。当服务器启动并执行Hypervisor时，它会加载所有虚拟机客户端的操作系统同时会分配给每一台虚拟机适量的内存，CPU，网络和磁盘。&lt;/p&gt;
@@ -4506,10 +4506,10 @@ Hello world
     
     </summary>
     
-      <category term="Docker" scheme="http://yoursite.com/categories/Docker/"/>
+      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
     
     
-      <category term="容器 Docker" scheme="http://yoursite.com/tags/%E5%AE%B9%E5%99%A8-Docker/"/>
+      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
     
   </entry>
   
@@ -4518,7 +4518,7 @@ Hello world
     <link href="http://yoursite.com/2017/08/11/Spark%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2017/08/11/Spark介绍及安装部署/</id>
     <published>2017-08-11T00:11:26.000Z</published>
-    <updated>2017-09-20T12:39:19.000Z</updated>
+    <updated>2017-11-07T07:49:20.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Spark介绍&quot;&gt;&lt;a href=&quot;#Spark介绍&quot; class=&quot;headerlink&quot; title=&quot;Spark介绍&quot;&gt;&lt;/a&gt;Spark介绍&lt;/h2&gt;&lt;h3 id=&quot;Apache-Spark&quot;&gt;&lt;a href=&quot;#Apache-Spark&quot; class=&quot;headerlink&quot; title=&quot;Apache Spark&quot;&gt;&lt;/a&gt;Apache Spark&lt;/h3&gt;&lt;p&gt;Apache Spark是一个围绕速度、易用性和复杂分析构建的大数据处理框架(没有数据存储)。最初在2009年由加州大学伯克利分校的AMPLab开发，并于2010年成为Apache的开源项目之一。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;Hadoop和Spark&quot;&gt;&lt;a href=&quot;#Hadoop和Spark&quot; class=&quot;headerlink&quot; title=&quot;Hadoop和Spark&quot;&gt;&lt;/a&gt;Hadoop和Spark&lt;/h3&gt;&lt;p&gt;Hadoop常用于解决高吞吐、批量处理的业务场景，例如离线计算结果用于浏览量统计。如果需要实时查看浏览量统计信息，Hadoop显然不符合这样的要求。Spark通过内存计算能力极大地提高了大数据处理速度，满足了以上场景的需要。&lt;br&gt;与Hadoop和Storm等其他大数据和MapReduce技术相比，Spark有以下特点：&lt;br&gt;&lt;strong&gt;1.快速处理能力&lt;/strong&gt;&lt;br&gt;随着实时大数据应用越来越多，Hadoop作为离线的高吞吐、低响应框架已不能满足这类需求。Hadoop MapReduce的Job将中间输出和结果存储在HDFS中，读写HDFS造成磁盘I/O称为瓶颈。Spark允许将中间输出和结果存储在内存中，避免了大量的磁盘I/O。同时Spark自身的DAG执行引擎也支持数据在内存中的计算。Spark官网声称性能比Hadoop快100倍，如图所示。即便是内存不足，需要磁盘I/O，其速度也是Hadoop的10倍以上。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
@@ -4764,7 +4764,7 @@ export PATH=$SPARK_HOME/bin:$PATH
       <category term="实时处理" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E5%A4%84%E7%90%86/"/>
     
     
-      <category term="大数据 实时处理 Spark" scheme="http://yoursite.com/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE-%E5%AE%9E%E6%97%B6%E5%A4%84%E7%90%86-Spark/"/>
+      <category term="Spark" scheme="http://yoursite.com/tags/Spark/"/>
     
   </entry>
   
