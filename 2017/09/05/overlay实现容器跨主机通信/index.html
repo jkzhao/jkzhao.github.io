@@ -127,7 +127,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/33.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/34.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/35.png">
-<meta property="og:updated_time" content="2017-11-07T07:47:34.000Z">
+<meta property="og:updated_time" content="2017-11-07T13:06:15.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="overlay实现容器跨主机通信">
 <meta name="twitter:description" content="Docker容器跨主机通信方案实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是doc">
@@ -357,7 +357,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-07T15:47:34+08:00" content="2017-11-07">
+              <time itemprop="dateUpdated" datetime="2017-11-07T21:06:15+08:00" content="2017-11-07">
               2017-11-07
               </time>
               </span>
@@ -451,7 +451,7 @@
 <pre><code>[root@node1 ~]# rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
 </code></pre><p>3.在yum的ELRepo源中，mainline 为最新版本的内核<br>安装 ml 的内核</p>
 <pre><code>[root@node1 ~]# yum --enablerepo=elrepo-kernel install  kernel-ml-devel kernel-ml -y
-</code></pre><p>4.修改内核启动顺序，默认启动的顺序应该为1,升级以后内核是往前面插入，为0<br>由于CentOS 7使用grub2作为引导程序 ，所以和CentOS 6有所不同，并不是修改/etc/grub.conf来修改启动项，需要如下操作：</p>
+</code></pre><p>4.修改内核启动顺序，默认启动的顺序应该为1，升级以后内核是往前面插入，为0<br>由于CentOS 7使用grub2作为引导程序 ，所以和CentOS 6有所不同，并不是修改/etc/grub.conf来修改启动项，需要如下操作：</p>
 <pre><code>[root@node1 ~]# cat /boot/grub2/grub.cfg |grep menuentry   #查看有哪些内核选项
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/21.png" alt=""></p>
 <pre><code>[root@node1 ~]# grub2-editenv list
@@ -459,7 +459,7 @@
 <pre><code>[root@node1 ~]# grub2-set-default 0
 </code></pre><p>5.重启系统</p>
 <pre><code>[root@node1 ~]# shutdown -r now
-</code></pre><p>6.查看 内核版本</p>
+</code></pre><p>6.查看内核版本</p>
 <pre><code>[root@node1 ~]# uname -r
 4.5.2-1.el7.elrepo.x86_64
 </code></pre><h2 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h2><pre><code>[root@node1 ~]# vim /etc/yum.repos.d/docker.repo
@@ -537,7 +537,10 @@ ca0c50dd3a49             net1                    overlay
 <h2 id="抓包分析"><a href="#抓包分析" class="headerlink" title="抓包分析"></a>抓包分析</h2><p>在node2主机上使用tcpdump抓包，然后在windows上用wireshark分析。<br>1.container1容器里ping container2的ip地址：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/33.png" alt=""></p>
 <p>2.node2主机上抓包</p>
 <pre><code>[root@node2 ~]# tcpdump -i ens32 -s 0 -X -nnn -vvv -w /tmp/package.pcap
-</code></pre><p>3.把package.pcap传下来放到wireshark上分析<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/34.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/35.png" alt=""><br><strong>以在container1中ping container2，分析数据包流向：</strong><br>①container1(10.10.10.3)中ping container2(10.10.10.4)，根据container1的路由表，数据包可通过直连网络到达container2。于是arp请求获取container2的MAC地址(在xvlan上的arp这里不详述)，得到mac地址后，封包，从eth0发出；<br>②eth0桥接在net ns 1-ca0c50dd3a中的br0上，这个br0是个网桥(交换机)虚拟设备，需要将来自eth0的包转发出去，于是包转给了vxlan设备；这个可以通过arp -a看到一些端倪：<br>[root@node1 ~]# ip netns exec 1-ca0c50dd3a arp -a<br>③vxlan是个特殊设备，收到包后，由vxlan设备创建时注册的设备处理程序对包进行处理，即进行VXLAN封包（这期间会查询consul中存储的net1信息），将ICMP包整体作为UDP包的payload封装起来，并将UDP包通过宿主机的eth0发送出去。<br>④152宿主机收到UDP包后，发现是VXLAN包，根据VXLAN包中的相关信息（比如Vxlan Network Identifier，VNI=256)找到vxlan设备，并转给该vxlan设备处理。vxlan设备的处理程序进行解包，并将UDP中的payload取出，整体通过br0转给veth口，net1c2从eth0收到ICMP数据包，回复icmp reply。<br><strong>从这个通信过程中来看，跨主机通信过程中的步骤如下：</strong></p>
+</code></pre><p>3.把package.pcap传下来放到wireshark上分析<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/34.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/35.png" alt=""><br><strong>以在container1中ping container2，分析数据包流向：</strong><br>①container1(10.10.10.3)中ping container2(10.10.10.4)，根据container1的路由表，数据包可通过直连网络到达container2。于是arp请求获取container2的MAC地址(在xvlan上的arp这里不详述)，得到mac地址后，封包，从eth0发出；<br>②eth0桥接在net ns 1-ca0c50dd3a中的br0上，这个br0是个网桥(交换机)虚拟设备，需要将来自eth0的包转发出去，于是包转给了vxlan设备；这个可以通过arp -a看到一些端倪：</p>
+<pre><code>[root@node1 ~]# ip netns exec 1-ca0c50dd3a arp -a
+</code></pre><p>③vxlan是个特殊设备，收到包后，由vxlan设备创建时注册的设备处理程序对包进行处理，即进行VXLAN封包（这期间会查询consul中存储的net1信息），将ICMP包整体作为UDP包的payload封装起来，并将UDP包通过宿主机的eth0发送出去。<br>④152宿主机收到UDP包后，发现是VXLAN包，根据VXLAN包中的相关信息（比如Vxlan Network Identifier，VNI=256)找到vxlan设备，并转给该vxlan设备处理。vxlan设备的处理程序进行解包，并将UDP中的payload取出，整体通过br0转给veth口，net1c2从eth0收到ICMP数据包，回复icmp reply。</p>
+<p><strong>从这个通信过程中来看，跨主机通信过程中的步骤如下：</strong></p>
 <ul>
 <li>容器的网络命名空间与overlay网络的网络命名空间通过一对veth pair连接起来，当容器对外通信时，veth pair起到网线的作用，将流量发送到overlay网络的网络命名空间中。 </li>
 <li>容器的veth pair对端eth2与vxlan设备通过br0这个Linux bridge桥接在一起，br0在同一宿主机上起到虚拟机交换机的作用，如果目标地址在同一宿主机上，则直接通信，如果不再则通过设置在vxlan1这个vxlan设备进行跨主机通信。 </li>
@@ -673,7 +676,7 @@ ca0c50dd3a49             net1                    overlay
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

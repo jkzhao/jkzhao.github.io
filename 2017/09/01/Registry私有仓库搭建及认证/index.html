@@ -112,7 +112,7 @@
 <meta property="og:site_name" content="jkzhao&#39;s blog">
 <meta property="og:description" content="Registry相关概念前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-11-07T07:50:01.000Z">
+<meta property="og:updated_time" content="2017-11-10T04:20:42.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Registry私有仓库搭建及认证">
 <meta name="twitter:description" content="Registry相关概念前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。">
@@ -341,8 +341,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-07T15:50:01+08:00" content="2017-11-07">
-              2017-11-07
+              <time itemprop="dateUpdated" datetime="2017-11-10T12:20:42+08:00" content="2017-11-10">
+              2017-11-10
               </time>
               </span>
             
@@ -403,19 +403,19 @@
       
         <h2 id="Registry相关概念"><a href="#Registry相关概念" class="headerlink" title="Registry相关概念"></a>Registry相关概念</h2><p>前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。<br>image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。可以很容易和本地源代码以及远端Git服务的关系相对应。<br>Docker hub是Docker公司提供的一些存储镜像的空间，这部分空间是有限的。我们一般会自主建设Docker私有仓库Registry。<br><a id="more"></a></p>
 <h2 id="Registry-V1和V2"><a href="#Registry-V1和V2" class="headerlink" title="Registry V1和V2"></a>Registry V1和V2</h2><p>Docker Registry 2.0版本在安全性和性能上做了诸多优化，并重新设计了镜像的存储的格式。Docker目前1.6之后支持V2。</p>
-<h2 id="安装Docker"><a href="#安装Docker" class="headerlink" title="安装Docker"></a>安装Docker</h2><p>见前面发布的文章《CentOS安装Docker CE》。注意，在docker 1.12版本上测试registry有问题。</p>
+<h2 id="安装Docker"><a href="#安装Docker" class="headerlink" title="安装Docker"></a>安装Docker</h2><p>见前面发布的文章《CentOS安装Docker CE》。</p>
 <h2 id="搭建本地registry-v2"><a href="#搭建本地registry-v2" class="headerlink" title="搭建本地registry v2"></a>搭建本地registry v2</h2><p>环境：172.16.7.151 CentOS 7.0</p>
 <pre><code>[root@node1 ~]# docker run -d -p 5000:5000 --name wisedu_registry registry:2
-</code></pre><p>本地上传:</p>
+</code></pre><p>本地push镜像到仓库:</p>
 <pre><code>[root@node1 ~]# docker pull ubuntu:16.04
 [root@node1 ~]# docker tag ubuntu:16.04 localhost:5000/my-ubuntu
 [root@node1 ~]# docker push localhost:5000/my-ubuntu
-</code></pre><p>删除本地的ubuntu:16.04和localhost:5000/my-ubuntu</p>
+</code></pre><p>删除本地的ubuntu:16.04和localhost:5000/my-ubuntu镜像</p>
 <pre><code>[root@node1 ~]# docker image remove ubuntu:16.04
 [root@node1 ~]# docker image remove localhost:5000/my-ubuntu
 </code></pre><p>从本地registry中拉取 localhost:5000/my-ubuntu 镜像：</p>
 <pre><code>[root@node1 ~]# docker pull localhost:5000/my-ubuntu
-</code></pre><p>但是这种registry只是本地能使用，我们找另外一台主机172.16.7.152来push镜像：</p>
+</code></pre><p>但是这种registry只是本地能使用，我们找另外一台主机172.16.7.152往该registry中push镜像：</p>
 <pre><code>[root@node2 ~]# docker pull ubuntu:16.04
 [root@node2 docker]# docker tag ubuntu:16.04 172.16.7.151:5000/ubuntu:v1
 [root@node2 docker]# docker push 172.16.7.151:5000/ubuntu:v1
@@ -430,7 +430,8 @@ wisedu_registry
 [root@node1 ~]# docker rm -v wisedu_registry
 wisedu_registry
 </code></pre><h2 id="搭建外部可访问的Registry"><a href="#搭建外部可访问的Registry" class="headerlink" title="搭建外部可访问的Registry"></a>搭建外部可访问的Registry</h2><p>官方文档：<a href="https://docs.docker.com/registry/deploying/#run-an-externally-accessible-registry" target="_blank" rel="external">https://docs.docker.com/registry/deploying/#run-an-externally-accessible-registry</a><br>Running a registry only accessible on localhost has limited usefulness. In order to make your registry accessible to external hosts, you must first secure it using TLS.</p>
-<p>使用TLS认证registry容器时，必须有证书。一般情况下，是要去认证机构购买签名证书。这里使用openssl生成自签名的证书。<br>1.生成自签名证书</p>
+<p>使用TLS认证registry容器时，必须有证书。一般情况下，是要去认证机构购买签名证书。这里使用openssl生成自签名的证书。<br>环境信息：172.16.206.32  CentOS 7.0  主机名：spark32</p>
+<p>1.生成自签名证书</p>
 <pre><code>[root@spark32 ~]# mkdir -p /opt/docker/registry/certs
 [root@spark32 ~]# openssl req -newkey rsa:4096 -nodes -sha256 -keyout /opt/docker/registry/certs/domain.key -x509 -days 365 -out /opt/docker/registry/certs/domain.crt
 Generating a 4096 bit RSA private key
@@ -451,7 +452,7 @@ Email Address []:01115004@wisedu.com
 [root@node1 certs.d]# mkdir registry.docker.com:5000
 </code></pre><p>4.将证书 domain.crt 复制到每一个docker客户端宿主机/etc/docker/certs.d/registry.docker.com:5000/ca.crt，不需要重启docker</p>
 <pre><code>[root@spark32 ~]# scp -p /opt/docker/registry/certs/domain.crt root@172.16.7.151:/etc/docker/certs.d/registry.docker.com\:5000/ca.crt
-</code></pre><p>5.push镜像到registry</p>
+</code></pre><p>5.push镜像到registry<br>另找一台客户机，node1。</p>
 <pre><code>[root@node1 certs.d]# docker tag ubuntu:16.04 registry.docker.com:5000/my-ubuntu:v1
 [root@node1 certs.d]# docker push registry.docker.com:5000/my-ubuntu:v1
 The push refers to a repository [registry.docker.com:5000/my-ubuntu]
@@ -488,10 +489,10 @@ Email Address []:
 [root@spark32 ~]# docker run --entrypoint htpasswd registry:2 -Bbn testuser testpassword &gt; /opt/docker/registry/auth/htpasswd
 </code></pre><p>2.运行registry容器</p>
 <pre><code>[root@spark32 ~]# docker run -d --name registry_native_auth -p 5000:5000 -v /opt/docker/registry/auth:/auth -e &quot;REGISTRY_AUTH=htpasswd&quot; -e &quot;REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm&quot; -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd -v /opt/docker/registry/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2
-</code></pre><p>3.现在尝试拉取镜像：</p>
+</code></pre><p>3.现在尝试拉取镜像</p>
 <pre><code>[root@node1 ~]# docker pull registry.docker.com:5000/my-ubuntu:v1
 Error response from daemon: Get https://registry.docker.com:5000/v2/my-ubuntu/manifests/v1: no basic auth credentials
-</code></pre><p>4.登录registry，push镜像：</p>
+</code></pre><p>4.登录registry，push镜像</p>
 <pre><code>[root@node1 ~]# docker login registry.docker.com:5000
 Username: testuser
 Password: 
@@ -613,7 +614,7 @@ Login Succeeded
 </code></pre><h3 id="补充Docker-compose"><a href="#补充Docker-compose" class="headerlink" title="补充Docker compose"></a>补充Docker compose</h3><h4 id="Docker-compose是什么"><a href="#Docker-compose是什么" class="headerlink" title="Docker compose是什么"></a>Docker compose是什么</h4><p>Docker Compose是一个用来定义和运行复杂应用的Docker工具。使用Compose，你可以在一个文件中定义一个多容器应用，然后使用一条命令来启动你的应用，完成一切准备工作。<br>一个使用Docker容器的应用，通常由多个容器组成。使用Docker Compose，不再需要使用shell脚本来启动容器。<br>Docker Compose将所管理的容器分为三层，工程(project)、服务(service)以及容器(contaienr)。一个工程当中可包含多个服务，每个服务中定义了容器运行的镜像，参数，依赖。一个服务当中可包括多个容器实例，Docker Compose并没有解决负载均衡的问题，因此需要借助其他工具实现服务发现及负载均衡。</p>
 <h4 id="安装docker-compose"><a href="#安装docker-compose" class="headerlink" title="安装docker compose"></a>安装docker compose</h4><p>将变量 $dockerComposeVersion 换成指定的<a href="https://github.com/docker/compose/releases" target="_blank" rel="external">版本</a></p>
 <pre><code>[root@spark32 ~]# curl -L https://github.com/docker/compose/releases/download/$dockerComposeVersion/docker-compose-`uname -m` -o /usr/local/bin/docker-compose
-</code></pre><p>比如下载1.15.0版本：</p>
+</code></pre><p>比如下载安装1.15.0版本：</p>
 <pre><code>[root@spark32 ~]# curl -L https://github.com/docker/compose/releases/download/1.15.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 </code></pre><p>可能会下载失败，多试几次。实在不行就需要翻墙去下载。</p>
 <p>赋予执行权限：</p>
@@ -753,7 +754,7 @@ docker-compose version 1.15.0, build e12f3b9
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
