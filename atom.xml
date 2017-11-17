@@ -717,7 +717,7 @@ partition
     <link href="http://yoursite.com/2017/09/30/Jenkins-Docker-%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/"/>
     <id>http://yoursite.com/2017/09/30/Jenkins-Docker-持续集成/</id>
     <published>2017-09-30T08:56:51.000Z</published>
-    <updated>2017-11-13T07:38:57.000Z</updated>
+    <updated>2017-11-14T02:17:53.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Jenkins介绍&quot;&gt;&lt;a href=&quot;#Jenkins介绍&quot; class=&quot;headerlink&quot; title=&quot;Jenkins介绍&quot;&gt;&lt;/a&gt;Jenkins介绍&lt;/h2&gt;&lt;p&gt;Jenkins是一个开源软件项目，是基于Java开发的一种持续集成工具，用于监控持续重复的工作，旨在提供一个开放易用的软件平台，使软件的持续集成变成可能。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;安装部署Jenkins&quot;&gt;&lt;a href=&quot;#安装部署Jenkins&quot; class=&quot;headerlink&quot; title=&quot;安装部署Jenkins&quot;&gt;&lt;/a&gt;安装部署Jenkins&lt;/h2&gt;&lt;p&gt;&lt;a href=&quot;https://jenkins.io/download/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://jenkins.io/download/&lt;/a&gt;&lt;br&gt;我这里下载war包安装，版本：1.642.3 LTS .war&lt;/p&gt;
@@ -759,12 +759,12 @@ Jenkins home directory: /home/jenkins/.jenkins found at: $user.home/.jenkins
 &lt;pre&gt;&lt;code&gt;[jenkins@osb30 ~]$ cd apache-tomcat-8.0.30/bin/
 [jenkins@osb30 bin]$ vim catalina.sh 
 JAVA_OPTS=&amp;quot;-Xms1024m -Xmx1024m -Djava.awt.headless=true&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.访问jenkins：&lt;br&gt;&lt;a href=&quot;http://172.16.206.30:8080/jenkins&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.30:8080/jenkins&lt;/a&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.访问jenkins&lt;br&gt;&lt;a href=&quot;http://172.16.206.30:8080/jenkins&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.30:8080/jenkins&lt;/a&gt;&lt;/p&gt;
 &lt;h4 id=&quot;java部署启动jenkins&quot;&gt;&lt;a href=&quot;#java部署启动jenkins&quot; class=&quot;headerlink&quot; title=&quot;java部署启动jenkins&quot;&gt;&lt;/a&gt;java部署启动jenkins&lt;/h4&gt;&lt;p&gt;切换到jenkins.war存放的目录，输入如下命令：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;$ java -jar jenkins.war   
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可以修改启动端口&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;$ java -jar jenkins.war --httpPort=8000
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后在浏览器中（推荐用火狐、chrom）输入&lt;a href=&quot;http://localhost:8080，localhost可以是本机的ip，也可以是计算机名。就可以打开jenkins；修改端口后，访问地址的端口需同步变更。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://localhost:8080，localhost可以是本机的ip，也可以是计算机名。就可以打开jenkins；修改端口后，访问地址的端口需同步变更。&lt;/a&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后在浏览器中（推荐用火狐、chrome）输入&lt;a href=&quot;http://localhost:8080，localhost可以是本机的ip，也可以是计算机名。就可以打开jenkins；修改端口后，访问地址的端口需同步变更。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://localhost:8080，localhost可以是本机的ip，也可以是计算机名。就可以打开jenkins；修改端口后，访问地址的端口需同步变更。&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;Jenkins授权和访问控制&quot;&gt;&lt;a href=&quot;#Jenkins授权和访问控制&quot; class=&quot;headerlink&quot; title=&quot;Jenkins授权和访问控制&quot;&gt;&lt;/a&gt;Jenkins授权和访问控制&lt;/h3&gt;&lt;p&gt;默认地Jenkins不包含任何的安全检查，任何人可以修改Jenkins设置，job和启动build等。显然地在大规模的公司需要多个部门一起协调工作的时候，没有任何安全检查会带来很多的问题。 我们可以通过下面的方式来增强Jenkins的安全：&lt;br&gt;访问jenkins：&lt;a href=&quot;http://172.16.206.30:8080/jenkins，&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.30:8080/jenkins，&lt;/a&gt;&lt;br&gt;点击系统管理—&amp;gt; Configure Global Security，点击”启用安全”，可以看到可以使用多种方式来增强Jenkins的授权和访问控制：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/44.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/45.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;如上图所示，默认是”任何用户可以做任何事情(没有任何限制)”。&lt;br&gt;我们在”安全域”选择”Jenkins专有用户数据库”，”允许用户注册”；并先在“授权策略”点击“任何用户可以做任何事情(没有任何限制)”， 防止注册之后无法再管理jenkins。此时就可以刷新一下jenkins的页面看到右上角有登录、注册的按钮。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/46.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h4 id=&quot;注册管理员账号&quot;&gt;&lt;a href=&quot;#注册管理员账号&quot; class=&quot;headerlink&quot; title=&quot;注册管理员账号&quot;&gt;&lt;/a&gt;注册管理员账号&lt;/h4&gt;&lt;p&gt;1.点击注册，首先注册一个管理员账号。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/47.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;2.点击系统管理—&amp;gt; Configure Global Security，在“授权策略”选择”安全矩阵”，添加用户/组——添加admin账户——为admin账户添加所有权限，为匿名用户勾选你希望对方了解的功能。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/48.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;【注意】：匿名用户一定要开启此处的可读权限，若不开启，后面github或者bitbucket的webhook自动构建会没有权限。&lt;br&gt;并且勾选上该项，点击保存。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/49.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;做完此部操作之后，即可用admin帐号登录，取消登录用户可以做任何事的权限。&lt;br&gt;以上操作，即可完成jenkins的授权和访问控制。&lt;/p&gt;
@@ -892,7 +892,7 @@ sonar.web.port=9003
 &lt;h3 id=&quot;关闭sonar&quot;&gt;&lt;a href=&quot;#关闭sonar&quot; class=&quot;headerlink&quot; title=&quot;关闭sonar&quot;&gt;&lt;/a&gt;关闭sonar&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[sonar@osb30 ~]$ sonarqube-4.5.7/bin/linux-x86-64/sonar.sh stop
 &lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;访问sonar&quot;&gt;&lt;a href=&quot;#访问sonar&quot; class=&quot;headerlink&quot; title=&quot;访问sonar&quot;&gt;&lt;/a&gt;访问sonar&lt;/h3&gt;&lt;p&gt;浏览器输入&lt;a href=&quot;http://172.16.206.30:9003/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.30:9003/&lt;/a&gt;&lt;br&gt;默认的管理员帐号和密码为:admin/admin。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/76.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/77.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/78.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h3 id=&quot;sonar插件&quot;&gt;&lt;a href=&quot;#sonar插件&quot; class=&quot;headerlink&quot; title=&quot;sonar插件&quot;&gt;&lt;/a&gt;sonar插件&lt;/h3&gt;&lt;p&gt;Sonar支持多种插件，插件的下载地址为：&lt;a href=&quot;http://docs.codehaus.org/display/SONAR/Plugin+Library&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://docs.codehaus.org/display/SONAR/Plugin+Library&lt;/a&gt;&lt;br&gt;将下载后的插件上传到${SONAR_HOME}extensions\plugins目录下，重新启动sonar。&lt;/p&gt;
-&lt;p&gt;sonar默认集成了Java Ecosystem插件，该插件是一组插件的合集&lt;/p&gt;
+&lt;p&gt;sonar默认集成了Java Ecosystem插件，该插件是一组插件的合集:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Java [sonar-java-plugin]：java源代码解析，计算指标等&lt;/li&gt;
 &lt;li&gt;Squid [sonar-squid-java-plugin]：检查违反Sonar定义规则的代码&lt;/li&gt;
@@ -979,7 +979,7 @@ Defaults:root !requiretty
 &lt;pre&gt;&lt;code&gt;[SSH] executing...
 sudo: sorry, you must have a tty to run sudo
 docker: invalid reference format.
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装插件&quot;&gt;&lt;a href=&quot;#安装插件&quot; class=&quot;headerlink&quot; title=&quot;安装插件&quot;&gt;&lt;/a&gt;安装插件&lt;/h3&gt;&lt;p&gt;登录Jenkins，点击“系统管理”，点击“管理插件”，搜索插件“SSH plugin”，进行安装。&lt;br&gt;登录Jenkins，点击“Credentials”，点击“Add domain”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/88.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/89.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/90.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击“系统管理”，“系统配置”，找到“&lt;br&gt;SSH remote hosts”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/91.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装插件&quot;&gt;&lt;a href=&quot;#安装插件&quot; class=&quot;headerlink&quot; title=&quot;安装插件&quot;&gt;&lt;/a&gt;安装插件&lt;/h3&gt;&lt;p&gt;登录Jenkins，点击“系统管理”，点击“管理插件”，搜索插件“SSH plugin”，进行安装。&lt;br&gt;登录Jenkins，点击“Credentials”，点击“Add domain”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/88.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/89.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/90.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击“系统管理”，“系统配置”，找到“SSH remote hosts”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/91.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h3 id=&quot;配置Post-Steps&quot;&gt;&lt;a href=&quot;#配置Post-Steps&quot; class=&quot;headerlink&quot; title=&quot;配置Post Steps&quot;&gt;&lt;/a&gt;配置Post Steps&lt;/h3&gt;&lt;p&gt;项目其他的配置不变，见上面的章节。&lt;br&gt;【注意】：脚本中用到的仓库和认证的账号需要先在harbor新建好。&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/92.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# Jenkins机器：编译完成后，build生成一个新版本的镜像，push到远程docker仓库
@@ -1830,7 +1830,7 @@ To further debug and diagnose cluster problems, use &amp;apos;kubectl cluster-in
     <link href="http://yoursite.com/2017/09/15/%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%B9%E5%BC%8F%E9%83%A8%E7%BD%B2Kubernetes-1-6-0%E9%9B%86%E7%BE%A4-%E5%BC%80%E5%90%AFTLS/"/>
     <id>http://yoursite.com/2017/09/15/二进制方式部署Kubernetes-1-6-0集群-开启TLS/</id>
     <published>2017-09-15T06:06:09.000Z</published>
-    <updated>2017-11-13T07:40:23.000Z</updated>
+    <updated>2017-11-17T13:23:23.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Kubernetes简介&quot;&gt;&lt;a href=&quot;#Kubernetes简介&quot; class=&quot;headerlink&quot; title=&quot;Kubernetes简介&quot;&gt;&lt;/a&gt;Kubernetes简介&lt;/h2&gt;&lt;p&gt;Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本,主要功能包括:&lt;/p&gt;
 &lt;ul&gt;
@@ -2452,7 +2452,7 @@ e64edc68e5e81b55: name=node2 peerURLs=https://172.16.7.152:2380 clientURLs=https
 9a0745d96695eec6: name=node3 peerURLs=https://172.16.7.153:2380 clientURLs=https://172.16.7.153:2379 isLeader=false
 e64edc68e5e81b55: name=node2 peerURLs=https://172.16.7.152:2380 clientURLs=https://172.16.7.152:2379 isLeader=true
 # etcdctl --endpoints &amp;quot;http://192.168.2.210:2379&amp;quot; member remove 9a0745d96695eec6
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;部署高可用-kubernetes-master-集群&quot;&gt;&lt;a href=&quot;#部署高可用-kubernetes-master-集群&quot; class=&quot;headerlink&quot; title=&quot;部署高可用 kubernetes master 集群&quot;&gt;&lt;/a&gt;部署高可用 kubernetes master 集群&lt;/h2&gt;&lt;p&gt;kubernetes master 节点包含的组件：&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;部署-kubernetes-master-集群&quot;&gt;&lt;a href=&quot;#部署-kubernetes-master-集群&quot; class=&quot;headerlink&quot; title=&quot;部署 kubernetes master 集群&quot;&gt;&lt;/a&gt;部署 kubernetes master 集群&lt;/h2&gt;&lt;p&gt;kubernetes master 节点包含的组件：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;kube-apiserver&lt;/li&gt;
 &lt;li&gt;kube-scheduler&lt;/li&gt;
