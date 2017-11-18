@@ -104,20 +104,20 @@
 
 
 
-<meta name="description" content="Kubernetes简介Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本,主要功能包括:  基于容器的应用部署、维护和滚动升级 负载均衡和服务发现 跨机器和跨地区的集群调度">
+<meta name="description" content="Kubernetes简介Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本，主要功能包括:  基于容器的应用部署、维护和滚动升级 负载均衡和服务发现 跨机器和跨地区的集群调度">
 <meta name="keywords" content="Kubernetes">
 <meta property="og:type" content="article">
 <meta property="og:title" content="二进制方式部署Kubernetes 1.6.0集群(开启TLS)">
 <meta property="og:url" content="http://yoursite.com/2017/09/15/二进制方式部署Kubernetes-1-6-0集群-开启TLS/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="Kubernetes简介Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本,主要功能包括:  基于容器的应用部署、维护和滚动升级 负载均衡和服务发现 跨机器和跨地区的集群调度">
+<meta property="og:description" content="Kubernetes简介Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本，主要功能包括:  基于容器的应用部署、维护和滚动升级 负载均衡和服务发现 跨机器和跨地区的集群调度">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/1.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/2.png">
-<meta property="og:updated_time" content="2017-11-17T13:23:23.000Z">
+<meta property="og:updated_time" content="2017-11-18T01:45:31.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="二进制方式部署Kubernetes 1.6.0集群(开启TLS)">
-<meta name="twitter:description" content="Kubernetes简介Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本,主要功能包括:  基于容器的应用部署、维护和滚动升级 负载均衡和服务发现 跨机器和跨地区的集群调度">
+<meta name="twitter:description" content="Kubernetes简介Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本，主要功能包括:  基于容器的应用部署、维护和滚动升级 负载均衡和服务发现 跨机器和跨地区的集群调度">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/1.png">
 
 
@@ -344,8 +344,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-17T21:23:23+08:00" content="2017-11-17">
-              2017-11-17
+              <time itemprop="dateUpdated" datetime="2017-11-18T09:45:31+08:00" content="2017-11-18">
+              2017-11-18
               </time>
               </span>
             
@@ -404,7 +404,7 @@
       
 
       
-        <h2 id="Kubernetes简介"><a href="#Kubernetes简介" class="headerlink" title="Kubernetes简介"></a>Kubernetes简介</h2><p>Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本,主要功能包括:</p>
+        <h2 id="Kubernetes简介"><a href="#Kubernetes简介" class="headerlink" title="Kubernetes简介"></a>Kubernetes简介</h2><p>Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本，主要功能包括:</p>
 <ul>
 <li>基于容器的应用部署、维护和滚动升级</li>
 <li>负载均衡和服务发现</li>
@@ -414,7 +414,7 @@
 <li>广泛的Volume支持 </li>
 <li>插件机制保证扩展性</li>
 </ul>
-<p>之前尝试使用kubeadm自动化部署集群，使用yum去安装kubeadm等工具，但是不翻墙的情况下，这种方式在国内几乎是不可能安装成功的。于是改为采用二进制文件部署Kubernetes集群，同时开启了集群的TLS安全认证。本篇实践是参照opsnull的文章<a href="https://mp.weixin.qq.com/s/bvCZUl6LQhlqDVv_TNeDFg" target="_blank" rel="external">创建 kubernetes 各组件 TLS 加密通信的证书和秘钥</a>，结合公司的实际情况进行的。</p>
+<p>之前尝试使用kubeadm自动化部署集群，使用yum去安装kubeadm等工具，但是不翻墙的情况下，这种方式在国内几乎是不可能安装成功的。于是改为采用二进制文件部署Kubernetes集群，同时开启了集群的TLS安全认证。本篇实践是参照opsnull的文章<a href="https://mp.weixin.qq.com/s/bvCZUl6LQhlqDVv_TNeDFg" target="_blank" rel="external">创建 kubernetes 各组件 TLS 加密通信的证书和秘钥</a>，结合公司的实际情况进行部署的。</p>
 <h2 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h2><table>
 <thead>
 <tr>
@@ -431,7 +431,7 @@
 <td>CentOS 7.0</td>
 <td>172.16.7.151</td>
 <td>Kubernetes Master、Node</td>
-<td>etcd、kube-apiserver、kube-scheduler、kube-controller-manager、kubelet、kube-proxy、etcd 3.2.7、flannel 0.7.1、docker 1.12.6</td>
+<td>etcd 3.2.7、kube-apiserver、kube-scheduler、kube-controller-manager、kubelet、kube-proxy、etcd 3.2.7、flannel 0.7.1、docker 1.12.6</td>
 </tr>
 <tr>
 <td>node2</td>
@@ -445,7 +445,7 @@
 <td>CentOS 7.0</td>
 <td>172.16.7.153</td>
 <td>Kubernetes Node</td>
-<td>kubelet、kube-proxy、flannel0.7.1、etcd 3.2.7、docker 1.12.6</td>
+<td>kubelet、kube-proxy、flannel 0.7.1、etcd 3.2.7、docker 1.12.6</td>
 </tr>
 <tr>
 <td>spark32</td>
