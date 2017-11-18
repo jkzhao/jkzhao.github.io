@@ -1830,7 +1830,7 @@ To further debug and diagnose cluster problems, use &amp;apos;kubectl cluster-in
     <link href="http://yoursite.com/2017/09/15/%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%B9%E5%BC%8F%E9%83%A8%E7%BD%B2Kubernetes-1-6-0%E9%9B%86%E7%BE%A4-%E5%BC%80%E5%90%AFTLS/"/>
     <id>http://yoursite.com/2017/09/15/二进制方式部署Kubernetes-1-6-0集群-开启TLS/</id>
     <published>2017-09-15T06:06:09.000Z</published>
-    <updated>2017-11-18T01:45:31.000Z</updated>
+    <updated>2017-11-18T13:07:37.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Kubernetes简介&quot;&gt;&lt;a href=&quot;#Kubernetes简介&quot; class=&quot;headerlink&quot; title=&quot;Kubernetes简介&quot;&gt;&lt;/a&gt;Kubernetes简介&lt;/h2&gt;&lt;p&gt;Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本，主要功能包括:&lt;/p&gt;
 &lt;ul&gt;
@@ -1967,7 +1967,7 @@ cfssl  cfssl-bundle  cfssl-certinfo  cfssljson  cfssl-newkey  cfssl-scan  mkbund
 &lt;li&gt;&lt;strong&gt;ca-config.json：&lt;/strong&gt;可以定义多个 profiles，分别指定不同的过期时间、使用场景等参数；后续在签名证书时使用某个 profile；&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;signing：&lt;/strong&gt;表示该证书可用于签名其它证书；生成的 ca.pem 证书中 CA=TRUE；&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;server auth：&lt;/strong&gt;表示client可以用该 CA 对server提供的证书进行验证；&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;client auth：&lt;/strong&gt;表示server可以用该 CA 对client提供的证书进行验证；&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;client auth：&lt;/strong&gt;表示server可以用该 CA 对client提供的证书进行验证。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;2.创建 CA 证书签名请求&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ssl]# vim ca-csr.json
@@ -2036,7 +2036,7 @@ ca-config.json  ca.csr  ca-csr.json  ca-key.pem  ca.pem
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;部分字段说明：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;如果 hosts 字段不为空则需要指定授权使用该证书的 IP 或域名列表，由于该证书后续被 etcd 集群和 kubernetes master 集群使用，所以上面分别指定了 etcd 集群、kubernetes master 集群的主机 IP；&lt;/li&gt;
-&lt;li&gt;还需要添加kube-apiserver注册的名为 kubernetes 服务的 IP（一般是 kue-apiserver 指定的 service-cluster-ip-range 网段的第一个IP，如 10.254.0.1。&lt;/li&gt;
+&lt;li&gt;还需要添加kube-apiserver注册的名为 kubernetes 服务的 IP（一般是 kue-apiserver 指定的 service-cluster-ip-range 网段的第一个IP，如 10.254.0.1)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;2.生成 kubernetes 证书和私钥&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ssl]# cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kubernetes-csr.json | cfssljson -bare kubernetes
@@ -2072,7 +2072,7 @@ kubernetes.csr  kubernetes-csr.json  kubernetes-key.pem  kubernetes.pem
 &lt;ul&gt;
 &lt;li&gt;后续 kube-apiserver 使用 RBAC 对客户端(如 kubelet、kube-proxy、Pod)请求进行授权；&lt;/li&gt;
 &lt;li&gt;kube-apiserver 预定义了一些 RBAC 使用的 RoleBindings，如 cluster-admin 将 Groupsystem:masters 与 Role cluster-admin 绑定，该 Role 授予了调用kube-apiserver 的所有 API的权限；&lt;/li&gt;
-&lt;li&gt;OU 指定该证书的 Group 为 system:masters，kubelet 使用该证书访问 kube-apiserver时 ，由于证书被 CA 签名，所以认证通过，同时由于证书用户组为经过预授权的system:masters，所以被授予访问所有 API 的权限；&lt;/li&gt;
+&lt;li&gt;OU 指定该证书的 Group 为 system:masters，kubelet 使用该证书访问 kube-apiserver时 ，由于证书被 CA 签名，所以认证通过，同时由于证书用户组为经过预授权的system:masters，所以被授予访问所有 API 的权限。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;2.生成 admin 证书和私钥&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ssl]# cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes admin-csr.json | cfssljson -bare admin
@@ -2107,7 +2107,7 @@ admin.csr  admin-csr.json  admin-key.pem  admin.pem
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;说明：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;CN 指定该证书的 User 为 system:kube-proxy；&lt;/li&gt;
-&lt;li&gt;kube-apiserver 预定义的 RoleBinding cluster-admin 将User system:kube-proxy 与 Rolesystem:node-proxier 绑定，该 Role 授予了调用 kube-apiserver Proxy 相关 API 的权限；&lt;/li&gt;
+&lt;li&gt;kube-apiserver 预定义的 RoleBinding cluster-admin 将User system:kube-proxy 与 Rolesystem:node-proxier 绑定，该 Role 授予了调用 kube-apiserver Proxy 相关 API 的权限。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;2.生成 kube-proxy 客户端证书和私钥&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ssl]# cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes  kube-proxy-csr.json | cfssljson -bare kube-proxy
@@ -2146,11 +2146,12 @@ Certificate:
             X509v3 Subject Alternative Name: 
                 DNS:kubernetes, DNS:kubernetes.default, DNS:kubernetes.default.svc, DNS:kubernetes.default.svc.cluster, DNS:kubernetes.default.svc.cluster.local, IP Address:127.0.0.1, IP Address:172.16.7.151, IP Address:172.16.7.152, IP Address:172.16.7.153, IP Address:172.16.206.32, IP Address:10.254.0.1
 ...
-&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【说明】：&lt;/p&gt;
+&lt;ul&gt;
 &lt;li&gt;确认 Issuer 字段的内容和 ca-csr.json 一致；&lt;/li&gt;
 &lt;li&gt;确认 Subject 字段的内容和 kubernetes-csr.json 一致；&lt;/li&gt;
 &lt;li&gt;确认 X509v3 Subject Alternative Name 字段的内容和 kubernetes-csr.json 一致；&lt;/li&gt;
-&lt;li&gt;确认 X509v3 Key Usage、Extended Key Usage 字段的内容和 ca-config.json 中 kubernetesprofile 一致；&lt;/li&gt;
+&lt;li&gt;确认 X509v3 Key Usage、Extended Key Usage 字段的内容和 ca-config.json 中 kubernetesprofile 一致。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h4 id=&quot;使用-Cfssl-Certinfo-命令校验&quot;&gt;&lt;a href=&quot;#使用-Cfssl-Certinfo-命令校验&quot; class=&quot;headerlink&quot; title=&quot;使用 Cfssl-Certinfo 命令校验&quot;&gt;&lt;/a&gt;使用 Cfssl-Certinfo 命令校验&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@node1 ssl]# cfssl-certinfo -cert kubernetes.pem
 {
@@ -2243,7 +2244,7 @@ Switched to context &amp;quot;kubernetes&amp;quot;.
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【说明】：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;admin.pem 证书 OU 字段值为 system:masters，kube-apiserver 预定义的 RoleBinding cluster-admin 将 Groupsystem:masters 与 Role cluster admin 绑定，该 Role 授予了调用kube-apiserver 相关 API 的权限；&lt;/li&gt;
-&lt;li&gt;生成的 kubeconfig 被保存到 ~/.kube/config 文件；&lt;/li&gt;
+&lt;li&gt;生成的 kubeconfig 被保存到 ~/.kube/config 文件。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&quot;创建-kubeconfig-文件&quot;&gt;&lt;a href=&quot;#创建-kubeconfig-文件&quot; class=&quot;headerlink&quot; title=&quot;创建 kubeconfig 文件&quot;&gt;&lt;/a&gt;创建 kubeconfig 文件&lt;/h2&gt;&lt;p&gt;kubelet、kube-proxy 等 Node 机器上的进程与 Master 机器的 kube-apiserver 进程通信时需要认证和授权.&lt;br&gt;kubernetes 1.4 开始支持由 kube-apiserver 为客户端生成 TLS 证书的 TLS Bootstrapping 功能，这样就不需要为每个客户端生成证书了；该功能当前仅支持为 kubelet 生成证书。&lt;/p&gt;
 &lt;h3 id=&quot;创建-TLS-Bootstrapping-Token&quot;&gt;&lt;a href=&quot;#创建-TLS-Bootstrapping-Token&quot; class=&quot;headerlink&quot; title=&quot;创建 TLS Bootstrapping Token&quot;&gt;&lt;/a&gt;创建 TLS Bootstrapping Token&lt;/h3&gt;&lt;h4 id=&quot;Token-auth-file&quot;&gt;&lt;a href=&quot;#Token-auth-file&quot; class=&quot;headerlink&quot; title=&quot;Token auth file&quot;&gt;&lt;/a&gt;Token auth file&lt;/h4&gt;&lt;p&gt;Token可以是任意的包涵128 bit的字符串，可以使用安全的随机数发生器生成。&lt;/p&gt;
@@ -2278,10 +2279,10 @@ Context &amp;quot;default&amp;quot; created.
 # 设置默认上下文
 [root@node1 kubernetes]# kubectl config use-context default --kubeconfig=bootstrap.kubeconfig
 Switched to context &amp;quot;default&amp;quot;.
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;说明：&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【说明】：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;–embed-certs 为 true 时表示将 certificate-authority 证书写入到生成的 bootstrap.kubeconfig 文件中；&lt;/li&gt;
-&lt;li&gt;设置客户端认证参数时没有指定秘钥和证书，后续由 kube-apiserver 自动生成；&lt;/li&gt;
+&lt;li&gt;设置客户端认证参数时没有指定秘钥和证书，后续由 kube-apiserver 自动生成。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&quot;创建-kube-proxy-kubeconfig-文件&quot;&gt;&lt;a href=&quot;#创建-kube-proxy-kubeconfig-文件&quot; class=&quot;headerlink&quot; title=&quot;创建 kube-proxy kubeconfig 文件&quot;&gt;&lt;/a&gt;创建 kube-proxy kubeconfig 文件&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 kubernetes]# export KUBE_APISERVER=&amp;quot;https://172.16.7.151:6443&amp;quot;
 # 设置集群参数
@@ -2307,10 +2308,10 @@ Context &amp;quot;default&amp;quot; created.
 # 设置默认上下文
 [root@node1 kubernetes]# kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
 Switched to context &amp;quot;default&amp;quot;.
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;说明：&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【说明】：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;设置集群参数和客户端认证参数时 –embed-certs 都为 true，这会将 certificate-authority、client-certificate 和client-key 指向的证书文件内容写入到生成的 kube-proxy.kubeconfig 文件中；&lt;/li&gt;
-&lt;li&gt;kube-proxy.pem 证书中 CN 为 system:kube-proxy，kube-apiserver 预定义的 RoleBinding cluster-admin 将Usersystem:kube-proxy 与 Role system:node-proxier 绑定，该 Role 授予了调用 kube-apiserver Proxy 相关 API 的权限；&lt;/li&gt;
+&lt;li&gt;kube-proxy.pem 证书中 CN 为 system:kube-proxy，kube-apiserver 预定义的 RoleBinding cluster-admin 将Usersystem:kube-proxy 与 Role system:node-proxier 绑定，该 Role 授予了调用 kube-apiserver Proxy 相关 API 的权限。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&quot;分发-kubeconfig-文件&quot;&gt;&lt;a href=&quot;#分发-kubeconfig-文件&quot; class=&quot;headerlink&quot; title=&quot;分发 kubeconfig 文件&quot;&gt;&lt;/a&gt;分发 kubeconfig 文件&lt;/h3&gt;&lt;p&gt;将两个 kubeconfig 文件分发到所有 Node 机器的 /etc/kubernetes/ 目录。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 kubernetes]# scp -p bootstrap.kubeconfig root@172.16.7.152:/etc/kubernetes/
@@ -2327,8 +2328,8 @@ Switched to context &amp;quot;default&amp;quot;.
 &lt;pre&gt;&lt;code&gt;[root@node1 local]# tar xf etcd-v3.2.7-linux-amd64.tar
 [root@node1 local]# mv etcd-v3.2.7-linux-amd64/etcd* /usr/local/bin/
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;etcd集群中另外两台机器也需要如上操作。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;3.创建 etcd 的 systemd unit 文件&lt;/strong&gt;&lt;br&gt;配置文件模板如下，注意替换 ETCD_NAME 和 INTERNAL_IP 变量的值；&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 system]# vim etcd.service
+&lt;p&gt;&lt;strong&gt;3.创建 etcd 的 systemd unit 文件&lt;/strong&gt;&lt;br&gt;配置文件模板如下，注意替换 ETCD_NAME 和 INTERNAL_IP 变量的值。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@node1 ~]# cat etcd.service
 [Unit]
 Description=Etcd Server
 After=network.target
@@ -2428,7 +2429,7 @@ ExecStart=/usr/local/bin/etcd \
 &lt;li&gt;创建 kubernetes.pem 证书时使用的 kubernetes-csr.json 文件的 hosts 字段包含所有 etcd 节点的 INTERNAL_IP，否则证书校验会出错；&lt;/li&gt;
 &lt;li&gt;–initial-cluster-state 值为 new 时，–name 的参数值必须位于 –initial-cluster 列表中。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h3 id=&quot;启动-etcd-服务&quot;&gt;&lt;a href=&quot;#启动-etcd-服务&quot; class=&quot;headerlink&quot; title=&quot;启动 etcd 服务&quot;&gt;&lt;/a&gt;启动 etcd 服务&lt;/h3&gt;&lt;p&gt;集群中的节点都需要执行：&lt;/p&gt;
+&lt;h3 id=&quot;启动-etcd-服务&quot;&gt;&lt;a href=&quot;#启动-etcd-服务&quot; class=&quot;headerlink&quot; title=&quot;启动 etcd 服务&quot;&gt;&lt;/a&gt;启动 etcd 服务&lt;/h3&gt;&lt;p&gt;集群中的节点都执行以下命令：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# systemctl daemon-reload
 # systemctl enable etcd
 # systemctl start etcd
@@ -2451,18 +2452,19 @@ e64edc68e5e81b55: name=node2 peerURLs=https://172.16.7.152:2380 clientURLs=https
 31800ab6b566b2b: name=node1 peerURLs=https://172.16.7.151:2380 clientURLs=https://172.16.7.151:2379 isLeader=false
 9a0745d96695eec6: name=node3 peerURLs=https://172.16.7.153:2380 clientURLs=https://172.16.7.153:2379 isLeader=false
 e64edc68e5e81b55: name=node2 peerURLs=https://172.16.7.152:2380 clientURLs=https://172.16.7.152:2379 isLeader=true
+# 删除一个节点
 # etcdctl --endpoints &amp;quot;http://192.168.2.210:2379&amp;quot; member remove 9a0745d96695eec6
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;部署-kubernetes-master-集群&quot;&gt;&lt;a href=&quot;#部署-kubernetes-master-集群&quot; class=&quot;headerlink&quot; title=&quot;部署 kubernetes master 集群&quot;&gt;&lt;/a&gt;部署 kubernetes master 集群&lt;/h2&gt;&lt;p&gt;kubernetes master 节点包含的组件：&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;部署-kubernetes-master&quot;&gt;&lt;a href=&quot;#部署-kubernetes-master&quot; class=&quot;headerlink&quot; title=&quot;部署 kubernetes master&quot;&gt;&lt;/a&gt;部署 kubernetes master&lt;/h2&gt;&lt;p&gt;kubernetes master 节点包含的组件：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;kube-apiserver&lt;/li&gt;
 &lt;li&gt;kube-scheduler&lt;/li&gt;
 &lt;li&gt;kube-controller-manager&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;目前这三个组件需要部署在同一台机器上。&lt;br&gt;kube-scheduler、kube-controller-manager 和 kube-apiserver 三者的功能紧密相关；&lt;br&gt;同时只能有一个 kube-scheduler、kube-controller-manager 进程处于工作状态，如果运行多个，则需要通过选举产生一个 leader；&lt;/p&gt;
+&lt;p&gt;目前这三个组件需要部署在同一台机器上。&lt;br&gt;kube-scheduler、kube-controller-manager 和 kube-apiserver 三者的功能紧密相关；&lt;br&gt;同时只能有一个 kube-scheduler、kube-controller-manager 进程处于工作状态，如果运行多个，则需要通过选举产生一个 leader。&lt;/p&gt;
 &lt;h3 id=&quot;TLS-证书文件&quot;&gt;&lt;a href=&quot;#TLS-证书文件&quot; class=&quot;headerlink&quot; title=&quot;TLS 证书文件&quot;&gt;&lt;/a&gt;TLS 证书文件&lt;/h3&gt;&lt;p&gt;检查之前生成的证书。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 kubernetes]# ls /etc/kubernetes/ssl
 admin-key.pem  admin.pem  ca-key.pem  ca.pem  kube-proxy-key.pem  kube-proxy.pem  kubernetes-key.pem  kubernetes.pem
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;下载二进制文件&quot;&gt;&lt;a href=&quot;#下载二进制文件&quot; class=&quot;headerlink&quot; title=&quot;下载二进制文件&quot;&gt;&lt;/a&gt;下载二进制文件&lt;/h3&gt;&lt;p&gt;有两种下载方式：&lt;br&gt;方式一：从 &lt;a href=&quot;https://github.com/kubernetes/kubernetes/releases&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;github release&lt;/a&gt; 页面 下载发布版 tarball，解压后再执行下载脚本。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;下载二进制文件&quot;&gt;&lt;a href=&quot;#下载二进制文件&quot; class=&quot;headerlink&quot; title=&quot;下载二进制文件&quot;&gt;&lt;/a&gt;下载二进制文件&lt;/h3&gt;&lt;p&gt;有两种下载方式：&lt;br&gt;方式一：从 &lt;a href=&quot;https://github.com/kubernetes/kubernetes/releases&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;github release&lt;/a&gt; 页面下载发布版 tarball，解压后再执行下载脚本。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 local]# cd /opt/
 [root@node1 opt]# wget https://github.com/kubernetes/kubernetes/releases/download/v1.6.0/kubernetes.tar.gz
 [root@node1 opt]# tar zxf kubernetes.tar.gz 
@@ -2477,7 +2479,7 @@ Will download and extract kubernetes-client-linux-amd64.tar.gz from https://stor
 Is this ok? [Y]/n
 y
 ...
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;方式二：从 CHANGELOG页面 下载 client 或 server tarball 文件&lt;br&gt;server 的 tarball kubernetes-server-linux-amd64.tar.gz 已经包含了 client(kubectl) 二进制文件，所以不用单独下载kubernetes-client-linux-amd64.tar.gz文件；&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;方式二：从 CHANGELOG页面 下载 client 或 server tarball 文件&lt;br&gt;server 的 tarball kubernetes-server-linux-amd64.tar.gz 已经包含了 client(kubectl) 二进制文件，所以不用单独下载kubernetes-client-linux-amd64.tar.gz文件&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;wget https://dl.k8s.io/v1.6.0/kubernetes-server-linux-amd64.tar.gz
 tar -xzvf kubernetes-server-linux-amd64.tar.gz
 ...
