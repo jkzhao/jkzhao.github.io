@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-11-13T07:38:39.000Z</updated>
+  <updated>2017-11-19T08:06:13.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,83 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>nexus搭建maven私服</title>
+    <link href="http://yoursite.com/2017/11/19/nexus%E6%90%AD%E5%BB%BAmaven%E7%A7%81%E6%9C%8D/"/>
+    <id>http://yoursite.com/2017/11/19/nexus搭建maven私服/</id>
+    <published>2017-11-19T06:49:41.000Z</published>
+    <updated>2017-11-19T08:06:13.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;为什么要搭建私服&quot;&gt;&lt;a href=&quot;#为什么要搭建私服&quot; class=&quot;headerlink&quot; title=&quot;为什么要搭建私服&quot;&gt;&lt;/a&gt;为什么要搭建私服&lt;/h2&gt;&lt;p&gt;私服不是Maven的核心概念，它仅仅是一种衍生出来的特殊的Maven仓库。通过建立自己的私服，就可以降低中央仓库负荷、节省外网带宽、加速Maven构建、自己部署构建等，从而高效地使用Maven。Nexus也是当前最流行的Maven仓库管理软件。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;下载Nexus&quot;&gt;&lt;a href=&quot;#下载Nexus&quot; class=&quot;headerlink&quot; title=&quot;下载Nexus&quot;&gt;&lt;/a&gt;下载Nexus&lt;/h2&gt;&lt;p&gt;最新nexus下载地址：&lt;a href=&quot;http://www.sonatype.org/nexus/go&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://www.sonatype.org/nexus/go&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;Nexus是典型的Java Web应用，它有两种安装包，一种是包含Jetty容器的Bundle包，另一种是不包含Web容器的war包。&lt;/p&gt;
+&lt;h2 id=&quot;安装Nexus&quot;&gt;&lt;a href=&quot;#安装Nexus&quot; class=&quot;headerlink&quot; title=&quot;安装Nexus&quot;&gt;&lt;/a&gt;安装Nexus&lt;/h2&gt;&lt;h3 id=&quot;安装JDK1-8&quot;&gt;&lt;a href=&quot;#安装JDK1-8&quot; class=&quot;headerlink&quot; title=&quot;安装JDK1.8&quot;&gt;&lt;/a&gt;安装JDK1.8&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# mkdir /usr/java
+# tar zxf /usr/local/jdk-8u73-linux-x64.gz -C /usr/java/
+# vim /etc/profile
+export JAVA_HOME=/usr/java/jdk1.8.0_73
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+# source /etc/profile
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装Nexus-1&quot;&gt;&lt;a href=&quot;#安装Nexus-1&quot; class=&quot;headerlink&quot; title=&quot;安装Nexus&quot;&gt;&lt;/a&gt;安装Nexus&lt;/h3&gt;&lt;p&gt;上传Nexus安装包到/opt目录下。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@hadoop33 opt]# mkdir nexus
+[root@hadoop33 opt]# tar zxf nexus-2.14.0-01-bundle.tar.gz -C /opt/nexus
+[root@hadoop33 opt]# cd nexus/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;nexus-2.6.2-01: 该目录包含了Nexus运行所需要的文件，如启动脚本、依赖jar包等。&lt;br&gt;sonatype-work：该目录包含Nenus生成的配置文件、日志文件、仓库文件等。&lt;br&gt;其中第一个目录是运行Nexus必须的，而第二个不是必须的，Nexus会在运行的时候动态创建该目录。&lt;/p&gt;
+&lt;h3 id=&quot;启动Nexus&quot;&gt;&lt;a href=&quot;#启动Nexus&quot; class=&quot;headerlink&quot; title=&quot;启动Nexus&quot;&gt;&lt;/a&gt;启动Nexus&lt;/h3&gt;&lt;p&gt;默认端口为8081，如需修改请查看配置文件 conf/nexus.properties&lt;br&gt;它本身不建议在root用户下使用，如果我们需要在root用户下启动服务，要先配置 bin/nexus 文件中的 RUN_AS_USER=root&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/3.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@hadoop33 nexus]# cd nexus-2.14.0-01/bin/
+[root@hadoop33 bin]# ./nexus start
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/4.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;停止-Nexus&quot;&gt;&lt;a href=&quot;#停止-Nexus&quot; class=&quot;headerlink&quot; title=&quot;停止 Nexus&quot;&gt;&lt;/a&gt;停止 Nexus&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop33 bin]# ./nexus stop
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;访问&quot;&gt;&lt;a href=&quot;#访问&quot; class=&quot;headerlink&quot; title=&quot;访问&quot;&gt;&lt;/a&gt;访问&lt;/h2&gt;&lt;p&gt;启动后访问首页： &lt;a href=&quot;http://172.16.206.33:8081/nexus/index.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.33:8081/nexus/index.html&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击右上角的Login in&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;登录默认账号/密码 admin/admin123。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;如何修改 nexus 账号密码：&lt;/strong&gt;先停止 nexus，打开 %NEXUS_HOME%/sonatype-work/nexus/conf/security.xml，修改即可。&lt;br&gt;nexus 的密码采用 SHA1 加密算法 ( 在线加密工具 )，将加密后的 SHA1 串（小写）拷贝覆盖原来的。重启 nexus：./nexus restart。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/7.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;配置Nexus&quot;&gt;&lt;a href=&quot;#配置Nexus&quot; class=&quot;headerlink&quot; title=&quot;配置Nexus&quot;&gt;&lt;/a&gt;配置Nexus&lt;/h2&gt;&lt;p&gt;Nexus常用功能就是：指定私服的中央地址、将自己的Maven项目指定到私服地址、从私服下载中央库的项目索引、从私服仓库下载依赖组件、将第三方项目jar上传到私服供其他项目组使用。&lt;br&gt;登录&lt;a href=&quot;http://172.16.206.33:8081/nexus/index.html，点击左侧菜单栏的“Repositories”。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.33:8081/nexus/index.html，点击左侧菜单栏的“Repositories”。&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/8.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;一般用到的仓库种类是hosted、proxy。Hosted代表宿主仓库，用来发布一些第三方不允许的组件，比如oracle驱动、比如商业软件jar包。Proxy代表代理远程的仓库，最典型的就是Maven官方中央仓库、JBoss仓库等等。如果构建的Maven项目本地仓库没有依赖包，那么就会去这个代理站点去下载，那么如果代理站点也没有此依赖包，就回去远程中央仓库下载依赖，这些中央仓库就是proxy。代理站点下载成功后再下载至本机。一般情况下Maven这个自带的默认仓库一般情况下已经够大多数项目使用了。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;hosted   类型的仓库，内部项目的发布仓库&lt;/li&gt;
+&lt;li&gt;releases 内部的模块中release模块的发布仓库&lt;/li&gt;
+&lt;li&gt;snapshots 发布内部的SNAPSHOT模块的仓库&lt;/li&gt;
+&lt;li&gt;3rd party 第三方依赖的仓库，这个数据通常是由内部人员自行下载之后发布上去&lt;/li&gt;
+&lt;li&gt;proxy   类型的仓库，从远程中央仓库中寻找数据的仓库&lt;/li&gt;
+&lt;li&gt;group   类型的仓库，组仓库用来方便我们开发人员进行设置的仓库&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;maven项目索引&quot;&gt;&lt;a href=&quot;#maven项目索引&quot; class=&quot;headerlink&quot; title=&quot;maven项目索引&quot;&gt;&lt;/a&gt;maven项目索引&lt;/h3&gt;&lt;p&gt;下载Maven项目索引，项目索引是为了使用者能够在私服站点查找依赖使用的功能。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/9.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;保存后后台会运行一个任务，点击菜单栏的Scheduled Tasks选项即可看到有个任务在RUNNING。 下载完成后，Maven索引就可以使用了，在搜索栏输入要搜索的项，就可以查到相关的信息。例如spring-core&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/10.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;就可以检索出它的相关信息，包括怎么配置依赖信息。我们要想使用这个私服仓库，先在项目pom中配置相关私服信息。&lt;/p&gt;
+&lt;h2 id=&quot;Maven项目配置&quot;&gt;&lt;a href=&quot;#Maven项目配置&quot; class=&quot;headerlink&quot; title=&quot;Maven项目配置&quot;&gt;&lt;/a&gt;Maven项目配置&lt;/h2&gt;&lt;p&gt;在pom.xml文件中指定仓库：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;repositories&amp;gt;
+    &amp;lt;repository&amp;gt;
+        &amp;lt;id&amp;gt;nexus&amp;lt;/id&amp;gt;
+        &amp;lt;url&amp;gt;http://172.16.206.33:8081/nexus/content/groups/public/&amp;lt;/url&amp;gt;
+        &amp;lt;snapshots&amp;gt;&amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;&amp;lt;/snapshots&amp;gt;
+        &amp;lt;releases&amp;gt;&amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;&amp;lt;/releases&amp;gt;
+    &amp;lt;/repository&amp;gt;
+&amp;lt;/repositories&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在pom.xml文件中指定插件仓库：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;pluginRepositories&amp;gt;
+    &amp;lt;pluginRepository&amp;gt;
+        &amp;lt;id&amp;gt;nexus&amp;lt;/id&amp;gt;
+        &amp;lt;url&amp;gt;http://172.16.206.33:8081/nexus/content/groups/public/&amp;lt;/url&amp;gt;
+        &amp;lt;snapshots&amp;gt;&amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;&amp;lt;/snapshots&amp;gt;
+        &amp;lt;releases&amp;gt;&amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;&amp;lt;/releases&amp;gt;
+    &amp;lt;/pluginRepository&amp;gt;
+&amp;lt;/pluginRepositories&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;以上的配置使得只有本项目才在私服下载组件。这个Maven项目构建的时候会从私服下载相关依赖。&lt;br&gt;上面的配置仅仅是在此项目中生效，对于其他项目还是不起作用。如果相对Maven的其他项目也生效的话。需要修改全局的settings.xml文件。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/11.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;追加激活profile：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;activeProfiles&amp;gt;  
+     &amp;lt;activeProfile&amp;gt;central&amp;lt;/activeProfile&amp;gt;  
+&amp;lt;/activeProfiles
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;之后所有本机的Maven项目就在私服下载组件。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;为什么要搭建私服&quot;&gt;&lt;a href=&quot;#为什么要搭建私服&quot; class=&quot;headerlink&quot; title=&quot;为什么要搭建私服&quot;&gt;&lt;/a&gt;为什么要搭建私服&lt;/h2&gt;&lt;p&gt;私服不是Maven的核心概念，它仅仅是一种衍生出来的特殊的Maven仓库。通过建立自己的私服，就可以降低中央仓库负荷、节省外网带宽、加速Maven构建、自己部署构建等，从而高效地使用Maven。Nexus也是当前最流行的Maven仓库管理软件。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="maven" scheme="http://yoursite.com/categories/maven/"/>
+    
+    
+      <category term="nexus" scheme="http://yoursite.com/tags/nexus/"/>
+    
+  </entry>
   
   <entry>
     <title>Filebeat日志收集器</title>
@@ -1830,7 +1907,7 @@ To further debug and diagnose cluster problems, use &amp;apos;kubectl cluster-in
     <link href="http://yoursite.com/2017/09/15/%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%B9%E5%BC%8F%E9%83%A8%E7%BD%B2Kubernetes-1-6-0%E9%9B%86%E7%BE%A4-%E5%BC%80%E5%90%AFTLS/"/>
     <id>http://yoursite.com/2017/09/15/二进制方式部署Kubernetes-1-6-0集群-开启TLS/</id>
     <published>2017-09-15T06:06:09.000Z</published>
-    <updated>2017-11-18T13:07:37.000Z</updated>
+    <updated>2017-11-19T06:01:35.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Kubernetes简介&quot;&gt;&lt;a href=&quot;#Kubernetes简介&quot; class=&quot;headerlink&quot; title=&quot;Kubernetes简介&quot;&gt;&lt;/a&gt;Kubernetes简介&lt;/h2&gt;&lt;p&gt;Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本，主要功能包括:&lt;/p&gt;
 &lt;ul&gt;
@@ -2586,7 +2663,7 @@ KUBE_API_ARGS=&amp;quot;--authorization-mode=RBAC --runtime-config=rbac.authoriz
 &lt;li&gt;–bind-address 不能为 127.0.0.1；&lt;/li&gt;
 &lt;li&gt;runtime-config配置为rbac.authorization.k8s.io/v1beta1，表示运行时的apiVersion；&lt;/li&gt;
 &lt;li&gt;–service-cluster-ip-range 指定 Service Cluster IP 地址段，该地址段不能路由可达；&lt;/li&gt;
-&lt;li&gt;缺省情况下 kubernetes 对象保存在 etcd /registry 路径下，可以通过 –etcd-prefix 参数进行调整；&lt;/li&gt;
+&lt;li&gt;缺省情况下 kubernetes 对象保存在 etcd /registry 路径下，可以通过 –etcd-prefix 参数进行调整。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h4 id=&quot;启动kube-apiserver&quot;&gt;&lt;a href=&quot;#启动kube-apiserver&quot; class=&quot;headerlink&quot; title=&quot;启动kube-apiserver&quot;&gt;&lt;/a&gt;启动kube-apiserver&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# systemctl daemon-reload
 # systemctl enable kube-apiserver
@@ -2671,7 +2748,8 @@ WantedBy=multi-user.target
 
 # Add your own!
 KUBE_SCHEDULER_ARGS=&amp;quot;--leader-elect=true --address=127.0.0.1&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【说明】：&lt;/p&gt;
+&lt;ul&gt;
 &lt;li&gt;–address 值必须为 127.0.0.1，因为当前 kube-apiserver 期望 scheduler 和 controller-manager 在同一台机器。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h4 id=&quot;启动-kube-scheduler&quot;&gt;&lt;a href=&quot;#启动-kube-scheduler&quot; class=&quot;headerlink&quot; title=&quot;启动 kube-scheduler&quot;&gt;&lt;/a&gt;启动 kube-scheduler&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# systemctl daemon-reload
@@ -2686,7 +2764,7 @@ etcd-1               Healthy   {&amp;quot;health&amp;quot;: &amp;quot;true&amp;q
 etcd-2               Healthy   {&amp;quot;health&amp;quot;: &amp;quot;true&amp;quot;}              
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;部署kubernetes-node节点&quot;&gt;&lt;a href=&quot;#部署kubernetes-node节点&quot; class=&quot;headerlink&quot; title=&quot;部署kubernetes node节点&quot;&gt;&lt;/a&gt;部署kubernetes node节点&lt;/h2&gt;&lt;p&gt;kubernetes node 节点包含如下组件：&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Docker1.12.6&lt;/li&gt;
+&lt;li&gt;Docker 1.12.6&lt;/li&gt;
 &lt;li&gt;Flanneld&lt;/li&gt;
 &lt;li&gt;kubelet&lt;/li&gt;
 &lt;li&gt;kube-proxy&lt;/li&gt;
@@ -2791,7 +2869,7 @@ eth0: flags=4163&amp;lt;UP,BROADCAST,RUNNING,MULTICAST&amp;gt;  mtu 1450
 PING 172.16.51.2 (172.16.51.2) 56(84) bytes of data.
 64 bytes from 172.16.51.2: icmp_seq=1 ttl=254 time=1.00 ms
 64 bytes from 172.16.51.2: icmp_seq=2 ttl=254 time=1.29 ms
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;补充：下载二进制包安装flannel&quot;&gt;&lt;a href=&quot;#补充：下载二进制包安装flannel&quot; class=&quot;headerlink&quot; title=&quot;补充：下载二进制包安装flannel&quot;&gt;&lt;/a&gt;补充：下载二进制包安装flannel&lt;/h4&gt;&lt;p&gt;从官网 &lt;a href=&quot;https://github.com/coreos/flannel/releases&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/coreos/flannel/releases&lt;/a&gt; 下载的flannel release 0.7.1,并将下载的文件上传到服务器的/opt/flannel/目录下。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;补充：下载二进制包安装flannel&quot;&gt;&lt;a href=&quot;#补充：下载二进制包安装flannel&quot; class=&quot;headerlink&quot; title=&quot;补充：下载二进制包安装flannel&quot;&gt;&lt;/a&gt;补充：下载二进制包安装flannel&lt;/h4&gt;&lt;p&gt;从官网 &lt;a href=&quot;https://github.com/coreos/flannel/releases&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/coreos/flannel/releases&lt;/a&gt; 下载的flannel release 0.7.1，并将下载的文件上传到服务器的/opt/flannel/目录下。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# mkdir flannel
 # cd flannel/
 # tar xf flannel-v0.7.1-linux-amd64.tar  
@@ -2810,7 +2888,7 @@ docker daemon --bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU} &amp;amp;
 clusterrolebinding &amp;quot;kubelet-bootstrap&amp;quot; created  
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;【注意】：以上这步只需要在kubernetes node集群中的一台执行一次就可以了。&lt;/strong&gt;&lt;br&gt;【说明】：&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;–user=kubelet-bootstrap 是在 /etc/kubernetes/token.csv 文件中指定的用户名，同时也写入了/etc/kubernetes/bootstrap.kubeconfig 文件；&lt;/li&gt;
+&lt;li&gt;–user=kubelet-bootstrap 是在 /etc/kubernetes/token.csv 文件中指定的用户名，同时也写入了/etc/kubernetes/bootstrap.kubeconfig 文件。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h4 id=&quot;下载最新的-kubelet-和-kube-proxy-二进制文件&quot;&gt;&lt;a href=&quot;#下载最新的-kubelet-和-kube-proxy-二进制文件&quot; class=&quot;headerlink&quot; title=&quot;下载最新的 kubelet 和 kube-proxy 二进制文件&quot;&gt;&lt;/a&gt;下载最新的 kubelet 和 kube-proxy 二进制文件&lt;/h4&gt;&lt;p&gt;这个在之前安装kubernetes master时已经下载好了二进制文件，只需要复制到相应目录即可。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 kubernetes]# cd /opt/kubernetes/server/kubernetes/server/bin/
@@ -2877,12 +2955,12 @@ KUBELET_ARGS=&amp;quot;--cgroup-driver=systemd --cluster-dns=10.254.0.2 --experi
 &lt;li&gt;–experimental-bootstrap-kubeconfig 指向 bootstrap kubeconfig 文件，kubelet 使用该文件中的用户名和 token 向 kube-apiserver 发送 TLS Bootstrapping 请求；&lt;/li&gt;
 &lt;li&gt;管理员通过了 CSR 请求后，kubelet 自动在 –cert-dir 目录创建证书和私钥文件(kubelet-client.crt 和 kubelet-client.key)，然后写入 –kubeconfig 文件；&lt;/li&gt;
 &lt;li&gt;建议在 –kubeconfig 配置文件中指定 kube-apiserver 地址，如果未指定 –api-servers 选项，则必须指定 –require-kubeconfig 选项后才从配置文件中读取 kube-apiserver 的地址，否则 kubelet 启动后将找不到 kube-apiserver (日志中提示未找到 API Server），kubectl get nodes 不会返回对应的 Node 信息;&lt;/li&gt;
-&lt;li&gt;–cluster-dns 指定 kubedns 的 Service IP(可以先分配，后续创建 kubedns 服务时指定该 IP)，–cluster-domain 指定域名后缀，这两个参数同时指定后才会生效；&lt;/li&gt;
+&lt;li&gt;–cluster-dns 指定 kubedns 的 Service IP(可以先分配，后续创建 kubedns 服务时指定该 IP)，–cluster-domain 指定域名后缀，这两个参数同时指定后才会生效。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h4 id=&quot;启动kublet&quot;&gt;&lt;a href=&quot;#启动kublet&quot; class=&quot;headerlink&quot; title=&quot;启动kublet&quot;&gt;&lt;/a&gt;启动kublet&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# systemctl daemon-reload
+&lt;h4 id=&quot;启动kubelet&quot;&gt;&lt;a href=&quot;#启动kubelet&quot; class=&quot;headerlink&quot; title=&quot;启动kubelet&quot;&gt;&lt;/a&gt;启动kubelet&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# systemctl daemon-reload
 # systemctl enable kubelet
 # systemctl start kubelet
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;通过-kublet-的-TLS-证书请求&quot;&gt;&lt;a href=&quot;#通过-kublet-的-TLS-证书请求&quot; class=&quot;headerlink&quot; title=&quot;通过 kublet 的 TLS 证书请求&quot;&gt;&lt;/a&gt;通过 kublet 的 TLS 证书请求&lt;/h4&gt;&lt;p&gt;kubelet 首次启动时向 kube-apiserver 发送证书签名请求，必须通过后 kubernetes 系统才会将该 Node 加入到集群。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;通过-kubelet-的-TLS-证书请求&quot;&gt;&lt;a href=&quot;#通过-kubelet-的-TLS-证书请求&quot; class=&quot;headerlink&quot; title=&quot;通过 kubelet 的 TLS 证书请求&quot;&gt;&lt;/a&gt;通过 kubelet 的 TLS 证书请求&lt;/h4&gt;&lt;p&gt;kubelet 首次启动时向 kube-apiserver 发送证书签名请求，必须通过后 kubernetes 系统才会将该 Node 加入到集群。&lt;/p&gt;
 &lt;p&gt;1.查看未授权的 CSR 请求&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# kubectl get csr 
 NAME        AGE       REQUESTOR           CONDITION
@@ -2959,7 +3037,7 @@ KUBE_PROXY_ARGS=&amp;quot;--bind-address=172.16.7.151 --hostname-override=172.16
 &lt;li&gt;–hostname-override 参数值必须与 kubelet 的值一致，否则 kube-proxy 启动后会找不到该 Node，从而不会创建任何 iptables 规则；&lt;/li&gt;
 &lt;li&gt;kube-proxy 根据 –cluster-cidr 判断集群内部和外部流量，指定 –cluster-cidr 或 –masquerade-all 选项后 kube-proxy 才会对访问 Service IP 的请求做 SNAT；&lt;/li&gt;
 &lt;li&gt;–kubeconfig 指定的配置文件嵌入了 kube-apiserver 的地址、用户名、证书、秘钥等请求和认证信息；&lt;/li&gt;
-&lt;li&gt;预定义的 RoleBinding cluster-admin 将User system:kube-proxy 与 Role system:node-proxier 绑定，该 Role 授予了调用 kube-apiserver Proxy 相关 API 的权限；&lt;/li&gt;
+&lt;li&gt;预定义的 RoleBinding cluster-admin 将User system:kube-proxy 与 Role system:node-proxier 绑定，该 Role 授予了调用 kube-apiserver Proxy 相关 API 的权限。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;strong&gt;3.启动 kube-proxy&lt;/strong&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# systemctl daemon-reload
@@ -2983,6 +3061,7 @@ NodePort:               &amp;lt;unset&amp;gt; 32201/TCP
 Endpoints:              172.30.32.2:80,172.30.87.2:80
 Session Affinity:       None
 Events:                 &amp;lt;none&amp;gt;
+
 # kubectl get all
 NAME                        READY     STATUS    RESTARTS   AGE
 po/nginx-1931613429-nlsj1   1/1       Running   0          5m
@@ -3040,7 +3119,7 @@ deployment &amp;quot;nginx&amp;quot; deleted
 &lt;pre&gt;&lt;code&gt;# kubectl get pod -o yaml -l run=load-balancer-example|grep podIP 
     podIP: 172.30.32.2
     podIP: 172.30.87.2
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后就可以通过podIP在k8s集群内访问Nginx服务了。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后在Kubernetes集群的任一节点上就可以通过podIP在k8s集群内访问Nginx服务了。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# curl &amp;quot;172.30.32.2:80&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;但是这样存在几个问题：&lt;/p&gt;
 &lt;ul&gt;
@@ -3048,7 +3127,7 @@ deployment &amp;quot;nginx&amp;quot; deleted
 &lt;li&gt;Pod在运行中可能会重建，Pod的IP地址会随着Pod的重启而变化,并 不建议直接拿Pod的IP来交互&lt;/li&gt;
 &lt;li&gt;如何在多个Pod中实现负载均衡嘞？&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;使用k8s Service就可以解决。Service为一组Pod(通过labels来选择)提供一个统一的入口,并为它们提供负载均衡 和自动服务发现。&lt;br&gt;所以紧接着就创建了个service：&lt;/p&gt;
+&lt;p&gt;使用k8s Service就可以解决。Service为一组Pod(通过labels来选择)提供一个统一的入口，并为它们提供负载均衡和自动服务发现。&lt;br&gt;所以紧接着就创建了个service：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# kubectl expose deployment nginx --type=NodePort --name=example-service
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;创建之后，仍需要获取Service的Cluster-IP，再结合Port访问Nginx服务。&lt;br&gt;获取IP：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# kubectl get service example-service
@@ -3056,7 +3135,7 @@ NAME              CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
 example-service   10.254.67.61   &amp;lt;nodes&amp;gt;       80:32201/TCP   1h
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在集群内访问Service：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# curl &amp;quot;10.254.67.61:80&amp;quot; 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;而在cluster外面，则只能通过&lt;a href=&quot;http://node-ip:32201来访问。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://node-ip:32201来访问。&lt;/a&gt;&lt;br&gt;虽然Service解决了Pod的服务发现和负载均衡问题，但存在着类似的问题：不提前知道Service的IP，还是需要改程序或配置啊。kube-dns就是用来解决上面这个问题的。&lt;br&gt;kube-dns可以解决Service的发现问题，&lt;br&gt;k8s将Service的名称当做域名注册到kube-dns中，通过Service的名称就可以访问其提供的服务。也就是说其他应用能够直接使用服务的名字，不需要关心它实际的 ip 地址，中间的转换能够自动完成。名字和 ip 之间的转换就是 DNS 系统的功能。&lt;br&gt;kubu-dns 服务不是独立的系统服务，而是一种 addon ，作为插件来安装的，不是 kubernetes 集群必须的（但是非常推荐安装）。可以把它看做运行在集群上的应用，只不过这个应用比较特殊而已。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;而在Kubernetes cluster外面，则只能通过&lt;a href=&quot;http://node-ip:32201来访问。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://node-ip:32201来访问。&lt;/a&gt;&lt;br&gt;虽然Service解决了Pod的服务发现和负载均衡问题，但存在着类似的问题：不提前知道Service的IP，还是需要改程序或配置啊。kube-dns就是用来解决上面这个问题的。&lt;br&gt;kube-dns可以解决Service的发现问题，k8s将Service的名称当做域名注册到kube-dns中，通过Service的名称就可以访问其提供的服务。也就是说其他应用能够直接使用服务的名字，不需要关心它实际的 ip 地址，中间的转换能够自动完成。名字和 ip 之间的转换就是 DNS 系统的功能。&lt;br&gt;kubu-dns 服务不是独立的系统服务，而是一种 addon ，作为插件来安装的，不是 kubernetes 集群必须的（但是非常推荐安装）。可以把它看做运行在集群上的应用，只不过这个应用比较特殊而已。&lt;/p&gt;
 &lt;h3 id=&quot;安装配置kube-dns&quot;&gt;&lt;a href=&quot;#安装配置kube-dns&quot; class=&quot;headerlink&quot; title=&quot;安装配置kube-dns&quot;&gt;&lt;/a&gt;安装配置kube-dns&lt;/h3&gt;&lt;p&gt;官方的yaml文件目录：&lt;a href=&quot;https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dns。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dns。&lt;/a&gt;&lt;br&gt;kube-dns 有两种配置方式，在 1.3 之前使用 etcd + kube2sky + skydns 的方式，在 1.3 之后可以使用 kubedns + dnsmasq 的方式。&lt;br&gt;该插件直接使用kubernetes部署，实际上kube-dns插件只是运行在kube-system命名空间下的Pod，完全可以手动创建它。官方的配置文件中包含以下镜像：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64:1.14.1
 gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.1
@@ -3072,9 +3151,9 @@ index.tenxcloud.com/jimmy/k8s-dns-kube-dns-amd64:1.14.1
 index.tenxcloud.com/jimmy/k8s-dns-sidecar-amd64:1.14.1
 &lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
 &lt;li&gt;kubeDNS：提供了原来 kube2sky + etcd + skyDNS 的功能，可以单独对外提供 DNS 查询服务&lt;/li&gt;
-&lt;li&gt;dnsmasq： 一个轻量级的 DNS 服务软件，可以提供 DNS 缓存功能。kubeDNS 模式下，dnsmasq 在内存中预留一块大小（默认是 1G）的地方，保存当前最常用的 DNS 查询记录，如果缓存中没有要查找的记录，它会到 kubeDNS 中查询，并把结果缓存起来&lt;/li&gt;
+&lt;li&gt;dnsmasq： 一个轻量级的 DNS 服务软件，可以提供 DNS 缓存功能。kubeDNS 模式下，dnsmasq 在内存中预留一块大小（默认是 1G）的地方，保存当前最常用的 DNS 查询记录，如果缓存中没有要查找的记录，它会到 kubeDNS 中查询，并把结果缓存起来。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h4 id=&quot;系统预定义的-RoleBinding&quot;&gt;&lt;a href=&quot;#系统预定义的-RoleBinding&quot; class=&quot;headerlink&quot; title=&quot;系统预定义的 RoleBinding&quot;&gt;&lt;/a&gt;系统预定义的 RoleBinding&lt;/h4&gt;&lt;p&gt;预定义的 RoleBinding system:kube-dns 将 kube-system 命名空间的 kube-dns ServiceAccount 与 system:kube-dns Role 绑定， 该 Role 具有访问 kube-apiserver DNS 相关 API 的权限；&lt;/p&gt;
+&lt;h4 id=&quot;系统预定义的-RoleBinding&quot;&gt;&lt;a href=&quot;#系统预定义的-RoleBinding&quot; class=&quot;headerlink&quot; title=&quot;系统预定义的 RoleBinding&quot;&gt;&lt;/a&gt;系统预定义的 RoleBinding&lt;/h4&gt;&lt;p&gt;预定义的 RoleBinding system:kube-dns 将 kube-system 命名空间的 kube-dns ServiceAccount 与 system:kube-dns Role 绑定， 该 Role 具有访问 kube-apiserver DNS 相关 API 的权限。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# kubectl get clusterrolebindings system:kube-dns -o yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -3105,12 +3184,12 @@ subjects:
 &amp;gt;   clusterIP: 10.254.0.2
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【说明】：&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;spec.clusterIP = 10.254.0.2，即明确指定了 kube-dns Service IP，这个 IP 需要和 kubelet 的 –cluster-dns 参数值一致；&lt;/li&gt;
+&lt;li&gt;spec.clusterIP = 10.254.0.2，即明确指定了 kube-dns Service IP，这个 IP 需要和 kubelet 的 –cluster-dns 参数值一致。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h4 id=&quot;配置-kube-dns-Deployment&quot;&gt;&lt;a href=&quot;#配置-kube-dns-Deployment&quot; class=&quot;headerlink&quot; title=&quot;配置 kube-dns Deployment&quot;&gt;&lt;/a&gt;配置 kube-dns Deployment&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# diff kubedns-controller.yaml.base kubedns-controller.yaml
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【说明】：&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;使用系统已经做了 RoleBinding 的 kube-dns ServiceAccount，该账户具有访问 kube-apiserver DNS 相关 API 的权限；&lt;/li&gt;
+&lt;li&gt;使用系统已经做了 RoleBinding 的 kube-dns ServiceAccount，该账户具有访问 kube-apiserver DNS 相关 API 的权限。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h4 id=&quot;执行所有定义文件&quot;&gt;&lt;a href=&quot;#执行所有定义文件&quot; class=&quot;headerlink&quot; title=&quot;执行所有定义文件&quot;&gt;&lt;/a&gt;执行所有定义文件&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# pwd
 /opt/kube-dns
@@ -3187,7 +3266,7 @@ PING kubernetes (10.254.0.1): 56 data bytes
 
 kubectl exec -ti busybox -- ping kube-dns.kube-system.svc.cluster.local
 PING kube-dns.kube-system.svc.cluster.local (10.254.0.2): 56 data bytes
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;从结果来看，service名称可以正常解析。&lt;br&gt;使用kubernetes的时候建议不要再用docker命令操作。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;从结果来看，service名称可以正常解析。&lt;br&gt;另外，使用kubernetes的时候建议不要再用docker命令操作。&lt;/p&gt;
 </content>
     
     <summary type="html">
@@ -4516,261 +4595,6 @@ Hello world
     
     
       <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spark介绍及安装部署</title>
-    <link href="http://yoursite.com/2017/08/11/Spark%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
-    <id>http://yoursite.com/2017/08/11/Spark介绍及安装部署/</id>
-    <published>2017-08-11T00:11:26.000Z</published>
-    <updated>2017-11-07T07:49:20.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;Spark介绍&quot;&gt;&lt;a href=&quot;#Spark介绍&quot; class=&quot;headerlink&quot; title=&quot;Spark介绍&quot;&gt;&lt;/a&gt;Spark介绍&lt;/h2&gt;&lt;h3 id=&quot;Apache-Spark&quot;&gt;&lt;a href=&quot;#Apache-Spark&quot; class=&quot;headerlink&quot; title=&quot;Apache Spark&quot;&gt;&lt;/a&gt;Apache Spark&lt;/h3&gt;&lt;p&gt;Apache Spark是一个围绕速度、易用性和复杂分析构建的大数据处理框架(没有数据存储)。最初在2009年由加州大学伯克利分校的AMPLab开发，并于2010年成为Apache的开源项目之一。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&quot;Hadoop和Spark&quot;&gt;&lt;a href=&quot;#Hadoop和Spark&quot; class=&quot;headerlink&quot; title=&quot;Hadoop和Spark&quot;&gt;&lt;/a&gt;Hadoop和Spark&lt;/h3&gt;&lt;p&gt;Hadoop常用于解决高吞吐、批量处理的业务场景，例如离线计算结果用于浏览量统计。如果需要实时查看浏览量统计信息，Hadoop显然不符合这样的要求。Spark通过内存计算能力极大地提高了大数据处理速度，满足了以上场景的需要。&lt;br&gt;与Hadoop和Storm等其他大数据和MapReduce技术相比，Spark有以下特点：&lt;br&gt;&lt;strong&gt;1.快速处理能力&lt;/strong&gt;&lt;br&gt;随着实时大数据应用越来越多，Hadoop作为离线的高吞吐、低响应框架已不能满足这类需求。Hadoop MapReduce的Job将中间输出和结果存储在HDFS中，读写HDFS造成磁盘I/O称为瓶颈。Spark允许将中间输出和结果存储在内存中，避免了大量的磁盘I/O。同时Spark自身的DAG执行引擎也支持数据在内存中的计算。Spark官网声称性能比Hadoop快100倍，如图所示。即便是内存不足，需要磁盘I/O，其速度也是Hadoop的10倍以上。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;2.易于使用&lt;/strong&gt;&lt;br&gt;Spark现在支持Java、Scala、Python和R等语言编写应用程序，大大降低了使用者的门槛。自带了80多个高等级操作符，允许在Scala、Python、R的shell中进行交互式查询。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;3.通用性&lt;/strong&gt;&lt;br&gt;Spark支持SQL及Hive SQL对数据查询，支持流式计算、支持机器学习和图计算。而且除了Spark core以外，建立在其上的这些功能都是一些库，安装好Spark后，这些库就可以使用了。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/2.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;4.可用性高&lt;/strong&gt;&lt;br&gt;Spark自身实现了Standalone部署模式，还可以跑在Hadoop、Mesos、或者云上。此外，Spark还有丰富的数据源支持。Spark除了可以访问操作系统自身的文件系统和HDFS，还可以访问Cassandra、HBase、Hive、Tachyon以及任何Hadoop的数据源。&lt;/p&gt;
-&lt;h3 id=&quot;Spark中的概念&quot;&gt;&lt;a href=&quot;#Spark中的概念&quot; class=&quot;headerlink&quot; title=&quot;Spark中的概念&quot;&gt;&lt;/a&gt;Spark中的概念&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;RDD：&lt;/strong&gt;弹性分布式数据集。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Task：&lt;/strong&gt;具体执行任务。Task分为ShuffleMapTask和ResultTask两种。ShuffleMapTask和ResultTask分别类似于Hadoop中的Map和Reduce。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Job：&lt;/strong&gt;用户提交的作业。一个Job可能由一到多个Task组成。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Stage：&lt;/strong&gt;Job分成的阶段。一个Job可能被划分为一到多个Stage。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Partition：&lt;/strong&gt;数据分区。即一个RDD的数据可以划分为多少个分区。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;NarrowDependency：&lt;/strong&gt;窄依赖，即子RDD依赖于父RDD中固定的Partition。NarrowDependency分为OneToOneDependency和RangeDependency两种。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;ShuffleDependency：&lt;/strong&gt;shuffle依赖，也称为宽依赖，即子RDD对父RDD中的所有Partition都有依赖。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;DAG：&lt;/strong&gt;有向无环图。用于反映各RDD之间的依赖关系。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;Spark生态系统&quot;&gt;&lt;a href=&quot;#Spark生态系统&quot; class=&quot;headerlink&quot; title=&quot;Spark生态系统&quot;&gt;&lt;/a&gt;Spark生态系统&lt;/h3&gt;&lt;p&gt;整个Spark主要由以下模块组成：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Spark Core：&lt;/strong&gt;Spark的核心功能实现，包括：SparkContext的初始化(Driver Application通过SparkContext提交)、部署模式、存储体系、任务提交与执行、计算引擎等。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Spark SQL：&lt;/strong&gt;提供SQL处理能力，便于熟悉关系型数据库操作的工程师进行交互查询。此外，还为熟悉Hadoop的用户提供Hive SQL处理能力。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Spark Streaming：&lt;/strong&gt;提供流式计算处理能力，目前支持Kafka、Flume、Twitter、MQTT、ZeroMQ、Kinesis和简单的TCP套接字等数据源。此外，还提供窗口操作。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;GraphX：&lt;/strong&gt;提供图计算处理能力，支持分布式。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;MLlib：&lt;/strong&gt;提供机器学习相关的统计、分类、回归等领域的多种算法实现。其一致的API接口大大降低了用户的学习成本。&lt;br&gt;Spark SQL、Spark Streaming、GraphX、MLlib的能力都是建立在核心引擎之上。如下图所示。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/2.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&quot;Spark核心功能&quot;&gt;&lt;a href=&quot;#Spark核心功能&quot; class=&quot;headerlink&quot; title=&quot;Spark核心功能&quot;&gt;&lt;/a&gt;Spark核心功能&lt;/h4&gt;&lt;p&gt;Spark Core提供Spark最基础与最核心的功能，主要包括以下功能：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;SparkContext：&lt;/strong&gt;通常而言，Driver Application的执行和输出都是通过SparkContent来完成的，在正式提交Application之前，首先需要初始化SparkContent。SparkContent隐藏了网络通信、分布式部署、消息通信、存储能力、计算能力、缓存、测量系统、文件服务、Web服务等内容，应用程序开发者只需要使用SparkContent提供的API完成功能开发。SparkContent内置的DAGScheduler负责创建Job，将DAG中的RDD划分到不同的Stage，提交Stage等功能。内置的TaskScheduler负责资源的申请、任务的提交及请求集群对任务的调度等工作。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;存储体系：&lt;/strong&gt;Spark优先考虑使用各节点的内存作为存储，当内存不足时才会考虑使用磁盘，这极大地减少了磁盘I/O，提升了任务执行效率，使得Spark适用于实时计算、流式计算等场景。此外，Spark还提供了以内存为中心的高容错的分布式文件系统Tachyon供用户进行选择。Tachyon能够为Spark提供可靠的内存级的文件共享服务。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;计算引擎：&lt;/strong&gt;计算引擎由SparkContent中的DAGScheduler、RDD以及具体节点上的Executor负责执行的Map和Reduce任务组成。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;部署模式：&lt;/strong&gt;由于单节点不足以提供足够的存储和计算能力，所以作为大数据处理的Spark在SparkContext的TaskScheduler组件中提供了对Standalone部署模式的实现和Yarn、Mesos等分布式资源管理系统的支持。通过使用Standallone、Yarn、Mesos等部署模式为Task分配计算资源，提高任务的并发执行效率。除了可用于实际生产环境的Standalone、Yarn、Mesos等部署模式外，Spark还提供了Local模式和local-cluster模式便于开发和调试。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&quot;Spark扩展功能&quot;&gt;&lt;a href=&quot;#Spark扩展功能&quot; class=&quot;headerlink&quot; title=&quot;Spark扩展功能&quot;&gt;&lt;/a&gt;Spark扩展功能&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;Spark SQL&lt;/li&gt;
-&lt;li&gt;Spark Streaming&lt;/li&gt;
-&lt;li&gt;GraphX&lt;/li&gt;
-&lt;li&gt;MLlib&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;Spark部署架构&quot;&gt;&lt;a href=&quot;#Spark部署架构&quot; class=&quot;headerlink&quot; title=&quot;Spark部署架构&quot;&gt;&lt;/a&gt;Spark部署架构&lt;/h3&gt;&lt;h4 id=&quot;集群架构&quot;&gt;&lt;a href=&quot;#集群架构&quot; class=&quot;headerlink&quot; title=&quot;集群架构&quot;&gt;&lt;/a&gt;集群架构&lt;/h4&gt;&lt;p&gt;从集群部署的角度看，Spark集群由以下部分组成：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Cluster Manager：&lt;/strong&gt;Spark的集群管理器，主要负责资源的分配与管理。集群管理器分配的资源属于一级分配，它将各个Worker上内存、CPU等资源分配给应用程序，但是并不负责对Executor的资源分配。目前Standalone、YARN、Mesos、EC2等都可以作为Spark的集群管理器。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Worker：&lt;/strong&gt;Spark的工作节点。对Spark应用程序来说，由集群管理器分配得到资源的Worker节点主要负责以下工作：创建Executor，将资源和任务进一步分配给Executor，同步资源信息给Cluster Manager。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Executor：&lt;/strong&gt;执行计算任务的一线进程。主要负责任务的执行以及与Worker、Driver App的信息同步。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Driver App：&lt;/strong&gt;客户端驱动程序，也可以理解问客户端应用程序，用于将任务程序转换为RDD和DAG，并与Cluster Manager进行通信与调度。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/3.jpg&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&quot;Spark部署模式&quot;&gt;&lt;a href=&quot;#Spark部署模式&quot; class=&quot;headerlink&quot; title=&quot;Spark部署模式&quot;&gt;&lt;/a&gt;Spark部署模式&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;1.一些概念&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Driver：&lt;/strong&gt;应用驱动程序，可以理解为是老板的客户。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Master：&lt;/strong&gt;Spark的主控节点，可以理解为集群的老板。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Worker：&lt;/strong&gt;Spark的工作节点，可以理解为集群的各个主管。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Executor：&lt;/strong&gt;Spark的工作进程，由Worker监管，负责具体任务的执行。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;2.Spark目前支持的部署方式&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;本地部署模式：&lt;/strong&gt;local、local[N]或者local[N, maxRetries]。主要用于代码调试和跟踪。不具备容错能力，所以不适用于生产环境。local部署模式只有Driver，没有Master和Worker，执行任务的Executor与Driver在同一个JVM进程内。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;本地集群部署模式：&lt;/strong&gt;local-cluster[N, cores, memory]。也主要用于代码调试，是源码学习常用的模式。不具备容错能力，不能用于生产环境。local-cluster模式是一种伪分布式集群部署模式，Driver、Master和Worker在同一个JVM内，可以存在多个Worker，每个Worker会有多个Executor，但这些Executor都独自存在于一个JVM进程内。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Standalone部署模式：&lt;/strong&gt;spark://。具备容错能力并且支持分布式部署，所以可用于实际的生产。Driver在集群之外，可以是任意的客户端应用程序。Master部署于单独的进程，甚至应该在单独的机器节点上。Master有多个，但同时最多有只有一个处于激活状态。Worker部署于单独的进程，也推荐在单独的节点上部署。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;第三方部署模式：&lt;/strong&gt;yarn-standalone、yarn-cluster、mesos://、zk://、simr://等。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;安装部署spark&quot;&gt;&lt;a href=&quot;#安装部署spark&quot; class=&quot;headerlink&quot; title=&quot;安装部署spark&quot;&gt;&lt;/a&gt;安装部署spark&lt;/h2&gt;&lt;p&gt;Spark runs on Java 7+, Python 2.6+ and R 3.1+. For the Scala API, Spark 1.6.2 uses Scala 2.10. You will need to use a compatible Scala version (2.10.x).&lt;/p&gt;
-&lt;h3 id=&quot;本地部署模式&quot;&gt;&lt;a href=&quot;#本地部署模式&quot; class=&quot;headerlink&quot; title=&quot;本地部署模式&quot;&gt;&lt;/a&gt;本地部署模式&lt;/h3&gt;&lt;h4 id=&quot;下载安装JDK8&quot;&gt;&lt;a href=&quot;#下载安装JDK8&quot; class=&quot;headerlink&quot; title=&quot;下载安装JDK8&quot;&gt;&lt;/a&gt;下载安装JDK8&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# mkdir /usr/java
-# tar zxf /usr/local/jdk-8u73-linux-x64.gz -C /usr/java/
-# vim /etc/profile
-export JAVA_HOME=/usr/java/jdk1.8.0_73
-export PATH=$JAVA_HOME/bin:$PATH
-export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-# source /etc/profile
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;下载安装scala-2-10-6&quot;&gt;&lt;a href=&quot;#下载安装scala-2-10-6&quot; class=&quot;headerlink&quot; title=&quot;下载安装scala-2.10.6&quot;&gt;&lt;/a&gt;下载安装scala-2.10.6&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@care ~]# cd /usr/local/
-[root@care local]# tar zxf scala-2.10.6.tgz
-[root@care local]# vim /etc/profile
-# Scala environment
-export SCALA_HOME=/usr/local/scala-2.10.6
-export PATH=$SCALA_HOME/bin:$PATH
-[root@care local]# source /etc/profile
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看是否成功：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@care local]# scala -version
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;配置登录自己不需要输入密码&quot;&gt;&lt;a href=&quot;#配置登录自己不需要输入密码&quot; class=&quot;headerlink&quot; title=&quot;配置登录自己不需要输入密码&quot;&gt;&lt;/a&gt;配置登录自己不需要输入密码&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@care ~]# ssh-keygen -t rsa -P &amp;apos;&amp;apos;
-[root@care ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@localhost
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;下载安装spark&quot;&gt;&lt;a href=&quot;#下载安装spark&quot; class=&quot;headerlink&quot; title=&quot;下载安装spark&quot;&gt;&lt;/a&gt;下载安装spark&lt;/h4&gt;&lt;p&gt;&lt;a href=&quot;http://spark.apache.org/downloads.html，我这里选择编译好的二进制版本1.6.1&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://spark.apache.org/downloads.html，我这里选择编译好的二进制版本1.6.1&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/4.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@care local]# tar zxf spark-1.6.1-bin-hadoop2.6.tgz
-[root@care local]# mv spark-1.6.1-bin-hadoop2.6 spark-1.6.1
-[root@care local]# vim /etc/profile
-# Spark environment
-export SPARK_HOME=/usr/local/spark-1.6.1
-export PATH=$SPARK_HOME/bin:$PATH
-[root@care local]# source /etc/profile
-
-[root@care local]# cd spark-1.6.1/conf/
-[root@care conf]# cp spark-env.sh.template spark-env.sh
-[root@care conf]# vim spark-env.sh
-export JAVA_HOME=/usr/java/jdk1.8.0_73
-export SCALA_HOME=/usr/local/scala-2.10.6
-export SPARK_MASTER_IP=172.16.7.119
-export SPARK_WORKER_MEMORY=4G
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果要选择源码编译安装，Build方法网址：&lt;br&gt;&lt;a href=&quot;http://spark.apache.org/docs/latest/building-spark.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://spark.apache.org/docs/latest/building-spark.html&lt;/a&gt;&lt;/p&gt;
-&lt;h4 id=&quot;启动spark&quot;&gt;&lt;a href=&quot;#启动spark&quot; class=&quot;headerlink&quot; title=&quot;启动spark&quot;&gt;&lt;/a&gt;启动spark&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@care ~]# /usr/local/spark-1.6.1/sbin/start-all.sh
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看启动的进程：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@care ~]# jps
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;查看Web-UI&quot;&gt;&lt;a href=&quot;#查看Web-UI&quot; class=&quot;headerlink&quot; title=&quot;查看Web UI&quot;&gt;&lt;/a&gt;查看Web UI&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;Master UI：&lt;/strong&gt;&lt;a href=&quot;http://172.16.7.119:8080/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.119:8080/&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;Worker UI：&lt;/strong&gt;&lt;a href=&quot;http://172.16.7.119:8081/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.119:8081/&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/6.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h4 id=&quot;停止spark&quot;&gt;&lt;a href=&quot;#停止spark&quot; class=&quot;headerlink&quot; title=&quot;停止spark&quot;&gt;&lt;/a&gt;停止spark&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@care ~]# /usr/local/spark-1.6.1/sbin/stop-all.sh
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;Standalone模式部署spark-无HA&quot;&gt;&lt;a href=&quot;#Standalone模式部署spark-无HA&quot; class=&quot;headerlink&quot; title=&quot;Standalone模式部署spark (无HA)&quot;&gt;&lt;/a&gt;Standalone模式部署spark (无HA)&lt;/h3&gt;&lt;p&gt;Spark Standalone采用了Master/Slaves架构的集群模式，因此，存在着Master单点故障。&lt;br&gt;Spark提供了两种单点故障的解决方案：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;基于文件系统的单点恢复&lt;/li&gt;
-&lt;li&gt;基于ZooKeeper的Standby Masters&lt;br&gt;此模式主要用来做开发，因为开发时应用运行频率高，而且对Master故障的影响不大，最主要的是出现故障重新运行便可，不需要恢复。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h4&gt;&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;主机名&lt;/th&gt;
-&lt;th&gt;IP地址&lt;/th&gt;
-&lt;th&gt;操作系统版本&lt;/th&gt;
-&lt;th&gt;安装软件&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;spark17&lt;/td&gt;
-&lt;td&gt;172.16.206.17&lt;/td&gt;
-&lt;td&gt;CentOS 7.1&lt;/td&gt;
-&lt;td&gt;JDK8、scala-2.10.6、spark-1.6.1&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;spark31&lt;/td&gt;
-&lt;td&gt;172.16.206.31&lt;/td&gt;
-&lt;td&gt;CentOS 7.1&lt;/td&gt;
-&lt;td&gt;JDK8、scala-2.10.6、spark-1.6.1&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;spark132&lt;/td&gt;
-&lt;td&gt;172.16.206.32&lt;/td&gt;
-&lt;td&gt;CentOS 7.1&lt;/td&gt;
-&lt;td&gt;JDK8、scala-2.10.6、spark-1.6.1&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;spark17作为Mater节点，其他两台作为Worker节点。&lt;/p&gt;
-&lt;h4 id=&quot;节点时间同步&quot;&gt;&lt;a href=&quot;#节点时间同步&quot; class=&quot;headerlink&quot; title=&quot;节点时间同步&quot;&gt;&lt;/a&gt;节点时间同步&lt;/h4&gt;&lt;p&gt;采用NTP(Network Time Protocol)方式来实现, 选择一台机器, 作为集群的时间同步服务器, 然后分别配置服务端和集群其他机器。我这里以spark17机器(Hadoop集群机器)时间为准，其他机器同这台机器时间做同步。&lt;/p&gt;
-&lt;h5 id=&quot;NTP服务端&quot;&gt;&lt;a href=&quot;#NTP服务端&quot; class=&quot;headerlink&quot; title=&quot;NTP服务端&quot;&gt;&lt;/a&gt;NTP服务端&lt;/h5&gt;&lt;p&gt;1.安装ntp服务&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# yum install ntp -y
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.配置/etc/ntp.conf，这边采用本地机器作为时间的原点&lt;br&gt;注释server列表：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;server 0.centos.pool.ntp.org iburst
-server 1.centos.pool.ntp.org iburst
-server 2.centos.pool.ntp.org iburst
-server 3.centos.pool.ntp.org iburst
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;添加如下内容：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;server 127.127.1.0 prefer
-fudge 127.127.1.0 stratum 8
-logfile /var/log/ntp.log
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.启动ntpd服务&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# systemctl start ntpd
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.查看ntp服务状态&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# systemctl status ntpd
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.加入开机启动&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# systemctl enable ntpd
-&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&quot;NTP客户端&quot;&gt;&lt;a href=&quot;#NTP客户端&quot; class=&quot;headerlink&quot; title=&quot;NTP客户端&quot;&gt;&lt;/a&gt;NTP客户端&lt;/h5&gt;&lt;p&gt;1.安装ntp&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# yum install ntpdate -y
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.配置crontab任务主动同步&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# crontab -e
-*/10 * * * * /usr/sbin/ntpdate 172.16.206.17;hwclock -w
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;各节点配置hosts文件&quot;&gt;&lt;a href=&quot;#各节点配置hosts文件&quot; class=&quot;headerlink&quot; title=&quot;各节点配置hosts文件&quot;&gt;&lt;/a&gt;各节点配置hosts文件&lt;/h4&gt;&lt;p&gt;集群各主机都要配置：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# vim /etc/hosts
-172.16.206.17 spark17
-172.16.206.31 spark31
-172.16.206.32 spark32
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;下载安装JDK8-1&quot;&gt;&lt;a href=&quot;#下载安装JDK8-1&quot; class=&quot;headerlink&quot; title=&quot;下载安装JDK8&quot;&gt;&lt;/a&gt;下载安装JDK8&lt;/h4&gt;&lt;p&gt;集群每台机器都要安装JDK8。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# mkdir /usr/java
-# tar zxf /usr/local/jdk-8u73-linux-x64.gz -C /usr/java/
-# vim /etc/profile
-export JAVA_HOME=/usr/java/jdk1.8.0_73
-export PATH=$JAVA_HOME/bin:$PATH
-export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-# source /etc/profile
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;下载安装scala-2-10-6-1&quot;&gt;&lt;a href=&quot;#下载安装scala-2-10-6-1&quot; class=&quot;headerlink&quot; title=&quot;下载安装scala-2.10.6&quot;&gt;&lt;/a&gt;下载安装scala-2.10.6&lt;/h4&gt;&lt;p&gt;集群每个节点都需要安装scala。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /usr/local/
-# tar zxf scala-2.10.6.tgz
-# vim /etc/profile
-# Scala environment
-export SCALA_HOME=/usr/local/scala-2.10.6
-export PATH=$SCALA_HOME/bin:$PATH
-# source /etc/profile
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看是否成功：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# scala -version
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;配置主节点登录自己和其他节点不需要输入密码&quot;&gt;&lt;a href=&quot;#配置主节点登录自己和其他节点不需要输入密码&quot; class=&quot;headerlink&quot; title=&quot;配置主节点登录自己和其他节点不需要输入密码&quot;&gt;&lt;/a&gt;配置主节点登录自己和其他节点不需要输入密码&lt;/h4&gt;&lt;p&gt;生成一对密钥：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark17 ~]# ssh-keygen -t rsa -P &amp;apos;&amp;apos;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;拷贝公钥到自己和其他节点：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark17 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@spark17
-[root@spark17 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@spark31
-[root@spark17 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@spark32
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;安装配置spark&quot;&gt;&lt;a href=&quot;#安装配置spark&quot; class=&quot;headerlink&quot; title=&quot;安装配置spark&quot;&gt;&lt;/a&gt;安装配置spark&lt;/h4&gt;&lt;p&gt;我这里下载的是Spark的编译版本spark-1.6.1-bin-hadoop2.6.tgz，否则需要自己事先自行编译。&lt;br&gt;&lt;strong&gt;先在master机器上(172.16.206.17)安装spark：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark17 ~]# cd /usr/local/
-[root@spark17 local]# tar zxf spark-1.6.1-bin-hadoop2.6.tgz
-[root@spark17 local]# mv spark-1.6.1-bin-hadoop2.6 spark-1.6.1
-[root@spark17 local]# vim /etc/profile
-# Spark environment
-export SPARK_HOME=/usr/local/spark-1.6.1
-export PATH=$SPARK_HOME/bin:$PATH
-[root@spark17 local]# source /etc/profile
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;配置spark：&lt;/strong&gt;&lt;br&gt;&lt;strong&gt;修改spark-env.sh文件：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark17 local]# cd spark-1.6.1/conf/
-[root@ spark17 conf]# cp spark-env.sh.template spark-env.sh
-[root@ spark17 conf]# vim spark-env.sh
-export JAVA_HOME=/usr/java/jdk1.8.0_73
-export SCALA_HOME=/usr/local/scala-2.10.6
-export SPARK_MASTER_IP=spark17
-export SPARK_MASTER_PORT=7077
-export SPARK_WORKER_CORES=1
-export SPARK_WORDER_INSTANCES=1
-export SPARK_WORKER_MEMORY=4G
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;修改slave文件：&lt;/strong&gt;只需要在slave文件中写入各节点的主机名即可，包括master的主机名。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark17 conf]# cp slaves.template slaves
-[root@spark17 conf]# vim slaves
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Spark/7.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;一旦创建好文件， 你就可以使用下面的shell脚本启动或者停止你的集群了。 这些脚本基于Hadoop的发布脚本， 可以在SPARK_HOME/bin找到:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;sbin/start-master.sh：在脚本执行的机器上启动master.&lt;/li&gt;
-&lt;li&gt;sbin/start-slaves.sh：启动conf/slaves 文件中配置的所有的slave.&lt;/li&gt;
-&lt;li&gt;sbin/start-all.sh：启动上面描述的master和salve.&lt;/li&gt;
-&lt;li&gt;sbin/stop-master.sh：停止bin/start-master.sh 脚本启动的master.&lt;/li&gt;
-&lt;li&gt;sbin/stop-slaves.sh：停止conf/slaves 文件中配置的slave.&lt;/li&gt;
-&lt;li&gt;sbin/stop-all.sh：停止上面描述的master和slave.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;【注意】:这些脚本必须在你想运行的master机器上执行，而不是你的本地机。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;将master上配置好的spark通过scp复制到其他各个节点上（注意其他节点上的profile文件也要一致）&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark17 ~]# scp -r /usr/local/spark-1.6.1 root@spark31:/usr/local/
-[root@spark17 ~]# scp -r /usr/local/spark-1.6.1 root@spark32:/usr/local/
-[root@spark31 local]# vim /etc/profile
-# Spark environment
-export SPARK_HOME=/usr/local/spark-1.6.1
-export PATH=$SPARK_HOME/bin:$PATH
-[root@spark31 local]# source /etc/profile
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;启动spark-1&quot;&gt;&lt;a href=&quot;#启动spark-1&quot; class=&quot;headerlink&quot; title=&quot;启动spark&quot;&gt;&lt;/a&gt;启动spark&lt;/h4&gt;&lt;p&gt;在master上一次性启动集群：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark17 ~]# cd /usr/local/spark-1.6.1/sbin/
-[root@spark17 sbin]# ./start-all.sh
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;停止spark-1&quot;&gt;&lt;a href=&quot;#停止spark-1&quot; class=&quot;headerlink&quot; title=&quot;停止spark&quot;&gt;&lt;/a&gt;停止spark&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@spark17 ~]# cd /usr/local/spark-1.6.1/sbin/
-[root@spark17 sbin]# ./stop-all.sh
-&lt;/code&gt;&lt;/pre&gt;</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Spark介绍&quot;&gt;&lt;a href=&quot;#Spark介绍&quot; class=&quot;headerlink&quot; title=&quot;Spark介绍&quot;&gt;&lt;/a&gt;Spark介绍&lt;/h2&gt;&lt;h3 id=&quot;Apache-Spark&quot;&gt;&lt;a href=&quot;#Apache-Spark&quot; class=&quot;headerlink&quot; title=&quot;Apache Spark&quot;&gt;&lt;/a&gt;Apache Spark&lt;/h3&gt;&lt;p&gt;Apache Spark是一个围绕速度、易用性和复杂分析构建的大数据处理框架(没有数据存储)。最初在2009年由加州大学伯克利分校的AMPLab开发，并于2010年成为Apache的开源项目之一。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="实时处理" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E5%A4%84%E7%90%86/"/>
-    
-    
-      <category term="Spark" scheme="http://yoursite.com/tags/Spark/"/>
     
   </entry>
   

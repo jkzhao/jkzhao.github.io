@@ -114,7 +114,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/1.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/2.png">
-<meta property="og:updated_time" content="2017-11-18T13:07:37.000Z">
+<meta property="og:updated_time" content="2017-11-19T06:01:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="二进制方式部署Kubernetes 1.6.0集群(开启TLS)">
 <meta name="twitter:description" content="Kubernetes简介Kubernetes是谷歌开源的容器集群管理系统，是Google多年大规模容器管理技术Borg的 开源版本，主要功能包括:  基于容器的应用部署、维护和滚动升级 负载均衡和服务发现 跨机器和跨地区的集群调度">
@@ -344,8 +344,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-18T21:07:37+08:00" content="2017-11-18">
-              2017-11-18
+              <time itemprop="dateUpdated" datetime="2017-11-19T14:01:35+08:00" content="2017-11-19">
+              2017-11-19
               </time>
               </span>
             
@@ -1158,7 +1158,7 @@ KUBE_API_ARGS=&quot;--authorization-mode=RBAC --runtime-config=rbac.authorizatio
 <li>–bind-address 不能为 127.0.0.1；</li>
 <li>runtime-config配置为rbac.authorization.k8s.io/v1beta1，表示运行时的apiVersion；</li>
 <li>–service-cluster-ip-range 指定 Service Cluster IP 地址段，该地址段不能路由可达；</li>
-<li>缺省情况下 kubernetes 对象保存在 etcd /registry 路径下，可以通过 –etcd-prefix 参数进行调整；</li>
+<li>缺省情况下 kubernetes 对象保存在 etcd /registry 路径下，可以通过 –etcd-prefix 参数进行调整。</li>
 </ul>
 <h4 id="启动kube-apiserver"><a href="#启动kube-apiserver" class="headerlink" title="启动kube-apiserver"></a>启动kube-apiserver</h4><pre><code># systemctl daemon-reload
 # systemctl enable kube-apiserver
@@ -1243,7 +1243,8 @@ WantedBy=multi-user.target
 
 # Add your own!
 KUBE_SCHEDULER_ARGS=&quot;--leader-elect=true --address=127.0.0.1&quot;
-</code></pre><ul>
+</code></pre><p>【说明】：</p>
+<ul>
 <li>–address 值必须为 127.0.0.1，因为当前 kube-apiserver 期望 scheduler 和 controller-manager 在同一台机器。</li>
 </ul>
 <h4 id="启动-kube-scheduler"><a href="#启动-kube-scheduler" class="headerlink" title="启动 kube-scheduler"></a>启动 kube-scheduler</h4><pre><code># systemctl daemon-reload
@@ -1258,7 +1259,7 @@ etcd-1               Healthy   {&quot;health&quot;: &quot;true&quot;}
 etcd-2               Healthy   {&quot;health&quot;: &quot;true&quot;}              
 </code></pre><h2 id="部署kubernetes-node节点"><a href="#部署kubernetes-node节点" class="headerlink" title="部署kubernetes node节点"></a>部署kubernetes node节点</h2><p>kubernetes node 节点包含如下组件：</p>
 <ul>
-<li>Docker1.12.6</li>
+<li>Docker 1.12.6</li>
 <li>Flanneld</li>
 <li>kubelet</li>
 <li>kube-proxy</li>
@@ -1363,7 +1364,7 @@ eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450
 PING 172.16.51.2 (172.16.51.2) 56(84) bytes of data.
 64 bytes from 172.16.51.2: icmp_seq=1 ttl=254 time=1.00 ms
 64 bytes from 172.16.51.2: icmp_seq=2 ttl=254 time=1.29 ms
-</code></pre><h4 id="补充：下载二进制包安装flannel"><a href="#补充：下载二进制包安装flannel" class="headerlink" title="补充：下载二进制包安装flannel"></a>补充：下载二进制包安装flannel</h4><p>从官网 <a href="https://github.com/coreos/flannel/releases" target="_blank" rel="external">https://github.com/coreos/flannel/releases</a> 下载的flannel release 0.7.1,并将下载的文件上传到服务器的/opt/flannel/目录下。</p>
+</code></pre><h4 id="补充：下载二进制包安装flannel"><a href="#补充：下载二进制包安装flannel" class="headerlink" title="补充：下载二进制包安装flannel"></a>补充：下载二进制包安装flannel</h4><p>从官网 <a href="https://github.com/coreos/flannel/releases" target="_blank" rel="external">https://github.com/coreos/flannel/releases</a> 下载的flannel release 0.7.1，并将下载的文件上传到服务器的/opt/flannel/目录下。</p>
 <pre><code># mkdir flannel
 # cd flannel/
 # tar xf flannel-v0.7.1-linux-amd64.tar  
@@ -1382,7 +1383,7 @@ docker daemon --bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU} &amp;
 clusterrolebinding &quot;kubelet-bootstrap&quot; created  
 </code></pre><p><strong>【注意】：以上这步只需要在kubernetes node集群中的一台执行一次就可以了。</strong><br>【说明】：</p>
 <ul>
-<li>–user=kubelet-bootstrap 是在 /etc/kubernetes/token.csv 文件中指定的用户名，同时也写入了/etc/kubernetes/bootstrap.kubeconfig 文件；</li>
+<li>–user=kubelet-bootstrap 是在 /etc/kubernetes/token.csv 文件中指定的用户名，同时也写入了/etc/kubernetes/bootstrap.kubeconfig 文件。</li>
 </ul>
 <h4 id="下载最新的-kubelet-和-kube-proxy-二进制文件"><a href="#下载最新的-kubelet-和-kube-proxy-二进制文件" class="headerlink" title="下载最新的 kubelet 和 kube-proxy 二进制文件"></a>下载最新的 kubelet 和 kube-proxy 二进制文件</h4><p>这个在之前安装kubernetes master时已经下载好了二进制文件，只需要复制到相应目录即可。</p>
 <pre><code>[root@node1 kubernetes]# cd /opt/kubernetes/server/kubernetes/server/bin/
@@ -1449,12 +1450,12 @@ KUBELET_ARGS=&quot;--cgroup-driver=systemd --cluster-dns=10.254.0.2 --experiment
 <li>–experimental-bootstrap-kubeconfig 指向 bootstrap kubeconfig 文件，kubelet 使用该文件中的用户名和 token 向 kube-apiserver 发送 TLS Bootstrapping 请求；</li>
 <li>管理员通过了 CSR 请求后，kubelet 自动在 –cert-dir 目录创建证书和私钥文件(kubelet-client.crt 和 kubelet-client.key)，然后写入 –kubeconfig 文件；</li>
 <li>建议在 –kubeconfig 配置文件中指定 kube-apiserver 地址，如果未指定 –api-servers 选项，则必须指定 –require-kubeconfig 选项后才从配置文件中读取 kube-apiserver 的地址，否则 kubelet 启动后将找不到 kube-apiserver (日志中提示未找到 API Server），kubectl get nodes 不会返回对应的 Node 信息;</li>
-<li>–cluster-dns 指定 kubedns 的 Service IP(可以先分配，后续创建 kubedns 服务时指定该 IP)，–cluster-domain 指定域名后缀，这两个参数同时指定后才会生效；</li>
+<li>–cluster-dns 指定 kubedns 的 Service IP(可以先分配，后续创建 kubedns 服务时指定该 IP)，–cluster-domain 指定域名后缀，这两个参数同时指定后才会生效。</li>
 </ul>
-<h4 id="启动kublet"><a href="#启动kublet" class="headerlink" title="启动kublet"></a>启动kublet</h4><pre><code># systemctl daemon-reload
+<h4 id="启动kubelet"><a href="#启动kubelet" class="headerlink" title="启动kubelet"></a>启动kubelet</h4><pre><code># systemctl daemon-reload
 # systemctl enable kubelet
 # systemctl start kubelet
-</code></pre><h4 id="通过-kublet-的-TLS-证书请求"><a href="#通过-kublet-的-TLS-证书请求" class="headerlink" title="通过 kublet 的 TLS 证书请求"></a>通过 kublet 的 TLS 证书请求</h4><p>kubelet 首次启动时向 kube-apiserver 发送证书签名请求，必须通过后 kubernetes 系统才会将该 Node 加入到集群。</p>
+</code></pre><h4 id="通过-kubelet-的-TLS-证书请求"><a href="#通过-kubelet-的-TLS-证书请求" class="headerlink" title="通过 kubelet 的 TLS 证书请求"></a>通过 kubelet 的 TLS 证书请求</h4><p>kubelet 首次启动时向 kube-apiserver 发送证书签名请求，必须通过后 kubernetes 系统才会将该 Node 加入到集群。</p>
 <p>1.查看未授权的 CSR 请求</p>
 <pre><code># kubectl get csr 
 NAME        AGE       REQUESTOR           CONDITION
@@ -1531,7 +1532,7 @@ KUBE_PROXY_ARGS=&quot;--bind-address=172.16.7.151 --hostname-override=172.16.7.1
 <li>–hostname-override 参数值必须与 kubelet 的值一致，否则 kube-proxy 启动后会找不到该 Node，从而不会创建任何 iptables 规则；</li>
 <li>kube-proxy 根据 –cluster-cidr 判断集群内部和外部流量，指定 –cluster-cidr 或 –masquerade-all 选项后 kube-proxy 才会对访问 Service IP 的请求做 SNAT；</li>
 <li>–kubeconfig 指定的配置文件嵌入了 kube-apiserver 的地址、用户名、证书、秘钥等请求和认证信息；</li>
-<li>预定义的 RoleBinding cluster-admin 将User system:kube-proxy 与 Role system:node-proxier 绑定，该 Role 授予了调用 kube-apiserver Proxy 相关 API 的权限；</li>
+<li>预定义的 RoleBinding cluster-admin 将User system:kube-proxy 与 Role system:node-proxier 绑定，该 Role 授予了调用 kube-apiserver Proxy 相关 API 的权限。</li>
 </ul>
 <p><strong>3.启动 kube-proxy</strong></p>
 <pre><code># systemctl daemon-reload
@@ -1555,6 +1556,7 @@ NodePort:               &lt;unset&gt; 32201/TCP
 Endpoints:              172.30.32.2:80,172.30.87.2:80
 Session Affinity:       None
 Events:                 &lt;none&gt;
+
 # kubectl get all
 NAME                        READY     STATUS    RESTARTS   AGE
 po/nginx-1931613429-nlsj1   1/1       Running   0          5m
@@ -1612,7 +1614,7 @@ deployment &quot;nginx&quot; deleted
 <pre><code># kubectl get pod -o yaml -l run=load-balancer-example|grep podIP 
     podIP: 172.30.32.2
     podIP: 172.30.87.2
-</code></pre><p>然后就可以通过podIP在k8s集群内访问Nginx服务了。</p>
+</code></pre><p>然后在Kubernetes集群的任一节点上就可以通过podIP在k8s集群内访问Nginx服务了。</p>
 <pre><code># curl &quot;172.30.32.2:80&quot;
 </code></pre><p>但是这样存在几个问题：</p>
 <ul>
@@ -1620,7 +1622,7 @@ deployment &quot;nginx&quot; deleted
 <li>Pod在运行中可能会重建，Pod的IP地址会随着Pod的重启而变化,并 不建议直接拿Pod的IP来交互</li>
 <li>如何在多个Pod中实现负载均衡嘞？</li>
 </ul>
-<p>使用k8s Service就可以解决。Service为一组Pod(通过labels来选择)提供一个统一的入口,并为它们提供负载均衡 和自动服务发现。<br>所以紧接着就创建了个service：</p>
+<p>使用k8s Service就可以解决。Service为一组Pod(通过labels来选择)提供一个统一的入口，并为它们提供负载均衡和自动服务发现。<br>所以紧接着就创建了个service：</p>
 <pre><code># kubectl expose deployment nginx --type=NodePort --name=example-service
 </code></pre><p>创建之后，仍需要获取Service的Cluster-IP，再结合Port访问Nginx服务。<br>获取IP：</p>
 <pre><code># kubectl get service example-service
@@ -1628,7 +1630,7 @@ NAME              CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
 example-service   10.254.67.61   &lt;nodes&gt;       80:32201/TCP   1h
 </code></pre><p>在集群内访问Service：</p>
 <pre><code># curl &quot;10.254.67.61:80&quot; 
-</code></pre><p>而在cluster外面，则只能通过<a href="http://node-ip:32201来访问。" target="_blank" rel="external">http://node-ip:32201来访问。</a><br>虽然Service解决了Pod的服务发现和负载均衡问题，但存在着类似的问题：不提前知道Service的IP，还是需要改程序或配置啊。kube-dns就是用来解决上面这个问题的。<br>kube-dns可以解决Service的发现问题，<br>k8s将Service的名称当做域名注册到kube-dns中，通过Service的名称就可以访问其提供的服务。也就是说其他应用能够直接使用服务的名字，不需要关心它实际的 ip 地址，中间的转换能够自动完成。名字和 ip 之间的转换就是 DNS 系统的功能。<br>kubu-dns 服务不是独立的系统服务，而是一种 addon ，作为插件来安装的，不是 kubernetes 集群必须的（但是非常推荐安装）。可以把它看做运行在集群上的应用，只不过这个应用比较特殊而已。</p>
+</code></pre><p>而在Kubernetes cluster外面，则只能通过<a href="http://node-ip:32201来访问。" target="_blank" rel="external">http://node-ip:32201来访问。</a><br>虽然Service解决了Pod的服务发现和负载均衡问题，但存在着类似的问题：不提前知道Service的IP，还是需要改程序或配置啊。kube-dns就是用来解决上面这个问题的。<br>kube-dns可以解决Service的发现问题，k8s将Service的名称当做域名注册到kube-dns中，通过Service的名称就可以访问其提供的服务。也就是说其他应用能够直接使用服务的名字，不需要关心它实际的 ip 地址，中间的转换能够自动完成。名字和 ip 之间的转换就是 DNS 系统的功能。<br>kubu-dns 服务不是独立的系统服务，而是一种 addon ，作为插件来安装的，不是 kubernetes 集群必须的（但是非常推荐安装）。可以把它看做运行在集群上的应用，只不过这个应用比较特殊而已。</p>
 <h3 id="安装配置kube-dns"><a href="#安装配置kube-dns" class="headerlink" title="安装配置kube-dns"></a>安装配置kube-dns</h3><p>官方的yaml文件目录：<a href="https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dns。" target="_blank" rel="external">https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dns。</a><br>kube-dns 有两种配置方式，在 1.3 之前使用 etcd + kube2sky + skydns 的方式，在 1.3 之后可以使用 kubedns + dnsmasq 的方式。<br>该插件直接使用kubernetes部署，实际上kube-dns插件只是运行在kube-system命名空间下的Pod，完全可以手动创建它。官方的配置文件中包含以下镜像：</p>
 <pre><code>gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64:1.14.1
 gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.1
@@ -1644,9 +1646,9 @@ index.tenxcloud.com/jimmy/k8s-dns-kube-dns-amd64:1.14.1
 index.tenxcloud.com/jimmy/k8s-dns-sidecar-amd64:1.14.1
 </code></pre><ul>
 <li>kubeDNS：提供了原来 kube2sky + etcd + skyDNS 的功能，可以单独对外提供 DNS 查询服务</li>
-<li>dnsmasq： 一个轻量级的 DNS 服务软件，可以提供 DNS 缓存功能。kubeDNS 模式下，dnsmasq 在内存中预留一块大小（默认是 1G）的地方，保存当前最常用的 DNS 查询记录，如果缓存中没有要查找的记录，它会到 kubeDNS 中查询，并把结果缓存起来</li>
+<li>dnsmasq： 一个轻量级的 DNS 服务软件，可以提供 DNS 缓存功能。kubeDNS 模式下，dnsmasq 在内存中预留一块大小（默认是 1G）的地方，保存当前最常用的 DNS 查询记录，如果缓存中没有要查找的记录，它会到 kubeDNS 中查询，并把结果缓存起来。</li>
 </ul>
-<h4 id="系统预定义的-RoleBinding"><a href="#系统预定义的-RoleBinding" class="headerlink" title="系统预定义的 RoleBinding"></a>系统预定义的 RoleBinding</h4><p>预定义的 RoleBinding system:kube-dns 将 kube-system 命名空间的 kube-dns ServiceAccount 与 system:kube-dns Role 绑定， 该 Role 具有访问 kube-apiserver DNS 相关 API 的权限；</p>
+<h4 id="系统预定义的-RoleBinding"><a href="#系统预定义的-RoleBinding" class="headerlink" title="系统预定义的 RoleBinding"></a>系统预定义的 RoleBinding</h4><p>预定义的 RoleBinding system:kube-dns 将 kube-system 命名空间的 kube-dns ServiceAccount 与 system:kube-dns Role 绑定， 该 Role 具有访问 kube-apiserver DNS 相关 API 的权限。</p>
 <pre><code># kubectl get clusterrolebindings system:kube-dns -o yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -1677,12 +1679,12 @@ subjects:
 &gt;   clusterIP: 10.254.0.2
 </code></pre><p>【说明】：</p>
 <ul>
-<li>spec.clusterIP = 10.254.0.2，即明确指定了 kube-dns Service IP，这个 IP 需要和 kubelet 的 –cluster-dns 参数值一致；</li>
+<li>spec.clusterIP = 10.254.0.2，即明确指定了 kube-dns Service IP，这个 IP 需要和 kubelet 的 –cluster-dns 参数值一致。</li>
 </ul>
 <h4 id="配置-kube-dns-Deployment"><a href="#配置-kube-dns-Deployment" class="headerlink" title="配置 kube-dns Deployment"></a>配置 kube-dns Deployment</h4><pre><code># diff kubedns-controller.yaml.base kubedns-controller.yaml
 </code></pre><p>【说明】：</p>
 <ul>
-<li>使用系统已经做了 RoleBinding 的 kube-dns ServiceAccount，该账户具有访问 kube-apiserver DNS 相关 API 的权限；</li>
+<li>使用系统已经做了 RoleBinding 的 kube-dns ServiceAccount，该账户具有访问 kube-apiserver DNS 相关 API 的权限。</li>
 </ul>
 <h4 id="执行所有定义文件"><a href="#执行所有定义文件" class="headerlink" title="执行所有定义文件"></a>执行所有定义文件</h4><pre><code># pwd
 /opt/kube-dns
@@ -1759,7 +1761,7 @@ PING kubernetes (10.254.0.1): 56 data bytes
 
 kubectl exec -ti busybox -- ping kube-dns.kube-system.svc.cluster.local
 PING kube-dns.kube-system.svc.cluster.local (10.254.0.2): 56 data bytes
-</code></pre><p>从结果来看，service名称可以正常解析。<br>使用kubernetes的时候建议不要再用docker命令操作。</p>
+</code></pre><p>从结果来看，service名称可以正常解析。<br>另外，使用kubernetes的时候建议不要再用docker命令操作。</p>
 
       
     </div>
@@ -1870,7 +1872,7 @@ PING kube-dns.kube-system.svc.cluster.local (10.254.0.2): 56 data bytes
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">48</span>
+              <span class="site-state-item-count">49</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1878,7 +1880,7 @@ PING kube-dns.kube-system.svc.cluster.local (10.254.0.2): 56 data bytes
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1887,7 +1889,7 @@ PING kube-dns.kube-system.svc.cluster.local (10.254.0.2): 56 data bytes
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1957,7 +1959,7 @@ PING kube-dns.kube-system.svc.cluster.local (10.254.0.2): 56 data bytes
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes简介"><span class="nav-number">1.</span> <span class="nav-text">Kubernetes简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境信息"><span class="nav-number">2.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建TLS加密通信的证书和密钥"><span class="nav-number">3.</span> <span class="nav-text">创建TLS加密通信的证书和密钥</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装CFSSL"><span class="nav-number">3.1.</span> <span class="nav-text">安装CFSSL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建CA"><span class="nav-number">3.2.</span> <span class="nav-text">创建CA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Kubernetes-证书"><span class="nav-number">3.3.</span> <span class="nav-text">创建 Kubernetes 证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Admin-证书"><span class="nav-number">3.4.</span> <span class="nav-text">创建 Admin 证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Kube-Proxy-证书"><span class="nav-number">3.5.</span> <span class="nav-text">创建 Kube-Proxy 证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#校验证书"><span class="nav-number">3.6.</span> <span class="nav-text">校验证书</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用openssl命令校验证书"><span class="nav-number">3.6.1.</span> <span class="nav-text">使用openssl命令校验证书</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用-Cfssl-Certinfo-命令校验"><span class="nav-number">3.6.2.</span> <span class="nav-text">使用 Cfssl-Certinfo 命令校验</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分发证书"><span class="nav-number">3.7.</span> <span class="nav-text">分发证书</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下载和配置-kubectl-kubecontrol-命令行工具"><span class="nav-number">4.</span> <span class="nav-text">下载和配置 kubectl(kubecontrol) 命令行工具</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#下载kubectl"><span class="nav-number">4.1.</span> <span class="nav-text">下载kubectl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-kubectl-kubeconfig-文件"><span class="nav-number">4.2.</span> <span class="nav-text">创建 kubectl kubeconfig 文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建-kubeconfig-文件"><span class="nav-number">5.</span> <span class="nav-text">创建 kubeconfig 文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-TLS-Bootstrapping-Token"><span class="nav-number">5.1.</span> <span class="nav-text">创建 TLS Bootstrapping Token</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Token-auth-file"><span class="nav-number">5.1.1.</span> <span class="nav-text">Token auth file</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-kubelet-bootstrapping-kubeconfig-文件"><span class="nav-number">5.1.2.</span> <span class="nav-text">创建 kubelet bootstrapping kubeconfig 文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-kube-proxy-kubeconfig-文件"><span class="nav-number">5.2.</span> <span class="nav-text">创建 kube-proxy kubeconfig 文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分发-kubeconfig-文件"><span class="nav-number">5.3.</span> <span class="nav-text">分发 kubeconfig 文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建高可用-etcd-集群"><span class="nav-number">6.</span> <span class="nav-text">创建高可用 etcd 集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装配置etcd集群"><span class="nav-number">6.1.</span> <span class="nav-text">安装配置etcd集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动-etcd-服务"><span class="nav-number">6.2.</span> <span class="nav-text">启动 etcd 服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证服务"><span class="nav-number">6.3.</span> <span class="nav-text">验证服务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署-kubernetes-master"><span class="nav-number">7.</span> <span class="nav-text">部署 kubernetes master</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TLS-证书文件"><span class="nav-number">7.1.</span> <span class="nav-text">TLS 证书文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载二进制文件"><span class="nav-number">7.2.</span> <span class="nav-text">下载二进制文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置和启动-kube-apiserver"><span class="nav-number">7.3.</span> <span class="nav-text">配置和启动 kube-apiserver</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-kube-apiserver的service配置文件"><span class="nav-number">7.3.1.</span> <span class="nav-text">创建 kube-apiserver的service配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动kube-apiserver"><span class="nav-number">7.3.2.</span> <span class="nav-text">启动kube-apiserver</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置和启动-kube-controller-manager"><span class="nav-number">7.4.</span> <span class="nav-text">配置和启动 kube-controller-manager</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-kube-controller-manager-的service配置文件"><span class="nav-number">7.4.1.</span> <span class="nav-text">创建 kube-controller-manager 的service配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动-kube-controller-manager"><span class="nav-number">7.4.2.</span> <span class="nav-text">启动 kube-controller-manager</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置和启动-kube-scheduler"><span class="nav-number">7.5.</span> <span class="nav-text">配置和启动 kube-scheduler</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-kube-scheduler的serivce配置文件"><span class="nav-number">7.5.1.</span> <span class="nav-text">创建 kube-scheduler的serivce配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动-kube-scheduler"><span class="nav-number">7.5.2.</span> <span class="nav-text">启动 kube-scheduler</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证-master-节点功能"><span class="nav-number">7.6.</span> <span class="nav-text">验证 master 节点功能</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署kubernetes-node节点"><span class="nav-number">8.</span> <span class="nav-text">部署kubernetes node节点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Docker"><span class="nav-number">8.1.</span> <span class="nav-text">安装Docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装配置Flanneld"><span class="nav-number">8.2.</span> <span class="nav-text">安装配置Flanneld</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Flannel介绍"><span class="nav-number">8.2.1.</span> <span class="nav-text">Flannel介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装配置flannel"><span class="nav-number">8.2.2.</span> <span class="nav-text">安装配置flannel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在etcd中初始化flannel网络数据"><span class="nav-number">8.2.3.</span> <span class="nav-text">在etcd中初始化flannel网络数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动flannel"><span class="nav-number">8.2.4.</span> <span class="nav-text">启动flannel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#测试跨主机容器通信"><span class="nav-number">8.2.5.</span> <span class="nav-text">测试跨主机容器通信</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#补充：下载二进制包安装flannel"><span class="nav-number">8.2.6.</span> <span class="nav-text">补充：下载二进制包安装flannel</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装和配置-kubelet"><span class="nav-number">8.3.</span> <span class="nav-text">安装和配置 kubelet</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#下载最新的-kubelet-和-kube-proxy-二进制文件"><span class="nav-number">8.3.1.</span> <span class="nav-text">下载最新的 kubelet 和 kube-proxy 二进制文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置kubelet"><span class="nav-number">8.3.2.</span> <span class="nav-text">配置kubelet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动kublet"><span class="nav-number">8.3.3.</span> <span class="nav-text">启动kublet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过-kublet-的-TLS-证书请求"><span class="nav-number">8.3.4.</span> <span class="nav-text">通过 kublet 的 TLS 证书请求</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-kube-proxy"><span class="nav-number">8.4.</span> <span class="nav-text">配置 kube-proxy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证测试"><span class="nav-number">8.5.</span> <span class="nav-text">验证测试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装和配置-kube-dns-插件"><span class="nav-number">9.</span> <span class="nav-text">安装和配置 kube-dns 插件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#kube-dns是什么"><span class="nav-number">9.1.</span> <span class="nav-text">kube-dns是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装配置kube-dns"><span class="nav-number">9.2.</span> <span class="nav-text">安装配置kube-dns</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#下载yaml文件"><span class="nav-number">9.2.1.</span> <span class="nav-text">下载yaml文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#系统预定义的-RoleBinding"><span class="nav-number">9.2.2.</span> <span class="nav-text">系统预定义的 RoleBinding</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-kube-dns-ServiceAccount"><span class="nav-number">9.2.3.</span> <span class="nav-text">配置 kube-dns ServiceAccount</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-kube-dns-服务"><span class="nav-number">9.2.4.</span> <span class="nav-text">配置 kube-dns 服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-kube-dns-Deployment"><span class="nav-number">9.2.5.</span> <span class="nav-text">配置 kube-dns Deployment</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#执行所有定义文件"><span class="nav-number">9.2.6.</span> <span class="nav-text">执行所有定义文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检查-kube-dns-功能"><span class="nav-number">9.3.</span> <span class="nav-text">检查 kube-dns 功能</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes简介"><span class="nav-number">1.</span> <span class="nav-text">Kubernetes简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境信息"><span class="nav-number">2.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建TLS加密通信的证书和密钥"><span class="nav-number">3.</span> <span class="nav-text">创建TLS加密通信的证书和密钥</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装CFSSL"><span class="nav-number">3.1.</span> <span class="nav-text">安装CFSSL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建CA"><span class="nav-number">3.2.</span> <span class="nav-text">创建CA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Kubernetes-证书"><span class="nav-number">3.3.</span> <span class="nav-text">创建 Kubernetes 证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Admin-证书"><span class="nav-number">3.4.</span> <span class="nav-text">创建 Admin 证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Kube-Proxy-证书"><span class="nav-number">3.5.</span> <span class="nav-text">创建 Kube-Proxy 证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#校验证书"><span class="nav-number">3.6.</span> <span class="nav-text">校验证书</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用openssl命令校验证书"><span class="nav-number">3.6.1.</span> <span class="nav-text">使用openssl命令校验证书</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用-Cfssl-Certinfo-命令校验"><span class="nav-number">3.6.2.</span> <span class="nav-text">使用 Cfssl-Certinfo 命令校验</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分发证书"><span class="nav-number">3.7.</span> <span class="nav-text">分发证书</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下载和配置-kubectl-kubecontrol-命令行工具"><span class="nav-number">4.</span> <span class="nav-text">下载和配置 kubectl(kubecontrol) 命令行工具</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#下载kubectl"><span class="nav-number">4.1.</span> <span class="nav-text">下载kubectl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-kubectl-kubeconfig-文件"><span class="nav-number">4.2.</span> <span class="nav-text">创建 kubectl kubeconfig 文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建-kubeconfig-文件"><span class="nav-number">5.</span> <span class="nav-text">创建 kubeconfig 文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-TLS-Bootstrapping-Token"><span class="nav-number">5.1.</span> <span class="nav-text">创建 TLS Bootstrapping Token</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Token-auth-file"><span class="nav-number">5.1.1.</span> <span class="nav-text">Token auth file</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-kubelet-bootstrapping-kubeconfig-文件"><span class="nav-number">5.1.2.</span> <span class="nav-text">创建 kubelet bootstrapping kubeconfig 文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-kube-proxy-kubeconfig-文件"><span class="nav-number">5.2.</span> <span class="nav-text">创建 kube-proxy kubeconfig 文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分发-kubeconfig-文件"><span class="nav-number">5.3.</span> <span class="nav-text">分发 kubeconfig 文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建高可用-etcd-集群"><span class="nav-number">6.</span> <span class="nav-text">创建高可用 etcd 集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装配置etcd集群"><span class="nav-number">6.1.</span> <span class="nav-text">安装配置etcd集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动-etcd-服务"><span class="nav-number">6.2.</span> <span class="nav-text">启动 etcd 服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证服务"><span class="nav-number">6.3.</span> <span class="nav-text">验证服务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署-kubernetes-master"><span class="nav-number">7.</span> <span class="nav-text">部署 kubernetes master</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TLS-证书文件"><span class="nav-number">7.1.</span> <span class="nav-text">TLS 证书文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载二进制文件"><span class="nav-number">7.2.</span> <span class="nav-text">下载二进制文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置和启动-kube-apiserver"><span class="nav-number">7.3.</span> <span class="nav-text">配置和启动 kube-apiserver</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-kube-apiserver的service配置文件"><span class="nav-number">7.3.1.</span> <span class="nav-text">创建 kube-apiserver的service配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动kube-apiserver"><span class="nav-number">7.3.2.</span> <span class="nav-text">启动kube-apiserver</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置和启动-kube-controller-manager"><span class="nav-number">7.4.</span> <span class="nav-text">配置和启动 kube-controller-manager</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-kube-controller-manager-的service配置文件"><span class="nav-number">7.4.1.</span> <span class="nav-text">创建 kube-controller-manager 的service配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动-kube-controller-manager"><span class="nav-number">7.4.2.</span> <span class="nav-text">启动 kube-controller-manager</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置和启动-kube-scheduler"><span class="nav-number">7.5.</span> <span class="nav-text">配置和启动 kube-scheduler</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-kube-scheduler的serivce配置文件"><span class="nav-number">7.5.1.</span> <span class="nav-text">创建 kube-scheduler的serivce配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动-kube-scheduler"><span class="nav-number">7.5.2.</span> <span class="nav-text">启动 kube-scheduler</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证-master-节点功能"><span class="nav-number">7.6.</span> <span class="nav-text">验证 master 节点功能</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署kubernetes-node节点"><span class="nav-number">8.</span> <span class="nav-text">部署kubernetes node节点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Docker"><span class="nav-number">8.1.</span> <span class="nav-text">安装Docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装配置Flanneld"><span class="nav-number">8.2.</span> <span class="nav-text">安装配置Flanneld</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Flannel介绍"><span class="nav-number">8.2.1.</span> <span class="nav-text">Flannel介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装配置flannel"><span class="nav-number">8.2.2.</span> <span class="nav-text">安装配置flannel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在etcd中初始化flannel网络数据"><span class="nav-number">8.2.3.</span> <span class="nav-text">在etcd中初始化flannel网络数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动flannel"><span class="nav-number">8.2.4.</span> <span class="nav-text">启动flannel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#测试跨主机容器通信"><span class="nav-number">8.2.5.</span> <span class="nav-text">测试跨主机容器通信</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#补充：下载二进制包安装flannel"><span class="nav-number">8.2.6.</span> <span class="nav-text">补充：下载二进制包安装flannel</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装和配置-kubelet"><span class="nav-number">8.3.</span> <span class="nav-text">安装和配置 kubelet</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#下载最新的-kubelet-和-kube-proxy-二进制文件"><span class="nav-number">8.3.1.</span> <span class="nav-text">下载最新的 kubelet 和 kube-proxy 二进制文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置kubelet"><span class="nav-number">8.3.2.</span> <span class="nav-text">配置kubelet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动kubelet"><span class="nav-number">8.3.3.</span> <span class="nav-text">启动kubelet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过-kubelet-的-TLS-证书请求"><span class="nav-number">8.3.4.</span> <span class="nav-text">通过 kubelet 的 TLS 证书请求</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-kube-proxy"><span class="nav-number">8.4.</span> <span class="nav-text">配置 kube-proxy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证测试"><span class="nav-number">8.5.</span> <span class="nav-text">验证测试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装和配置-kube-dns-插件"><span class="nav-number">9.</span> <span class="nav-text">安装和配置 kube-dns 插件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#kube-dns是什么"><span class="nav-number">9.1.</span> <span class="nav-text">kube-dns是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装配置kube-dns"><span class="nav-number">9.2.</span> <span class="nav-text">安装配置kube-dns</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#下载yaml文件"><span class="nav-number">9.2.1.</span> <span class="nav-text">下载yaml文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#系统预定义的-RoleBinding"><span class="nav-number">9.2.2.</span> <span class="nav-text">系统预定义的 RoleBinding</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-kube-dns-ServiceAccount"><span class="nav-number">9.2.3.</span> <span class="nav-text">配置 kube-dns ServiceAccount</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-kube-dns-服务"><span class="nav-number">9.2.4.</span> <span class="nav-text">配置 kube-dns 服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-kube-dns-Deployment"><span class="nav-number">9.2.5.</span> <span class="nav-text">配置 kube-dns Deployment</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#执行所有定义文件"><span class="nav-number">9.2.6.</span> <span class="nav-text">执行所有定义文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检查-kube-dns-功能"><span class="nav-number">9.3.</span> <span class="nav-text">检查 kube-dns 功能</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
@@ -2003,7 +2005,7 @@ PING kube-dns.kube-system.svc.cluster.local (10.254.0.2): 56 data bytes
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共122.3k字</span>
+  <span class="post-count">博客全站共123.6k字</span>
 </div>
 
         
