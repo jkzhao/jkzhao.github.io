@@ -121,7 +121,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/7.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/8.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/9.png">
-<meta property="og:updated_time" content="2017-11-13T07:39:49.000Z">
+<meta property="og:updated_time" content="2017-11-24T07:23:49.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kubernetes监控:部署Heapster、InfluxDB和Grafana">
 <meta name="twitter:description" content="Kubernetes 监控方案可选的方案：  Heapster + InfluxDB + Grafana Prometheus + Grafana Cadvisor + InfluxDB + Grafana  本篇文章介绍的是Heapster + InfluxDB + Grafana，kubernetes集群（1.6.0）搭建见前面的文章。">
@@ -351,8 +351,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-13T15:39:49+08:00" content="2017-11-13">
-              2017-11-13
+              <time itemprop="dateUpdated" datetime="2017-11-24T15:23:49+08:00" content="2017-11-24">
+              2017-11-24
               </time>
               </span>
             
@@ -419,15 +419,15 @@
 </ul>
 <p>本篇文章介绍的是Heapster + InfluxDB + Grafana，kubernetes集群（1.6.0）搭建见前面的文章。<br><a id="more"></a></p>
 <h2 id="Heapster、InfluxDB和Grafana介绍"><a href="#Heapster、InfluxDB和Grafana介绍" class="headerlink" title="Heapster、InfluxDB和Grafana介绍"></a>Heapster、InfluxDB和Grafana介绍</h2><p>开源软件cAdvisor（Container cAdvisor）是用于监控容器运行状态的利器之一（cAdvisor项目的主页为<a href="https://github.com/cAdvisor），它被用于多个与Docker相关的开源项目中。" target="_blank" rel="external">https://github.com/cAdvisor），它被用于多个与Docker相关的开源项目中。</a><br>在kubernetes系统中，cAdvisor已经被默认集成到了kubelet组件内，当kubelet服务启动时，它会自动启动cAdvisor服务，然后cAdvisor会实时采集所在节点的性能指标及节点上运行的容器的性能指标。kubelet的启动参数–cadvisor-port可自定义cAdvisor对外提供服务的端口号，默认是4194。<br>cAdvisor提供了web页面可供浏览器访问，例如本kubernetes集群中的一个Node的ip是172.16.7.151，那么浏览器输入<a href="http://172.16.7.151:4194可以访问cAdvisor的监控页面。cAdvisor主页显示了主机的实时运行状态，包括CPU使用情况、内存使用情况、网络吞吐量及文件系统使用情况等信息。" target="_blank" rel="external">http://172.16.7.151:4194可以访问cAdvisor的监控页面。cAdvisor主页显示了主机的实时运行状态，包括CPU使用情况、内存使用情况、网络吞吐量及文件系统使用情况等信息。</a><br>但是cAdvisor只提供了单机的容器资源占用情况，而在大规模容器集群中，需要对所有的Node和全部容器进行性能监控。这就需要一套工具来实现集群性能数据的采集、存储和展示：Heapster、InfluxDB和Grafana。<br>Heapster提供了整个集群的资源监控，并支持持久化数据存储到InfluxDB、Google Cloud Monitoring或者其他的存储后端。Heapster从kubelet提供的API采集节点和容器的资源占用。另外，Heapster的 /metrics API提供了Prometheus格式的数据。<br>InfluxDB是一个开源分布式时序、事件和指标数据库；而Grafana则是InfluxDB的 dashboard，提供了强大的图表展示功能。它们常被组合使用展示图表化的监控数据。<br>Heapster、InfluxDB和Grafana均以Pod的形式启动和运行，其中Heapster需要与Kubernetes Master进行安全连接。</p>
-<h2 id="下载安装Heapster"><a href="#下载安装Heapster" class="headerlink" title="下载安装Heapster"></a>下载安装Heapster</h2><p>到<a href="https://github.com/kubernetes/heapster/releases" target="_blank" rel="external">heapster release 页面</a>下载heapster。</p>
+<h2 id="安装配置Heapster、InfluxDB和Grafana"><a href="#安装配置Heapster、InfluxDB和Grafana" class="headerlink" title="安装配置Heapster、InfluxDB和Grafana"></a>安装配置Heapster、InfluxDB和Grafana</h2><p>到<a href="https://github.com/kubernetes/heapster/releases" target="_blank" rel="external">heapster release 页面</a>下载heapster。</p>
 <pre><code>[root@node1 opt]# wget https://github.com/kubernetes/heapster/archive/v1.3.0.zip
 [root@node1 opt]# unzip v1.3.0.zip
 [root@node1 opt]# cd heapster-1.3.0/deploy/kube-config/influxdb
 [root@node1 influxdb]# ls *.yaml
 grafana-deployment.yaml  heapster-deployment.yaml  influxdb-deployment.yaml
 grafana-service.yaml     heapster-service.yaml     influxdb-service.yaml
-</code></pre><p>我们创建了heapster的rbac配置heapster-rbac.yaml。已经修改好的 yaml 文件见：<a href="https://github.com/rootsongjc/follow-me-install-kubernetes-cluster/tree/master/manifests/heapster" target="_blank" rel="external">heapster</a><br>下面比对的是我们自己修改的和源文件。或者直接点直接去上面的地址下载这几个配置文件替换原有的配置文件。</p>
-<h2 id="配置-grafana-deployment"><a href="#配置-grafana-deployment" class="headerlink" title="配置 grafana-deployment"></a>配置 grafana-deployment</h2><pre><code>diff grafana-deployment.yaml.orig grafana-deployment.yaml
+</code></pre><p>创建heapster的rbac配置heapster-rbac.yaml。已经修改好的 yaml 文件见：<a href="https://github.com/rootsongjc/follow-me-install-kubernetes-cluster/tree/master/manifests/heapster" target="_blank" rel="external">heapster</a><br>下面比对的是我自己修改的和源文件。或者直接点直接去上面的地址下载这几个配置文件替换原有的配置文件。</p>
+<h3 id="修改-grafana-deployment-yaml"><a href="#修改-grafana-deployment-yaml" class="headerlink" title="修改 grafana-deployment.yaml"></a>修改 grafana-deployment.yaml</h3><pre><code>diff grafana-deployment.yaml.orig grafana-deployment.yaml
 16c16
 &lt;         image: gcr.io/google_containers/heapster-grafana-amd64:v4.0.2
 ---
@@ -440,19 +440,21 @@ grafana-service.yaml     heapster-service.yaml     influxdb-service.yaml
 &gt;           #value: /
 </code></pre><p>根据上面的差异修改源文件grafana-deployment.yaml，并将image地址改为：</p>
 <pre><code>index.tenxcloud.com/jimmy/heapster-grafana-amd64:v4.0.2
-</code></pre><ul>
-<li>如果后续使用 kube-apiserver 或者 kubectl proxy 访问 grafana dashboard，则必须将 GF_SERVER_ROOT_URL 设置为/api/v1/proxy/namespaces/kube-system/services/monitoring-grafana/，否则后续访问grafana时访问时提示找不到<a href="http://10.64.3.7:8086/api/v1/proxy/namespaces/kube-system/services/monitoring-grafana/api/dashboards/home" target="_blank" rel="external">http://10.64.3.7:8086/api/v1/proxy/namespaces/kube-system/services/monitoring-grafana/api/dashboards/home</a> 页面；</li>
+</code></pre><p>【说明】：</p>
+<ul>
+<li>如果后续使用 kube-apiserver 或者 kubectl proxy 访问 grafana dashboard，则必须将 GF_SERVER_ROOT_URL 设置为/api/v1/proxy/namespaces/kube-system/services/monitoring-grafana/，否则后续访问grafana时访问时提示找不到<a href="http://10.64.3.7:8086/api/v1/proxy/namespaces/kube-system/services/monitoring-grafana/api/dashboards/home" target="_blank" rel="external">http://10.64.3.7:8086/api/v1/proxy/namespaces/kube-system/services/monitoring-grafana/api/dashboards/home</a> 页面。</li>
 </ul>
-<h2 id="配置-heapster-deployment"><a href="#配置-heapster-deployment" class="headerlink" title="配置 heapster-deployment"></a>配置 heapster-deployment</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">[root@node1 influxdb]# pwd</div><div class="line">/opt/heapster-1.3.0/deploy/kube-config/influxdb</div><div class="line">[root@node1 influxdb]# vim heapster-deployment.yaml </div><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Deployment</div><div class="line">metadata:</div><div class="line">  name: heapster</div><div class="line">  namespace: kube-system</div><div class="line">spec:</div><div class="line">  replicas: 1</div><div class="line">  template:</div><div class="line">    metadata:</div><div class="line">      labels:</div><div class="line">        task: monitoring</div><div class="line">        k8s-app: heapster</div><div class="line">    spec:</div><div class="line">      serviceAccountName: heapster</div><div class="line">      containers:</div><div class="line">      - name: heapster</div><div class="line">        image: index.tenxcloud.com/jimmy/heapster-amd64:v1.3.0-beta.1</div><div class="line">        imagePullPolicy: IfNotPresent</div><div class="line">        command:</div><div class="line">        - /heapster</div><div class="line">        - --source=kubernetes:https://kubernetes.default</div><div class="line">        - --sink=influxdb:http://monitoring-influxdb:8086</div></pre></td></tr></table></figure>
+<h3 id="修改-heapster-deployment-yaml"><a href="#修改-heapster-deployment-yaml" class="headerlink" title="修改 heapster-deployment.yaml"></a>修改 heapster-deployment.yaml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">[root@node1 influxdb]# pwd</div><div class="line">/opt/heapster-1.3.0/deploy/kube-config/influxdb</div><div class="line">[root@node1 influxdb]# vim heapster-deployment.yaml </div><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Deployment</div><div class="line">metadata:</div><div class="line">  name: heapster</div><div class="line">  namespace: kube-system</div><div class="line">spec:</div><div class="line">  replicas: 1</div><div class="line">  template:</div><div class="line">    metadata:</div><div class="line">      labels:</div><div class="line">        task: monitoring</div><div class="line">        k8s-app: heapster</div><div class="line">    spec:</div><div class="line">      serviceAccountName: heapster</div><div class="line">      containers:</div><div class="line">      - name: heapster</div><div class="line">        image: index.tenxcloud.com/jimmy/heapster-amd64:v1.3.0-beta.1</div><div class="line">        imagePullPolicy: IfNotPresent</div><div class="line">        command:</div><div class="line">        - /heapster</div><div class="line">        - --source=kubernetes:https://kubernetes.default</div><div class="line">        - --sink=influxdb:http://monitoring-influxdb:8086</div></pre></td></tr></table></figure>
 <p>将image地址改为：</p>
 <pre><code>index.tenxcloud.com/jimmy/heapster-amd64:v1.3.0-beta.1 
 </code></pre><p>【说明】:Heapster需要设置的启动参数如下：</p>
 <ul>
-<li>source<br>配置采集源，为Master URL地址：<br>–source=kubernetes:<a href="https://kubernetes.default" target="_blank" rel="external">https://kubernetes.default</a></li>
-<li>sink<br>配置后端存储系统，使用InfluxDB系统：<br>–sink=influxdb:<a href="http://monitoring-influxdb:8086" target="_blank" rel="external">http://monitoring-influxdb:8086</a><br>其他参数可以通过进入heapster容器执行 # heapster –help 命令查看和设置。</li>
+<li>source：配置采集源，为Master URL地址：–source=kubernetes:<a href="https://kubernetes.default" target="_blank" rel="external">https://kubernetes.default</a></li>
+<li>sink：配置后端存储系统，使用InfluxDB系统：–sink=influxdb:<a href="http://monitoring-influxdb:8086" target="_blank" rel="external">http://monitoring-influxdb:8086</a></li>
 </ul>
-<p>注意：URL中的主机名地址使用的是InfluxDB的Service名字，这需要DNS服务正常工作，如果没有配置DNS服务，则也可以使用Service的ClusterIP地址。<br>另外，InfluxDB服务的名称没有加上命名空间，是因为Heapster服务与InfluxDB服务属于相同的命名空间kube-system。也可以使用上命名空间的全服务名，例如：<a href="http://monitoring-influxdb.kube-system:8086" target="_blank" rel="external">http://monitoring-influxdb.kube-system:8086</a></p>
-<h2 id="配置-influxdb-deployment"><a href="#配置-influxdb-deployment" class="headerlink" title="配置 influxdb-deployment"></a>配置 influxdb-deployment</h2><p>influxdb 官方建议使用命令行或 HTTP API 接口来查询数据库，从 v1.1.0 版本开始默认关闭 admin UI，将在后续版本中移除 admin UI 插件。<br>开启镜像中 admin UI的办法如下：先导出镜像中的 influxdb 配置文件，开启 admin 插件后，再将配置文件内容写入 ConfigMap，最后挂载到镜像中，达到覆盖原始配置的目的。<br>注意：manifests 目录已经提供了 <a href="https://github.com/opsnull/follow-me-install-kubernetes-cluster/blob/master/manifests/heapster/influxdb-cm.yaml" target="_blank" rel="external">修改后的 ConfigMap 定义文件</a></p>
+<p>其他参数可以通过进入heapster容器执行 # heapster –help 命令查看和设置。</p>
+<p>【注意】：URL中的主机名地址使用的是InfluxDB的Service名字，这需要DNS服务正常工作，如果没有配置DNS服务，则也可以使用Service的ClusterIP地址。<br>另外，InfluxDB服务的名称没有加上命名空间，是因为Heapster服务与InfluxDB服务属于相同的命名空间kube-system。也可以使用上命名空间的全服务名，例如：<a href="http://monitoring-influxdb.kube-system:8086" target="_blank" rel="external">http://monitoring-influxdb.kube-system:8086</a></p>
+<h3 id="修改-influxdb-deployment-yaml"><a href="#修改-influxdb-deployment-yaml" class="headerlink" title="修改 influxdb-deployment.yaml"></a>修改 influxdb-deployment.yaml</h3><p>influxdb 官方建议使用命令行或 HTTP API 接口来查询数据库，从 v1.1.0 版本开始默认关闭 admin UI，将在后续版本中移除 admin UI 插件。<br>开启镜像中 admin UI的办法如下：先导出镜像中的 influxdb 配置文件，开启 admin 插件后，再将配置文件内容写入 ConfigMap，最后挂载到镜像中，达到覆盖原始配置的目的。<br>【注意】：manifests 目录已经提供了 <a href="https://github.com/opsnull/follow-me-install-kubernetes-cluster/blob/master/manifests/heapster/influxdb-cm.yaml" target="_blank" rel="external">修改后的 ConfigMap 定义文件</a></p>
 <pre><code># 导出镜像中的 influxdb 配置文件
 [root@node1 influxdb]# docker run --rm --entrypoint &apos;cat&apos;  -ti lvanneo/heapster-influxdb-amd64:v1.1.1 /etc/config.toml &gt;config.toml.orig
 [root@node1 influxdb]# cp config.toml.orig config.toml 
@@ -480,7 +482,7 @@ diff influxdb-deployment.yaml.orig influxdb-deployment.yaml
 <pre><code>index.tenxcloud.com/jimmy/heapster-influxdb-amd64:v1.1.1
 </code></pre><p>然后删除这两个文件：</p>
 <pre><code>[root@node1 influxdb]# rm -f config.toml config.toml.orig 
-</code></pre><h2 id="配置-monitoring-influxdb-Service"><a href="#配置-monitoring-influxdb-Service" class="headerlink" title="配置 monitoring-influxdb Service"></a>配置 monitoring-influxdb Service</h2><pre><code>diff influxdb-service.yaml.orig influxdb-service.yaml
+</code></pre><h3 id="修改-influxdb-service-yaml"><a href="#修改-influxdb-service-yaml" class="headerlink" title="修改 influxdb-service.yaml"></a>修改 influxdb-service.yaml</h3><pre><code>diff influxdb-service.yaml.orig influxdb-service.yaml
 12a13
 &gt;   type: NodePort
 15a17,20
@@ -488,10 +490,11 @@ diff influxdb-deployment.yaml.orig influxdb-deployment.yaml
 &gt;   - port: 8083
 &gt;     targetPort: 8083
 &gt;     name: admin
-</code></pre><ul>
-<li>定义端口类型为 NodePort，将InfluxDB暴露在宿主机Node的端口上，以便后续浏览器访问 influxdb 的 admin UI 界面；</li>
+</code></pre><p>【说明】：</p>
+<ul>
+<li>定义端口类型为 NodePort，将InfluxDB暴露在宿主机Node的端口上，以便后续浏览器访问 influxdb 的 admin UI 界面。</li>
 </ul>
-<h2 id="执行所有定义文件进行安装"><a href="#执行所有定义文件进行安装" class="headerlink" title="执行所有定义文件进行安装"></a>执行所有定义文件进行安装</h2><pre><code>[root@node1 influxdb]# pwd
+<h3 id="执行所有定义文件进行安装"><a href="#执行所有定义文件进行安装" class="headerlink" title="执行所有定义文件进行安装"></a>执行所有定义文件进行安装</h3><pre><code>[root@node1 influxdb]# pwd
 /opt/heapster-1.3.0/deploy/kube-config/influxdb
 [root@node1 influxdb]# ls
 grafana-deployment.yaml  heapster-deployment.yaml  heapster-service.yaml  influxdb-deployment.yaml
@@ -506,7 +509,7 @@ service &quot;heapster&quot; created
 deployment &quot;monitoring-influxdb&quot; created
 service &quot;monitoring-influxdb&quot; created
 Error from server (AlreadyExists): error when creating &quot;influxdb-cm.yaml&quot;: configmaps &quot;influxdb-config&quot; already exists
-</code></pre><h2 id="检查执行结果"><a href="#检查执行结果" class="headerlink" title="检查执行结果"></a>检查执行结果</h2><p><strong>1.检查 Deployment</strong></p>
+</code></pre><h3 id="检查执行结果"><a href="#检查执行结果" class="headerlink" title="检查执行结果"></a>检查执行结果</h3><p><strong>1.检查 Deployment</strong></p>
 <pre><code># kubectl get deployments -n kube-system | grep -E &apos;heapster|monitoring&apos;
 heapster               1         1         1            1           12m
 monitoring-grafana     1         1         1            1           12m
@@ -902,7 +905,7 @@ monitoring-influxdb    10.254.66.133    &lt;nodes&gt;       8086:32570/TCP,8083:
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes-监控方案"><span class="nav-number">1.</span> <span class="nav-text">Kubernetes 监控方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Heapster、InfluxDB和Grafana介绍"><span class="nav-number">2.</span> <span class="nav-text">Heapster、InfluxDB和Grafana介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下载安装Heapster"><span class="nav-number">3.</span> <span class="nav-text">下载安装Heapster</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-grafana-deployment"><span class="nav-number">4.</span> <span class="nav-text">配置 grafana-deployment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-heapster-deployment"><span class="nav-number">5.</span> <span class="nav-text">配置 heapster-deployment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-influxdb-deployment"><span class="nav-number">6.</span> <span class="nav-text">配置 influxdb-deployment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-monitoring-influxdb-Service"><span class="nav-number">7.</span> <span class="nav-text">配置 monitoring-influxdb Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#执行所有定义文件进行安装"><span class="nav-number">8.</span> <span class="nav-text">执行所有定义文件进行安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检查执行结果"><span class="nav-number">9.</span> <span class="nav-text">检查执行结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问-grafana"><span class="nav-number">10.</span> <span class="nav-text">访问 grafana</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问-influxdb-admin-UI"><span class="nav-number">11.</span> <span class="nav-text">访问 influxdb admin UI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#heapster采集的metric"><span class="nav-number">12.</span> <span class="nav-text">heapster采集的metric</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes-监控方案"><span class="nav-number">1.</span> <span class="nav-text">Kubernetes 监控方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Heapster、InfluxDB和Grafana介绍"><span class="nav-number">2.</span> <span class="nav-text">Heapster、InfluxDB和Grafana介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置Heapster、InfluxDB和Grafana"><span class="nav-number">3.</span> <span class="nav-text">安装配置Heapster、InfluxDB和Grafana</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改-grafana-deployment-yaml"><span class="nav-number">3.1.</span> <span class="nav-text">修改 grafana-deployment.yaml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改-heapster-deployment-yaml"><span class="nav-number">3.2.</span> <span class="nav-text">修改 heapster-deployment.yaml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改-influxdb-deployment-yaml"><span class="nav-number">3.3.</span> <span class="nav-text">修改 influxdb-deployment.yaml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改-influxdb-service-yaml"><span class="nav-number">3.4.</span> <span class="nav-text">修改 influxdb-service.yaml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#执行所有定义文件进行安装"><span class="nav-number">3.5.</span> <span class="nav-text">执行所有定义文件进行安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检查执行结果"><span class="nav-number">3.6.</span> <span class="nav-text">检查执行结果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问-grafana"><span class="nav-number">4.</span> <span class="nav-text">访问 grafana</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问-influxdb-admin-UI"><span class="nav-number">5.</span> <span class="nav-text">访问 influxdb admin UI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#heapster采集的metric"><span class="nav-number">6.</span> <span class="nav-text">heapster采集的metric</span></a></li></ol></div>
             
           </div>
         </section>

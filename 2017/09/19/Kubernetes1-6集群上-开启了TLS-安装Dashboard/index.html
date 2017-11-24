@@ -115,7 +115,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/3.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/3.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/3.png">
-<meta property="og:updated_time" content="2017-11-13T07:39:22.000Z">
+<meta property="og:updated_time" content="2017-11-22T07:38:50.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kubernetes1.6集群上(开启了TLS)安装Dashboard">
 <meta name="twitter:description" content="配置和安装 dashboard这是接着上一篇《二进制方式部署Kubernetes 1.6.0集群(开启TLS)》写的。Kubernetes Dashboard is a general purpose, web-based UI for Kubernetes clusters. It allows users to manage applications running in the cluste">
@@ -345,8 +345,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-13T15:39:22+08:00" content="2017-11-13">
-              2017-11-13
+              <time itemprop="dateUpdated" datetime="2017-11-22T15:38:50+08:00" content="2017-11-22">
+              2017-11-22
               </time>
               </span>
             
@@ -406,7 +406,7 @@
 
       
         <h2 id="配置和安装-dashboard"><a href="#配置和安装-dashboard" class="headerlink" title="配置和安装 dashboard"></a>配置和安装 dashboard</h2><p>这是接着上一篇《二进制方式部署Kubernetes 1.6.0集群(开启TLS)》写的。<br>Kubernetes Dashboard is a general purpose, web-based UI for Kubernetes clusters. It allows users to manage applications running in the cluster and troubleshoot them, as well as manage the cluster itself.<br><a id="more"></a></p>
-<h3 id="配置dashboard"><a href="#配置dashboard" class="headerlink" title="配置dashboard"></a>配置dashboard</h3><p>官方文件目录：<a href="https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dashboard" target="_blank" rel="external">https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dashboard</a><br>我们使用的文件:<br>从 <a href="https://github.com/rootsongjc/follow-me-install-kubernetes-cluster/tree/master/manifests/dashboard" target="_blank" rel="external">https://github.com/rootsongjc/follow-me-install-kubernetes-cluster/tree/master/manifests/dashboard</a> 下载3个文件下来，并上传到/opt/kube-dashboard/目录下。</p>
+<h3 id="配置dashboard"><a href="#配置dashboard" class="headerlink" title="配置dashboard"></a>配置dashboard</h3><p>官方文件目录：<a href="https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dashboard" target="_blank" rel="external">https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dashboard</a><br>我使用的文件:<br>从 <a href="https://github.com/rootsongjc/follow-me-install-kubernetes-cluster/tree/master/manifests/dashboard" target="_blank" rel="external">https://github.com/rootsongjc/follow-me-install-kubernetes-cluster/tree/master/manifests/dashboard</a> 下载3个文件下来，并上传到/opt/kube-dashboard/目录下。</p>
 <pre><code>[root@node1 opt]# mkdir kube-dashboard
 [root@node1 opt]# cd kube-dashboard/
 [root@node1 kube-dashboard]# ls
@@ -432,7 +432,7 @@ service &quot;kubernetes-dashboard&quot; created
 NAME                   CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
 kubernetes-dashboard   10.254.207.77   &lt;nodes&gt;       80:32281/TCP   41s
 </code></pre><ul>
-<li>NodePort 32281映射到 dashboard pod 80端口；</li>
+<li>NodePort 32281映射到 dashboard pod 80端口。</li>
 </ul>
 <p><strong>2.检查 controller</strong></p>
 <pre><code># kubectl get deployment kubernetes-dashboard  -n kube-system
