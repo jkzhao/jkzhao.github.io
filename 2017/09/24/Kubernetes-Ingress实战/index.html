@@ -112,7 +112,7 @@
 <meta property="og:site_name" content="jkzhao&#39;s blog">
 <meta property="og:description" content="服务发现与负载均衡在前面的安装部署kubernetes集群中已经简单用示例来演示了Pod和Service，Kubernetes通过Service资源在Kubernetes集群内针对容器实现了服务发现和负载均衡。而Service就是kubernetes服务发现与负载均衡中的一种。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-11-13T07:37:59.000Z">
+<meta property="og:updated_time" content="2017-11-25T12:50:03.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kubernetes Ingress实战">
 <meta name="twitter:description" content="服务发现与负载均衡在前面的安装部署kubernetes集群中已经简单用示例来演示了Pod和Service，Kubernetes通过Service资源在Kubernetes集群内针对容器实现了服务发现和负载均衡。而Service就是kubernetes服务发现与负载均衡中的一种。">
@@ -341,8 +341,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-13T15:37:59+08:00" content="2017-11-13">
-              2017-11-13
+              <time itemprop="dateUpdated" datetime="2017-11-25T20:50:03+08:00" content="2017-11-25">
+              2017-11-25
               </time>
               </span>
             
@@ -415,17 +415,17 @@
 <li>LoadBalancer:在NodePort的基础上,借助cloud provider创建一个外部的负载均 衡器,并将请求转发到 <nodeip>:NodePort</nodeip></li>
 <li>ExternalName:将服务通过DNS CNAME记录方式转发到指定的域名(通<br>过 spec.externlName 设定)。需要kube-dns版本在1.7以上。</li>
 </ul>
-<p>另外,也可以将已有的服务以Service的形式加入到Kubernetes集群中来,只需要在创建 Service的时候不指定Label selector,而是在Service创建好后手动为其添加endpoint。</p>
-<h3 id="Ingress和Ingress-Controller简介"><a href="#Ingress和Ingress-Controller简介" class="headerlink" title="Ingress和Ingress Controller简介"></a>Ingress和Ingress Controller简介</h3><p>Service虽然解决了服务发现和负载均衡的问题,但它在使用上还是有一些限制,比如</p>
+<p>另外，也可以将已有的服务以Service的形式加入到Kubernetes集群中来，只需要在创建 Service的时候不指定Label selector，而是在Service创建好后手动为其添加endpoint。</p>
+<h3 id="Ingress和Ingress-Controller简介"><a href="#Ingress和Ingress-Controller简介" class="headerlink" title="Ingress和Ingress Controller简介"></a>Ingress和Ingress Controller简介</h3><p>Service虽然解决了服务发现和负载均衡的问题，但它在使用上还是有一些限制，比如</p>
 <ul>
-<li>只支持4层负载均衡,没有7层功能 </li>
-<li>对外访问的时候,NodePort类型需要在外部搭建额外的负载均衡,而LoadBalancer要求kubernetes必须跑在支持的cloud provider上面。</li>
+<li>只支持4层负载均衡，没有7层功能 </li>
+<li>对外访问的时候，NodePort类型需要在外部搭建额外的负载均衡，而LoadBalancer要求kubernetes必须跑在支持的cloud provider上面。</li>
 </ul>
-<h4 id="Ingress"><a href="#Ingress" class="headerlink" title="Ingress"></a>Ingress</h4><p>Ingress就是为了解决这些限制而引入的新资源,主要用来将服务暴露到cluster外面,并 且可以自定义服务的访问策略。比如想要通过负载均衡器实现不同子域名到不同服务的 访问:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">foo.bar.com --|                 |-&gt; foo.bar.com s1:80</div><div class="line">              | 178.91.123.132  |</div><div class="line">bar.foo.com --|                 |-&gt; bar.foo.com s2:80</div></pre></td></tr></table></figure></p>
+<h4 id="Ingress"><a href="#Ingress" class="headerlink" title="Ingress"></a>Ingress</h4><p>Ingress就是为了解决这些限制而引入的新资源，主要用来将服务暴露到cluster外面，并 且可以自定义服务的访问策略。比如想要通过负载均衡器实现不同子域名到不同服务的访问:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">foo.bar.com --|                 |-&gt; foo.bar.com s1:80</div><div class="line">              | 178.91.123.132  |</div><div class="line">bar.foo.com --|                 |-&gt; bar.foo.com s2:80</div></pre></td></tr></table></figure></p>
 <p>可以这样来定义Ingress:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: test</div><div class="line">spec:</div><div class="line">  rules:</div><div class="line">  - host: foo.bar.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - backend:</div><div class="line">          serviceName: s1</div><div class="line">          servicePort: 80</div><div class="line">  - host: bar.foo.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - backend:</div><div class="line">          serviceName: s2</div><div class="line">          servicePort: 80</div></pre></td></tr></table></figure></p>
 <p>【注意】：Ingress本身并不会自动创建负载均衡器，cluster中需要运行一个ingress controller来根据Ingress的定义来管理负载均衡器。目前社区提供了<a href="https://github.com/kubernetes/ingress/tree/master/controllers" target="_blank" rel="external">nginx和gce的参考实现</a>。</p>
-<p>简单的说，ingress就是从kubernetes集群外访问集群的入口,将用户的URL请求转发到 不同的service上。Ingress相当于nginx、apache等负载均衡方向代理服务器,其中还包 括规则定义,即URL的路由信息,路由信息得的刷新由Ingress controller来提供。</p>
-<h4 id="Ingress-Controller"><a href="#Ingress-Controller" class="headerlink" title="Ingress Controller"></a>Ingress Controller</h4><p>Ingress Controller 实质上可以理解为是个监视器,Ingress Controller 通过不断地跟 kubernetes API 打交道,实时的感知后端 service、pod 等变化,比如新增和减少 pod, service 增加与减少等;当得到这些变化信息后,Ingress Controller 再结合下文的 Ingress 生成配置,然后更新反向代理负载均衡器,并刷新其配置,达到服务发现的作用。</p>
+<p>简单的说，ingress就是从kubernetes集群外访问集群的入口，将用户的URL请求转发到 不同的service上。Ingress相当于nginx、apache等负载均衡方向代理服务器，其中还包括规则定义，即URL的路由信息，路由信息得的刷新由Ingress controller来提供。</p>
+<h4 id="Ingress-Controller"><a href="#Ingress-Controller" class="headerlink" title="Ingress Controller"></a>Ingress Controller</h4><p>Ingress Controller 实质上可以理解为是个监视器，Ingress Controller 通过不断地跟 kubernetes API 打交道，实时的感知后端 service、pod 等变化，比如新增和减少 pod，service 增加与减少等;当得到这些变化信息后，Ingress Controller 再结合下文的 Ingress 生成配置，然后更新反向代理负载均衡器，并刷新其配置，达到服务发现的作用。</p>
 <h2 id="Ingress实战"><a href="#Ingress实战" class="headerlink" title="Ingress实战"></a>Ingress实战</h2><p>在使用Ingress resource之前，有必要先了解下面几件事情。Ingress是beta版本的resource，在kubernetes1.1之前还没有。你需要一个Ingress Controller来实现Ingress，单纯的创建一个Ingress没有任何意义。目前社区提供了<a href="https://github.com/kubernetes/ingress/tree/master/controllers" target="_blank" rel="external">nginx和gce的参考实现</a>。当然还有其他实现，<a href="https://github.com/nginxinc/kubernetes-ingress" target="_blank" rel="external">开源的 NGINX 和 NGINX Plus 开发了相应的 Ingress controller</a>。</p>
 <ul>
 <li>GCE/GKE会在master节点上部署一个ingress controller。你可以在一个pod中部署任意个自定义的ingress controller。你必须正确地annotate每个ingress，比如 <a href="https://github.com/kubernetes/ingress/tree/master/controllers/nginx#running-multiple-ingress-controllers" target="_blank" rel="external">运行多个ingress controller</a> 和 <a href="https://github.com/kubernetes/ingress/blob/master/controllers/gce/BETA_LIMITATIONS.md#disabling-glbc" target="_blank" rel="external">关闭glbc</a>.</li>
