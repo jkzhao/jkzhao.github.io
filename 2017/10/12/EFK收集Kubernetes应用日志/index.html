@@ -116,7 +116,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/17.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/18.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/19.png">
-<meta property="og:updated_time" content="2017-11-13T07:38:22.000Z">
+<meta property="og:updated_time" content="2017-12-04T02:36:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="EFK收集Kubernetes应用日志">
 <meta name="twitter:description" content="EFK介绍 Logstash(或者Fluentd)负责收集日志  Elasticsearch存储日志并提供搜索  Kibana负责日志查询和展示  官方地址：https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch">
@@ -346,8 +346,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-13T15:38:22+08:00" content="2017-11-13">
-              2017-11-13
+              <time itemprop="dateUpdated" datetime="2017-12-04T10:36:46+08:00" content="2017-12-04">
+              2017-12-04
               </time>
               </span>
             
@@ -483,7 +483,7 @@ server.basePath: /api/v1/proxy/namespaces/kube-system/services/kibana-logging
 {&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:40Z&quot;,&quot;tags&quot;:[&quot;listening&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;message&quot;:&quot;Server running at http://0.0.0.0:5601&quot;}
 {&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:45Z&quot;,&quot;tags&quot;:[&quot;status&quot;,&quot;plugin:elasticsearch@1.0.0&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;state&quot;:&quot;yellow&quot;,&quot;message&quot;:&quot;Status changed from yellow to yellow - No existing Kibana index found&quot;,&quot;prevState&quot;:&quot;yellow&quot;,&quot;prevMsg&quot;:&quot;Waiting for Elasticsearch&quot;}
 {&quot;type&quot;:&quot;log&quot;,&quot;@timestamp&quot;:&quot;2017-10-13T01:13:49Z&quot;,&quot;tags&quot;:[&quot;status&quot;,&quot;plugin:elasticsearch@1.0.0&quot;,&quot;info&quot;],&quot;pid&quot;:5,&quot;state&quot;:&quot;green&quot;,&quot;message&quot;:&quot;Status changed from yellow to green - Kibana index ready&quot;,&quot;prevState&quot;:&quot;yellow&quot;,&quot;prevMsg&quot;:&quot;No existing Kibana index found&quot;}
-</code></pre><h2 id="访问-kibana"><a href="#访问-kibana" class="headerlink" title="访问 kibana"></a>访问 kibana</h2><h3 id="通过-kube-apiserver-访问：获取-monitoring-grafana-服务-URL"><a href="#通过-kube-apiserver-访问：获取-monitoring-grafana-服务-URL" class="headerlink" title="通过 kube-apiserver 访问：获取 monitoring-grafana 服务 URL"></a>通过 kube-apiserver 访问：获取 monitoring-grafana 服务 URL</h3><pre><code>[root@node1 efk]# kubectl cluster-info
+</code></pre><h2 id="访问-kibana"><a href="#访问-kibana" class="headerlink" title="访问 kibana"></a>访问 kibana</h2><h3 id="通过-kube-apiserver-访问：获取-kibana-服务-URL"><a href="#通过-kube-apiserver-访问：获取-kibana-服务-URL" class="headerlink" title="通过 kube-apiserver 访问：获取 kibana 服务 URL"></a>通过 kube-apiserver 访问：获取 kibana 服务 URL</h3><pre><code>[root@node1 efk]# kubectl cluster-info
 Kubernetes master is running at https://172.16.7.151:6443
 Elasticsearch is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/elasticsearch-logging
 Heapster is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/heapster
@@ -525,7 +525,11 @@ Logging Driver: journald
 <pre><code>[root@node1 ~]# vim /etc/sysconfig/docker
 OPTIONS=&apos;--selinux-enabled --log-driver=json-file --signature-verification=false&apos;
 [root@node1 efk]# systemctl restart docker
-</code></pre><p>【注意】：本来修改这个参数应该在在/etc/docker/daemon.json文件中添加<br>    {<br>      “log-driver”: “json-file”,<br>    }<br>但是在该版本中，–log-driver是在文件/etc/sysconfig/docker中定义的。<br>在docker-ce版本中，默认的–log-driver是json-file。</p>
+</code></pre><p>【注意】：本来修改这个参数应该在在/etc/docker/daemon.json文件中添加</p>
+<pre><code>{
+  &quot;log-driver&quot;: &quot;json-file&quot;,
+}
+</code></pre><p>但是在该版本中，–log-driver是在文件/etc/sysconfig/docker中定义的。<br>在docker-ce版本中，默认的–log-driver是json-file。</p>
 <p><strong>遇到的问题：</strong><br>由于之前在/etc/docker/daemon.json中配置–log-driver，重启导致docker程序启动失败，等到后来在/etc/sysconfig/docker配置文件中配置好后，启动docker却发现当前node变成NotReady状态，所有的Pod也变为Unknown状态。查看kubelet状态，发现kubelet程序已经挂掉了。</p>
 <pre><code>[root@node1 ~]# kubectl get nodes
 NAME           STATUS     AGE       VERSION
@@ -540,7 +544,7 @@ NAME           STATUS    AGE       VERSION
 172.16.7.152   Ready     28d       v1.6.0
 172.16.7.153   Ready     28d       v1.6.0
 </code></pre><p>浏览器再次访问 kibana URL：<a href="http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kibana-logging" target="_blank" rel="external">http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kibana-logging</a><br>此时就会发现有Create按钮了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/17.png" alt=""></p>
-<p>在 Settings -&gt; Indices 页面创建一个 index（相当于 mysql 中的一个 database），选中 <strong>Index contains time-based events</strong>，使用默认的 <strong>logstash-*</strong> pattern，点击 Create ;<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/18.png" alt=""></p>
+<p>在 Settings -&gt; Indices 页面创建一个 index（相当于 mysql 中的一个 database），去掉已经勾选的 <strong>Index contains time-based events</strong>，使用默认的 <strong>logstash-*</strong> pattern，点击 Create ;<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/18.png" alt=""></p>
 <p>创建Index后，可以在 Discover 下看到 ElasticSearch logging 中汇聚的日志。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/19.png" alt=""></p>
 
       
@@ -652,7 +656,7 @@ NAME           STATUS    AGE       VERSION
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-count">50</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -660,7 +664,7 @@ NAME           STATUS    AGE       VERSION
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -669,7 +673,7 @@ NAME           STATUS    AGE       VERSION
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-count">21</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -739,7 +743,7 @@ NAME           STATUS    AGE       VERSION
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#EFK介绍"><span class="nav-number">1.</span> <span class="nav-text">EFK介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置efk-rbac-yaml文件"><span class="nav-number">2.</span> <span class="nav-text">配置efk-rbac.yaml文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-es-controller-yaml"><span class="nav-number">3.</span> <span class="nav-text">配置 es-controller.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-es-service-yaml"><span class="nav-number">4.</span> <span class="nav-text">配置 es-service.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-fluentd-es-ds-yaml"><span class="nav-number">5.</span> <span class="nav-text">配置 fluentd-es-ds.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-kibana-controller-yaml"><span class="nav-number">6.</span> <span class="nav-text">配置 kibana-controller.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-kibana-service-yaml"><span class="nav-number">7.</span> <span class="nav-text">配置 kibana-service.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#给-Node-设置标签"><span class="nav-number">8.</span> <span class="nav-text">给 Node 设置标签</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#执行定义文件"><span class="nav-number">9.</span> <span class="nav-text">执行定义文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检查执行结果"><span class="nav-number">10.</span> <span class="nav-text">检查执行结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问-kibana"><span class="nav-number">11.</span> <span class="nav-text">访问 kibana</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过-kube-apiserver-访问：获取-monitoring-grafana-服务-URL"><span class="nav-number">11.1.</span> <span class="nav-text">通过 kube-apiserver 访问：获取 monitoring-grafana 服务 URL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过-kubectl-proxy-访问：创建代理"><span class="nav-number">11.2.</span> <span class="nav-text">通过 kubectl proxy 访问：创建代理</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#EFK介绍"><span class="nav-number">1.</span> <span class="nav-text">EFK介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置efk-rbac-yaml文件"><span class="nav-number">2.</span> <span class="nav-text">配置efk-rbac.yaml文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-es-controller-yaml"><span class="nav-number">3.</span> <span class="nav-text">配置 es-controller.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-es-service-yaml"><span class="nav-number">4.</span> <span class="nav-text">配置 es-service.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-fluentd-es-ds-yaml"><span class="nav-number">5.</span> <span class="nav-text">配置 fluentd-es-ds.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-kibana-controller-yaml"><span class="nav-number">6.</span> <span class="nav-text">配置 kibana-controller.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-kibana-service-yaml"><span class="nav-number">7.</span> <span class="nav-text">配置 kibana-service.yaml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#给-Node-设置标签"><span class="nav-number">8.</span> <span class="nav-text">给 Node 设置标签</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#执行定义文件"><span class="nav-number">9.</span> <span class="nav-text">执行定义文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检查执行结果"><span class="nav-number">10.</span> <span class="nav-text">检查执行结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问-kibana"><span class="nav-number">11.</span> <span class="nav-text">访问 kibana</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过-kube-apiserver-访问：获取-kibana-服务-URL"><span class="nav-number">11.1.</span> <span class="nav-text">通过 kube-apiserver 访问：获取 kibana 服务 URL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过-kubectl-proxy-访问：创建代理"><span class="nav-number">11.2.</span> <span class="nav-text">通过 kubectl proxy 访问：创建代理</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
@@ -785,7 +789,7 @@ NAME           STATUS    AGE       VERSION
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共123.6k字</span>
+  <span class="post-count">博客全站共126.0k字</span>
 </div>
 
         

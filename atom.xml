@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-11-19T08:06:13.000Z</updated>
+  <updated>2017-12-15T14:03:28.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,239 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>时序数据库InfluxDB</title>
+    <link href="http://yoursite.com/2017/12/15/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93InfluxDB/"/>
+    <id>http://yoursite.com/2017/12/15/时序数据库InfluxDB/</id>
+    <published>2017-12-15T14:00:36.000Z</published>
+    <updated>2017-12-15T14:03:28.000Z</updated>
+    
+    <content type="html">&lt;p&gt;最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学习过程，同时也希望能够帮助到其他学习的同学。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;InfluxDB介绍&quot;&gt;&lt;a href=&quot;#InfluxDB介绍&quot; class=&quot;headerlink&quot; title=&quot;InfluxDB介绍&quot;&gt;&lt;/a&gt;InfluxDB介绍&lt;/h2&gt;&lt;p&gt;什么是时间序列数据？最简单的定义就是数据格式里包含timestamp字段的数据。比如股票市场的价格，环境中的温度，主机的CPU使用率等。但是又有什么数据是不包含timestamp的呢？几乎所有的数据都可以打上一个timestamp字段。时间序列数据更重要的一个属性是如何去查询它。在查询的时候，对于时间序列我们总是会带上一个时间范围去过滤数据。同时查询的结果里也总是会包含timestamp字段。&lt;br&gt;InfluxDB 是一个开源分布式时序、事件和指标数据库。使用 Go 语言编写，无需外部依赖。其设计目标是实现分布式和水平伸缩扩展。&lt;br&gt;它有三大特性：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Time Series （时间序列）：你可以使用与时间有关的相关函数（如最大，最小，求和等）&lt;/li&gt;
+&lt;li&gt;Metrics（度量）：你可以实时对大量数据进行计算&lt;/li&gt;
+&lt;li&gt;Eevents（事件）：它支持任意的事件数据&lt;br&gt;特点：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;schemaless(无结构)，可以是任意数量的列&lt;/li&gt;
+&lt;li&gt;min, max, sum, count, mean, median 一系列函数，方便统计&lt;/li&gt;
+&lt;li&gt;Native HTTP API, 内置http支持，使用http读写&lt;/li&gt;
+&lt;li&gt;Powerful Query Language 类似sql&lt;/li&gt;
+&lt;li&gt;Built-in Explorer 自带web管理界面。（从1.4版本开始去除了自带的web管理界面）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;安装部署InfluxDB&quot;&gt;&lt;a href=&quot;#安装部署InfluxDB&quot; class=&quot;headerlink&quot; title=&quot;安装部署InfluxDB&quot;&gt;&lt;/a&gt;安装部署InfluxDB&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;influxdb下载地址：&lt;/strong&gt;&lt;br&gt;&lt;a href=&quot;https://portal.influxdata.com/downloads&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://portal.influxdata.com/downloads&lt;/a&gt;&lt;br&gt;&lt;strong&gt;influxdb文档：&lt;/strong&gt;&lt;br&gt;&lt;a href=&quot;http://docs.influxdata.com/influxdb/v1.4/introduction/getting_started/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://docs.influxdata.com/influxdb/v1.4/introduction/getting_started/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1.下载安装&lt;/strong&gt;&lt;br&gt;对于在不同操作系统上安装，官网都有说明，我这里使用的是CentOS 7。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/2.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@docdesginer local]# wget https://dl.influxdata.com/influxdb/releases/influxdb-1.4.2.x86_64.rpm
+[root@docdesginer local]# yum localinstall influxdb-1.4.2.x86_64.rpm
+[root@docdesginer local]# rpm -ql influxdb
+/etc/influxdb/influxdb.conf
+/etc/logrotate.d/influxdb
+/usr/bin/influx
+/usr/bin/influx_inspect
+/usr/bin/influx_stress
+/usr/bin/influx_tsm
+/usr/bin/influxd
+/usr/lib/influxdb/scripts/influxdb.service
+/usr/lib/influxdb/scripts/init.sh
+/usr/share/man/man1/influx.1.gz
+/usr/share/man/man1/influx_inspect.1.gz
+/usr/share/man/man1/influx_stress.1.gz
+/usr/share/man/man1/influx_tsm.1.gz
+/usr/share/man/man1/influxd-backup.1.gz
+/usr/share/man/man1/influxd-config.1.gz
+/usr/share/man/man1/influxd-restore.1.gz
+/usr/share/man/man1/influxd-run.1.gz
+/usr/share/man/man1/influxd-version.1.gz
+/usr/share/man/man1/influxd.1.gz
+/var/lib/influxdb
+/var/log/influxdb
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.启动&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@docdesginer local]# systemctl start influxdb 
+[root@docdesginer local]# systemctl status influxdb
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.登录&lt;/strong&gt;&lt;br&gt;客户端工具：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@docdesginer local]# /usr/bin/influx
+Connected to http://localhost:8086 version 1.4.2
+InfluxDB shell version: 1.4.2
+&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看数据库：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt; SHOW DATABASES
+name: databases
+name
+----
+_internal
+&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;HTTP API访问：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@docdesginer ~]# curl -G http://localhost:8086/query --data-urlencode &amp;quot;q=SHOW DATABASES&amp;quot;
+{&amp;quot;results&amp;quot;:[{&amp;quot;statement_id&amp;quot;:0,&amp;quot;series&amp;quot;:[{&amp;quot;name&amp;quot;:&amp;quot;databases&amp;quot;,&amp;quot;columns&amp;quot;:[&amp;quot;name&amp;quot;],&amp;quot;values&amp;quot;:[[&amp;quot;_internal&amp;quot;]]}]}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;此时数据库中还有没有用户，还没开启认证。&lt;/p&gt;
+&lt;h2 id=&quot;开启认证&quot;&gt;&lt;a href=&quot;#开启认证&quot; class=&quot;headerlink&quot; title=&quot;开启认证&quot;&gt;&lt;/a&gt;开启认证&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.创建管理员&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@docdesginer local]# /usr/bin/influx
+Connected to http://localhost:8086 version 1.4.2
+InfluxDB shell version: 1.4.2
+&amp;gt; CREATE USER root WITH PASSWORD &amp;apos;wisedu123&amp;apos; WITH ALL PRIVILEGES
+&amp;gt; quit
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.修改配置文件，开启认证&lt;/strong&gt;&lt;br&gt;By default, authentication is disabled in the configuration file. Enable authentication by setting the auth-enabled option to true in the [http] section of the configuration file:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[http]  
+  enabled = true  
+  bind-address = &amp;quot;:8086&amp;quot;  
+  auth-enabled = true 
+  log-enabled = true  
+  write-tracing = false  
+  pprof-enabled = false  
+  https-enabled = false  
+  https-certificate = &amp;quot;/etc/ssl/influxdb.pem&amp;quot; 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重启InfluxDB：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@docdesginer ~]# systemctl restart influxdb 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.再次登录&lt;/strong&gt;&lt;br&gt;客户端工具连接数据库：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@docdesginer ~]# influx
+Connected to http://localhost:8086 version 1.4.2
+InfluxDB shell version: 1.4.2
+&amp;gt; show databases;
+ERR: unable to parse authentication credentials
+Warning: It is possible this error is due to not setting a database.
+Please set a database with the command &amp;quot;use &amp;lt;database&amp;gt;&amp;quot;.
+&amp;gt;
+
+[root@docdesginer ~]# /usr/bin/influx
+Connected to http://localhost:8086 version 1.4.2
+InfluxDB shell version: 1.4.2
+&amp;gt; auth
+username: root
+password: 
+&amp;gt; show databases;
+name: databases
+name
+----
+_internal
+&amp;gt; 
+或者
+[root@docdesginer ~]# /usr/bin/influx -username root -password wisedu123 -precision rfc3339 
+Connected to http://localhost:8086 version 1.4.2
+InfluxDB shell version: 1.4.2
+&amp;gt; show databases;
+name: databases
+name
+----
+_internal
+&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;HTTP API：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@docdesginer ~]# curl -G http://localhost:8086/query --data-urlencode &amp;quot;q=SHOW DATABASES&amp;quot;                  
+{&amp;quot;error&amp;quot;:&amp;quot;unable to parse authentication credentials&amp;quot;}
+[root@docdesginer ~]# curl -G http://localhost:8086/query -u root:wisedu123 --data-urlencode &amp;quot;q=SHOW DATABASES&amp;quot;
+{&amp;quot;results&amp;quot;:[{&amp;quot;statement_id&amp;quot;:0,&amp;quot;series&amp;quot;:[{&amp;quot;name&amp;quot;:&amp;quot;databases&amp;quot;,&amp;quot;columns&amp;quot;:[&amp;quot;name&amp;quot;],&amp;quot;values&amp;quot;:[[&amp;quot;_internal&amp;quot;]]}]}
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;InfluxDB概念&quot;&gt;&lt;a href=&quot;#InfluxDB概念&quot; class=&quot;headerlink&quot; title=&quot;InfluxDB概念&quot;&gt;&lt;/a&gt;InfluxDB概念&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.influxdb相关名词（可类比关系型数据库）&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;database：数据库。&lt;/li&gt;
+&lt;li&gt;measurement：数据库中的表。它就是tag，field，time的容器；对于influxDB的measurement来说，field是必须的，并且不能根据field来排序；Tag是可选的，tag可以用来做索引，tag是以字符串的形式存放的。&lt;/li&gt;
+&lt;li&gt;points：表里面的一行数据。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;2.influxDB中独有的概念&lt;/strong&gt;&lt;br&gt;（1）Point由时间戳（time）、数据（field）和标签（tags）组成。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;time：每条数据记录的时间，也是数据库自动生成的主索引；&lt;/li&gt;
+&lt;li&gt;fields：各种记录的值；&lt;/li&gt;
+&lt;li&gt;tags：各种有索引的属性。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;InfluxDb不需要做schema定义，这意味着你可以随意的添加measurements, tags, and fields at any time。&lt;/p&gt;
+&lt;p&gt;（2）series&lt;br&gt;a series is the collection of data that share a retention policy, measurement, and tag set&lt;br&gt;所有在数据库中的数据，都需要通过图表来展示，而这个series表示这个表里面的数据，可以在图表上画成几条线：通过tags排列组合算出来。&lt;br&gt;其实一个series就是一个测点，或者说一条曲线，那么retention policy, measurement, tagset就共同组成了一个定位测点序列的唯一标识。&lt;br&gt;point，就是某个series的同一个时刻的多个field的value，就组成了一个point；其实就是一条曲线上的一个点。&lt;/p&gt;
+&lt;p&gt;（3）retention policy&lt;br&gt;保留策略，用于决定要保留多久的数据，保存几个备份，以及集群的策略等。&lt;/p&gt;
+&lt;h2 id=&quot;InfluxDB基本操作&quot;&gt;&lt;a href=&quot;#InfluxDB基本操作&quot; class=&quot;headerlink&quot; title=&quot;InfluxDB基本操作&quot;&gt;&lt;/a&gt;InfluxDB基本操作&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;连接数据库：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@docdesginer ~]# /usr/bin/influx -username root -password wisedu123 -precision rfc3339   
+Connected to http://localhost:8086 version 1.4.2
+InfluxDB shell version: 1.4.2
+&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这里的-precision参数指定了时间戳的格式为rfc3339，也可以不使用该参数。&lt;br&gt;&lt;strong&gt;查看数据库：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt; SHOW DATABASES
+name: databases
+name
+----
+_internal
+&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;创建数据库：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt; CREATE DATABASE mydb
+&amp;gt; SHOW DATABASES
+name: databases
+name
+----
+_internal
+mydb
+&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;进入数据库：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt; USE mydb
+Using database mydb
+&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;插入数据：&lt;/strong&gt;&lt;br&gt;influxDB存储数据采用的是Line Protocol格式。&lt;br&gt;Line Protocol格式：写入数据库的Point的固定格式。格式如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;measurement&amp;gt;[,&amp;lt;tag-key&amp;gt;=&amp;lt;tag-value&amp;gt;...] &amp;lt;field-key&amp;gt;=&amp;lt;field-value&amp;gt;[,&amp;lt;field2-key&amp;gt;=&amp;lt;field2-value&amp;gt;...] [unix-nano-timestamp]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;比如：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;weather,location=us-midwest temperature=82 1465839830100400200
+  |    -------------------- --------------  |
+  |             |             |             |
+  |             |             |             |
++-----------+--------+-+---------+-+---------+
+|measurement|,tag_set| |field_set| |timestamp|
++-----------+--------+-+---------+-+---------+
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】：最后的timestamp是 unix时间戳*1000000000 的值，或者使用 %Y-%m-%dT%H:%M:%SZ 这种格式。使用其他格式在插入时会报错。&lt;/p&gt;
+&lt;p&gt;示例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt; INSERT cpu,host=serverA,region=us_west value=0.64
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;cpu是表名&lt;/li&gt;
+&lt;li&gt;host=serverA,region=us_west 是tag&lt;/li&gt;
+&lt;li&gt;value=0.64是field&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;想对此格式有详细的了解参见&lt;a href=&quot;https://docs.influxdata.com/influxdb/v1.4/write_protocols/line_protocol_tutorial/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;官方文档&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;查询数据：&lt;/strong&gt;&lt;br&gt;influxDB是支持类sql语句的，具体的查询语法都差不多。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt; select * from cpu
+name: cpu
+time                           host    region  value
+----                           ----    ------  -----
+2017-12-15T13:17:09.660446488Z serverA us_west 0.64
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】：InfluxDB集群功能已经不再开源。要想使用集群服务需要购买企业版。开源版和企业版的主要区别就是企业版的InfluxDB支持集群，而开源版不支持，此外企业版提供了先进的备份/恢复功能，而开源版本没有。但InfluxDB单机版性能也足够支撑中小公司的业务了。&lt;/p&gt;
+&lt;h2 id=&quot;Chronograf介绍&quot;&gt;&lt;a href=&quot;#Chronograf介绍&quot; class=&quot;headerlink&quot; title=&quot;Chronograf介绍&quot;&gt;&lt;/a&gt;Chronograf介绍&lt;/h2&gt;&lt;p&gt;Influxdb在1.3以后版本已经关闭了内置的8086的web管理功能，需要单独的工具来管理。而这个工具就是Chronograf。&lt;br&gt;其实Chronograf是TICK技术栈的一个组成部分。TICK是InfluxdDB公司推出的监控套件，承包指标采集、分析、画图等时序数据库上下游的工作，有点模仿日志分析系统ELK套件的意思。TICK包含：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;T = Telegraf is a plugin-driven server agent for collecting and reporting metrics.&lt;/li&gt;
+&lt;li&gt;I = InfluxDB is a time series database built from the ground up to handle high write and query loads.&lt;/li&gt;
+&lt;li&gt;C = Chronograf is a graphing and visualization application for performing ad hoc exploration of data.&lt;/li&gt;
+&lt;li&gt;K = Kapacitor is a data processing framework proving alerting, anomaly detection and action frameworks.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;也就是说：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Telegraf：数据采集&lt;/li&gt;
+&lt;li&gt;InfluxDB：数据接收和存储&lt;/li&gt;
+&lt;li&gt;Chronograf：数据汇总展示，报警等。&lt;/li&gt;
+&lt;li&gt;Kapacitor：数据处理，比如监控策略等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;安装Chronograf-v1-3-10-0&quot;&gt;&lt;a href=&quot;#安装Chronograf-v1-3-10-0&quot; class=&quot;headerlink&quot; title=&quot;安装Chronograf v1.3.10.0&quot;&gt;&lt;/a&gt;安装Chronograf v1.3.10.0&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.安装部署&lt;/strong&gt;&lt;br&gt;下载地址：&lt;a href=&quot;https://portal.influxdata.com/downloads&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://portal.influxdata.com/downloads&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/3.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@docdesginer local]# wget https://dl.influxdata.com/chronograf/releases/chronograf-1.3.10.0.x86_64.rpm
+[root@docdesginer local]# yum localinstall chronograf-1.3.10.0.x86_64.rpm
+[root@docdesginer local]# rpm -ql chronograf
+/etc/logrotate.d/chronograf
+/usr/bin/chronograf
+/usr/lib/chronograf/scripts/chronograf.service
+/usr/lib/chronograf/scripts/init.sh
+/usr/share/chronograf/canned/apache.json
+/usr/share/chronograf/canned/consul.json
+/usr/share/chronograf/canned/consul_agent.json
+...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.启动&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@docdesginer local]# systemctl start chronograf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.访问Chronograf&lt;/strong&gt;&lt;br&gt;浏览器输入&lt;a href=&quot;http://IP:8888&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://IP:8888&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/4.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;查询：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;在查询时，最好数据库名和表名都加上引号。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学习过程，同时也希望能够帮助到其他学习的同学。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="时序数据库" scheme="http://yoursite.com/categories/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+    
+      <category term="InfluxDB" scheme="http://yoursite.com/tags/InfluxDB/"/>
+    
+  </entry>
   
   <entry>
     <title>nexus搭建maven私服</title>
@@ -526,7 +759,7 @@ elasticsearch.url: &amp;quot;http://172.16.206.16:9200&amp;quot;
     <link href="http://yoursite.com/2017/10/12/EFK%E6%94%B6%E9%9B%86Kubernetes%E5%BA%94%E7%94%A8%E6%97%A5%E5%BF%97/"/>
     <id>http://yoursite.com/2017/10/12/EFK收集Kubernetes应用日志/</id>
     <published>2017-10-12T06:53:08.000Z</published>
-    <updated>2017-11-13T07:38:22.000Z</updated>
+    <updated>2017-12-04T02:36:46.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;EFK介绍&quot;&gt;&lt;a href=&quot;#EFK介绍&quot; class=&quot;headerlink&quot; title=&quot;EFK介绍&quot;&gt;&lt;/a&gt;EFK介绍&lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;Logstash(或者Fluentd)负责收集日志 &lt;/li&gt;
@@ -605,7 +838,7 @@ server.basePath: /api/v1/proxy/namespaces/kube-system/services/kibana-logging
 {&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:40Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;listening&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;message&amp;quot;:&amp;quot;Server running at http://0.0.0.0:5601&amp;quot;}
 {&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:45Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;status&amp;quot;,&amp;quot;plugin:elasticsearch@1.0.0&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;state&amp;quot;:&amp;quot;yellow&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Status changed from yellow to yellow - No existing Kibana index found&amp;quot;,&amp;quot;prevState&amp;quot;:&amp;quot;yellow&amp;quot;,&amp;quot;prevMsg&amp;quot;:&amp;quot;Waiting for Elasticsearch&amp;quot;}
 {&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:49Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;status&amp;quot;,&amp;quot;plugin:elasticsearch@1.0.0&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;state&amp;quot;:&amp;quot;green&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Status changed from yellow to green - Kibana index ready&amp;quot;,&amp;quot;prevState&amp;quot;:&amp;quot;yellow&amp;quot;,&amp;quot;prevMsg&amp;quot;:&amp;quot;No existing Kibana index found&amp;quot;}
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;访问-kibana&quot;&gt;&lt;a href=&quot;#访问-kibana&quot; class=&quot;headerlink&quot; title=&quot;访问 kibana&quot;&gt;&lt;/a&gt;访问 kibana&lt;/h2&gt;&lt;h3 id=&quot;通过-kube-apiserver-访问：获取-monitoring-grafana-服务-URL&quot;&gt;&lt;a href=&quot;#通过-kube-apiserver-访问：获取-monitoring-grafana-服务-URL&quot; class=&quot;headerlink&quot; title=&quot;通过 kube-apiserver 访问：获取 monitoring-grafana 服务 URL&quot;&gt;&lt;/a&gt;通过 kube-apiserver 访问：获取 monitoring-grafana 服务 URL&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 efk]# kubectl cluster-info
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;访问-kibana&quot;&gt;&lt;a href=&quot;#访问-kibana&quot; class=&quot;headerlink&quot; title=&quot;访问 kibana&quot;&gt;&lt;/a&gt;访问 kibana&lt;/h2&gt;&lt;h3 id=&quot;通过-kube-apiserver-访问：获取-kibana-服务-URL&quot;&gt;&lt;a href=&quot;#通过-kube-apiserver-访问：获取-kibana-服务-URL&quot; class=&quot;headerlink&quot; title=&quot;通过 kube-apiserver 访问：获取 kibana 服务 URL&quot;&gt;&lt;/a&gt;通过 kube-apiserver 访问：获取 kibana 服务 URL&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 efk]# kubectl cluster-info
 Kubernetes master is running at https://172.16.7.151:6443
 Elasticsearch is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/elasticsearch-logging
 Heapster is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/heapster
@@ -647,7 +880,11 @@ Logging Driver: journald
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim /etc/sysconfig/docker
 OPTIONS=&amp;apos;--selinux-enabled --log-driver=json-file --signature-verification=false&amp;apos;
 [root@node1 efk]# systemctl restart docker
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】：本来修改这个参数应该在在/etc/docker/daemon.json文件中添加&lt;br&gt;    {&lt;br&gt;      “log-driver”: “json-file”,&lt;br&gt;    }&lt;br&gt;但是在该版本中，–log-driver是在文件/etc/sysconfig/docker中定义的。&lt;br&gt;在docker-ce版本中，默认的–log-driver是json-file。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】：本来修改这个参数应该在在/etc/docker/daemon.json文件中添加&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;log-driver&amp;quot;: &amp;quot;json-file&amp;quot;,
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;但是在该版本中，–log-driver是在文件/etc/sysconfig/docker中定义的。&lt;br&gt;在docker-ce版本中，默认的–log-driver是json-file。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;遇到的问题：&lt;/strong&gt;&lt;br&gt;由于之前在/etc/docker/daemon.json中配置–log-driver，重启导致docker程序启动失败，等到后来在/etc/sysconfig/docker配置文件中配置好后，启动docker却发现当前node变成NotReady状态，所有的Pod也变为Unknown状态。查看kubelet状态，发现kubelet程序已经挂掉了。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@node1 ~]# kubectl get nodes
 NAME           STATUS     AGE       VERSION
@@ -662,7 +899,7 @@ NAME           STATUS    AGE       VERSION
 172.16.7.152   Ready     28d       v1.6.0
 172.16.7.153   Ready     28d       v1.6.0
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;浏览器再次访问 kibana URL：&lt;a href=&quot;http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kibana-logging&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kibana-logging&lt;/a&gt;&lt;br&gt;此时就会发现有Create按钮了。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/17.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;在 Settings -&amp;gt; Indices 页面创建一个 index（相当于 mysql 中的一个 database），选中 &lt;strong&gt;Index contains time-based events&lt;/strong&gt;，使用默认的 &lt;strong&gt;logstash-*&lt;/strong&gt; pattern，点击 Create ;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/18.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;在 Settings -&amp;gt; Indices 页面创建一个 index（相当于 mysql 中的一个 database），去掉已经勾选的 &lt;strong&gt;Index contains time-based events&lt;/strong&gt;，使用默认的 &lt;strong&gt;logstash-*&lt;/strong&gt; pattern，点击 Create ;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/18.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;创建Index后，可以在 Discover 下看到 ElasticSearch logging 中汇聚的日志。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/19.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 </content>
     
@@ -1141,7 +1378,7 @@ docker run -d --name godseye_web -p 8080:8080 ${HARBOR_IP}/${REPOSITORIES}:${TAG
     <link href="http://yoursite.com/2017/09/25/%E5%9C%A8Kubernetes%E4%B8%8A%E4%BD%BF%E7%94%A8Traefik/"/>
     <id>http://yoursite.com/2017/09/25/在Kubernetes上使用Traefik/</id>
     <published>2017-09-25T03:30:01.000Z</published>
-    <updated>2017-11-13T07:40:48.000Z</updated>
+    <updated>2017-12-01T13:22:25.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;Traefik介绍&quot;&gt;&lt;a href=&quot;#Traefik介绍&quot; class=&quot;headerlink&quot; title=&quot;Traefik介绍&quot;&gt;&lt;/a&gt;Traefik介绍&lt;/h2&gt;&lt;p&gt;traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等编排工具具有良好的支持；同 nginx 等相比，traefik 能够自动感知后端容器变化，从而实现自动服务发现。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;由于微服务架构以及 Docker 技术和 kubernetes 编排工具最近几年才开始逐渐流行，所以一开始的反向代理服务器比如 nginx、apache 并未提供其支持，毕竟他们也不是先知；所以才会出现 Ingress Controller 这种东西来做 kubernetes 和前端负载均衡器如 nginx 之间做衔接；即 Ingress Controller 的存在就是为了能跟 kubernetes 交互，又能写 nginx 配置，还能 reload 它，这是一种折中方案；而 traefik 天生就是提供了对 kubernetes 的支持，也就是说 traefik 本身就能跟 kubernetes API 交互，感知后端变化，因此可以得知: 在使用 traefik 时，Ingress Controller 已经没什么用了，整体架构如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h2 id=&quot;部署测试用的两个服务&quot;&gt;&lt;a href=&quot;#部署测试用的两个服务&quot; class=&quot;headerlink&quot; title=&quot;部署测试用的两个服务&quot;&gt;&lt;/a&gt;部署测试用的两个服务&lt;/h2&gt;&lt;p&gt;部署两个服务nginx1-7和nginx1-8，后面用Traefik去负载这两个服务：&lt;br&gt;nginx1-7.yaml：&lt;/p&gt;
@@ -1273,7 +1510,7 @@ spec:
         - --web
         - --web.address=:8580
         - --kubernetes  
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中 traefik 监听 node 的 80 和 8580 端口，80 提供正常服务，8580 是其自带的 UI 界面，原本默认是 8080，因为环境里端口冲突了，所以这里临时改一下。&lt;br&gt;注意：这里用的是Deploy类型，没有限定该pod运行在哪个主机上。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中 traefik 监听 node 的 80 和 8580 端口，80 提供正常服务，8580 是其自带的 UI 界面，原本默认是 8080，因为环境里端口冲突了，所以这里临时改一下。&lt;br&gt;【注意】：这里用的是Deploy类型，没有限定该pod运行在哪个主机上。&lt;/p&gt;
 &lt;h2 id=&quot;部署-Ingress&quot;&gt;&lt;a href=&quot;#部署-Ingress&quot; class=&quot;headerlink&quot; title=&quot;部署 Ingress&quot;&gt;&lt;/a&gt;部署 Ingress&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# cat traefik.yaml 
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -1339,7 +1576,7 @@ ingress &amp;quot;traefik-ingress&amp;quot; created
 NAME                                  READY     STATUS    RESTARTS   AGE       IP             NODE
 traefik-ingress-lb-4237248072-1dg9n   1/1       Running   0          2m        172.16.7.152   172.16.7.152
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;浏览器输入&lt;a href=&quot;http://172.16.7.152:8580/，将可以看到dashboard。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.152:8580/，将可以看到dashboard。&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;左侧黄色部分部分列出的是所有的rule，右侧绿色部分是所有的backend。&lt;/p&gt;
-&lt;p&gt;在集群的任意一个节点上执行。假如现在我要访问nginx的”/“路径。&lt;/p&gt;
+&lt;p&gt;在Kubernetes集群的任意一个节点上执行。假如现在我要访问nginx的”/“路径。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;curl -H Host:traefik.nginx.io http://172.16.7.152/
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果需要在kubernetes集群以外访问就需要设置DNS，或者修改本机的hosts文件。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;172.16.7.152 traefik.nginx.io
@@ -4537,60 +4774,6 @@ Hello world
     <summary type="html">
     
       &lt;h2 id=&quot;安装Docker&quot;&gt;&lt;a href=&quot;#安装Docker&quot; class=&quot;headerlink&quot; title=&quot;安装Docker&quot;&gt;&lt;/a&gt;安装Docker&lt;/h2&gt;&lt;p&gt;Docker 对 Linux 内核版本的最低要求是3.10，如果内核版本低于 3.10 会缺少一些运行 Docker 容器的功能。这些比较旧的内核，在一定条件下会导致数据丢失和频繁恐慌错误。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
-    
-    
-      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Docker介绍</title>
-    <link href="http://yoursite.com/2017/08/14/Docker%E4%BB%8B%E7%BB%8D/"/>
-    <id>http://yoursite.com/2017/08/14/Docker介绍/</id>
-    <published>2017-08-14T01:17:58.000Z</published>
-    <updated>2017-11-07T07:46:59.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;Docker的诞生&quot;&gt;&lt;a href=&quot;#Docker的诞生&quot; class=&quot;headerlink&quot; title=&quot;Docker的诞生&quot;&gt;&lt;/a&gt;Docker的诞生&lt;/h2&gt;&lt;p&gt;dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。&lt;br&gt;Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;容器技术其实早在2000年早起的UNIX系统上就出现了，直到2007年才加入Linux。容器的行为表现与虚拟机非常类似。现在人们提起容器，基本上指的都是Docker容器了。Docker极大地简化了容器的使用方法，将基于Linux内核隔离机制的容器实现细节统统隐藏在一条简单的命令：docker run之后。另外，Docker提供了一种容器格式，允许将应用和服务打包成一个理论上可以运行在任何安装了Docker Daemon的Linux系统上的容器。&lt;/p&gt;
-&lt;h2 id=&quot;Hypervisor与Docker&quot;&gt;&lt;a href=&quot;#Hypervisor与Docker&quot; class=&quot;headerlink&quot; title=&quot;Hypervisor与Docker&quot;&gt;&lt;/a&gt;Hypervisor与Docker&lt;/h2&gt;&lt;h3 id=&quot;Hypervisor&quot;&gt;&lt;a href=&quot;#Hypervisor&quot; class=&quot;headerlink&quot; title=&quot;Hypervisor&quot;&gt;&lt;/a&gt;Hypervisor&lt;/h3&gt;&lt;p&gt;Hypervisor是一种运行在物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享一套基础物理硬件，因此也可以看作是虚拟环境中的“元”操作系统，它可以协调访问服务器上的所有物理设备和虚拟机，也叫虚拟机监视器（Virtual Machine Monitor）。Hypervisor是所有虚拟化技术的核心。&lt;br&gt;Hypervisor是一种运行在基础物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享硬件。也可叫做VMM（ virtual machine monitor ），即虚拟机监视器。 Hypervisors是一种在虚拟环境中的“元”操作系统。他们可以访问服务器上包括磁盘和内存在内的所有物理设备。Hypervisors不但协调着这些硬件资源的访问，也同时在各个虚拟机之间施加防护。当服务器启动并执行Hypervisor时，它会加载所有虚拟机客户端的操作系统同时会分配给每一台虚拟机适量的内存，CPU，网络和磁盘。&lt;/p&gt;
-&lt;h3 id=&quot;Docker&quot;&gt;&lt;a href=&quot;#Docker&quot; class=&quot;headerlink&quot; title=&quot;Docker&quot;&gt;&lt;/a&gt;Docker&lt;/h3&gt;&lt;p&gt;Docker也是虚拟化的一种，是通过内核虚拟化技术(namespaces和cgroups等)来提供容器的资源隔离与安全保障等。由于Docker通过操作系统层虚拟化实现隔离，所以Docker容器在运行时，不需要类似虚拟机(VM)额外的操作系统开销，提高资源利用率。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;Docker要解决的问题&quot;&gt;&lt;a href=&quot;#Docker要解决的问题&quot; class=&quot;headerlink&quot; title=&quot;Docker要解决的问题&quot;&gt;&lt;/a&gt;Docker要解决的问题&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;消除环境的不一致&lt;/li&gt;
-&lt;li&gt;隔离运行环境&lt;/li&gt;
-&lt;li&gt;应用的打包和分发&lt;/li&gt;
-&lt;li&gt;简单便捷的操作（统一的API）&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/2.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;Docker配合运维的优势&quot;&gt;&lt;a href=&quot;#Docker配合运维的优势&quot; class=&quot;headerlink&quot; title=&quot;Docker配合运维的优势&quot;&gt;&lt;/a&gt;Docker配合运维的优势&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;环境一致性——减少环境切换带来的问题&lt;/li&gt;
-&lt;li&gt;交付标准化——统一的交付件规格便于管理&lt;/li&gt;
-&lt;li&gt;自动化运维——提高运维效率，Docker提供了API&lt;/li&gt;
-&lt;li&gt;资源利用率——降低基础设施成本&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;Docker配合运维的劣势&quot;&gt;&lt;a href=&quot;#Docker配合运维的劣势&quot; class=&quot;headerlink&quot; title=&quot;Docker配合运维的劣势&quot;&gt;&lt;/a&gt;Docker配合运维的劣势&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;操作习惯的变化——ssh/cronjob等变动&lt;/li&gt;
-&lt;li&gt;监控方式的变化——系统指标/日志等方面&lt;/li&gt;
-&lt;li&gt;网络/存储的变化——学习成本&lt;/li&gt;
-&lt;li&gt;周边系统的变化——架构成本&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;Docker的架构及工作流&quot;&gt;&lt;a href=&quot;#Docker的架构及工作流&quot; class=&quot;headerlink&quot; title=&quot;Docker的架构及工作流&quot;&gt;&lt;/a&gt;Docker的架构及工作流&lt;/h2&gt;&lt;p&gt;Docker的基本组成：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Docker Client 客户端&lt;/li&gt;
-&lt;li&gt;Docker Daemon 守护进程&lt;/li&gt;
-&lt;li&gt;Docker Image 镜像&lt;/li&gt;
-&lt;li&gt;Docker Container 容器&lt;/li&gt;
-&lt;li&gt;Docker Registry 仓库&lt;br&gt;docker是C/S架构的程序。客户端对服务器端的访问既可以是在本地，也可以通过远程来访问。&lt;br&gt;我们通过docker客户端来执行各种命令，docker客户端会将这些命令发送给守护进程，从而操作docker的容器，而容器是通过镜像来创建，而镜像是保存在仓库中。守护进程执行的结果还会传回给客户端。这样我们就可以通过客户端来查看命令运行的结果。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/3.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;Docker-Image镜像&quot;&gt;&lt;a href=&quot;#Docker-Image镜像&quot; class=&quot;headerlink&quot; title=&quot;Docker Image镜像&quot;&gt;&lt;/a&gt;Docker Image镜像&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;镜像是docker容器的基石，容器基于镜像启动和运行。镜像就好比容器的源代码，保存了用于启动容器的各种条件。&lt;br&gt;深层次的理解镜像：docker的镜像是个层叠的只读文件系统，它的最底端是个引导文件系统，即bootfs。这很像典型的Linux文件系统，docker用户几乎永远不可能和底层引导文件系统有交互。实际上，当一个容器启动后，它将会被移到内存中，而引导文件系统则会被卸载。&lt;br&gt;docker镜像的第二层是root文件系统，即rootfs。root文件系统可以是一种或多种的文件系统，比如Ubuntu或者CentOS等。在传统的linux引导过程中，root文件系统会最先以只读的方式加载，但引导结束并完成了完整性检查后，它才会切换为读写模式。但是在docker里，root文件系统永远只能是只读的。并且docker利用联合加载技术又会在root文件系统之上加载更多的只读文件系统。联合加载：一次加载多个文件系统，但是在外面看起来只能看见一个文件系统。联合加载会将各层文件系统叠加到一起。docker将这样的文件系统称为镜像。一个镜像可以放到另一个镜像的顶部，位于下面的镜像称为父镜像，以此类推，最底部的镜像称为基础镜像。也就是图中的root文件系统。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;bootfs (boot file system) 主要包含 bootloader 和 kernel, bootloader主要是引导加载kernel, 当boot成功后 kernel 被加载到内存中后 bootfs就被umount了. rootfs (root file system) 包含的就是典型 Linux 系统中的 /dev, /proc,/bin, /etc 等标准目录和文件。&lt;br&gt;对于不同的linux发行版, bootfs基本是一致的, 但rootfs会有差别, 因此不同的发行版可以公用bootfs 如下图:&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;【补充】:BusyBox就是一个工具，使用它可以对linux进行定制，可以制作非常小的系统。BusyBox生成的系统映像可以独立安装在硬盘上。&lt;/p&gt;
-&lt;h3 id=&quot;Docker-Container容器&quot;&gt;&lt;a href=&quot;#Docker-Container容器&quot; class=&quot;headerlink&quot; title=&quot;Docker Container容器&quot;&gt;&lt;/a&gt;Docker Container容器&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;容器通过镜像来启动，docker的容器是docker的执行单元，容器中可以运行客户的一个或多个进程。如果说镜像是docker生命周期中的构建和打包阶段，那么容器则是启动和执行阶段。&lt;br&gt;那么容器是怎样通过镜像来启动的呢？当一个容器启动时，会在该镜像的最顶层加载一个读写文件系统，也就是一个可写的文件层。我们在docker中运行的程序就是在这层中运行的。当docker第一次启动一个容器时，初始的读写层是空的，当文件系统发生变化时，这些变化都会应用到这一层上，比如如果想修改一个文件，这个文件首先会从该读写层下面的只读层复制到该读写层，该文件的只读版本依然存在，但是已经被读写层中的文件副本所隐藏。这就是docker中的一个重要技术，“写时复制”。每个只读镜像层都是只读的，并且以后永远不会变化。&lt;br&gt;当创建一个新容器时，docker会构建一个镜像站，就像右图所示。在站的最顶层添加可写层，这个读写层加上下面的镜像层以及一些配置数据就构成了一个容器。&lt;/p&gt;
-&lt;h3 id=&quot;Docker-Registry仓库&quot;&gt;&lt;a href=&quot;#Docker-Registry仓库&quot; class=&quot;headerlink&quot; title=&quot;Docker Registry仓库&quot;&gt;&lt;/a&gt;Docker Registry仓库&lt;/h3&gt;&lt;p&gt;docker用仓库保存用户构建的镜像。仓库分为公有和私有两种。docker公司自己提供了一个公有的仓库，叫Docker Hub。我们可以在docker hub上注册账号，分享并保存自己的镜像。目前docker上已经有了非常丰富的镜像。所以我们也可以通过docker hub来查找我们需要的镜像。当然我们也可以架设自己私有的仓库。&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Docker的诞生&quot;&gt;&lt;a href=&quot;#Docker的诞生&quot; class=&quot;headerlink&quot; title=&quot;Docker的诞生&quot;&gt;&lt;/a&gt;Docker的诞生&lt;/h2&gt;&lt;p&gt;dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。&lt;br&gt;Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。&lt;br&gt;
     
     </summary>
     

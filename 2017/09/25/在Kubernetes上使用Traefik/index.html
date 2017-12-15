@@ -114,7 +114,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/12.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/13.png">
-<meta property="og:updated_time" content="2017-11-13T07:40:48.000Z">
+<meta property="og:updated_time" content="2017-12-01T13:22:25.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在Kubernetes上使用Traefik">
 <meta name="twitter:description" content="Traefik介绍traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等编排工具具有良好的支持；同 nginx 等相比，traefik 能够自动感知后端容器变化，从而实现自动服务发现。">
@@ -344,8 +344,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-13T15:40:48+08:00" content="2017-11-13">
-              2017-11-13
+              <time itemprop="dateUpdated" datetime="2017-12-01T21:22:25+08:00" content="2017-12-01">
+              2017-12-01
               </time>
               </span>
             
@@ -534,7 +534,7 @@ spec:
         - --web
         - --web.address=:8580
         - --kubernetes  
-</code></pre><p>其中 traefik 监听 node 的 80 和 8580 端口，80 提供正常服务，8580 是其自带的 UI 界面，原本默认是 8080，因为环境里端口冲突了，所以这里临时改一下。<br>注意：这里用的是Deploy类型，没有限定该pod运行在哪个主机上。</p>
+</code></pre><p>其中 traefik 监听 node 的 80 和 8580 端口，80 提供正常服务，8580 是其自带的 UI 界面，原本默认是 8080，因为环境里端口冲突了，所以这里临时改一下。<br>【注意】：这里用的是Deploy类型，没有限定该pod运行在哪个主机上。</p>
 <h2 id="部署-Ingress"><a href="#部署-Ingress" class="headerlink" title="部署 Ingress"></a>部署 Ingress</h2><pre><code>[root@node1 traefik]# cat traefik.yaml 
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -600,7 +600,7 @@ ingress &quot;traefik-ingress&quot; created
 NAME                                  READY     STATUS    RESTARTS   AGE       IP             NODE
 traefik-ingress-lb-4237248072-1dg9n   1/1       Running   0          2m        172.16.7.152   172.16.7.152
 </code></pre><p>浏览器输入<a href="http://172.16.7.152:8580/，将可以看到dashboard。" target="_blank" rel="external">http://172.16.7.152:8580/，将可以看到dashboard。</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/13.png" alt=""><br>左侧黄色部分部分列出的是所有的rule，右侧绿色部分是所有的backend。</p>
-<p>在集群的任意一个节点上执行。假如现在我要访问nginx的”/“路径。</p>
+<p>在Kubernetes集群的任意一个节点上执行。假如现在我要访问nginx的”/“路径。</p>
 <pre><code>curl -H Host:traefik.nginx.io http://172.16.7.152/
 </code></pre><p>如果需要在kubernetes集群以外访问就需要设置DNS，或者修改本机的hosts文件。</p>
 <pre><code>172.16.7.152 traefik.nginx.io
@@ -791,7 +791,7 @@ spec:
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-count">50</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -799,7 +799,7 @@ spec:
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -808,7 +808,7 @@ spec:
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-count">21</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -924,7 +924,7 @@ spec:
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共123.6k字</span>
+  <span class="post-count">博客全站共126.0k字</span>
 </div>
 
         

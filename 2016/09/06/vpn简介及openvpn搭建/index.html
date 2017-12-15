@@ -163,7 +163,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/49.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/50.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/51.png">
-<meta property="og:updated_time" content="2017-11-07T07:34:10.000Z">
+<meta property="og:updated_time" content="2017-11-29T01:58:22.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="vpn简介及openvpn搭建">
 <meta name="twitter:description" content="VPN介绍VPN概述VPN(全称Virtual Private Network)虚拟专用网络，是依靠ISP和其他的NSP，在公共网络中建立专用的数据通信网络的技术，可以为企业之间或者个人与企业之间提供安全的数据传输隧道服务。在VPN中任意两点之间的连接并没有传统专网所需的端到端的物理链路，而是利用公共网络资源动态组成的，可以理解为通过私有的隧道技术在公共数据网络上模拟出来的和专网有同样功能的点到点">
@@ -393,8 +393,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-07T15:34:10+08:00" content="2017-11-07">
-              2017-11-07
+              <time itemprop="dateUpdated" datetime="2017-11-29T09:58:22+08:00" content="2017-11-29">
+              2017-11-29
               </time>
               </span>
             
@@ -496,8 +496,20 @@
 <p>3.安装openvpn软件 <br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@odsee lzo-2.06]# cd ..</div><div class="line">[root@odsee openvpn]# tar zxf openvpn-2.2.2.tar.gz</div><div class="line">[root@odsee openvpn]# cd openvpn-2.2.2</div></pre></td></tr></table></figure></p>
 <p>查看依赖包有没有安装，openvpn需要ssl支持：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@odsee openvpn-2.2.2]# rpm -qa|grep openssl</div></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/4.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@odsee openvpn-2.2.2]# ./configure --with-lzo-headers=/usr/local/include --with-lzo-lib=/usr/local/lib</div><div class="line">[root@odsee openvpn-2.2.2]# make</div><div class="line">[root@odsee openvpn-2.2.2]# make install</div></pre></td></tr></table></figure></p>
-<p>4.配置openvpn server，建立CA证书 <br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@odsee openvpn-2.2.2]# cd easy-rsa/2.0/</div><div class="line">[root@odsee 2.0]# cp vars.bak vars20151204.bak</div><div class="line">[root@odsee 2.0]# vim vars</div></pre></td></tr></table></figure></p>
-<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/5.png" alt=""><br>修改完vars文件后，执行source vars使修改生效：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/6.png" alt=""><br>清除所有证书keys：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@odsee 2.0]# ./clean-all</div></pre></td></tr></table></figure></p>
+<p>4.配置openvpn server，建立CA证书 <br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@odsee openvpn-2.2.2]# cd easy-rsa/2.0/</div><div class="line">[root@odsee 2.0]# cp vars vars20151204.bak</div><div class="line">[root@odsee 2.0]# vim vars</div></pre></td></tr></table></figure></p>
+<p>在文件最后修改为如下内容：</p>
+<pre><code>export KEY_COUNTRY=&quot;CN&quot;
+export KEY_PROVINCE=&quot;JS&quot;
+export KEY_CITY=&quot;Nanjing&quot;
+export KEY_ORG=&quot;wisedu&quot;
+export KEY_EMAIL=&quot;salafeng1024@163.com&quot;
+export KEY_EMAIL=salafeng1024@163.com
+export KEY_CN=CN
+export KEY_NAME=wisedu
+export KEY_OU=wisedu
+export PKCS11_MODULE_PATH=changeme
+export PKCS11_PIN=1234
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/5.png" alt=""><br>修改完vars文件后，执行source vars使修改生效：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/6.png" alt=""><br>清除所有证书keys：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@odsee 2.0]# ./clean-all</div></pre></td></tr></table></figure></p>
 <p>创建新的ca证书：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/7.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/8.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@odsee 2.0]# vim vars</div></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/9.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@odsee 2.0]# source vars</div></pre></td></tr></table></figure></p>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/10.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@odsee 2.0]# ./clean-all</div><div class="line">[root@odsee 2.0]# ./build-ca</div></pre></td></tr></table></figure></p>
@@ -527,10 +539,36 @@
 </ul>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/25.png" alt=""></p>
 <ul>
-<li>修改服务端配置文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@odsee 2.0]# cd /etc/openvpn/</div><div class="line">[root@odsee openvpn]# grep -vE &quot;;|#|^$&quot; server.conf &gt;tmp.log</div><div class="line">[root@odsee openvpn]# cat tmp.log &gt;server.conf</div></pre></td></tr></table></figure>
+<li>修改服务端配置文件<br>原来的配置文件内容如下：<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@odsee 2.0]# cd /etc/openvpn/</div><div class="line">[root@odsee openvpn]# grep -vE &quot;;|#|^$&quot; server.conf &gt;tmp.log</div><div class="line">[root@odsee openvpn]# cat tmp.log &gt;server.conf</div></pre></td></tr></table></figure>
 </li>
 </ul>
-<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/26.png" alt=""><br>常用的配置说明：</p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/OpenVPN/26.png" alt=""><br>最终修改后的文件内容如下：</p>
+<pre><code>local 172.16.4.81
+port 52115
+proto tcp
+dev tun
+ca /etc/openvpn/keys/ca.crt
+cert /etc/openvpn/keys/server.crt
+key /etc/openvpn/keys/server.key
+dh /etc/openvpn/keys/dh1024.pem
+server 10.8.0.0 255.255.255.0
+push &quot;route 172.16.4.0 255.255.255.0&quot;
+push &quot;redirect-gateway def1 bypass-dhcp&quot;
+#push &quot;dhcp-option DNS 8.8.8.8&quot;
+#push &quot;dhcp-option DNS 208.67.222.222&quot;
+#push &quot;dhcp-option DNS 208.67.220.220&quot;
+push &quot;dhcp-option DNS 114.114.114.114&quot;
+ifconfig-pool-persist ipp.txt
+keepalive 10 120
+comp-lzo
+persist-key
+persist-tun
+status openvpn-status.log
+verb 3
+client-to-client
+duplicate-cn
+log /var/log/openvpn.log
+</code></pre><p>常用的配置说明：</p>
 <table>
 <thead>
 <tr>
@@ -751,7 +789,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-count">50</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -759,7 +797,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -768,7 +806,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-count">21</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -884,7 +922,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共123.6k字</span>
+  <span class="post-count">博客全站共126.0k字</span>
 </div>
 
         
