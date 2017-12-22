@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-18T01:11:13.000Z</updated>
+  <updated>2017-12-22T13:13:55.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,82 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Python操作InfluxDB</title>
+    <link href="http://yoursite.com/2017/12/20/Python%E6%93%8D%E4%BD%9CInfluxDB/"/>
+    <id>http://yoursite.com/2017/12/20/Python操作InfluxDB/</id>
+    <published>2017-12-20T11:50:06.000Z</published>
+    <updated>2017-12-22T13:13:55.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;InfluxDB-API-Client-Libraries&quot;&gt;&lt;a href=&quot;#InfluxDB-API-Client-Libraries&quot; class=&quot;headerlink&quot; title=&quot;InfluxDB API Client Libraries&quot;&gt;&lt;/a&gt;InfluxDB API Client Libraries&lt;/h2&gt;&lt;p&gt;上一篇文章介绍了安装部署InfluxDB和它的一些基本概念，接着就得来处理Nginx access.log，并将处理结果存储在InfluxDB中。&lt;br&gt;InfluxDB支持多种语言使用其客户端库来进行交互，具体参见官方文档：&lt;br&gt;&lt;a href=&quot;https://docs.influxdata.com/influxdb/v1.4/tools/api_client_libraries/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.influxdata.com/influxdb/v1.4/tools/api_client_libraries/&lt;/a&gt;&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;我这里使用Python语言来处理Nginx access.log并将结果存储于InfluxDB中。&lt;/p&gt;
+&lt;h2 id=&quot;下载安装模块influxdb&quot;&gt;&lt;a href=&quot;#下载安装模块influxdb&quot; class=&quot;headerlink&quot; title=&quot;下载安装模块influxdb&quot;&gt;&lt;/a&gt;下载安装模块influxdb&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# pip install influxdb
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;编写代码&quot;&gt;&lt;a href=&quot;#编写代码&quot; class=&quot;headerlink&quot; title=&quot;编写代码&quot;&gt;&lt;/a&gt;编写代码&lt;/h2&gt;&lt;p&gt;Nginx access.log的一行日志如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;line =&amp;apos;res.wisedu.com 172.16.6.4 [20/Dec/2017:09:20:17 +0800] &amp;quot;GET /statistics/res?/bh_apis/1.0/module-bhMenu.html&amp;amp;callback=__jp0 HTTP/1.1&amp;quot; 200 0 &amp;quot;-&amp;quot; &amp;quot;Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)&amp;quot; 0.000 -&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# -*- coding: utf-8 -*-
+
+import re
+from influxdb import InfluxDBClient
+
+def read_log(path): # 生成器generator
+    &amp;apos;&amp;apos;&amp;apos;一行一行读取日志并返回&amp;apos;&amp;apos;&amp;apos;
+    with open(path) as f:
+        yield from f
+
+def write_influxDB(lst):
+    &amp;apos;&amp;apos;&amp;apos;写入InfluxDB数据库&amp;apos;&amp;apos;&amp;apos;
+    client.write_points(lst)
+
+def regular_line(line):
+    &amp;apos;&amp;apos;&amp;apos;利用正则分析一行日志，存于字典中&amp;apos;&amp;apos;&amp;apos;
+    o = re.compile(pattern)
+    m = o.search(line)
+    field_dict = m.groupdict()
+
+    return field_dict
+
+def main():
+    &amp;apos;&amp;apos;&amp;apos;主函数&amp;apos;&amp;apos;&amp;apos;
+    for line in read_log(path):
+        field_dict = regular_line(line)
+        lst = []
+        point_dict = {}
+        point_dict[&amp;apos;measurement&amp;apos;] = &amp;apos;res_access_log&amp;apos;
+        point_dict[&amp;apos;fields&amp;apos;] = field_dict
+        lst.append(point_dict)
+
+        write_influxDB(lst)
+
+if __name__ == &amp;apos;__main__&amp;apos;:
+    pattern = &amp;apos;(?P&amp;lt;host&amp;gt;[\w+\.]+\w+) (?P&amp;lt;ip&amp;gt;\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) \[(?P&amp;lt;time_local&amp;gt;.*)\]&amp;apos;
+    pattern += &amp;apos; &amp;quot;(?P&amp;lt;method&amp;gt;\w+) (?P&amp;lt;url&amp;gt;[^\s]*) (?P&amp;lt;version&amp;gt;[\w\/\d\.]*)&amp;quot; (?P&amp;lt;status&amp;gt;\d+) (?P&amp;lt;length&amp;gt;\d+)&amp;apos;
+    pattern += &amp;apos; &amp;quot;(?P&amp;lt;http_referer&amp;gt;[^\s]*)&amp;quot; &amp;quot;(?P&amp;lt;ua&amp;gt;.*)&amp;quot; (?P&amp;lt;request_time&amp;gt;[\d\.]*) (?P&amp;lt;upstream_response_time&amp;gt;[\d\.]*)&amp;apos;
+
+    path = &amp;quot;logs/res.statistics.log&amp;quot;
+    client = InfluxDBClient(host=&amp;apos;172.16.7.151&amp;apos;, port=8086, username=&amp;apos;root&amp;apos;, password=&amp;apos;wisedu123&amp;apos;, database=&amp;apos;mydb&amp;apos;)
+
+    main()
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;Chronograf查看表数据&quot;&gt;&lt;a href=&quot;#Chronograf查看表数据&quot; class=&quot;headerlink&quot; title=&quot;Chronograf查看表数据&quot;&gt;&lt;/a&gt;Chronograf查看表数据&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/7.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;InfluxDB-API-Client-Libraries&quot;&gt;&lt;a href=&quot;#InfluxDB-API-Client-Libraries&quot; class=&quot;headerlink&quot; title=&quot;InfluxDB API Client Libraries&quot;&gt;&lt;/a&gt;InfluxDB API Client Libraries&lt;/h2&gt;&lt;p&gt;上一篇文章介绍了安装部署InfluxDB和它的一些基本概念，接着就得来处理Nginx access.log，并将处理结果存储在InfluxDB中。&lt;br&gt;InfluxDB支持多种语言使用其客户端库来进行交互，具体参见官方文档：&lt;br&gt;&lt;a href=&quot;https://docs.influxdata.com/influxdb/v1.4/tools/api_client_libraries/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.influxdata.com/influxdb/v1.4/tools/api_client_libraries/&lt;/a&gt;&lt;br&gt;
+    
+    </summary>
+    
+      <category term="时序数据库" scheme="http://yoursite.com/categories/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+    
+      <category term="InfluxDB" scheme="http://yoursite.com/tags/InfluxDB/"/>
+    
+  </entry>
+  
+  <entry>
     <title>时序数据库InfluxDB</title>
     <link href="http://yoursite.com/2017/12/15/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93InfluxDB/"/>
     <id>http://yoursite.com/2017/12/15/时序数据库InfluxDB/</id>
     <published>2017-12-15T14:00:36.000Z</published>
-    <updated>2017-12-18T01:11:13.000Z</updated>
+    <updated>2017-12-22T12:35:07.000Z</updated>
     
     <content type="html">&lt;p&gt;最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学习过程，同时也希望能够帮助到其他学习的同学。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;InfluxDB介绍&quot;&gt;&lt;a href=&quot;#InfluxDB介绍&quot; class=&quot;headerlink&quot; title=&quot;InfluxDB介绍&quot;&gt;&lt;/a&gt;InfluxDB介绍&lt;/h2&gt;&lt;p&gt;什么是时间序列数据？最简单的定义就是数据格式里包含timestamp字段的数据。比如股票市场的价格，环境中的温度，主机的CPU使用率等。但是又有什么数据是不包含timestamp的呢？几乎所有的数据都可以打上一个timestamp字段。时间序列数据更重要的一个属性是如何去查询它。在查询的时候，对于时间序列我们总是会带上一个时间范围去过滤数据。同时查询的结果里也总是会包含timestamp字段。&lt;br&gt;InfluxDB 是一个开源分布式时序、事件和指标数据库。使用 Go 语言编写，无需外部依赖。其设计目标是实现分布式和水平伸缩扩展。&lt;br&gt;它有三大特性：&lt;/p&gt;
@@ -4626,214 +4697,6 @@ test2.txt
 &lt;li&gt;docker network ls：列出当前docker中已有的网络&lt;/li&gt;
 &lt;li&gt;docker network inspect：查看网络详情，比如查看网络中有哪些容器&lt;/li&gt;
 &lt;li&gt;docker run –network=&lt;network&gt;：指定运行容器时使用哪个网络
-    
-    </summary>
-    
-      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
-    
-    
-      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Docker镜像和容器</title>
-    <link href="http://yoursite.com/2017/08/16/Docker%E9%95%9C%E5%83%8F%E5%92%8C%E5%AE%B9%E5%99%A8/"/>
-    <id>http://yoursite.com/2017/08/16/Docker镜像和容器/</id>
-    <published>2017-08-16T01:03:56.000Z</published>
-    <updated>2017-11-07T07:47:17.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;安装Docker&quot;&gt;&lt;a href=&quot;#安装Docker&quot; class=&quot;headerlink&quot; title=&quot;安装Docker&quot;&gt;&lt;/a&gt;安装Docker&lt;/h2&gt;&lt;p&gt;Docker 对 Linux 内核版本的最低要求是3.10，如果内核版本低于 3.10 会缺少一些运行 Docker 容器的功能。这些比较旧的内核，在一定条件下会导致数据丢失和频繁恐慌错误。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;CentOS 6：&lt;br&gt;操作系统需要升级下内核，升级内核后安装Docker：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# yum install -y docker-io
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;CentOS 7：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# yum install -y docker
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我这里用的CentOS 7。启动docker：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# systemctl start docker.service
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;卸载docker&quot;&gt;&lt;a href=&quot;#卸载docker&quot; class=&quot;headerlink&quot; title=&quot;卸载docker&quot;&gt;&lt;/a&gt;卸载docker&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# systemctl stop docker.service
-# yum remove docker docker-common docker-selinux docker-engine container-selinux
-# rm -rf docker/
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;镜像基本操作&quot;&gt;&lt;a href=&quot;#镜像基本操作&quot; class=&quot;headerlink&quot; title=&quot;镜像基本操作&quot;&gt;&lt;/a&gt;镜像基本操作&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;搜索镜像 docker search&lt;/li&gt;
-&lt;li&gt;获取镜像 docker pull&lt;/li&gt;
-&lt;li&gt;查看镜像 docker images&lt;/li&gt;
-&lt;li&gt;删除镜像 docker rmi&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;1.获取镜像&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# docker pull centos
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;默认是去 docker.io/library/centos 仓库中拉取centos镜像，镜像资源都在国外，所以在国内要获取docker镜像，速度有时会很慢。为了快速访问 Docker 官方镜像都会配置三方加速器，目前常用三方加速器有：网易、USTC、DaoCloud、阿里云。&lt;br&gt;现在 Docker 官方针对中国区推出了镜像加速服务。通过 Docker 官方镜像加速，国内用户能够以更快的下载速度和更强的稳定性访问最流行的 Docker 镜像。&lt;br&gt;Docker 中国官方镜像加速可通过 registry.docker-cn.com 访问。目前该镜像库只包含流行的公有镜像，而私有镜像仍需要从美国镜像库中拉取。&lt;br&gt;可以使用以下命令直接从该镜像加速地址进行拉取：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# docker pull registry.docker-cn.com/myname/myrepo:mytag
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;例如:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# docker pull registry.docker-cn.com/library/centos:latest
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;注意: 除非修改了 Docker 守护进程的 –registry-mirror 参数 , 否则您将需要完整地指定官方镜像的名称。例如，library/ubuntu、library/redis、library/nginx。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;给Docker守护进程配置加速器&lt;/strong&gt;&lt;br&gt;如果要配置 Docker 守护进程默认使用 Docker 官方镜像加速。您可以在 Docker 守护进程启动时配置 –registry-mirror参数。&lt;br&gt;（1）通过命令行启动Docker&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# docker --registry-mirror=https://registry.docker-cn.com daemon
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;（2）通过配置文件启动Docker&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;Docker版本在 1.12 或更高&lt;br&gt;修改 /etc/docker/daemon.json 文件并添加上 registry-mirrors 键值。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;registry-mirror&amp;quot;: [&amp;quot;https://registry.docker-cn.com&amp;quot;]
-}
-# systemctl restart docker.service
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Docker版本在 1.8 与 1.11 之间&lt;br&gt;找到 Docker 配置文件，在配置文件中的 DOCKER_OPTS 加入。不同的 Linux 发行版的配置路径不同。&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;2.查看镜像&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# docker images
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/8.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;REPOSITORY：镜像所属的仓库名。&lt;br&gt;TAG：镜像的标签名&lt;br&gt;IMAGE ID：镜像的唯一ID，实际上和磁盘上存储的镜像的文件名是对应的。这是文件名截断显示的结果。&lt;br&gt;CREATED：镜像建立的时间。&lt;br&gt;SIZE：镜像的大小。&lt;/p&gt;
-&lt;p&gt;查看镜像的详细信息：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# docker inspect 328edcd84f1b
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.镜像标签和仓库&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;REPOSITORY和REGISTRY&lt;br&gt;一系列镜像的集合。包含了一系列关联的镜像，比如上图中的Ubuntu，就是个大的仓库，下面的不同镜像就对应这个操作系统的不同版本。这和之前讲到的docker组件中的仓库有很大的区别。REGISTRY提供的是docker镜像的存储服务。所以在REGISTRY仓库中包含了很多REPOSITORY之类的仓库。而在REPOSITORY仓库中包含的是一个一个独立的镜像。&lt;/li&gt;
-&lt;li&gt;TAG 镜像标签&lt;br&gt;在仓库中，不同的镜像是以标签来区分的。一个REPOSITORY仓库名和一个标签名就构成了一个完整的镜像名字。我们之前在演示的时候只是指定镜像名Ubuntu，并没有指定标签名。那么在docker中会默认使用latest标签所对应的镜像。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;4.删除镜像&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# docker rmi 328edcd84f1b
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;5.推送镜像&lt;/strong&gt;&lt;br&gt;pull镜像到本地后，我们在具体的业务场景中，可以会自己修改镜像，制作镜像，完成后可以把镜像push到&lt;a href=&quot;https://registry.hub.docker.com&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Docker Hub&lt;/a&gt;，或者自建的registry中。这个在后面的博客中会写到。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;6.导出镜像&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker images
-REPOSITORY                              TAG                 IMAGE ID            CREATED             SIZE
-registry.docker-cn.com/library/centos   latest              328edcd84f1b        13 days ago         192.5 MB
-[root@node1 ~]# docker save 328edcd84f1b &amp;gt; /opt/centos.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;7.导入镜像&lt;/strong&gt;&lt;br&gt;比如有些镜像很难下载，别人下载好了，或者之前下载过了，可以导入。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker load &amp;lt; /opt/centos.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;容器基本操作&quot;&gt;&lt;a href=&quot;#容器基本操作&quot; class=&quot;headerlink&quot; title=&quot;容器基本操作&quot;&gt;&lt;/a&gt;容器基本操作&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;启动容器 docker run &lt;/li&gt;
-&lt;li&gt;停止容器 docker stop&lt;/li&gt;
-&lt;li&gt;查看容器 docker ps&lt;/li&gt;
-&lt;li&gt;进入容器 docker exec | docker attach&lt;/li&gt;
-&lt;li&gt;删除容器 docker rm&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;启动容器&quot;&gt;&lt;a href=&quot;#启动容器&quot; class=&quot;headerlink&quot; title=&quot;启动容器&quot;&gt;&lt;/a&gt;启动容器&lt;/h3&gt;&lt;p&gt;docker run IMAGE [COMMOND] [ARG…]&lt;br&gt;   run 启动一个容器并在容器中执行命令&lt;br&gt;   IMAGE 启动容器所使用的操作系统镜像&lt;br&gt;当运行docker run这个命令的时候，docker会检测本地是否有相应名字的镜像，如果没有，会去公共的仓库下载。然后利用该镜像启动一个容器，包括分配文件系统，ip地址等等。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run centos echo &amp;quot;Hello world&amp;quot;
-Hello world
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;但是在启动容器并完成命令后，实际上这个容器已经停止了。这只是执行单次命令的容器。这是docker中最基本的容器运行方式。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;启动交互式容器&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;docker run -i -t IMAGE /bin/bash
-    -i --interface=true|false 默认是false      ——告诉docker的守护进程为容器始终打开标准输入
-    -t --tty=true|false 默认是false   ——告诉docker要为创建的容器分配一个伪tty终端
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这样新创建的容器就可以提供一个交互式的shell。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -i -t centos /bin/bash
-[root@fb316d4c0719 /]# exit;
-exit
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;一退出，容器就停止了。&lt;/p&gt;
-&lt;p&gt;重新启动已经停止的容器：&lt;br&gt;docker start [-i] 容器名&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;-i 以交互的方式来重新启动停止的容器&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker start -i fb316d4c0719
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;查看容器&quot;&gt;&lt;a href=&quot;#查看容器&quot; class=&quot;headerlink&quot; title=&quot;查看容器&quot;&gt;&lt;/a&gt;查看容器&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;docker ps [-a]
-    -a 列出所有的容器
-    不给参数，ps命令返回的是正在运行中的docker容器
-
-[root@node1 ~]# docker ps 
-CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
-[root@node1 ~]# docker ps  -a
-CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS                      PORTS               NAMES
-fb316d4c0719        centos              &amp;quot;/bin/bash&amp;quot;            17 minutes ago      Exited (0) 17 minutes ago                       silly_bell
-762db863e04a        centos              &amp;quot;echo &amp;apos;Hello world&amp;apos;&amp;quot;   20 minutes ago      Exited (0) 20 minutes ago                       romantic_murdock
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;CONTAINER ID：docker的守护进程在启动容器时为容器分配的唯一ID。&lt;br&gt;NAMES：docker守护进程为容器自动分配的名字。也可以在启动容器时手动指定，比如：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -i -t --name test centos /bin/bash   
-[root@d985fe8622f7 /]# exit
-exit
-[root@node1 ~]# docker ps  -a
-CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS                      PORTS               NAMES
-d985fe8622f7        centos              &amp;quot;/bin/bash&amp;quot;            7 seconds ago       Exited (0) 4 seconds ago                        test
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;查看某个容器的详细信息，包括名称、网络配置等信息：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker inspect fb316d4c0719 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/9.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;停止容器&quot;&gt;&lt;a href=&quot;#停止容器&quot; class=&quot;headerlink&quot; title=&quot;停止容器&quot;&gt;&lt;/a&gt;停止容器&lt;/h3&gt;&lt;p&gt;docker stop 容器名&lt;br&gt;docker kill 容器名&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;stop命令是发送一个信号给容器，等待容器的停止。&lt;/li&gt;
-&lt;li&gt;kill命令会直接停止容器。&lt;br&gt;容器名可以是container id，也可以是names &lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;删除停止的容器&quot;&gt;&lt;a href=&quot;#删除停止的容器&quot; class=&quot;headerlink&quot; title=&quot;删除停止的容器&quot;&gt;&lt;/a&gt;删除停止的容器&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;注意不能删除运行中的容器&lt;/strong&gt;&lt;br&gt;docker rm 容器名&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker ps -a
-CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS                         PORTS               NAMES
-d985fe8622f7        centos              &amp;quot;/bin/bash&amp;quot;            About an hour ago   Exited (0) About an hour ago                       test
-fb316d4c0719        centos              &amp;quot;/bin/bash&amp;quot;            2 hours ago         Exited (0) 2 hours ago                             silly_bell
-762db863e04a        centos              &amp;quot;echo &amp;apos;Hello world&amp;apos;&amp;quot;   2 hours ago         Exited (0) 2 hours ago                             romantic_murdock
-[root@node1 ~]# docker rm 762db863e04a
-762db863e04a
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;Docker守护式容器&quot;&gt;&lt;a href=&quot;#Docker守护式容器&quot; class=&quot;headerlink&quot; title=&quot;Docker守护式容器&quot;&gt;&lt;/a&gt;Docker守护式容器&lt;/h3&gt;&lt;p&gt;守护式容器：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;能够长期运行&lt;/li&gt;
-&lt;li&gt;没有交互式会话&lt;/li&gt;
-&lt;li&gt;适合运行应用程序和服务&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&quot;方式一&quot;&gt;&lt;a href=&quot;#方式一&quot; class=&quot;headerlink&quot; title=&quot;方式一&quot;&gt;&lt;/a&gt;方式一&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;# docker run -i -t IMAGE /bin/bash
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Ctrl+P Ctrl +Q退出交互式容器的bash，这样容器就会在后台运行&lt;/p&gt;
-&lt;h4 id=&quot;方式二&quot;&gt;&lt;a href=&quot;#方式二&quot; class=&quot;headerlink&quot; title=&quot;方式二&quot;&gt;&lt;/a&gt;方式二&lt;/h4&gt;&lt;p&gt;docker run -d 镜像名 [COMMAND] [ARG…]&lt;br&gt;     -d 启动容器时用后台的方式&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;    [root@node1 ~]# docker run -d -i -t --name=test2 centos /bin/bash -c &amp;quot;while true; do echo hello world; sleep 5; done&amp;quot;
-6678e5462d023e2ecc90f5bac887326b0b10ed034e51884176028ddcee24d249
-    [root@node1 ~]# docker ps
-    CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
-    6678e5462d02        centos              &amp;quot;/bin/bash -c &amp;apos;while &amp;quot;   5 seconds ago       Up 4 seconds                            test2
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;进入容器&quot;&gt;&lt;a href=&quot;#进入容器&quot; class=&quot;headerlink&quot; title=&quot;进入容器&quot;&gt;&lt;/a&gt;进入容器&lt;/h4&gt;&lt;p&gt;docker attach 容器名  &lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker ps
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
-6678e5462d02        centos              &amp;quot;/bin/bash -c &amp;apos;while &amp;quot;   5 seconds ago       Up 4 seconds                            test2
-[root@node1 ~]# docker attach 6678e5462d02
-hello world
-hello world
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;使用 attach 命令有时候并不方便。当多个窗口同时 attach 到同一个容器的时候，所有窗口都会同步显示，当某个窗口因命令阻塞时，其他窗口也无法执行操作了。nsenter  (namespace enter)，nsenter 可以访问进程的另外一个名字空间。建议使用nsenter。&lt;br&gt;【注意】:nsenter 要正常工作需要有 root 权限。而且nsenter 工具在 util-linux 包2.23版本后才包含。安装方式：yum install util-linux&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker start d985fe8622f7
-d985fe8622f7
-[root@node1 ~]# docker inspect --format &amp;quot;{{.State.Pid}}&amp;quot; d985fe8622f7
-14526
-[root@node1 ~]# nsenter -t 14526 -u -i -n -p
-[root@d985fe8622f7 ~]# exit
-logout
-[root@node1 ~]# docker ps
-CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
-d985fe8622f7        centos              &amp;quot;/bin/bash&amp;quot;         3 hours ago         Up 4 minutes                            test
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/10.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;可以把这个命令写成脚本，以后用起来也方便：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# vim access_docker.sh
-#!/bin/bash
-Cname=$1
-Cpid=$(docker inspect --format &amp;quot;{{.State.Pid}}&amp;quot; $Cname)
-
-if ! ps ax | awk &amp;apos;{print $1}&amp;apos; | grep -e &amp;quot;^${Cpid}$&amp;quot; &amp;amp;&amp;gt; /dev/null; then
-        echo &amp;quot;$Cname is not exist,you cant&amp;apos;s enter it.!!!!!!!!!!!!!!!!!!!!!&amp;quot;
-else
-        echo &amp;quot;You will enter the docker containter:$Cname.&amp;quot;
-        nsenter --target $Cpid --mount --uts --ipc --net --pid
-fi
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;授予脚本执行权限：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# chmod +x access_docker.sh
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果需要进去docker的某个容器，直接/path/to/access_docker.sh 容器名称或是容器id：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# ./access_docker.sh d985fe8622f7
-You will enter the docker containter: d985fe8622f7.
-[root@d985fe8622f7 /]#
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;查看容器日志&quot;&gt;&lt;a href=&quot;#查看容器日志&quot; class=&quot;headerlink&quot; title=&quot;查看容器日志&quot;&gt;&lt;/a&gt;查看容器日志&lt;/h3&gt;&lt;p&gt;docker logs [-f] [-t] [–tail] 容器名&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;-f –follows=true|false  默认是false    一直跟踪日志的变化，并返回结果&lt;/li&gt;
-&lt;li&gt;-t –timestamps=true|false  默认是false  在返回的结果上加上时间戳&lt;/li&gt;
-&lt;li&gt;–tail=”all”  返回结尾处多少数量的日志&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;如果不指定，logs将会返回所有的日志&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker ps
-CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
-d985fe8622f7        centos              &amp;quot;/bin/bash&amp;quot;         3 hours ago         Up 4 minutes                            test
-[root@node1 ~]# docker logs -tf d985fe8622f7
-2017-08-17T03:50:39.127155000Z [root@d985fe8622f7 /]# exit
-2017-08-17T03:50:39.127493000Z exit
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;查看容器内的进程&quot;&gt;&lt;a href=&quot;#查看容器内的进程&quot; class=&quot;headerlink&quot; title=&quot;查看容器内的进程&quot;&gt;&lt;/a&gt;查看容器内的进程&lt;/h3&gt;&lt;p&gt;docker top 容器名&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker top d985fe8622f7
-UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD
-root                14526               14506               0                   03:12               pts/1               00:00:00            /bin/bash
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;在运行中的容器内启动新进程&quot;&gt;&lt;a href=&quot;#在运行中的容器内启动新进程&quot; class=&quot;headerlink&quot; title=&quot;在运行中的容器内启动新进程&quot;&gt;&lt;/a&gt;在运行中的容器内启动新进程&lt;/h3&gt;&lt;p&gt;虽然docker的理念是一个容器运行一个服务，我们仍就需要在docker中运行多个进程。比如需要对运行中的容器进行维护、监控，或者执行一些管理任务。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# docker exec [-d] [-i] [-t] 容器名 [COMMAND] [ARG...]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果我们在学习时做实验，可能会启动很多容器，长期下来，残留的容器就会有很多，有个技巧，可以在启动的时候加一个参数，让在退出容器后，自动删除容器。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run --rm centos echo &amp;quot;Hello world&amp;quot;
-Hello world
-&lt;/code&gt;&lt;/pre&gt;</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;安装Docker&quot;&gt;&lt;a href=&quot;#安装Docker&quot; class=&quot;headerlink&quot; title=&quot;安装Docker&quot;&gt;&lt;/a&gt;安装Docker&lt;/h2&gt;&lt;p&gt;Docker 对 Linux 内核版本的最低要求是3.10，如果内核版本低于 3.10 会缺少一些运行 Docker 容器的功能。这些比较旧的内核，在一定条件下会导致数据丢失和频繁恐慌错误。&lt;br&gt;
     
     </summary>
     
