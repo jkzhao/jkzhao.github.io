@@ -112,7 +112,7 @@
 <meta property="og:site_name" content="jkzhao&#39;s blog">
 <meta property="og:description" content="安装Redis我这里安装的版本是 3.2.2 [root@log2 ~]# yum install readline-devel pcre-devel openssl-devel -y [root@log2 local]# tar zxf redis-3.2.2.tar.gz  [root@log2 local]# cd redis-3.2.2/ [root@log2 redis-3.2.2]#">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-10T01:36:37.000Z">
+<meta property="og:updated_time" content="2018-01-10T03:42:18.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis安装部署">
 <meta name="twitter:description" content="安装Redis我这里安装的版本是 3.2.2 [root@log2 ~]# yum install readline-devel pcre-devel openssl-devel -y [root@log2 local]# tar zxf redis-3.2.2.tar.gz  [root@log2 local]# cd redis-3.2.2/ [root@log2 redis-3.2.2]#">
@@ -344,7 +344,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-01-10T09:36:37+08:00" content="2018-01-10">
+              <time itemprop="dateUpdated" datetime="2018-01-10T11:42:18+08:00" content="2018-01-10">
               2018-01-10
               </time>
               </span>
@@ -459,7 +459,25 @@ protected-mode no
 <pre><code>[root@log2 ~]# /usr/local/bin/redis-server /etc/redis.conf
 </code></pre><p>2.停止</p>
 <pre><code>[root@log2 ~]# /usr/local/redis-3.2.2/src/redis-cli -p 6400 shutdown
-</code></pre>
+</code></pre><h2 id="Redis简单使用"><a href="#Redis简单使用" class="headerlink" title="Redis简单使用"></a>Redis简单使用</h2><h3 id="使用客户端连接redis-server"><a href="#使用客户端连接redis-server" class="headerlink" title="使用客户端连接redis-server"></a>使用客户端连接redis-server</h3><p>在Redis的安装目录中有redis客户端，即redis-cli（Redis Command Line Interface），它是Redis自带的基于命令行的Redis的客户端。</p>
+<pre><code># cd /usr/local/bin/
+# ./redis-cli -h 172.16.206.30 -p 6400
+172.16.206.30:6400&gt; 
+</code></pre><h3 id="向Redis服务器发送命令"><a href="#向Redis服务器发送命令" class="headerlink" title="向Redis服务器发送命令"></a>向Redis服务器发送命令</h3><p>redis-cli连上redis服务后，可以在命令行发送命令。</p>
+<ul>
+<li><p>ping，测试客户端与redis的连接是否正常，如果正常会收到回复PONG</p>
+<h1 id="redis-cli-h-172-16-206-30-p-6400"><a href="#redis-cli-h-172-16-206-30-p-6400" class="headerlink" title="./redis-cli -h 172.16.206.30 -p 6400"></a>./redis-cli -h 172.16.206.30 -p 6400</h1><p>  172.16.206.30:6400&gt; ping<br>  PONG<br>  172.16.206.30:6400&gt; </p>
+</li>
+<li><p>set/get，使用set和get可以向redis设置数据、获取数据</p>
+<p>  172.16.206.30:6400&gt; set name wisedu<br>  OK<br>  172.16.206.30:6400&gt; get name<br>  “wisedu”</p>
+</li>
+<li><p>del，删除指定key的内容</p>
+<p>  172.16.206.30:6400&gt; del name<br>  (integer) 1<br>  172.16.206.30:6400&gt; get name<br>  (nil)</p>
+</li>
+<li><p>keys *，查看当前库中所有的key</p>
+</li>
+</ul>
+
       
     </div>
 
@@ -652,7 +670,7 @@ protected-mode no
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Redis"><span class="nav-number">1.</span> <span class="nav-text">安装Redis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Redis"><span class="nav-number">2.</span> <span class="nav-text">配置Redis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动-停止"><span class="nav-number">3.</span> <span class="nav-text">启动/停止</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Redis"><span class="nav-number">1.</span> <span class="nav-text">安装Redis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Redis"><span class="nav-number">2.</span> <span class="nav-text">配置Redis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动-停止"><span class="nav-number">3.</span> <span class="nav-text">启动/停止</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis简单使用"><span class="nav-number">4.</span> <span class="nav-text">Redis简单使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用客户端连接redis-server"><span class="nav-number">4.1.</span> <span class="nav-text">使用客户端连接redis-server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#向Redis服务器发送命令"><span class="nav-number">4.2.</span> <span class="nav-text">向Redis服务器发送命令</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#redis-cli-h-172-16-206-30-p-6400"><span class="nav-number"></span> <span class="nav-text">./redis-cli -h 172.16.206.30 -p 6400</span></a></div>
             
           </div>
         </section>
@@ -698,7 +716,7 @@ protected-mode no
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共127.8k字</span>
+  <span class="post-count">博客全站共128.0k字</span>
 </div>
 
         
