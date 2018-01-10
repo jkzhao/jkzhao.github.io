@@ -104,13 +104,13 @@
 
 
 
-<meta name="description" content="最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学">
+<meta name="description" content="最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下">
 <meta name="keywords" content="InfluxDB">
 <meta property="og:type" content="article">
 <meta property="og:title" content="时序数据库InfluxDB">
 <meta property="og:url" content="http://yoursite.com/2017/12/15/时序数据库InfluxDB/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学">
+<meta property="og:description" content="最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/1.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/2.png">
@@ -118,10 +118,10 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/4.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/5.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/6.png">
-<meta property="og:updated_time" content="2017-12-22T12:35:07.000Z">
+<meta property="og:updated_time" content="2018-01-10T07:55:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="时序数据库InfluxDB">
-<meta name="twitter:description" content="最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学">
+<meta name="twitter:description" content="最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/1.png">
 
 
@@ -351,8 +351,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-12-22T20:35:07+08:00" content="2017-12-22">
-              2017-12-22
+              <time itemprop="dateUpdated" datetime="2018-01-10T15:55:24+08:00" content="2018-01-10">
+              2018-01-10
               </time>
               </span>
             
@@ -411,7 +411,9 @@
       
 
       
-        <p>最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学习过程，同时也希望能够帮助到其他学习的同学。<br><a id="more"></a></p>
+        <blockquote>
+<p>最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学习过程，同时也希望能够帮助到其他学习的同学。<br><a id="more"></a></p>
+</blockquote>
 <h2 id="InfluxDB介绍"><a href="#InfluxDB介绍" class="headerlink" title="InfluxDB介绍"></a>InfluxDB介绍</h2><p>什么是时间序列数据？最简单的定义就是数据格式里包含timestamp字段的数据。比如股票市场的价格，环境中的温度，主机的CPU使用率等。但是又有什么数据是不包含timestamp的呢？几乎所有的数据都可以打上一个timestamp字段。时间序列数据更重要的一个属性是如何去查询它。在查询的时候，对于时间序列我们总是会带上一个时间范围去过滤数据。同时查询的结果里也总是会包含timestamp字段。<br>InfluxDB 是一个开源分布式时序、事件和指标数据库。使用 Go 语言编写，无需外部依赖。其设计目标是实现分布式和水平伸缩扩展。<br>它有三大特性：</p>
 <ol>
 <li>Time Series （时间序列）：你可以使用与时间有关的相关函数（如最大，最小，求和等）</li>

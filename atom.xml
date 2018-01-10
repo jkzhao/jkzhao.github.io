@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-01-10T03:44:49.000Z</updated>
+  <updated>2018-01-10T03:45:22.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2018/01/10/Redis%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2018/01/10/Redis安装部署/</id>
     <published>2018-01-10T01:12:43.000Z</published>
-    <updated>2018-01-10T03:44:49.000Z</updated>
+    <updated>2018-01-10T03:45:22.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;安装Redis&quot;&gt;&lt;a href=&quot;#安装Redis&quot; class=&quot;headerlink&quot; title=&quot;安装Redis&quot;&gt;&lt;/a&gt;安装Redis&lt;/h2&gt;&lt;p&gt;我这里安装的版本是 3.2.2&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@log2 ~]# yum install readline-devel pcre-devel openssl-devel -y
@@ -194,9 +194,11 @@ if __name__ == &amp;apos;__main__&amp;apos;:
     <link href="http://yoursite.com/2017/12/15/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93InfluxDB/"/>
     <id>http://yoursite.com/2017/12/15/时序数据库InfluxDB/</id>
     <published>2017-12-15T14:00:36.000Z</published>
-    <updated>2017-12-22T12:35:07.000Z</updated>
+    <updated>2018-01-10T07:55:24.000Z</updated>
     
-    <content type="html">&lt;p&gt;最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学习过程，同时也希望能够帮助到其他学习的同学。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学习过程，同时也希望能够帮助到其他学习的同学。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
 &lt;h2 id=&quot;InfluxDB介绍&quot;&gt;&lt;a href=&quot;#InfluxDB介绍&quot; class=&quot;headerlink&quot; title=&quot;InfluxDB介绍&quot;&gt;&lt;/a&gt;InfluxDB介绍&lt;/h2&gt;&lt;p&gt;什么是时间序列数据？最简单的定义就是数据格式里包含timestamp字段的数据。比如股票市场的价格，环境中的温度，主机的CPU使用率等。但是又有什么数据是不包含timestamp的呢？几乎所有的数据都可以打上一个timestamp字段。时间序列数据更重要的一个属性是如何去查询它。在查询的时候，对于时间序列我们总是会带上一个时间范围去过滤数据。同时查询的结果里也总是会包含timestamp字段。&lt;br&gt;InfluxDB 是一个开源分布式时序、事件和指标数据库。使用 Go 语言编写，无需外部依赖。其设计目标是实现分布式和水平伸缩扩展。&lt;br&gt;它有三大特性：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;Time Series （时间序列）：你可以使用与时间有关的相关函数（如最大，最小，求和等）&lt;/li&gt;
@@ -471,7 +473,8 @@ autogen 0s       168h0m0s           1        true
     
     <summary type="html">
     
-      &lt;p&gt;最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学习过程，同时也希望能够帮助到其他学习的同学。&lt;br&gt;
+      &lt;blockquote&gt;
+&lt;p&gt;最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学习过程，同时也希望能够帮助到其他学习的同学。&lt;br&gt;
     
     </summary>
     
