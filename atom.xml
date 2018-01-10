@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-01-10T03:42:18.000Z</updated>
+  <updated>2018-01-10T03:44:49.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2018/01/10/Redis%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2018/01/10/Redis安装部署/</id>
     <published>2018-01-10T01:12:43.000Z</published>
-    <updated>2018-01-10T03:42:18.000Z</updated>
+    <updated>2018-01-10T03:44:49.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;安装Redis&quot;&gt;&lt;a href=&quot;#安装Redis&quot; class=&quot;headerlink&quot; title=&quot;安装Redis&quot;&gt;&lt;/a&gt;安装Redis&lt;/h2&gt;&lt;p&gt;我这里安装的版本是 3.2.2&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[root@log2 ~]# yum install readline-devel pcre-devel openssl-devel -y
@@ -81,20 +81,22 @@ protected-mode no
 &lt;pre&gt;&lt;code&gt;# cd /usr/local/bin/
 # ./redis-cli -h 172.16.206.30 -p 6400
 172.16.206.30:6400&amp;gt; 
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;向Redis服务器发送命令&quot;&gt;&lt;a href=&quot;#向Redis服务器发送命令&quot; class=&quot;headerlink&quot; title=&quot;向Redis服务器发送命令&quot;&gt;&lt;/a&gt;向Redis服务器发送命令&lt;/h3&gt;&lt;p&gt;redis-cli连上redis服务后，可以在命令行发送命令。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;ping，测试客户端与redis的连接是否正常，如果正常会收到回复PONG&lt;/p&gt;
-&lt;h1 id=&quot;redis-cli-h-172-16-206-30-p-6400&quot;&gt;&lt;a href=&quot;#redis-cli-h-172-16-206-30-p-6400&quot; class=&quot;headerlink&quot; title=&quot;./redis-cli -h 172.16.206.30 -p 6400&quot;&gt;&lt;/a&gt;./redis-cli -h 172.16.206.30 -p 6400&lt;/h1&gt;&lt;p&gt;  172.16.206.30:6400&amp;gt; ping&lt;br&gt;  PONG&lt;br&gt;  172.16.206.30:6400&amp;gt; &lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;set/get，使用set和get可以向redis设置数据、获取数据&lt;/p&gt;
-&lt;p&gt;  172.16.206.30:6400&amp;gt; set name wisedu&lt;br&gt;  OK&lt;br&gt;  172.16.206.30:6400&amp;gt; get name&lt;br&gt;  “wisedu”&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;del，删除指定key的内容&lt;/p&gt;
-&lt;p&gt;  172.16.206.30:6400&amp;gt; del name&lt;br&gt;  (integer) 1&lt;br&gt;  172.16.206.30:6400&amp;gt; get name&lt;br&gt;  (nil)&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;keys *，查看当前库中所有的key&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;向Redis服务器发送命令&quot;&gt;&lt;a href=&quot;#向Redis服务器发送命令&quot; class=&quot;headerlink&quot; title=&quot;向Redis服务器发送命令&quot;&gt;&lt;/a&gt;向Redis服务器发送命令&lt;/h3&gt;&lt;p&gt;redis-cli连上redis服务后，可以在命令行发送命令。&lt;br&gt;&lt;strong&gt;1.ping，测试客户端与redis的连接是否正常，如果正常会收到回复PONG&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# ./redis-cli -h 172.16.206.30 -p 6400
+172.16.206.30:6400&amp;gt; ping
+PONG
+172.16.206.30:6400&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.set/get，使用set和get可以向redis设置数据、获取数据&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;172.16.206.30:6400&amp;gt; set name wisedu
+OK
+172.16.206.30:6400&amp;gt; get name
+&amp;quot;wisedu&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.del，删除指定key的内容&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;172.16.206.30:6400&amp;gt; del name
+(integer) 1
+172.16.206.30:6400&amp;gt; get name
+(nil)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;4.keys *，查看当前库中所有的key&lt;/strong&gt;&lt;/p&gt;
 </content>
     
     <summary type="html">
