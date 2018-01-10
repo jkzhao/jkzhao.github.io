@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-22T13:13:55.000Z</updated>
+  <updated>2018-01-10T01:36:37.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,89 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Redis安装部署</title>
+    <link href="http://yoursite.com/2018/01/10/Redis%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
+    <id>http://yoursite.com/2018/01/10/Redis安装部署/</id>
+    <published>2018-01-10T01:12:43.000Z</published>
+    <updated>2018-01-10T01:36:37.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;安装Redis&quot;&gt;&lt;a href=&quot;#安装Redis&quot; class=&quot;headerlink&quot; title=&quot;安装Redis&quot;&gt;&lt;/a&gt;安装Redis&lt;/h2&gt;&lt;p&gt;我这里安装的版本是 3.2.2&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 ~]# yum install readline-devel pcre-devel openssl-devel -y
+[root@log2 local]# tar zxf redis-3.2.2.tar.gz 
+[root@log2 local]# cd redis-3.2.2/
+[root@log2 redis-3.2.2]# make
+[root@log2 redis-3.2.2]# make install
+&lt;/code&gt;&lt;/pre&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
+&lt;h2 id=&quot;配置Redis&quot;&gt;&lt;a href=&quot;#配置Redis&quot; class=&quot;headerlink&quot; title=&quot;配置Redis&quot;&gt;&lt;/a&gt;配置Redis&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;[root@log2 redis-3.2.2]# cp redis.conf /etc/
+[root@log2 redis-3.2.2]# vim /etc/redis.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;1.配置redis后台启动&lt;/strong&gt;&lt;br&gt;打开/etc/redis.conf，将daemonize处修改为yes。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;################################# GENERAL #####################################
+
+# By default Redis does not run as a daemon. Use &amp;apos;yes&amp;apos; if you need it.
+# Note that Redis will write a pid file in /var/run/redis.pid when daemonized.
+daemonize yes
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.配置Redis持久化策略&lt;/strong&gt;&lt;br&gt;使用RDB和AOF双持久化策略：其中默认开启了RDB持久化，我们只需要开启AOF持久化。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# AOF and RDB persistence can be enabled at the same time without problems.
+# If the AOF is enabled on startup Redis will load the AOF, that is the file
+# with the better durability guarantees.
+#
+# Please check http://redis.io/topics/persistence for more information.
+
+appendonly yes
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.配置redis日志文件&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# Specify the log file name. Also the empty string can be used to force
+# Redis to log on the standard output. Note that if you use standard
+# output for logging but daemonize, logs will be sent to /dev/null
+logfile &amp;quot;/var/log/redis.log&amp;quot;   
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;4.配置数据文件存放路径，在/目录下面创建/RedisData目录&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 redis-3.2.2]# mkdir /RedisData
+
+ # The working directory.
+#
+# The DB will be written inside this directory, with the filename specified
+# above using the &amp;apos;dbfilename&amp;apos; configuration directive.
+#
+# The Append Only File will also be created inside this directory.
+#
+# Note that you must specify a directory here, not a file name.
+dir /RedisData
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;5.修改Redis监听地址&lt;/strong&gt;&lt;br&gt;注释掉 #bind 127.0.0.1&lt;br&gt;否则redis只会监听在127.0.0.1的某个端口上。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;6.修改Redis监听端口&lt;/strong&gt;&lt;br&gt;为了安全，强烈建议修改redis的监听端口。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# Accept connections on the specified port, default is 6379 (IANA #815344).
+# If port 0 is specified Redis will not listen on a TCP socket.
+port 6400
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;7.在redis3.2之后，redis增加了protected-mode，在这个模式下，即使注释掉了bind 127.0.0.1，再访问redis的时候还是报错，所以要如下设置：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# By default protected mode is enabled. You should disable it only if
+# you are sure you want clients from other hosts to connect to Redis
+# even if no authentication is configured, nor a specific set of interfaces
+# are explicitly listed using the &amp;quot;bind&amp;quot; directive.
+protected-mode no
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;启动-停止&quot;&gt;&lt;a href=&quot;#启动-停止&quot; class=&quot;headerlink&quot; title=&quot;启动/停止&quot;&gt;&lt;/a&gt;启动/停止&lt;/h2&gt;&lt;p&gt;1.启动&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 ~]# /usr/local/bin/redis-server /etc/redis.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.停止&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 ~]# /usr/local/redis-3.2.2/src/redis-cli -p 6400 shutdown
+&lt;/code&gt;&lt;/pre&gt;</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;安装Redis&quot;&gt;&lt;a href=&quot;#安装Redis&quot; class=&quot;headerlink&quot; title=&quot;安装Redis&quot;&gt;&lt;/a&gt;安装Redis&lt;/h2&gt;&lt;p&gt;我这里安装的版本是 3.2.2&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@log2 ~]# yum install readline-devel pcre-devel openssl-devel -y
+[root@log2 local]# tar zxf redis-3.2.2.tar.gz 
+[root@log2 local]# cd redis-3.2.2/
+[root@log2 redis-3.2.2]# make
+[root@log2 redis-3.2.2]# make install
+&lt;/code&gt;&lt;/pre&gt;
+    
+    </summary>
+    
+      <category term="NoSQL" scheme="http://yoursite.com/categories/NoSQL/"/>
+    
+    
+      <category term="Redis" scheme="http://yoursite.com/tags/Redis/"/>
+    
+  </entry>
   
   <entry>
     <title>Python操作InfluxDB</title>
@@ -4583,120 +4666,6 @@ docker.io/nginx                         latest              b8efb18f159b        
       &lt;h2 id=&quot;创建docker镜像的方法&quot;&gt;&lt;a href=&quot;#创建docker镜像的方法&quot; class=&quot;headerlink&quot; title=&quot;创建docker镜像的方法&quot;&gt;&lt;/a&gt;创建docker镜像的方法&lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;使用”docker commit”命令&lt;/li&gt;
 &lt;li&gt;使用”docker build”命令+”Dockerfile”文件&lt;br&gt;不推荐使用docker commit命令，而应该使用更灵活、更强大的dockerfile来构建docker镜像。&lt;br&gt;本篇文章先介绍docker commit来构建镜像。
-    
-    </summary>
-    
-      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
-    
-    
-      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Docker网络和存储</title>
-    <link href="http://yoursite.com/2017/08/18/Docker%E7%BD%91%E7%BB%9C%E5%92%8C%E5%AD%98%E5%82%A8/"/>
-    <id>http://yoursite.com/2017/08/18/Docker网络和存储/</id>
-    <published>2017-08-18T09:17:19.000Z</published>
-    <updated>2017-11-07T07:47:08.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;Docker网络访问&quot;&gt;&lt;a href=&quot;#Docker网络访问&quot; class=&quot;headerlink&quot; title=&quot;Docker网络访问&quot;&gt;&lt;/a&gt;Docker网络访问&lt;/h2&gt;&lt;h3 id=&quot;docker自带的网络&quot;&gt;&lt;a href=&quot;#docker自带的网络&quot; class=&quot;headerlink&quot; title=&quot;docker自带的网络&quot;&gt;&lt;/a&gt;docker自带的网络&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;docker network ls：列出当前docker中已有的网络&lt;/li&gt;
-&lt;li&gt;docker network inspect：查看网络详情，比如查看网络中有哪些容器&lt;/li&gt;
-&lt;li&gt;docker run –network=&lt;network&gt;：指定运行容器时使用哪个网络&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-&lt;/network&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;host网络&quot;&gt;&lt;a href=&quot;#host网络&quot; class=&quot;headerlink&quot; title=&quot;host网络&quot;&gt;&lt;/a&gt;host网络&lt;/h3&gt;&lt;p&gt;容器的网络接口跟主机一样。&lt;/p&gt;
-&lt;h3 id=&quot;none网络&quot;&gt;&lt;a href=&quot;#none网络&quot; class=&quot;headerlink&quot; title=&quot;none网络&quot;&gt;&lt;/a&gt;none网络&lt;/h3&gt;&lt;p&gt;除了lo接口外，容器没有任何其他网络接口。&lt;/p&gt;
-&lt;h3 id=&quot;bridge网络&quot;&gt;&lt;a href=&quot;#bridge网络&quot; class=&quot;headerlink&quot; title=&quot;bridge网络&quot;&gt;&lt;/a&gt;bridge网络&lt;/h3&gt;&lt;p&gt;这是新建容器时默认使用的网络，也是使用得最多的网络。网络中的所有容器可以通过IP互相访问。&lt;br&gt;bridge网络通过网络接口docker0跟主机桥接，可以在主机上通过ifconfig docker0查看到该网络接口的信息。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/11.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;端口映射&quot;&gt;&lt;a href=&quot;#端口映射&quot; class=&quot;headerlink&quot; title=&quot;端口映射&quot;&gt;&lt;/a&gt;端口映射&lt;/h2&gt;&lt;p&gt;docker使用端口映射来让容器里面某一个端口对外。一种是随机映射，一种是指定端口映射。&lt;/p&gt;
-&lt;h3 id=&quot;随机映射&quot;&gt;&lt;a href=&quot;#随机映射&quot; class=&quot;headerlink&quot; title=&quot;随机映射&quot;&gt;&lt;/a&gt;随机映射&lt;/h3&gt;&lt;p&gt;docker run -P&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;-P参数 随机映射端口。随机端口的好处是不会冲突。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;举个例子：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker pull nginx
-[root@node1 ~]# docker run -d -P nginx
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/14.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;可以访问Docker日志：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker logs 1822a2ea3ff3
-172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &amp;quot;GET / HTTP/1.1&amp;quot; 200 612 &amp;quot;-&amp;quot; &amp;quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&amp;quot; &amp;quot;-&amp;quot;
-2017/08/22 09:20:25 [error] 5#5: *1 open() &amp;quot;/usr/share/nginx/html/favicon.ico&amp;quot; failed (2: No such file or directory), client: 172.16.4.81, server: localhost, request: &amp;quot;GET /favicon.ico HTTP/1.1&amp;quot;, host: &amp;quot;172.16.7.151:32768&amp;quot;, referrer: &amp;quot;http://172.16.7.151:32768/&amp;quot;
-172.16.4.81 - - [22/Aug/2017:09:20:25 +0000] &amp;quot;GET /favicon.ico HTTP/1.1&amp;quot; 404 571 &amp;quot;http://172.16.7.151:32768/&amp;quot; &amp;quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36&amp;quot; &amp;quot;-&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;指定端口映射&quot;&gt;&lt;a href=&quot;#指定端口映射&quot; class=&quot;headerlink&quot; title=&quot;指定端口映射&quot;&gt;&lt;/a&gt;指定端口映射&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;docker run -p hostPort:containerPort
-docker run -p ip:hostPort:containerPort
-docker run -p ip::containerPort
-docker run -p hostPort:containerPort:udp
-    -p 指定端口映射，前面的是主机端口，后面的是容器端口。
-
-    [root@node1 ~]# docker run -d -p 81:80 nginx
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/15.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;数据管理&quot;&gt;&lt;a href=&quot;#数据管理&quot; class=&quot;headerlink&quot; title=&quot;数据管理&quot;&gt;&lt;/a&gt;数据管理&lt;/h2&gt;&lt;p&gt;两种方式：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;数据卷&lt;/li&gt;
-&lt;li&gt;数据卷容器&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;数据卷&quot;&gt;&lt;a href=&quot;#数据卷&quot; class=&quot;headerlink&quot; title=&quot;数据卷&quot;&gt;&lt;/a&gt;数据卷&lt;/h3&gt;&lt;p&gt;启动一个容器，把宿主机的某个目录挂载到容器目录上。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;-v /data&lt;/li&gt;
-&lt;li&gt;-v src:dst  指定一个目录挂载进容器。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;【示例1】:未指定宿主机目录挂载&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it --name volume-test1 -v /data centos    
-[root@5d485979254b /]# ls -l /data 
-total 0
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个容器里的/data 肯定在宿主机的某个位置。打开一个新的终端，查看这个位置：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker ps
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                   NAMES
-5d485979254b        centos              &amp;quot;/bin/bash&amp;quot;              2 minutes ago       Up 2 minutes                                volume-test1                                 test
-[root@node1 ~]# docker inspect 5d485979254b
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/16.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;在宿主机上的目录中创建文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# cd /var/lib/docker/volumes/7f37e83849f079275545b7d1f3381903795e946d113e1c43ff24fc1a7717e00f/_data
-[root@node1 _data]# ls -l
-total 0
-[root@node1 _data]# touch test.txt
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;回到容器中，查看/data目录下是否有刚才创建的文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@5d485979254b /]# ls -l /data 
--rw-r--r--. 1 root root 0 Aug 23 02:07 test.txt
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;【示例2】:指定宿主机目录挂载&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it -v /opt:/opt centos
-[root@850031902bb7 /]# ls /opt/
-ansible_playbooks  rh
-[root@850031902bb7 /]# exit
-exit
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;宿主机的/opt:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ls /opt
-ansible_playbooks  rh
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;挂载的时候可以指定权限：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it -v /opt:/opt:rw centos
-rw: 读写
-ro: 只读
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;挂载单个文件到容器：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it -v ~/.bash_history:/.bash_history centos
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;数据卷容器&quot;&gt;&lt;a href=&quot;#数据卷容器&quot; class=&quot;headerlink&quot; title=&quot;数据卷容器&quot;&gt;&lt;/a&gt;数据卷容器&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;--volumes-from  让一个容器访问另外一个容器的卷
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;【示例3】:创建一个容器作为数据卷，启动其他容器访问这个容器的卷。&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it --name nfs -v /data centos /bin/bash 
-[root@72bb5caa54db /]#
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Ctrl+P Ctrl +Q退出交互式容器的bash，这样容器就会在后台运行。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker ps
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                NAMES
-72bb5caa54db        centos              &amp;quot;/bin/bash&amp;quot;              37 seconds ago      Up 36 seconds                            nfs
-[root@node1 ~]# docker inspect 72bb5caa54db
-[root@node1 ~]# cd /var/lib/docker/volumes/8f1e1da837d5d86f79ac14e5d57c0e47243e3c68d5ca822d4f7a498386c07a59/_data
-[root@node1 _data]# touch test2.txt
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动其他容器，访问这个容器的卷：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 _data]# docker run -it --name test1 --volumes-from nfs centos
-[root@9097c1af8e86 /]# ls /data/
-test2.txt
-[root@9097c1af8e86 /]# 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个数据卷容器可以用来作收容器间数据共享，哪怕这个数据卷容器nfs停了，依然可以通过其在宿主机上真实的目录访问里面的数据。这个数据卷容器创建后可以什么都不干，直接关闭，其他容器挂载过来。&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Docker网络访问&quot;&gt;&lt;a href=&quot;#Docker网络访问&quot; class=&quot;headerlink&quot; title=&quot;Docker网络访问&quot;&gt;&lt;/a&gt;Docker网络访问&lt;/h2&gt;&lt;h3 id=&quot;docker自带的网络&quot;&gt;&lt;a href=&quot;#docker自带的网络&quot; class=&quot;headerlink&quot; title=&quot;docker自带的网络&quot;&gt;&lt;/a&gt;docker自带的网络&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;docker network ls：列出当前docker中已有的网络&lt;/li&gt;
-&lt;li&gt;docker network inspect：查看网络详情，比如查看网络中有哪些容器&lt;/li&gt;
-&lt;li&gt;docker run –network=&lt;network&gt;：指定运行容器时使用哪个网络
     
     </summary>
     
