@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Ansible," />
+  <meta name="keywords" content="Nginx," />
 
 
 
@@ -104,20 +104,18 @@
 
 
 
-<meta name="description" content="tags介绍我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个t">
-<meta name="keywords" content="Ansible">
+<meta name="description" content="最近将公司前端组件的Nginx配置了http 2.0，特此在此记录一下。突然发现博客里竟然没有什么关于Nginx的文章，毕竟是一直在使用的，后面会写几篇关于自己这几年使用Nginx的一些总结。">
+<meta name="keywords" content="Nginx">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Ansible之tags介绍">
-<meta property="og:url" content="http://yoursite.com/2017/07/22/Ansible之tags介绍/index.html">
+<meta property="og:title" content="Nginx配置HTTP&#x2F;2.0">
+<meta property="og:url" content="http://yoursite.com/2018/01/16/Nginx配置HTTP-2-0/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="tags介绍我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个t">
+<meta property="og:description" content="最近将公司前端组件的Nginx配置了http 2.0，特此在此记录一下。突然发现博客里竟然没有什么关于Nginx的文章，毕竟是一直在使用的，后面会写几篇关于自己这几年使用Nginx的一些总结。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/43.png">
-<meta property="og:updated_time" content="2017-11-07T07:45:15.000Z">
+<meta property="og:updated_time" content="2018-01-16T10:49:01.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Ansible之tags介绍">
-<meta name="twitter:description" content="tags介绍我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个t">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/43.png">
+<meta name="twitter:title" content="Nginx配置HTTP&#x2F;2.0">
+<meta name="twitter:description" content="最近将公司前端组件的Nginx配置了http 2.0，特此在此记录一下。突然发现博客里竟然没有什么关于Nginx的文章，毕竟是一直在使用的，后面会写几篇关于自己这几年使用Nginx的一些总结。">
 
 
 
@@ -135,7 +133,7 @@
   };
 </script>
 
-  <title> Ansible之tags介绍 | jkzhao's blog </title>
+  <title> Nginx配置HTTP/2.0 | jkzhao's blog </title>
 </head>
 <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 
@@ -328,7 +326,7 @@
             
             
               
-                Ansible之tags介绍
+                Nginx配置HTTP/2.0
               
             
           </h1>
@@ -340,14 +338,14 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-22T20:37:16+08:00" content="2017-07-22">
-              2017-07-22
+            <time itemprop="dateCreated" datetime="2018-01-16T13:53:17+08:00" content="2018-01-16">
+              2018-01-16
             </time>
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-07T15:45:15+08:00" content="2017-11-07">
-              2017-11-07
+              <time itemprop="dateUpdated" datetime="2018-01-16T18:49:01+08:00" content="2018-01-16">
+              2018-01-16
               </time>
               </span>
             
@@ -362,8 +360,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
+                  <a href="/categories/Nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">Nginx</span>
                   </a>
                 </span>
 
@@ -382,7 +380,7 @@
 
           
           
-             <span id="/2017/07/22/Ansible之tags介绍/" class="leancloud_visitors" data-flag-title="Ansible之tags介绍">
+             <span id="/2018/01/16/Nginx配置HTTP-2-0/" class="leancloud_visitors" data-flag-title="Nginx配置HTTP/2.0">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -406,30 +404,70 @@
       
 
       
-        <h2 id="tags介绍"><a href="#tags介绍" class="headerlink" title="tags介绍"></a>tags介绍</h2><p>我们每次改完配置文件，比如上一篇博客中的的apache.yml，没必要把整个playbook都运行一遍，只需要运行改变了的task。我们可以给task一个标签，运行playbook时明确只运行这个标签对应的task就可以了。多个任务可以使用同一个tags。<br>如果在某次运行中，我们多次运行同一个playbook，第一次运行时我们期望所有的tasks都运行，第二次运行时我们期望只运行某一个task，你可以给这个task定义一个tags，例如：<br><a id="more"></a></p>
-<pre><code>[root@node1 ~]# vim apache.yml 
-- hosts: nginx
-  remote_user: root
-  vars:
-  - package: apache
-  tasks:
-  - name: install httpd package
-    yum: name={{ package }} state=latest
-  - name: install configuration file for httpd
-    template: src=/root/conf/httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf
-    tags:
-    - conf                                                                    
-    notify:
-    - restart httpd
-  - name: start httpd service 
-    service: enabled=true name=httpd state=started
-  handlers:
-  - name: restart httpd
-    service: name=httpd state=restarted
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/43.png" alt=""><br>运行：</p>
-<pre><code>[root@node1 ~]# ansible-playbook apache.yml --tags=&quot;conf&quot;
-</code></pre><p>如果一个playbook中有多个tags，但是有个tag你不想跑，可以使用–skip-tags。</p>
+        <blockquote>
+<p>最近将公司前端组件的Nginx配置了http 2.0，特此在此记录一下。突然发现博客里竟然没有什么关于Nginx的文章，毕竟是一直在使用的，后面会写几篇关于自己这几年使用Nginx的一些总结。<br><a id="more"></a></p>
+</blockquote>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>从 2015 年 5 月 14 日 HTTP/2 协议正式版的发布到现在已经快有一年了，越来越多的网站部署了 HTTP2，HTTP2 的广泛应用带来了更好的浏览体验，只要是 Modern 浏览器都支持，所以部署 HTTP2 并不会带来太多困扰。<br>虽然 h2 有 h2c （HTTP/2 Cleartext） 可以通过非加密通道传输，但是支持的浏览器初期还是比较少的，所以目前部署 h2 还是需要走加密的，不过由于 Let’s Encrypt 大力推行免费证书和证书的廉价化，部署 h2 的成本并不高。</p>
+<h2 id="HTTP-2-0介绍"><a href="#HTTP-2-0介绍" class="headerlink" title="HTTP 2.0介绍"></a>HTTP 2.0介绍</h2><p>HTTP 2.0即超文本传输协议 2.0，是下一代HTTP协议。是由互联网工程任务组（IETF）的Hypertext Transfer Protocol Bis (httpbis)工作小组进行开发。是自1999年http1.1发布后的首个更新。<br>HTTP/2 协议是从 SPDY 演变而来，SPDY 已经完成了使命并很快就会退出历史舞台（例如 Chrome 将在「2016 年初结束对 SPDY 的支持」；Nginx、Apache 也已经全面支持 HTTP/2 ，并也不再支持 SPDY）。<br>一般的大家把 HTTP2 简称为 h2，尽管有些朋友可能不怎么愿意，但是这个简称已经默认化了，特别是体现在浏览器对 HTTP2 都是这个简写的。<br>普通的 HTTPS 网站浏览会比 HTTP 网站稍微慢一些，因为需要处理加密任务，而配置了 h2 的 HTTPS，在低延时的情况下速度会比 HTTP 更快更稳定。<br>现在电信劫持事件频发，网站部署了 HTTPS 加密后可以杜绝大部分劫持，但不是完全。像电子商务行业对 HTTPS 加密可是标配啊，因此部署 h2 更是势在必行。</p>
+<h2 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h2><table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>操作系统版本</th>
+<th>IP地址</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>res</td>
+<td>CentOS 7.0</td>
+<td>172.16.7.180</td>
+<td>Res静态资源服务器</td>
+</tr>
+</tbody>
+</table>
+<p>我这里使用的Nginx是openresty-1.11.2.5。</p>
+<h2 id="安装Nginx"><a href="#安装Nginx" class="headerlink" title="安装Nginx"></a>安装Nginx</h2><p><strong>1.安装依赖包</strong></p>
+<pre><code># yum install readline-devel pcre-devel openssl-devel gcc -y
+</code></pre><p>首先确认当前openssl版本，最低要求1.0.2，如果不满足，还得手动下载openssl，然后在编译时使用–with-openssl指定openssl目录。我这里是满足条件的：</p>
+<pre><code># openssl version
+OpenSSL 1.0.2k-fips  26 Jan 2017
+</code></pre><p><strong>2.安装Openresty</strong></p>
+<pre><code>[root@res local]# cd /usr/local/
+[root@res local]# wget https://openresty.org/download/openresty-1.11.2.5.tar.gz
+[root@res local]# tar zxf openresty-1.11.2.5.tar.gz 
+[root@res local]# cd openresty-1.11.2.5/
+</code></pre><p>一些较低的版本里是不支持HTTP 2.0的，我这里使用的Openresty-1.11.2.5是支持的。另外，对于官方的Nginx，默认编译的 Nginx 并不包含 h2 模块，我们需要加入参数来编译，截止发文，Nginx 1.9 开发版及以上版本源码需要自己加入编译参数，从软件源仓库下载的则默认编译。 Tengine 可以同时部署 h2 和 SPDY 保证兼容性，Nginx 则是一刀切不再支持 SPDY。</p>
+<pre><code>#查看可供编译的参数是否有--with-http_v2_module
+[root@res openresty-1.11.2.5]# ./configure --help
+[root@res openresty-1.11.2.5]#./configure --with-http_v2_module
+[root@res openresty-1.11.2.5]#  gmake &amp;&amp; gmake install
+</code></pre><h2 id="配置Nginx"><a href="#配置Nginx" class="headerlink" title="配置Nginx"></a>配置Nginx</h2><pre><code>[root@res conf]# pwd
+/usr/local/nginx/nginx/conf
+[root@res conf]# cp nginx.conf nginx.conf.bak
+[root@res conf]# vim nginx.conf
+server {
+    listen       80;
+    server_name  res.wisedu.com;
 
+    rewrite ^(.*)$  https://$host$1 permanent; #http强制转https
+
+}
+
+server {
+    listen       443 ssl http2;
+    server_name  res.wisedu.com;
+
+    ssl on;
+    #证书和私钥
+    ssl_certificate /opt/ssl/214199023800937.pem;
+    ssl_certificate_key /opt/ssl/214199023800937.key;
+    ...
+</code></pre><p>关于ssl使用的证书，由于是公司对外的服务环境，证书是购买的。当然做实验时也可以建立私有CA，模拟颁发证书。</p>
+<p>启动Nginx：</p>
+<pre><code># systemctl start nginx.service
+</code></pre>
       
     </div>
 
@@ -450,7 +488,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Ansible/" rel="tag"><i class="fa fa-tag"></i>Ansible</a>
+            <a href="/tags/Nginx/" rel="tag"><i class="fa fa-tag"></i>Nginx</a>
           
         </div>
       
@@ -459,17 +497,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/07/20/Ansible之迭代、模板/" rel="next" title="Ansible之迭代、模板">
-                <i class="fa fa-chevron-left"></i> Ansible之迭代、模板
+              <a href="/2018/01/10/Redis安装部署/" rel="next" title="Redis安装部署">
+                <i class="fa fa-chevron-left"></i> Redis安装部署
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/07/24/Ansible之roles介绍/" rel="prev" title="Ansible之roles介绍">
-                Ansible之roles介绍 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -626,7 +660,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#tags介绍"><span class="nav-number">1.</span> <span class="nav-text">tags介绍</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-2-0介绍"><span class="nav-number">2.</span> <span class="nav-text">HTTP 2.0介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境信息"><span class="nav-number">3.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Nginx"><span class="nav-number">4.</span> <span class="nav-text">安装Nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Nginx"><span class="nav-number">5.</span> <span class="nav-text">配置Nginx</span></a></li></ol></div>
             
           </div>
         </section>

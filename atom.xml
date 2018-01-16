@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-01-10T03:45:22.000Z</updated>
+  <updated>2018-01-16T10:49:01.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,92 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Nginx配置HTTP/2.0</title>
+    <link href="http://yoursite.com/2018/01/16/Nginx%E9%85%8D%E7%BD%AEHTTP-2-0/"/>
+    <id>http://yoursite.com/2018/01/16/Nginx配置HTTP-2-0/</id>
+    <published>2018-01-16T05:53:17.000Z</published>
+    <updated>2018-01-16T10:49:01.000Z</updated>
+    
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;最近将公司前端组件的Nginx配置了http 2.0，特此在此记录一下。突然发现博客里竟然没有什么关于Nginx的文章，毕竟是一直在使用的，后面会写几篇关于自己这几年使用Nginx的一些总结。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;从 2015 年 5 月 14 日 HTTP/2 协议正式版的发布到现在已经快有一年了，越来越多的网站部署了 HTTP2，HTTP2 的广泛应用带来了更好的浏览体验，只要是 Modern 浏览器都支持，所以部署 HTTP2 并不会带来太多困扰。&lt;br&gt;虽然 h2 有 h2c （HTTP/2 Cleartext） 可以通过非加密通道传输，但是支持的浏览器初期还是比较少的，所以目前部署 h2 还是需要走加密的，不过由于 Let’s Encrypt 大力推行免费证书和证书的廉价化，部署 h2 的成本并不高。&lt;/p&gt;
+&lt;h2 id=&quot;HTTP-2-0介绍&quot;&gt;&lt;a href=&quot;#HTTP-2-0介绍&quot; class=&quot;headerlink&quot; title=&quot;HTTP 2.0介绍&quot;&gt;&lt;/a&gt;HTTP 2.0介绍&lt;/h2&gt;&lt;p&gt;HTTP 2.0即超文本传输协议 2.0，是下一代HTTP协议。是由互联网工程任务组（IETF）的Hypertext Transfer Protocol Bis (httpbis)工作小组进行开发。是自1999年http1.1发布后的首个更新。&lt;br&gt;HTTP/2 协议是从 SPDY 演变而来，SPDY 已经完成了使命并很快就会退出历史舞台（例如 Chrome 将在「2016 年初结束对 SPDY 的支持」；Nginx、Apache 也已经全面支持 HTTP/2 ，并也不再支持 SPDY）。&lt;br&gt;一般的大家把 HTTP2 简称为 h2，尽管有些朋友可能不怎么愿意，但是这个简称已经默认化了，特别是体现在浏览器对 HTTP2 都是这个简写的。&lt;br&gt;普通的 HTTPS 网站浏览会比 HTTP 网站稍微慢一些，因为需要处理加密任务，而配置了 h2 的 HTTPS，在低延时的情况下速度会比 HTTP 更快更稳定。&lt;br&gt;现在电信劫持事件频发，网站部署了 HTTPS 加密后可以杜绝大部分劫持，但不是完全。像电子商务行业对 HTTPS 加密可是标配啊，因此部署 h2 更是势在必行。&lt;/p&gt;
+&lt;h2 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h2&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;操作系统版本&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;作用&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;res&lt;/td&gt;
+&lt;td&gt;CentOS 7.0&lt;/td&gt;
+&lt;td&gt;172.16.7.180&lt;/td&gt;
+&lt;td&gt;Res静态资源服务器&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;我这里使用的Nginx是openresty-1.11.2.5。&lt;/p&gt;
+&lt;h2 id=&quot;安装Nginx&quot;&gt;&lt;a href=&quot;#安装Nginx&quot; class=&quot;headerlink&quot; title=&quot;安装Nginx&quot;&gt;&lt;/a&gt;安装Nginx&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.安装依赖包&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# yum install readline-devel pcre-devel openssl-devel gcc -y
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;首先确认当前openssl版本，最低要求1.0.2，如果不满足，还得手动下载openssl，然后在编译时使用–with-openssl指定openssl目录。我这里是满足条件的：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# openssl version
+OpenSSL 1.0.2k-fips  26 Jan 2017
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.安装Openresty&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@res local]# cd /usr/local/
+[root@res local]# wget https://openresty.org/download/openresty-1.11.2.5.tar.gz
+[root@res local]# tar zxf openresty-1.11.2.5.tar.gz 
+[root@res local]# cd openresty-1.11.2.5/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;一些较低的版本里是不支持HTTP 2.0的，我这里使用的Openresty-1.11.2.5是支持的。另外，对于官方的Nginx，默认编译的 Nginx 并不包含 h2 模块，我们需要加入参数来编译，截止发文，Nginx 1.9 开发版及以上版本源码需要自己加入编译参数，从软件源仓库下载的则默认编译。 Tengine 可以同时部署 h2 和 SPDY 保证兼容性，Nginx 则是一刀切不再支持 SPDY。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#查看可供编译的参数是否有--with-http_v2_module
+[root@res openresty-1.11.2.5]# ./configure --help
+[root@res openresty-1.11.2.5]#./configure --with-http_v2_module
+[root@res openresty-1.11.2.5]#  gmake &amp;amp;&amp;amp; gmake install
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;配置Nginx&quot;&gt;&lt;a href=&quot;#配置Nginx&quot; class=&quot;headerlink&quot; title=&quot;配置Nginx&quot;&gt;&lt;/a&gt;配置Nginx&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;[root@res conf]# pwd
+/usr/local/nginx/nginx/conf
+[root@res conf]# cp nginx.conf nginx.conf.bak
+[root@res conf]# vim nginx.conf
+server {
+    listen       80;
+    server_name  res.wisedu.com;
+
+    rewrite ^(.*)$  https://$host$1 permanent; #http强制转https
+
+}
+
+server {
+    listen       443 ssl http2;
+    server_name  res.wisedu.com;
+
+    ssl on;
+    #证书和私钥
+    ssl_certificate /opt/ssl/214199023800937.pem;
+    ssl_certificate_key /opt/ssl/214199023800937.key;
+    ...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;关于ssl使用的证书，由于是公司对外的服务环境，证书是购买的。当然做实验时也可以建立私有CA，模拟颁发证书。&lt;/p&gt;
+&lt;p&gt;启动Nginx：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# systemctl start nginx.service
+&lt;/code&gt;&lt;/pre&gt;</content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;最近将公司前端组件的Nginx配置了http 2.0，特此在此记录一下。突然发现博客里竟然没有什么关于Nginx的文章，毕竟是一直在使用的，后面会写几篇关于自己这几年使用Nginx的一些总结。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Nginx" scheme="http://yoursite.com/categories/Nginx/"/>
+    
+    
+      <category term="Nginx" scheme="http://yoursite.com/tags/Nginx/"/>
+    
+  </entry>
   
   <entry>
     <title>Redis安装部署</title>
@@ -4633,62 +4719,6 @@ CMD [ &amp;quot;irb&amp;quot; ]
     <summary type="html">
     
       &lt;h2 id=&quot;Dockerfile介绍&quot;&gt;&lt;a href=&quot;#Dockerfile介绍&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile介绍&quot;&gt;&lt;/a&gt;Dockerfile介绍&lt;/h2&gt;&lt;p&gt;dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。&lt;br&gt;若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：&lt;br&gt;
-    
-    </summary>
-    
-      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
-    
-    
-      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>手动构建镜像</title>
-    <link href="http://yoursite.com/2017/08/23/%E6%89%8B%E5%8A%A8%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/"/>
-    <id>http://yoursite.com/2017/08/23/手动构建镜像/</id>
-    <published>2017-08-23T03:15:08.000Z</published>
-    <updated>2017-11-07T07:46:11.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;创建docker镜像的方法&quot;&gt;&lt;a href=&quot;#创建docker镜像的方法&quot; class=&quot;headerlink&quot; title=&quot;创建docker镜像的方法&quot;&gt;&lt;/a&gt;创建docker镜像的方法&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;使用”docker commit”命令&lt;/li&gt;
-&lt;li&gt;使用”docker build”命令+”Dockerfile”文件&lt;br&gt;不推荐使用docker commit命令，而应该使用更灵活、更强大的dockerfile来构建docker镜像。&lt;br&gt;本篇文章先介绍docker commit来构建镜像。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;手动构建镜像&quot;&gt;&lt;a href=&quot;#手动构建镜像&quot; class=&quot;headerlink&quot; title=&quot;手动构建镜像&quot;&gt;&lt;/a&gt;手动构建镜像&lt;/h2&gt;&lt;p&gt;一般来说，我们并不是真正从0开始构建镜像，而是基于一个已经存在的镜像，比如centos，然后进行一些安装和配置，构建自己新的镜像。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;【示例】:手动构建Nginx镜像。&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker pull centos
-[root@node1 ~]# docker run -it --name mynginx centos 
-[root@eadfe0c0903d /]# rpm -ivh http://mirrors.aliyun.com/epel/epel-release-latest-7.noarch.rpm
-[root@eadfe0c0903d /]# yum install nginx -y
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;安装完成后，我们需要将nginx程序设置为前台运行模式，这样容器启动后nginx进程会一直在前台运行而不会退出。因为如果启动容器时的进程退出，容器也就结束了。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@eadfe0c0903d /]# vi /etc/nginx/nginx.conf
-daemon off;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/17.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@eadfe0c0903d /]# exit
-exit
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;基于上面的容器制作一个镜像：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker ps -a
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                     PORTS                NAMES
-eadfe0c0903d        centos              &amp;quot;/bin/bash&amp;quot;              12 minutes ago      Exited (0) 2 minutes ago                        mynginx
-[root@node1 ~]# docker commit -m &amp;quot;nginx test mirror&amp;quot; eadfe0c0903d jkzhao/mynginx:v1
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/18.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;基于这个镜像启动容器：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker images
-REPOSITORY                              TAG                 IMAGE ID            CREATED             SIZE
-jkzhao/mynginx                          v1                  bdf7d4fda6fb        4 minutes ago       381.6 MB
-docker.io/centos                        latest              328edcd84f1b        2 weeks ago         192.5 MB
-registry.docker-cn.com/library/centos   latest              328edcd84f1b        2 weeks ago         192.5 MB
-docker.io/nginx                         latest              b8efb18f159b        3 weeks ago         107.5 MB
-[root@node1 ~]# docker run -d -p 82:80 jkzhao/mynginx:v1 nginx
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】:&lt;br&gt;1.必须加tag v1，否则会去仓库中找latest标签的镜像；&lt;br&gt;2.最后 nginx 是命令，容器启动时运行的命令，我这里是yum安装，不是yum安装的要写绝对路径。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/19.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;创建docker镜像的方法&quot;&gt;&lt;a href=&quot;#创建docker镜像的方法&quot; class=&quot;headerlink&quot; title=&quot;创建docker镜像的方法&quot;&gt;&lt;/a&gt;创建docker镜像的方法&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;使用”docker commit”命令&lt;/li&gt;
-&lt;li&gt;使用”docker build”命令+”Dockerfile”文件&lt;br&gt;不推荐使用docker commit命令，而应该使用更灵活、更强大的dockerfile来构建docker镜像。&lt;br&gt;本篇文章先介绍docker commit来构建镜像。
     
     </summary>
     
