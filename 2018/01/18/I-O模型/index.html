@@ -119,7 +119,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/5.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/6.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/7.png">
-<meta property="og:updated_time" content="2018-01-19T01:38:08.000Z">
+<meta property="og:updated_time" content="2018-01-19T01:47:50.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="I&#x2F;O模型">
 <meta name="twitter:description" content="I/O类型从不同的角度来划分，有两种不同的方式：同步I/O和异步I/O    ——synchronous, asynchronous同步和异步关注的是消息通知机制。说白了就是如何通知调用者的。I/O就是一方能够提供服务，一方需要调用别人的服务，">
@@ -352,7 +352,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-01-19T09:38:08+08:00" content="2018-01-19">
+              <time itemprop="dateUpdated" datetime="2018-01-19T09:47:50+08:00" content="2018-01-19">
               2018-01-19
               </time>
               </span>
@@ -433,7 +433,7 @@
 <ul>
 <li>prefork工作模型<br>有一个主进程，主进程生成多个子进程，每个子进程处理一个请求。主进程是以管理员的身份启动的，所以它能够监听在80端口上。端口&lt;1024的被称为特权端口，只有管理员才有权限使用的。</li>
 <li>worker工作模型<br>有一个主进程，主进程生成多个子进程，每个子进程在生成多个线程，每个线程响应一个请求。</li>
-<li>event工作模型<br>有一个主进程，生成多个子进程，每个子进程响应多个请求。当然你也可以理解有一个主进程，生成多个子线程，对Linux而言，子进程和线程并没有严格意义上的区分。而event模型中最著名的、最典型的特性是事件驱动机制。什么叫事件驱动机制呢？下面就来讲讲I/O模型。</li>
+<li>event工作模型<br>有一个主进程，生成多个子进程，每个子进程响应多个请求。当然你也可以理解有一个主进程，生成多个子线程，对Linux而言，子进程和线程并没有严格意义上的区分。而event模型中最著名的、最典型的特性是事件驱动机制。</li>
 </ul>
 
       

@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-01-19T01:38:08.000Z</updated>
+  <updated>2018-01-19T01:47:50.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2018/01/18/I-O%E6%A8%A1%E5%9E%8B/"/>
     <id>http://yoursite.com/2018/01/18/I-O模型/</id>
     <published>2018-01-18T09:08:21.000Z</published>
-    <updated>2018-01-19T01:38:08.000Z</updated>
+    <updated>2018-01-19T01:47:50.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;I-O类型&quot;&gt;&lt;a href=&quot;#I-O类型&quot; class=&quot;headerlink&quot; title=&quot;I/O类型&quot;&gt;&lt;/a&gt;I/O类型&lt;/h2&gt;&lt;p&gt;从不同的角度来划分，有两种不同的方式：&lt;br&gt;&lt;strong&gt;同步I/O和异步I/O&lt;/strong&gt;    ——synchronous, asynchronous&lt;br&gt;同步和异步关注的是消息通知机制。说白了就是如何通知调用者的。I/O就是一方能够提供服务，一方需要调用别人的服务，&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;所以I/O请求就是调用方向被调用方请求运行一个应用，通常是一个函数，可以理解成是一个库调用、函数调用或者系统调用。假如是一次系统调用，调用方向被调用方发起一次系统调用请求，被调用方本地要把这个系统调用运行完成，所以要在本地处理处理，把处理的结果响应给调用方。问题是调用方什么时候知道自己的请求结束了呢？自己的请求对方响应了呢？所以这就是同步和异步两种模式。&lt;br&gt;所谓同步是调用发出之后不会立即返回，但一旦返回，则返回是最终结果；(被调用者一直在处理处理，处理到最后返回结果给调用者)&lt;br&gt;所谓异步是调用发出之后，被调用方返回消息，但返回的并非最终结果；被调用者通过状态、通知机制(比如打电话通知你)等来通知调用者，或通过回调函数来处理结果。 (当调用者发出请求以后，被调用者立即就告诉调用者了，比如：请求已收到，等着叫号吧。)&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;阻塞I/O和非阻塞I/O&lt;/strong&gt;    ——block, nonblock&lt;br&gt;阻塞和非阻塞关注的是调用者等待被调用返回结果时的状态。&lt;br&gt;阻塞是指调用结果返回之前，调用者(一般是进程或者线程)会被挂起；调用者只有在得到返回结果之后才能继续；&lt;br&gt;非阻塞是指调用者在结果返回之前，不会被挂起，即调用不会阻塞调用者。&lt;/p&gt;
@@ -43,7 +43,7 @@
 &lt;ul&gt;
 &lt;li&gt;prefork工作模型&lt;br&gt;有一个主进程，主进程生成多个子进程，每个子进程处理一个请求。主进程是以管理员的身份启动的，所以它能够监听在80端口上。端口&amp;lt;1024的被称为特权端口，只有管理员才有权限使用的。&lt;/li&gt;
 &lt;li&gt;worker工作模型&lt;br&gt;有一个主进程，主进程生成多个子进程，每个子进程在生成多个线程，每个线程响应一个请求。&lt;/li&gt;
-&lt;li&gt;event工作模型&lt;br&gt;有一个主进程，生成多个子进程，每个子进程响应多个请求。当然你也可以理解有一个主进程，生成多个子线程，对Linux而言，子进程和线程并没有严格意义上的区分。而event模型中最著名的、最典型的特性是事件驱动机制。什么叫事件驱动机制呢？下面就来讲讲I/O模型。&lt;/li&gt;
+&lt;li&gt;event工作模型&lt;br&gt;有一个主进程，生成多个子进程，每个子进程响应多个请求。当然你也可以理解有一个主进程，生成多个子线程，对Linux而言，子进程和线程并没有严格意义上的区分。而event模型中最著名的、最典型的特性是事件驱动机制。&lt;/li&gt;
 &lt;/ul&gt;
 </content>
     
