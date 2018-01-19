@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-01-16T10:49:01.000Z</updated>
+  <updated>2018-01-19T01:38:08.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,51 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>I/O模型</title>
+    <link href="http://yoursite.com/2018/01/18/I-O%E6%A8%A1%E5%9E%8B/"/>
+    <id>http://yoursite.com/2018/01/18/I-O模型/</id>
+    <published>2018-01-18T09:08:21.000Z</published>
+    <updated>2018-01-19T01:38:08.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;I-O类型&quot;&gt;&lt;a href=&quot;#I-O类型&quot; class=&quot;headerlink&quot; title=&quot;I/O类型&quot;&gt;&lt;/a&gt;I/O类型&lt;/h2&gt;&lt;p&gt;从不同的角度来划分，有两种不同的方式：&lt;br&gt;&lt;strong&gt;同步I/O和异步I/O&lt;/strong&gt;    ——synchronous, asynchronous&lt;br&gt;同步和异步关注的是消息通知机制。说白了就是如何通知调用者的。I/O就是一方能够提供服务，一方需要调用别人的服务，&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;所以I/O请求就是调用方向被调用方请求运行一个应用，通常是一个函数，可以理解成是一个库调用、函数调用或者系统调用。假如是一次系统调用，调用方向被调用方发起一次系统调用请求，被调用方本地要把这个系统调用运行完成，所以要在本地处理处理，把处理的结果响应给调用方。问题是调用方什么时候知道自己的请求结束了呢？自己的请求对方响应了呢？所以这就是同步和异步两种模式。&lt;br&gt;所谓同步是调用发出之后不会立即返回，但一旦返回，则返回是最终结果；(被调用者一直在处理处理，处理到最后返回结果给调用者)&lt;br&gt;所谓异步是调用发出之后，被调用方返回消息，但返回的并非最终结果；被调用者通过状态、通知机制(比如打电话通知你)等来通知调用者，或通过回调函数来处理结果。 (当调用者发出请求以后，被调用者立即就告诉调用者了，比如：请求已收到，等着叫号吧。)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;阻塞I/O和非阻塞I/O&lt;/strong&gt;    ——block, nonblock&lt;br&gt;阻塞和非阻塞关注的是调用者等待被调用返回结果时的状态。&lt;br&gt;阻塞是指调用结果返回之前，调用者(一般是进程或者线程)会被挂起；调用者只有在得到返回结果之后才能继续；&lt;br&gt;非阻塞是指调用者在结果返回之前，不会被挂起，即调用不会阻塞调用者。&lt;/p&gt;
+&lt;p&gt;【例子】：你去一个饭馆吃饭去了，点了一碗面，师傅在现做。然后你就在那等着，这期间不能做其他的事情，这就是阻塞。还有一种方案是在等面的时候该干嘛干嘛去，比如出去玩了会游戏等，估摸着面差不多的时候回到饭馆，吃面。这就是非阻塞。&lt;/p&gt;
+&lt;h2 id=&quot;I-O模型&quot;&gt;&lt;a href=&quot;#I-O模型&quot; class=&quot;headerlink&quot; title=&quot;I/O模型&quot;&gt;&lt;/a&gt;I/O模型&lt;/h2&gt;&lt;p&gt;同步、异步和阻塞、非阻塞看起来很像，但是关注的点不同，一个关注着调用者如何等待结果，一个关注着被调用者如何通知调用者调用完成的。所以压根不是一回事。站在这个角度来划分的话，I/O可以分成5种模型：&lt;br&gt;  ● 阻塞式I/O(blocking I/O)&lt;br&gt;  ● 非阻塞式I/O(nonblocking I/O)&lt;br&gt;  ● 复用式I/O(I/O multiplexing)&lt;br&gt;  ● 事件驱动式I/O(signal driven I/O)&lt;br&gt;  ● 异步I/O(asynchronous I/O)&lt;/p&gt;
+&lt;p&gt;下面以磁盘I/O来解释，这些概念非常关键。例如，用户程序发起一个I/O调用，如从磁盘上做一次read操作(用户空间的进程是没有权限直接访问文件的，进程向用户内核发起I/O调用，请求说我要读取某数据)：&lt;br&gt;(1)内核从磁盘将数据加载到内核内存空间；&lt;br&gt;(2)将内核内存中的数据copy一份到进程内存空间。&lt;br&gt;以上两步中真正被称为I/O的那一步其实只是第(2)步，第(1)步只是内核处理数据的过程。&lt;/p&gt;
+&lt;h3 id=&quot;阻塞式I-O-blocking-I-O&quot;&gt;&lt;a href=&quot;#阻塞式I-O-blocking-I-O&quot; class=&quot;headerlink&quot; title=&quot;阻塞式I/O(blocking I/O)&quot;&gt;&lt;/a&gt;阻塞式I/O(blocking I/O)&lt;/h3&gt;&lt;p&gt;下图中，左侧竖线代表调用者，右侧竖线代表被调用者。整个I/O调用在右侧内核来看，分为两步。如上。所谓阻塞式I/O指的是调用方发起调用后将会被挂起，这个进程或线程将转为不可中断式睡眠状态。调用者在得到返回结果之前，什么事都不能做，一直处于等待过程当中。想象一下，假如是个web服务器，第一个用户请求来了，由一个进程响应用户请求，这个进程向内核发起I/O调用请求，加载用户请求的页面资源，在加载这个页面资源的过程当中，假设它工作于阻塞式I/O的话，它就会被挂起，它显然不能响应用户的其他请求。Apache的prefork并不是工作在阻塞式I/O之下。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;非阻塞式I-O-nonblocking-I-O&quot;&gt;&lt;a href=&quot;#非阻塞式I-O-nonblocking-I-O&quot; class=&quot;headerlink&quot; title=&quot;非阻塞式I/O(nonblocking I/O)&quot;&gt;&lt;/a&gt;非阻塞式I/O(nonblocking I/O)&lt;/h3&gt;&lt;p&gt;左侧是调用者，右侧是被调用者。对于被调用者，依然是两个阶段，数据从磁盘到内核内存，然后数据从内核内存到进程内存。对于非阻塞式I/O，调用者也把这个过程分成两个阶段(左侧也是两个阶段)，第1阶段，当调用者发出请求之后，被调用者立即告诉你：请求已收到，你等着吧。但问题是等到什么时候呢？就像去面馆点了一碗面一样，然后你出去玩了，但是你怎么知道面好了呢？为了及时得到吃面，所以你不得不每隔几秒钟回去看看面好了没有。这种就叫做盲等，效率并不高。这种不会直接转为睡眠状态，直到好了告诉你。一旦老板告诉你面OK了，是指面已经在柜台上了，其实是指数据从磁盘到内核内存了，你想吃还得自己从柜台上端过去。所以第二阶段你去端面，在这个过程你是什么事情都是做不了的，所以虽然是非阻塞，第2阶段依然是阻塞的。&lt;br&gt;所以对于非阻塞式I/O，第一阶段是盲等，第二阶段依然是阻塞的。很显然第二种模式相对第一种模式，性能并没有提升。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/2.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;复用式I-O-I-O-multiplexing&quot;&gt;&lt;a href=&quot;#复用式I-O-I-O-multiplexing&quot; class=&quot;headerlink&quot; title=&quot;复用式I/O(I/O multiplexing)&quot;&gt;&lt;/a&gt;复用式I/O(I/O multiplexing)&lt;/h3&gt;&lt;p&gt;任何一个进程，它只能处理一个I/O，因为它一旦被一个I/O阻塞了，直到被唤醒之前，其他人干的事情它一概不知。但作为web服务器进程，它其实是处理两路I/O的，第一路用户通过网络进来，这是网络I/O，第二路是自己向内核发请求加载数据，这是磁盘I/O。这是两路不同的I/O，因此一旦进程被阻塞在磁盘I/O上，如果这个时候网络I/O发生异动了，这个进程是不会知道的。默认情况下，只能处理完一路I/O，在去处理另一路I/O。&lt;br&gt;再举个例子，比如终端执行一个命令，然后阻塞在磁盘I/O上，你不要了，按了ctrl+c，按道理这个进程处于不可中断睡眠，它应该是不知道的。怎么才能取消。现实中是能取消的，这就是多路I/O(或者说是复用I/O)的工作机制了。&lt;br&gt;默认情况下，调用者向被调用者发起调用请求时，如果阻塞了，调用者就任何事都做不了，任何信号都处理不了。为了避免这种情况，有人就在内核中开发了复用式I/O的程序，当调用者需要发起I/O调用时，而是内核给调用者准备了个代理人，调用者将请求发给这个代理人，代理人在把这个请求转为内核可以理解的请求，这样一来，调用者就被阻塞在代理人上，而不是阻塞在内核中完成任务的那个事情上。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;再举个例子，银行很多人在办业务，都在那排队，假如柜台是单进程模型的，在某个时刻只能处理一个业务。这个银行柜台就相当于内核准备的代理人，比如第一个用户想通过这个银行柜台开一张银行卡。向营业员发调用请求，给我开张银行卡，营业员在把请求结果响应给调用者之前，一般而言，这个调用者要一直在柜台坐在那等着。但是也有第二种情况，比如银行业务是两段式的，营业员不直接面对客户，每个营业员配一个助理，这个助理就站在柜台前，负责处理用户请求。所以当任何一个用户请求来了，用户请求扔给助理，助理帮你负责送到内部去。银行柜台有多个，分别办理不同的业务，比如说某个请求既要开张银行卡，又要存款。假设两个业务能同时进行的话，请求者跟助理说我要开张银行卡，于是助理把这个请求扔给一柜台了，自己就闲出来了。然后请求者又扔给助理一个请求，说我要存钱，于是助理又要第二个请求扔给第二个柜台了。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;内核的那个代理人就相当于助理，帮我们实现多路I/O。如果没有这个助理，想完成复用是不可能的。这个助理在内核中就是一种特殊的系统调用。早期的内核有个select()调用，就是这种模式。另外一个poll()调用，也是这种模式。select()是由BSD研发的，后来BSD内部吵架，又模仿select()写了个poll()。两者功能是一样的，只不过一个是BSD风格的，一个是SysV风格的。&lt;br&gt;此后，任何调用者在发起系统调用时，它把调用请求不是扔给内核，而是扔给内核中的助理了。或者说是向内核助理注册一个I/O。select()在实现多路I/O时有限制，要求最多不能超出1024路，如果你想超出，拿内核源码改一改。改成2048，没问题，但是1024的限制是由道理的，因为超出后性能会下降的。我们在讲到prefork模型时，说最多能接受1024个请求并发，其实prefork就是基于select()多路复用I/O模型来实现的。&lt;br&gt;对于这种复用式I/O，依然是阻塞型的，只不过它不是阻塞在自己真正的那个调用之上，而是阻塞在那个助理上，也是select()或poll()上。&lt;br&gt;因此两个阶段，第一个阶段数据从磁盘到内核空间，这个阶段调用者是被阻塞的，只不过没阻塞在内核的I/O调用上，而是阻塞在select()或poll()上。select()这个时候还可以接受其他请求。阻塞在select()之上的最大好处就是可以继续接受其他请求，因为它能够接受其他信号进来。但是对于第二阶段来讲，调用者依然是阻塞的。第二阶段是真正的I/O过程，这个时候调用者就不是阻塞在select()之上，而是阻塞在自己真正的调用之上。&lt;br&gt;复用式I/O对性能并没有提升，最多只是能处理额外的事情而已，并不是在性能上有什么提升。&lt;/p&gt;
+&lt;h3 id=&quot;事件驱动式I-O-signal-driven-I-O&quot;&gt;&lt;a href=&quot;#事件驱动式I-O-signal-driven-I-O&quot; class=&quot;headerlink&quot; title=&quot;事件驱动式I/O(signal driven I/O)&quot;&gt;&lt;/a&gt;事件驱动式I/O(signal driven I/O)&lt;/h3&gt;&lt;p&gt;调用者发起调用之后，在第一阶段，内核立即返回结果给调用者，告诉调用者：你的请求我已经收到了，你该干嘛干嘛去，一旦我这边完成了，我会通知你。就相当于你去吃面了，老板告诉你面做好了我会打电话通知你的。这不是盲等，你该干嘛干嘛，不需要回来看，过一会老板通知你OK了，你就回来了。回来后，面在柜台上，我们去端面。端面的过程才是真正的I/O过程，这个过程是不能干其他事情的。(也像我们去餐馆，没位置，留了个电话号码，然后出去玩了，等服务员电话。)&lt;br&gt;这个过程中，第一段是非阻塞的，第二段是阻塞的。作为web服务器来讲，这有什么用呢？一个进程，第一个用户请求来了，进程向内核发起系统调用，加载文件，内核说你该干嘛干嘛去。于是这个进程就闲下来了，这样它就可以处理其它请求了。这就是为什么一个进程可以处理多个请求的原因。但是这个并不意味着性能一定好。虽然已经比阻塞和盲等有优势了，但是它第二段依然是阻塞的。面已经OK了，你仍然得自己端，所以在内核空间数据复制到进程空间这段，仍然是阻塞的。&lt;br&gt;为什么叫事件驱动呢？因为一旦数据从磁盘到内核空间后，内核会通知调用者。所以调用者本身使用回调函数来处理。&lt;br&gt;假如第二个请求数据已经准备好了，等着调用者进程将数据从内核空间复制到用户空间，但是假如此时调用者阻塞在第一个请求上，正在复制第一个请求的数据到进程空间，怎么办？内核通知完了在特定时间内你没有接收，这个信号就消失了。怎么办？所以通知与否，怎么通知，这就引入了两种通知机制。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;第一种：水平触发。通知一次，你没响应，没来处理，内核就再通知一次。没来处理留再通知一次，直到你处理为止。多次通知看上去更可靠，但是浪费资源。(类似老板一直打电话给你，直到你接电话)&lt;/li&gt;
+&lt;li&gt;第二种：边缘触发。只通知一次，但是如果调用者没响应怎么办呢？把通知事件通过回调函数让调用者自行获取，或者把通知信息放置某处，或者过一会儿调用者自己去要。(老板打了一遍电话，你没接，怕面凉了，就端到厨房。过一会你看到未接电话，知道面好了，就回来了，跟老板要。这叫回调。)&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/5.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;异步I-O-asynchronous-I-O&quot;&gt;&lt;a href=&quot;#异步I-O-asynchronous-I-O&quot; class=&quot;headerlink&quot; title=&quot;异步I/O(asynchronous I/O)&quot;&gt;&lt;/a&gt;异步I/O(asynchronous I/O)&lt;/h3&gt;&lt;p&gt;当调用者向内核发调用，内核说请求已收到，该干嘛干嘛去。于是内核在后台默默地完成第一步，默默地完成第二步。然后才告诉调用者，饭已OK了，过来吃吧。饭都不用你端了，直接由营业员端到你事先定义好的座位上。因此第一个阶段不用阻塞，第二个阶段不用阻塞。&lt;br&gt;作为一个web服务器来讲，当第一个用户请求进来时，用户请求资源，这个进程向内核发起系统调用，内核自己把数据从磁盘到内核空间，在复制到进程空间，所有东西都准备好了，告诉进程OK了，进程就立即打包响应报文响应给客户端。&lt;br&gt;httpd的event模型就是事件驱动型I/O，但是据说新版2.4也支持异步I/O。在异步模型下，生产力大大解放。内核从磁盘加载数据到内核内存中，一般都会缓存下来。如果第二个用户请求的资源和前面的用户请求的资源是一样的，直接响应就可以了。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/6.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;五种I-O模型对比&quot;&gt;&lt;a href=&quot;#五种I-O模型对比&quot; class=&quot;headerlink&quot; title=&quot;五种I/O模型对比&quot;&gt;&lt;/a&gt;五种I/O模型对比&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;有通知机制的我们称为异步I/O，无通知机制的我们称为同步I/O。见上图最下面，前面3个是同步I/O，后面2个是异步I/O。&lt;/p&gt;
+&lt;p&gt;Nginx在设计时，用的就是事件驱动型I/O，而且基于边缘触发来实现。Nginx还支持异步I/O。而且还能完成mmap机制，内存映射机制。&lt;/p&gt;
+&lt;p&gt;Nginx基于File AIO(异步I/O)，在文件级别上磁盘I/O上基于异步I/O来实现的；同时对于异步通信，nginx基于事件驱动加上边缘触发来完成一个线程处理多个请求，这对于c10k问题是十分有效的解决方案。&lt;/p&gt;
+&lt;h2 id=&quot;HTTPD的MPM&quot;&gt;&lt;a href=&quot;#HTTPD的MPM&quot; class=&quot;headerlink&quot; title=&quot;HTTPD的MPM&quot;&gt;&lt;/a&gt;HTTPD的MPM&lt;/h2&gt;&lt;p&gt;httpd的MPM（多道处理模块）&lt;br&gt;  ● prefork：进程模型的。用的是复用型I/O。&lt;br&gt;  ● worker：线程模型的。用的是复用型I/O。并发有限，select()最多1024个。&lt;br&gt;  ● event：线程模型的。用的是事件驱动式I/O。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;prefork工作模型&lt;br&gt;有一个主进程，主进程生成多个子进程，每个子进程处理一个请求。主进程是以管理员的身份启动的，所以它能够监听在80端口上。端口&amp;lt;1024的被称为特权端口，只有管理员才有权限使用的。&lt;/li&gt;
+&lt;li&gt;worker工作模型&lt;br&gt;有一个主进程，主进程生成多个子进程，每个子进程在生成多个线程，每个线程响应一个请求。&lt;/li&gt;
+&lt;li&gt;event工作模型&lt;br&gt;有一个主进程，生成多个子进程，每个子进程响应多个请求。当然你也可以理解有一个主进程，生成多个子线程，对Linux而言，子进程和线程并没有严格意义上的区分。而event模型中最著名的、最典型的特性是事件驱动机制。什么叫事件驱动机制呢？下面就来讲讲I/O模型。&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;I-O类型&quot;&gt;&lt;a href=&quot;#I-O类型&quot; class=&quot;headerlink&quot; title=&quot;I/O类型&quot;&gt;&lt;/a&gt;I/O类型&lt;/h2&gt;&lt;p&gt;从不同的角度来划分，有两种不同的方式：&lt;br&gt;&lt;strong&gt;同步I/O和异步I/O&lt;/strong&gt;    ——synchronous, asynchronous&lt;br&gt;同步和异步关注的是消息通知机制。说白了就是如何通知调用者的。I/O就是一方能够提供服务，一方需要调用别人的服务，
+    
+    </summary>
+    
+      <category term="Nginx" scheme="http://yoursite.com/categories/Nginx/"/>
+    
+    
+      <category term="Nginx" scheme="http://yoursite.com/tags/Nginx/"/>
+    
+  </entry>
   
   <entry>
     <title>Nginx配置HTTP/2.0</title>
@@ -4546,179 +4591,6 @@ Cgroup Driver: cgroupfs
     <summary type="html">
     
       &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how registries are handled.”，并且建议我尝试较新的版本。在2017年4月份的DockerCon会议上，Docker公司直接将 Github 上原隶属于 Docker 组织的 Docker 项目，直接 transfer 到了一个新的、名叫 Moby 的组织下，并将其重命名为 Moby 项目。由此先来了解下这个Moby项目。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
-    
-    
-      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Dockerfile构建镜像</title>
-    <link href="http://yoursite.com/2017/08/25/Dockerfile%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/"/>
-    <id>http://yoursite.com/2017/08/25/Dockerfile构建镜像/</id>
-    <published>2017-08-25T02:55:41.000Z</published>
-    <updated>2017-11-07T07:46:49.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;Dockerfile介绍&quot;&gt;&lt;a href=&quot;#Dockerfile介绍&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile介绍&quot;&gt;&lt;/a&gt;Dockerfile介绍&lt;/h2&gt;&lt;p&gt;dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。&lt;br&gt;若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;可重现&lt;/li&gt;
-&lt;li&gt;dockerfile可以加入版本控制，这样可以追踪文件的变化和回滚错误&lt;/li&gt;
-&lt;li&gt;dockerfile很轻量，我们不需要copy几百M甚至上G的docker镜像&lt;br&gt;使用Dockerfile构建的流程：&lt;/li&gt;
-&lt;li&gt;编写Dockerfile&lt;/li&gt;
-&lt;li&gt;执行docker build命令&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;Dockerfile指令简单介绍&quot;&gt;&lt;a href=&quot;#Dockerfile指令简单介绍&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile指令简单介绍&quot;&gt;&lt;/a&gt;Dockerfile指令简单介绍&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;FROM：基础镜像。&lt;/li&gt;
-&lt;li&gt;MAINTAINER：维护者信息。&lt;/li&gt;
-&lt;li&gt;RUN：在需要执行的命令前加RUN。&lt;/li&gt;
-&lt;li&gt;ADD：ADD的文件和Dockerfile必须在同一个路径下。&lt;/li&gt;
-&lt;li&gt;ENV：设置环境变量。&lt;/li&gt;
-&lt;li&gt;WORKDIR：相当于cd。&lt;/li&gt;
-&lt;li&gt;VOLUME：目录挂载。&lt;/li&gt;
-&lt;li&gt;EXPOSE：映射端口。&lt;/li&gt;
-&lt;li&gt;ENTRYPOINT&lt;/li&gt;
-&lt;li&gt;CMD&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;RUN指令&quot;&gt;&lt;a href=&quot;#RUN指令&quot; class=&quot;headerlink&quot; title=&quot;RUN指令&quot;&gt;&lt;/a&gt;RUN指令&lt;/h3&gt;&lt;p&gt;RUN指令会在前一条命令创建的镜像的基础上启动一个容器，并在容器中运行指令的命令。在该命令结束后，会提交容器为新的镜像。新镜像会被dockerfile中的下一条指令所使用。&lt;br&gt;默认情况下，RUN指令会以shell的形式去执行命令。当然我们也可以使用exec格式的RUN指令。在exec方式中，我们使用一个数组来指定要运行的命令和传递给该命令的参数。exec中的参数会当成什么数组被docker解析，因此必须使用双引号，而不能使用单引号。&lt;br&gt;&lt;strong&gt;shell形式：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;RUN yum install -y nginx
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;exec形式：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;RUN [&amp;quot;yum&amp;quot;, &amp;quot;install&amp;quot;, &amp;quot;-y&amp;quot;, &amp;quot;nginx&amp;quot;]
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;EXPOSE指令&quot;&gt;&lt;a href=&quot;#EXPOSE指令&quot; class=&quot;headerlink&quot; title=&quot;EXPOSE指令&quot;&gt;&lt;/a&gt;EXPOSE指令&lt;/h3&gt;&lt;p&gt;告诉docker该容器内的应用程序将会指定端口，但是这并不意味着我们可以自动访问该容器内服务的端口。出于安全的原因，docker并不会自动打开该端口。而是需要我们在使用docker run的时候通过-p参数指定需要打开哪些端口。我们可以使用多个EXPOSE指令向外部暴露多个端口。注意不可以在dockerfile中指定端口映射关系。比如EXPOSE 80，这条指令是对的，而EXPOSE 8080:80这条指令就是错的。&lt;br&gt;【注意】:这会影响docker的可移植性。我们应该在docker run命令中使用-p参数实现端口映射。&lt;/p&gt;
-&lt;h3 id=&quot;CMD指令&quot;&gt;&lt;a href=&quot;#CMD指令&quot; class=&quot;headerlink&quot; title=&quot;CMD指令&quot;&gt;&lt;/a&gt;CMD指令&lt;/h3&gt;&lt;p&gt;CMD 指令允许用户指定容器启动的默认执行的命令。此命令会在容器启动且 docker run 没有指定其他命令时运行。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;如果 docker run 指定了其他命令，CMD 指定的默认命令将被忽略。&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;如果 Dockerfile 中有多个 CMD 指令，只有最后一个 CMD 有效。&lt;br&gt;CMD 有三种格式：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;Exec 格式：CMD [&amp;quot;executable&amp;quot;,&amp;quot;param1&amp;quot;,&amp;quot;param2&amp;quot;] 这是 CMD 的推荐格式。
-CMD [&amp;quot;param1&amp;quot;,&amp;quot;param2&amp;quot;] 为 ENTRYPOINT 提供额外的参数，此时 ENTRYPOINT 必须使用 Exec 格式。
-Shell 格式：CMD command param1 param2
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;第一种格式：运行一个可执行的文件并提供参数。&lt;br&gt;第二种格式 CMD [“param1”,”param2”] 要与 Exec 格式 的 ENTRYPOINT 指令配合使用，其用途是为 ENTRYPOINT 设置默认的参数。&lt;br&gt;第三种格式：是以”/bin/sh -c”的方法执行的命令。&lt;/p&gt;
-&lt;p&gt;下面看看 CMD 是如何工作的。Dockerfile 片段如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;CMD echo &amp;quot;Hello world&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行容器 docker run -it [image] 将输出：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;Hello world
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;但当后面加上一个命令，比如 docker run -it [image] /bin/bash，CMD 会被忽略掉，命令 bash 将被执行：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@76a5fd777648 /]# 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】:使用CMD指令时，最好使用数组语法。&lt;/p&gt;
-&lt;h3 id=&quot;ENTRYPOIN指令&quot;&gt;&lt;a href=&quot;#ENTRYPOIN指令&quot; class=&quot;headerlink&quot; title=&quot;ENTRYPOIN指令&quot;&gt;&lt;/a&gt;ENTRYPOIN指令&lt;/h3&gt;&lt;p&gt;ENTRYPOINT 看上去与 CMD 很像，它们都可以指定要执行的命令及其参数。不同的地方在于 ENTRYPOINT 不会被忽略，一定会被执行，即使运行 docker run 时指定了其他命令。&lt;br&gt;实际上docker run命令行中指定的任何参数都会被当作参数再次传递给ENTRYPOINT指令中指定的命令。&lt;br&gt;ENTRYPOINT 有两种格式：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;Exec 格式：ENTRYPOINT [&amp;quot;executable&amp;quot;, &amp;quot;param1&amp;quot;, &amp;quot;param2&amp;quot;] 这是 ENTRYPOINT 的推荐格式。
-Shell 格式：ENTRYPOINT command param1 param2
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在为 ENTRYPOINT 选择格式时必须小心，因为这两种格式的效果差别很大。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;ENTRYPOINT [&amp;quot;/usr/sbin/nginx&amp;quot;, &amp;quot;-g&amp;quot;, &amp;quot;daemon off;&amp;quot;]
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;Exec-格式&quot;&gt;&lt;a href=&quot;#Exec-格式&quot; class=&quot;headerlink&quot; title=&quot;Exec 格式&quot;&gt;&lt;/a&gt;Exec 格式&lt;/h4&gt;&lt;p&gt;ENTRYPOINT 的 Exec 格式用于设置要执行的命令及其参数，同时可通过 CMD 提供额外的参数。&lt;br&gt;ENTRYPOINT 中的参数始终会被使用，而 CMD 的额外参数可以在容器启动时动态替换掉。&lt;br&gt;比如下面的 Dockerfile 片段：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;ENTRYPOINT [&amp;quot;/bin/echo&amp;quot;, &amp;quot;Hello&amp;quot;]  
-CMD [&amp;quot;world&amp;quot;]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;当容器通过 docker run -it [image] 启动时，输出为：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;Hello world
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;而如果通过 docker run -it [image] CloudMan 启动，则输出为：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;Hello CloudMan
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;Shell-格式&quot;&gt;&lt;a href=&quot;#Shell-格式&quot; class=&quot;headerlink&quot; title=&quot;Shell 格式&quot;&gt;&lt;/a&gt;Shell 格式&lt;/h4&gt;&lt;p&gt;ENTRYPOINT 的 Shell 格式会忽略任何 CMD 或 docker run 提供的参数。&lt;br&gt;&lt;strong&gt;【注意】:使用CMD和ENTRYPOINT时，请务必使用数组语法。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;【总结】：&lt;/strong&gt;&lt;br&gt;1.使用 RUN 指令安装应用和软件包，构建镜像。&lt;br&gt;2.如果想为容器设置默认的启动命令，可使用 CMD 指令。用户可在 docker run 命令行中替换此默认命令。&lt;br&gt;3.如果 Docker 镜像的用途是运行应用程序或服务，比如运行一个 MySQL，应该优先使用 Exec 格式的 ENTRYPOINT 指令。CMD 可为 ENTRYPOINT 提供额外的默认参数，同时可利用 docker run 命令行替换默认参数。&lt;/p&gt;
-&lt;h2 id=&quot;示例1：构建Nginx镜像&quot;&gt;&lt;a href=&quot;#示例1：构建Nginx镜像&quot; class=&quot;headerlink&quot; title=&quot;示例1：构建Nginx镜像&quot;&gt;&lt;/a&gt;示例1：构建Nginx镜像&lt;/h2&gt;&lt;p&gt;创建一个目录单独存放各种Dockerfile：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# mkdir /opt/docker-file
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;创建Nginx目录存放Nginx Dockerfile和相关文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# mkdir nginx
-[root@node1 ~]# cd nginx
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;上传openresty-1.9.7.3.tar.gz到Nginx目录下，编写Dockerfile文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 nginx]# vim Dockerfile
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;该Dockerfile内容如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# This dockerfile is for openresty
-# Version 1.0
-
-# Base images. 
-FROM centos:centos7
-
-# Author.
-MAINTAINER jkzhao &amp;lt;01115004@wisedu.com&amp;gt;
-
-# Add openresty software.
-ADD openresty-1.9.7.3.tar.gz /usr/local
-
-# Define working directory.
-WORKDIR /usr/local/openresty-1.9.7.3
-
-# Install epel repo
-RUN rpm -ivh http://mirrors.aliyun.com/epel/epel-release-latest-7.noarch.rpm
-
-# Install openresty.
-RUN yum install -y readline-devel pcre-devel openssl-devel gcc perl make 
-RUN ./configure &amp;amp;&amp;amp; gmake &amp;amp;&amp;amp; gmake install
-RUN sed -i &amp;apos;1 i\daemon off;&amp;apos; /usr/local/openresty/nginx/conf/nginx.conf
-RUN sed -i &amp;apos;s@#error_log  logs\/error.log;@error_log logs\/error.log debug;@&amp;apos; /usr/local/openresty/nginx/conf/nginx.conf
-
-# Define environment variables.
-ENV PATH /usr/local/openresty/nginx/sbin:$PATH
-
-# Define default command. 
-CMD [&amp;quot;nginx&amp;quot;]
-
-# Expose ports.
-EXPOSE 80
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;利用该Dockerfile构建镜像：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 nginx]# docker build -t jkzhao/mynginx:v2 /opt/docker-file/nginx/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看构建的镜像：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 nginx]# docker images
-REPOSITORY                              TAG                 IMAGE ID            CREATED             SIZE
-jkzhao/mynginx                          v2                  f61afc8ce858        17 minutes ago      581.6 MB
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;基于镜像启动容器：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 nginx]# docker run -d -p 84:80 jkzhao/mynginx:v2   
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;访问Nginx服务：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/20.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;如果dockerfile中某条指令执行失败了，没有正常结束，那么我们也将得到一个可以使用的镜像。这对调试非常有帮助，我们可以基于该镜像，运行一个具有交互功能的容器，使用最后创建的镜像对为什么我们的指令会失败进行调试。&lt;/p&gt;
-&lt;h2 id=&quot;示例2：构建一个Ruby运行环境&quot;&gt;&lt;a href=&quot;#示例2：构建一个Ruby运行环境&quot; class=&quot;headerlink&quot; title=&quot;示例2：构建一个Ruby运行环境&quot;&gt;&lt;/a&gt;示例2：构建一个Ruby运行环境&lt;/h2&gt;&lt;p&gt;创建Ruby目录存放Ruby Dockerfile和相关文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# mkdir ruby
-[root@node1 ~]# cd ruby
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;该Dockerfile内容如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;FROM centos:7  
-
-MAINTAINER jkzhao &amp;lt;01115004@wisedu.com&amp;gt;
-
-# 为镜像添加备注信息
-LABEL version=&amp;quot;2.2.2&amp;quot; lang=&amp;quot;ruby&amp;quot;
-
-ENV RUBY_MAJOR 2.2
-ENV RUBY_VERSION 2.2.2
-
-RUN yum install -y wget tar gcc g++ make automake autoconf curl-devel openssl-devel zlib-devel httpd-devel apr-devel apr-util-devel sqlite-devel
-
-RUN cd /tmp \
-    &amp;amp;&amp;amp; wget http://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.2.tar.gz \
-    &amp;amp;&amp;amp; tar zxvf ruby-2.2.2.tar.gz \
-    &amp;amp;&amp;amp; cd ruby-2.2.2 \
-    &amp;amp;&amp;amp; autoconf \
-    &amp;amp;&amp;amp; ./configure --disable-install-doc \
-    &amp;amp;&amp;amp; make \
-    &amp;amp;&amp;amp; make install \
-    &amp;amp;&amp;amp; rm -rf /tmp/ruby-2.2.2*
-
-# skip installing gem documentation
-RUN echo -e &amp;apos;install: --no-document\nupdate: --no-document&amp;apos; &amp;gt;&amp;gt; &amp;quot;$HOME/.gemrc&amp;quot;
-
-ENV GEM_HOME /usr/local/bundle
-ENV PATH $GEM_HOME/bin:$PATH
-
-ENV BUNDLER_VERSION 1.10.6
-
-RUN gem install bundler --version &amp;quot;$BUNDLER_VERSION&amp;quot; \
- &amp;amp;&amp;amp; bundle config --global path &amp;quot;$GEM_HOME&amp;quot; \
- &amp;amp;&amp;amp; bundle config --global bin &amp;quot;$GEM_HOME/bin&amp;quot;
-
-# don&amp;apos;t create &amp;quot;.bundle&amp;quot; in all our apps
-ENV BUNDLE_APP_CONFIG $GEM_HOME
-
-CMD [ &amp;quot;irb&amp;quot; ]
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;构建缓存&quot;&gt;&lt;a href=&quot;#构建缓存&quot; class=&quot;headerlink&quot; title=&quot;构建缓存&quot;&gt;&lt;/a&gt;构建缓存&lt;/h2&gt;&lt;p&gt;dockerfile构建镜像过程非常聪明，它会将每一步的构建结果提交为一个镜像，我们可以将之前指令创建的镜像层看做缓存，比如第5条指令由于命令书写错误而导致构建失败，当我们修改它之后，前面的4条指令不会再执行，而是直接使用之前构建过程中保存的缓存。这样速度会提高很多，大大减少了构建的时间。&lt;br&gt;然而有时候我们要确保构建过程中不会使用缓存，比如对yum update等操作，要想跳过缓存，&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;docker build no-cache
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;缓存还有个好处，就是调试方便。比如第5条指令失败了，那么我们可以基于第4条指令创建的镜像启动一个新的容器。在容器里手工执行第5条指令所要的操作，调查指令失败的原因。&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Dockerfile介绍&quot;&gt;&lt;a href=&quot;#Dockerfile介绍&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile介绍&quot;&gt;&lt;/a&gt;Dockerfile介绍&lt;/h2&gt;&lt;p&gt;dockerfile是构建镜像的说明书。dockerfile提供了一种基于DSL语法的指令来构建镜像，通过代码化，镜像构建过程一目了然，我们能看出镜像构建的每一步都在干什么。&lt;br&gt;若要共享镜像，我们只需要共享dockerfile就可以了。共享dockerfile文件，具有以下优点：&lt;br&gt;
     
     </summary>
     
