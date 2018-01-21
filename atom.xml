@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-01-19T01:47:50.000Z</updated>
+  <updated>2018-01-21T13:07:59.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,124 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>安装部署Openresty</title>
+    <link href="http://yoursite.com/2018/01/21/%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2Openresty/"/>
+    <id>http://yoursite.com/2018/01/21/安装部署Openresty/</id>
+    <published>2018-01-21T11:55:10.000Z</published>
+    <updated>2018-01-21T13:07:59.000Z</updated>
+    
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;由于公司的一个产品用了Nginx Lua写了认证，所以在选型时选了OpenResty。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;什么是OpenResty&quot;&gt;&lt;a href=&quot;#什么是OpenResty&quot; class=&quot;headerlink&quot; title=&quot;什么是OpenResty&quot;&gt;&lt;/a&gt;什么是OpenResty&lt;/h2&gt;&lt;p&gt;Nginx 是俄罗斯人发明的， Lua 是巴西几个教授发明的，中国人章亦春把 LuaJIT VM 嵌入到 Nginx 中，实现了 OpenResty 这个高性能服务端解决方案。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;最先将Nginx，Lua组合到一起的是OpenResty，它有一个ngx_lua模块，将Lua嵌入到了Nginx里面；随后Tengine也包含了ngx_lua模块。至于二者的区别：OpenResty是Nginx的Bundle；而Tengine则是Nginx的Fork。值得一提的是，OpenResty和Tengine均是国人自己创建的项目，前者主要由章亦春和晓哲开发，后者主要由淘宝打理。&lt;/p&gt;
+&lt;h2 id=&quot;Nginx特性&quot;&gt;&lt;a href=&quot;#Nginx特性&quot; class=&quot;headerlink&quot; title=&quot;Nginx特性&quot;&gt;&lt;/a&gt;Nginx特性&lt;/h2&gt;&lt;h3 id=&quot;HTTP服务器&quot;&gt;&lt;a href=&quot;#HTTP服务器&quot; class=&quot;headerlink&quot; title=&quot;HTTP服务器&quot;&gt;&lt;/a&gt;HTTP服务器&lt;/h3&gt;&lt;p&gt;即web服务器，具有支持一个基本的web服务器应该具备的绝大多数功能。 (&lt;a href=&quot;http://www.netcraft.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://www.netcraft.com/&lt;/a&gt; 在这个站点上随时统计更新的有全球web服务器的占有状况)&lt;br&gt;灵活的配置：nginx和apache差不多，也是一个进程生成许多子进程，而这个子进程本身有worker进程，专门负责响应用户请求的。nginx是一个进程响应多个请求，事实上可以称为一个线程响应多个请求。除此之外还有许多其他进程，比如说管理缓存的进程，管理会话的进程。有了这样的架构设计，将来在重新添加配置之后，可以将新的连接都使用新配置，而老的连接即已经建立的连接使用原有的配置，所以在线升级的时候不需要中断正在处理的请求，这称为nginx热部署(无非就是平滑升级)。&lt;br&gt;重写(rewrite)模块：web服务器httpd的重写功能异常强大，但是也比较复杂。nginx比较简单，只需要使用正则表达式重写URL。对于任何一个web服务器来说，URL重写是个非常重要的功能，尤其是反向代理的服务器。&lt;/p&gt;
+&lt;h3 id=&quot;模块化设计&quot;&gt;&lt;a href=&quot;#模块化设计&quot; class=&quot;headerlink&quot; title=&quot;模块化设计&quot;&gt;&lt;/a&gt;模块化设计&lt;/h3&gt;&lt;p&gt;nginx是高度模块化的：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;核心模块：core module&lt;/li&gt;
+&lt;li&gt;Standard HTTP modules&lt;/li&gt;
+&lt;li&gt;Optional HTTP modules&lt;/li&gt;
+&lt;li&gt;Mail modules&lt;/li&gt;
+&lt;li&gt;3rd party modules&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;支持热部署&quot;&gt;&lt;a href=&quot;#支持热部署&quot; class=&quot;headerlink&quot; title=&quot;支持热部署&quot;&gt;&lt;/a&gt;支持热部署&lt;/h3&gt;&lt;p&gt;不停机更新配置文件、更换日志、更新服务器程序版本。&lt;/p&gt;
+&lt;h3 id=&quot;主要用途&quot;&gt;&lt;a href=&quot;#主要用途&quot; class=&quot;headerlink&quot; title=&quot;主要用途&quot;&gt;&lt;/a&gt;主要用途&lt;/h3&gt;&lt;p&gt;nginx有两个作用。第一，web服务器。具有web服务器要求的所有功能。第二，轻量级的反向代理服务器，能够反向代理两种应用：web和mail，只不过反向代理mail的功能很少被提到。我们的主要着眼点也是它的web服务器和web服务器反向代理。&lt;br&gt;Nginx基于File AIO(异步I/O)，在文件级别上磁盘I/O上基于异步I/O来实现的；同时对于异步通信，nginx基于事件驱动加上边缘触发来完成一个线程处理多个请求，这对于c10k问题是十分有效的解决方案。&lt;/p&gt;
+&lt;h2 id=&quot;Nginx工作模式、框架、模型&quot;&gt;&lt;a href=&quot;#Nginx工作模式、框架、模型&quot; class=&quot;headerlink&quot; title=&quot;Nginx工作模式、框架、模型&quot;&gt;&lt;/a&gt;Nginx工作模式、框架、模型&lt;/h2&gt;&lt;p&gt;nginx会按需同时运行多个进程：一个主进程(master)和几个工作进程(worker)，配置了缓存时还会有缓存加载器进程(cache loader)和缓存管理器进程(cache manager)等。所有进程均是仅含有一个线程，并主要通过“共享内存”的机制实现进程间通信。主进程以root用户身份运行，而worker、cache loader和cache manager均应以非特权用户身份运行。 &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;master进程(线程)监控worker进程(线程)，包括运行是否正常等。&lt;/li&gt;
+&lt;li&gt;worker进程：master的子进程，响应用户请求。&lt;/li&gt;
+&lt;li&gt;cache loader进程：在反向代理的时候用于管理缓存的进程。&lt;/li&gt;
+&lt;li&gt;·······&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/8.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;注意：master进程是以管理员启动的，因为nginx要启动为web服务器或反向代理的时候，它应该工作在80端口，只有管理员才有权限启用小于1023的端口，所以启动主进程的时候必须使用管理员身份。然后由master进程启动worker进程，而且master启动worker进程的时候完全以普通用户的身份运行，所以让我们的系统安全性得到提升。&lt;br&gt;nginx是高度模块化的，所以nginx的核心模块，像master进程、worker进程所处理的web应用非常简单，最多就是个web服务器，而额外的更多功能比如SSL、FLV流等都不是worker进程自己提供的，而是由额外的模块提供，所以在每个worker进程内部，它可能调用很多个模块，用到哪个模块再去加载哪个模块，而这些模块以流水线的方式工作，也就是一个模块只负责一个功能。比如说第一个分析头部，第二个帮助去的数据，第三个创建响应等等。每个请求，在内部串联起来的模块还不一样，所以每个请求到来了，worker一分析，到底要使用几个模块，这几个模块组成流水线，随时等待响应。&lt;br&gt;正是由于这种机制的存在，master负责装在主配置文件，如果我们改了nginx配置文件，由master分析一下配置文件中有没有语法错误，就算重新装在配置文件有语法错误，但是并不会影响worker进程，最多master返回错误告诉你配置文件有语法错误，需要重新装载。一装载成功了，并不会让运行中的worker进程都使用这个配置是文件的，让这些已经建立的连接继续使用老的配置文件，当某个worker进程建立的连接都退出了，此时把worker进程挂了，再重新启动个新worker进程，新worker进程响应新请求，而这个新worker进程用的就是新配置。&lt;br&gt;&lt;strong&gt;【nginx进程分工】：&lt;/strong&gt;&lt;br&gt;&lt;strong&gt;主进程master：&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;读取并验正配置信息；&lt;/li&gt;
+&lt;li&gt;创建、绑定及关闭套接字；&lt;/li&gt;
+&lt;li&gt;启动、终止及维护worker进程的个数；&lt;/li&gt;
+&lt;li&gt;无须中止服务而重新配置工作特性；&lt;/li&gt;
+&lt;li&gt;控制非中断式程序升级，启用新的二进制程序并在需要时回滚至老版本；   ——nginx自身升级&lt;/li&gt;
+&lt;li&gt;重新打开日志文件，实现日志滚动；&lt;/li&gt;
+&lt;li&gt;编译嵌入式perl脚本；&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;worker进程：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;接收、传入并处理来自客户端的连接；&lt;/li&gt;
+&lt;li&gt;提供反向代理及过滤功能；&lt;/li&gt;
+&lt;li&gt;nginx任何能完成的其它任务；&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;cache loader进程：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;检查缓存存储中的缓存对象；&lt;/li&gt;
+&lt;li&gt;使用缓存元数据建立内存数据库；&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;cache manager进程：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;缓存的失效及过期检验；&lt;br&gt;【注意】：cache loader和cache manager只是在使用nginx作为反向代理并使用了缓存功能的时候才启动，不是所有时候都运行的。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&quot;安装OpenResty&quot;&gt;&lt;a href=&quot;#安装OpenResty&quot; class=&quot;headerlink&quot; title=&quot;安装OpenResty&quot;&gt;&lt;/a&gt;安装OpenResty&lt;/h2&gt;&lt;p&gt;使用的版本是openresty-1.9.7.3.tar.gz&lt;br&gt;&lt;strong&gt;1.安装依赖包&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# yum install readline-devel pcre-devel openssl-devel gcc -y
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.安装openresty&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /usr/local
+# wget https://openresty.org/download/openresty-1.9.7.3.tar.gz
+# tar zxf openresty-1.9.7.3.tar.gz
+# cd openresty-1.9.7.3/
+# ./configure
+# gmake &amp;amp;&amp;amp; gmake install
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;安装完成后，在/usr/local/下多了个openresty目录，nginx部署安装在/usr/local/openresty/nginx。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3.将nginx加入系统服务&lt;/strong&gt;&lt;br&gt;&lt;strong&gt;【Redhat7之前的版本】：&lt;/strong&gt;&lt;br&gt;(1)    上传脚本nginx启动脚本到/etc/init.d/目录下&lt;br&gt;(2)    授权脚本执行权限&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# chmod a+x nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(3)    加入系统服务&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# chkconfig --add nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(4)    nginx开启自启动&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# chkconfig nginx on
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(5)    nginx启停重载&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# service nginx start/stop/restart/reload
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;【Redhat7版本】：&lt;/strong&gt;&lt;br&gt;(1)    启动服务单元&lt;br&gt;把写好的nginx.service放到/etc/systemd/system/目录下。&lt;br&gt;(2)    设置开机启动&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# systemctl enable nginx.service
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(3)    启动/停止/重载nginx服务&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# systemctl start/stop/reload nginx.service
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;脚本nginx的内容如下：&lt;/strong&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;32&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;33&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;34&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;35&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;36&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;37&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;38&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;39&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;40&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;41&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;42&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;43&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;44&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;45&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;46&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;47&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;48&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;49&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;50&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;51&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;52&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;53&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;54&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;55&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;56&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;57&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;58&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;59&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;60&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;61&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;62&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;63&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;64&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;65&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;66&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;67&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;68&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;69&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;70&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;71&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;72&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;73&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;74&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;75&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;76&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;77&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;78&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;79&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;80&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;81&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;82&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;83&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;84&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;85&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;86&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;87&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;88&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;89&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;90&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;91&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;92&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;93&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;94&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;95&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;#!/bin/sh&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# nginx - this script starts and stops the nginx daemon&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# chkconfig:   - 85 15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# description: Nginx is an HTTP(S) server, HTTP(S) reverse \&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#               proxyand IMAP/POP3 proxy server&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# processname: nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# config:      /etc/nginx/nginx.conf&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# config:      /etc/sysconfig/nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# pidfile:     /var/run/nginx.pid&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# Source function library.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;. /etc/rc.d/init.d/functions&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# Source networking configuration.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;. /etc/sysconfig/network&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# Check that networking is up.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[ &amp;quot;$NETWORKING&amp;quot; = &amp;quot;no&amp;quot; ] &amp;amp;&amp;amp; exit 0&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;nginx=&amp;quot;/usr/local/openresty/nginx/sbin/nginx&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;prog=$(basename $nginx)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;NGINX_CONF_FILE=&amp;quot;/usr/local/openresty/nginx/conf/nginx.conf&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[ -f /etc/sysconfig/nginx ] &amp;amp;&amp;amp; . /etc/sysconfig/nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;lockfile=/var/lock/subsys/nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;start() &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    [ -x $nginx ] || exit 5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    [ -f $NGINX_CONF_FILE ] || exit 6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    echo -n $&amp;quot;Starting $prog: &amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    daemon $nginx -c $NGINX_CONF_FILE&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    retval=$?&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    echo&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    [ $retval -eq 0 ] &amp;amp;&amp;amp; touch $lockfile&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    return $retval&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;stop() &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    echo -n $&amp;quot;Stopping $prog: &amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    killproc $prog -QUIT&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    retval=$?&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    echo&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    [ $retval -eq 0 ] &amp;amp;&amp;amp; rm -f $lockfile&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    return $retval&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;killall -9 nginx&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;restart() &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    configtest || return $?&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    stop&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    sleep 1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    start&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;reload() &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    configtest || return $?&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    echo -n $&amp;quot;Reloading $prog: &amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    killproc $nginx -HUP&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;RETVAL=$?&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    echo&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;force_reload() &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    restart&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;configtest() &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;$nginx -t -c $NGINX_CONF_FILE&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;rh_status() &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    status $prog&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;rh_status_q() &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    rh_status &amp;gt;/dev/null 2&amp;gt;&amp;amp;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;case &amp;quot;$1&amp;quot; in&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    start)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        rh_status_q &amp;amp;&amp;amp; exit0&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    $1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        ;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    stop)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        rh_status_q || exit 0&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        $1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        ;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    restart|configtest)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        $1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        ;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    reload)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        rh_status_q || exit 7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        $1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        ;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    force-reload)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        force_reload&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        ;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    status)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        rh_status&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        ;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    condrestart|try-restart)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        rh_status_q || exit 0&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            ;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    *)  &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      echo $&amp;quot;Usage: $0 &amp;#123;start|stop|status|restart|condrestart|try-restart|reload|force-reload|configtest&amp;#125;&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        exit 2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;esac&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;服务单元nginx.service的内容如下：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[Unit]
+Description=nginx - high performance web server
+Documentation=http://nginx.org/en/docs/
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+PIDFile=/usr/local/openresty/nginx/logs/nginx.pid
+ExecStartPre=/usr/local/openresty/nginx/sbin/nginx -t -c /usr/local/openresty/nginx/conf/nginx.conf
+ExecStart=/usr/local/openresty/nginx/sbin/nginx -c /usr/local/openresty/nginx/conf/nginx.conf
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【补充】:&lt;br&gt;RHEL/CentOS 7.0中一个最主要的改变，就是切换到了systemd。它用于替代红帽企业版Linux前任版本中的SysV和Upstart，对系统和服务进行管理。systemd兼容SysV和Linux标准组的启动脚本。&lt;br&gt;Systemd 是 Linux 系统中最新的初始化系统（init），它主要的设计目标是克服 sysvinit 固有的缺点，提高系统的启动速度。systemd 和 ubuntu 的 upstart 是竞争对手，已经取代了UpStart。&lt;br&gt;Systemd也是一个Linux操作系统下的系统和服务管理器。它被设计成向后兼容SysV启动脚本，并提供了大量的特性，如开机时平行启动系统服务，按需启动守护进程，支持系统状态快照，或者基于依赖的服务控制逻辑。&lt;br&gt;先前的使用SysV初始化或Upstart的红帽企业版Linux版本中，使用位于/etc/rc.d/init.d/目录中的bash初始化脚本进行管理。而在RHEL 7/CentOS 7中，这些启动脚本被服务单元取代了。服务单元以.service文件扩展结束，提供了与初始化脚本同样的用途。要查看、启动、停止、重启、启用或者禁用系统服务，你要使用systemctl来代替旧的service命令。&lt;br&gt;注：为了向后兼容，旧的service命令在CentOS 7中仍然可用，它会重定向所有命令到新的systemctl工具。&lt;/p&gt;
+&lt;p&gt;关于Nginx的具体配置将在下篇博文中分享。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;由于公司的一个产品用了Nginx Lua写了认证，所以在选型时选了OpenResty。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;什么是OpenResty&quot;&gt;&lt;a href=&quot;#什么是OpenResty&quot; class=&quot;headerlink&quot; title=&quot;什么是OpenResty&quot;&gt;&lt;/a&gt;什么是OpenResty&lt;/h2&gt;&lt;p&gt;Nginx 是俄罗斯人发明的， Lua 是巴西几个教授发明的，中国人章亦春把 LuaJIT VM 嵌入到 Nginx 中，实现了 OpenResty 这个高性能服务端解决方案。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Nginx" scheme="http://yoursite.com/categories/Nginx/"/>
+    
+    
+      <category term="Nginx" scheme="http://yoursite.com/tags/Nginx/"/>
+    
+  </entry>
+  
+  <entry>
     <title>I/O模型</title>
     <link href="http://yoursite.com/2018/01/18/I-O%E6%A8%A1%E5%9E%8B/"/>
     <id>http://yoursite.com/2018/01/18/I-O模型/</id>
     <published>2018-01-18T09:08:21.000Z</published>
-    <updated>2018-01-19T01:47:50.000Z</updated>
+    <updated>2018-01-21T12:12:42.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;I-O类型&quot;&gt;&lt;a href=&quot;#I-O类型&quot; class=&quot;headerlink&quot; title=&quot;I/O类型&quot;&gt;&lt;/a&gt;I/O类型&lt;/h2&gt;&lt;p&gt;从不同的角度来划分，有两种不同的方式：&lt;br&gt;&lt;strong&gt;同步I/O和异步I/O&lt;/strong&gt;    ——synchronous, asynchronous&lt;br&gt;同步和异步关注的是消息通知机制。说白了就是如何通知调用者的。I/O就是一方能够提供服务，一方需要调用别人的服务，&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;所以I/O请求就是调用方向被调用方请求运行一个应用，通常是一个函数，可以理解成是一个库调用、函数调用或者系统调用。假如是一次系统调用，调用方向被调用方发起一次系统调用请求，被调用方本地要把这个系统调用运行完成，所以要在本地处理处理，把处理的结果响应给调用方。问题是调用方什么时候知道自己的请求结束了呢？自己的请求对方响应了呢？所以这就是同步和异步两种模式。&lt;br&gt;所谓同步是调用发出之后不会立即返回，但一旦返回，则返回是最终结果；(被调用者一直在处理处理，处理到最后返回结果给调用者)&lt;br&gt;所谓异步是调用发出之后，被调用方返回消息，但返回的并非最终结果；被调用者通过状态、通知机制(比如打电话通知你)等来通知调用者，或通过回调函数来处理结果。 (当调用者发出请求以后，被调用者立即就告诉调用者了，比如：请求已收到，等着叫号吧。)&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;阻塞I/O和非阻塞I/O&lt;/strong&gt;    ——block, nonblock&lt;br&gt;阻塞和非阻塞关注的是调用者等待被调用返回结果时的状态。&lt;br&gt;阻塞是指调用结果返回之前，调用者(一般是进程或者线程)会被挂起；调用者只有在得到返回结果之后才能继续；&lt;br&gt;非阻塞是指调用者在结果返回之前，不会被挂起，即调用不会阻塞调用者。&lt;/p&gt;
@@ -33,7 +146,7 @@
 &lt;h3 id=&quot;事件驱动式I-O-signal-driven-I-O&quot;&gt;&lt;a href=&quot;#事件驱动式I-O-signal-driven-I-O&quot; class=&quot;headerlink&quot; title=&quot;事件驱动式I/O(signal driven I/O)&quot;&gt;&lt;/a&gt;事件驱动式I/O(signal driven I/O)&lt;/h3&gt;&lt;p&gt;调用者发起调用之后，在第一阶段，内核立即返回结果给调用者，告诉调用者：你的请求我已经收到了，你该干嘛干嘛去，一旦我这边完成了，我会通知你。就相当于你去吃面了，老板告诉你面做好了我会打电话通知你的。这不是盲等，你该干嘛干嘛，不需要回来看，过一会老板通知你OK了，你就回来了。回来后，面在柜台上，我们去端面。端面的过程才是真正的I/O过程，这个过程是不能干其他事情的。(也像我们去餐馆，没位置，留了个电话号码，然后出去玩了，等服务员电话。)&lt;br&gt;这个过程中，第一段是非阻塞的，第二段是阻塞的。作为web服务器来讲，这有什么用呢？一个进程，第一个用户请求来了，进程向内核发起系统调用，加载文件，内核说你该干嘛干嘛去。于是这个进程就闲下来了，这样它就可以处理其它请求了。这就是为什么一个进程可以处理多个请求的原因。但是这个并不意味着性能一定好。虽然已经比阻塞和盲等有优势了，但是它第二段依然是阻塞的。面已经OK了，你仍然得自己端，所以在内核空间数据复制到进程空间这段，仍然是阻塞的。&lt;br&gt;为什么叫事件驱动呢？因为一旦数据从磁盘到内核空间后，内核会通知调用者。所以调用者本身使用回调函数来处理。&lt;br&gt;假如第二个请求数据已经准备好了，等着调用者进程将数据从内核空间复制到用户空间，但是假如此时调用者阻塞在第一个请求上，正在复制第一个请求的数据到进程空间，怎么办？内核通知完了在特定时间内你没有接收，这个信号就消失了。怎么办？所以通知与否，怎么通知，这就引入了两种通知机制。&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;第一种：水平触发。通知一次，你没响应，没来处理，内核就再通知一次。没来处理留再通知一次，直到你处理为止。多次通知看上去更可靠，但是浪费资源。(类似老板一直打电话给你，直到你接电话)&lt;/li&gt;
-&lt;li&gt;第二种：边缘触发。只通知一次，但是如果调用者没响应怎么办呢？把通知事件通过回调函数让调用者自行获取，或者把通知信息放置某处，或者过一会儿调用者自己去要。(老板打了一遍电话，你没接，怕面凉了，就端到厨房。过一会你看到未接电话，知道面好了，就回来了，跟老板要。这叫回调。)&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/5.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
+&lt;li&gt;第二种：边缘触发。只通知一次，但是如果调用者没响应怎么办呢？把通知事件通过回调函数让调用者自行获取，或者把通知信息放置某处，或者过一会儿调用者自己去要。(老板打了一遍电话，你没接，怕面凉了，就端到厨房。过一会你看到未接电话，知道面好了，就回来了，跟老板要。这叫回调。至于什么是回调函数，可以看：&lt;a href=&quot;https://www.zhihu.com/question/19801131&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://www.zhihu.com/question/19801131&lt;/a&gt;)&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/5.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&quot;异步I-O-asynchronous-I-O&quot;&gt;&lt;a href=&quot;#异步I-O-asynchronous-I-O&quot; class=&quot;headerlink&quot; title=&quot;异步I/O(asynchronous I/O)&quot;&gt;&lt;/a&gt;异步I/O(asynchronous I/O)&lt;/h3&gt;&lt;p&gt;当调用者向内核发调用，内核说请求已收到，该干嘛干嘛去。于是内核在后台默默地完成第一步，默默地完成第二步。然后才告诉调用者，饭已OK了，过来吃吧。饭都不用你端了，直接由营业员端到你事先定义好的座位上。因此第一个阶段不用阻塞，第二个阶段不用阻塞。&lt;br&gt;作为一个web服务器来讲，当第一个用户请求进来时，用户请求资源，这个进程向内核发起系统调用，内核自己把数据从磁盘到内核空间，在复制到进程空间，所有东西都准备好了，告诉进程OK了，进程就立即打包响应报文响应给客户端。&lt;br&gt;httpd的event模型就是事件驱动型I/O，但是据说新版2.4也支持异步I/O。在异步模型下，生产力大大解放。内核从磁盘加载数据到内核内存中，一般都会缓存下来。如果第二个用户请求的资源和前面的用户请求的资源是一样的，直接响应就可以了。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/6.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h2 id=&quot;五种I-O模型对比&quot;&gt;&lt;a href=&quot;#五种I-O模型对比&quot; class=&quot;headerlink&quot; title=&quot;五种I/O模型对比&quot;&gt;&lt;/a&gt;五种I/O模型对比&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;有通知机制的我们称为异步I/O，无通知机制的我们称为同步I/O。见上图最下面，前面3个是同步I/O，后面2个是异步I/O。&lt;/p&gt;
@@ -4504,100 +4617,6 @@ docker-compose version 1.15.0, build e12f3b9
     
     
       <category term="Docker Registry" scheme="http://yoursite.com/tags/Docker-Registry/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>CentOS安装Docker CE</title>
-    <link href="http://yoursite.com/2017/08/28/CentOS%E5%AE%89%E8%A3%85Docker-CE/"/>
-    <id>http://yoursite.com/2017/08/28/CentOS安装Docker-CE/</id>
-    <published>2017-08-28T05:29:47.000Z</published>
-    <updated>2017-11-07T07:46:34.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how registries are handled.”，并且建议我尝试较新的版本。在2017年4月份的DockerCon会议上，Docker公司直接将 Github 上原隶属于 Docker 组织的 Docker 项目，直接 transfer 到了一个新的、名叫 Moby 的组织下，并将其重命名为 Moby 项目。由此先来了解下这个Moby项目。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;Moby项目&quot;&gt;&lt;a href=&quot;#Moby项目&quot; class=&quot;headerlink&quot; title=&quot;Moby项目&quot;&gt;&lt;/a&gt;Moby项目&lt;/h2&gt;&lt;p&gt;为什么会产生Moby这个项目呢？可以看到最近几年里面，在2015年之后的Docker 1.17版本之后，引入了很多的新特性，比如Network、runC等，Docker的组件越来越多，提供支持的场景也越来越复杂，比如微服务、机器学习、物联网等，所以Docker镜像的下载量也呈现指数型上升，最终Docker运行的环境，也是越来越复杂，越来越多，比如在Linux，Windows，还有在嵌入式设备上。&lt;br&gt;所以Docker原本的发行版本已经不能适配于这些越来越复杂的场景了，举个例子，其实在IoT里面，树莓派的性能是比较好的，但是它去运行Docker的话，Docker就会占整个性能的一大部分，这样它上面就已经无法运行其他的一些自己的应用了，那用户要怎么去解决这些事情，难道自己去再写一个Docker容器引擎吗？这个成本是很高的，需要自己去造轮子。所以为了提供更加开放的生态，Docker公司把Docker项目中现在的一些组件抽象成Moby项目，这样系统构建者就可以通过Moby项目把现有的组件去进行组装，然后组装成自己所需要的一个容器引擎。&lt;br&gt;Moby项目现在有80多个组件，通过这些组件，用户可以避免重复地去造轮子。用户可以按照自己的需要去组装组件，做出自己的一个容器系统。这些组件有一个标准化的调用方式，他们之间通过gRPC通信，它的语言也是可以去定制的，不会像之前一样必须用Go语言去写。通过标准化的方式，通过Moby这个项目就可以把这些组件进行组合，成为自己所依赖的容器系统。&lt;br&gt;Docker项目现在改名成Moby项目，但是Docker会逐渐的从Moby项目中去抽象和剥离出来，作为Moby的一种组装方式，比如Docker依赖于这里面的一些库，它就特化成一种组装，组装成自己的Docker CE的版本，也就是Docker的社区版。Docker社区版后面也会继续做开源，所以用户和开发者不需要担心以后用Docker就会收费了，对于Docker用户来说，他也无须感知用户接口的变化，使用的命令还是Docker不是Moby，需要更多运维支持的可以选择Docker EE的版本，让Docker公司的工程师去替你去做运维和更复杂的线上支持，如果自己开发可以继续选择Docker社区版。对于架构师而言，现在就可以不强依赖于Docker项目，而是通过这些组件去拼装出来一个容器引擎去满足自己的需求。&lt;/p&gt;
-&lt;h2 id=&quot;安装Docker-CE&quot;&gt;&lt;a href=&quot;#安装Docker-CE&quot; class=&quot;headerlink&quot; title=&quot;安装Docker CE&quot;&gt;&lt;/a&gt;安装Docker CE&lt;/h2&gt;&lt;h3 id=&quot;版本说明&quot;&gt;&lt;a href=&quot;#版本说明&quot; class=&quot;headerlink&quot; title=&quot;版本说明&quot;&gt;&lt;/a&gt;版本说明&lt;/h3&gt;&lt;p&gt;2017年2月份，Docker公司发布了全新的Docker版本：V1.13.0。从2017年3月1号开始，Docker的版本命名发生如下变化：&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;项目&lt;/th&gt;
-&lt;th&gt;说明&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;版本格式&lt;/td&gt;
-&lt;td&gt;YY.MM&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;stable版本&lt;/td&gt;
-&lt;td&gt;每个季度发行&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;edge版本&lt;/td&gt;
-&lt;td&gt;每个月发行&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;同时将Docker分成CE和EE 2个版本。CE版本即社区版（免费，支持周期三个月），EE即企业版，强调安全，付费使用。&lt;br&gt;Docker 会每月发布一个 edge 版本(17.03, 17.04, 17.05…)，每三个月发布一个 stable 版本(17.03, 17.06, 17.09…)，企业版(EE) 和 stable 版本号保持一致，但每个版本提供一年维护。&lt;br&gt;Docker 的 Linux 发行版的软件仓库也从以前的&lt;a href=&quot;https://apt.dockerproject.org和https://yum.dockerproject.org&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://apt.dockerproject.org和https://yum.dockerproject.org&lt;/a&gt; 变更为目前的 &lt;a href=&quot;https://download.docker.com&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://download.docker.com&lt;/a&gt; 。软件包名变更为 docker-ce(社区版) 和 docker-ee(企业版)。&lt;br&gt;当前的CE版本为17.03.0，基于V1.13.0。主要修复错误，没有重大功能增加，API亦保持不变。本文以此版本安装。&lt;br&gt;此版本的发行说明，请参考：&lt;a href=&quot;https://github.com/docker/docker/releases&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/docker/docker/releases&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&quot;安装Docker&quot;&gt;&lt;a href=&quot;#安装Docker&quot; class=&quot;headerlink&quot; title=&quot;安装Docker&quot;&gt;&lt;/a&gt;安装Docker&lt;/h3&gt;&lt;p&gt;官方安装文档：&lt;a href=&quot;https://docs.docker.com/engine/installation/linux/docker-ce/centos/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.docker.com/engine/installation/linux/docker-ce/centos/&lt;/a&gt;&lt;/p&gt;
-&lt;h4 id=&quot;环境要求&quot;&gt;&lt;a href=&quot;#环境要求&quot; class=&quot;headerlink&quot; title=&quot;环境要求&quot;&gt;&lt;/a&gt;环境要求&lt;/h4&gt;&lt;p&gt;To install Docker CE, you need the 64-bit version of CentOS 7.&lt;br&gt;The centos-extras repository must be enabled. This repository is enabled by default, but if you have disabled it, you need to re-enable it.&lt;/p&gt;
-&lt;h4 id=&quot;卸载安装的所有Docker组件&quot;&gt;&lt;a href=&quot;#卸载安装的所有Docker组件&quot; class=&quot;headerlink&quot; title=&quot;卸载安装的所有Docker组件&quot;&gt;&lt;/a&gt;卸载安装的所有Docker组件&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@spark32 lib]# systemctl stop docker.service
-[root@spark32 lib]# yum remove docker docker-common docker-selinux docker-engine container-selinux
-[root@spark32 lib]# rm -rf docker/
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;通过仓库安装Docker-CE&quot;&gt;&lt;a href=&quot;#通过仓库安装Docker-CE&quot; class=&quot;headerlink&quot; title=&quot;通过仓库安装Docker CE&quot;&gt;&lt;/a&gt;通过仓库安装Docker CE&lt;/h4&gt;&lt;p&gt;1.安装依赖包&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# yum install -y yum-utils device-mapper-persistent-data lvm2
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.下载docker yum源&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.更新软件缓存&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# yum makecache fast
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.安装Docker CE&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# yum install docker-ce -y
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.启动docker&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# systemctl start docker.service
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;6.查看docker版本信息&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# docker info
-Containers: 0
- Running: 0
- Paused: 0
- Stopped: 0
-Images: 0
-Server Version: 17.06.1-ce
-Storage Driver: overlay
- Backing Filesystem: extfs
- Supports d_type: true
-Logging Driver: json-file
-Cgroup Driver: cgroupfs
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】:在生产环境中，可能需要使用某一个特定版本的Docker，而不是使用最新的版本，我们可以先列出版本，然后安装指定版本：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# yum list docker-ce.x86_64  --showduplicates | sort -r
-[root@spark32 ~]# yum install docker-ce-&amp;lt;VERSION&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置镜像加速&quot;&gt;&lt;a href=&quot;#配置镜像加速&quot; class=&quot;headerlink&quot; title=&quot;配置镜像加速&quot;&gt;&lt;/a&gt;配置镜像加速&lt;/h3&gt;&lt;p&gt;国内访问 Docker Hub 有时会遇到困难，此时可以配置镜像加速器。国内很多云服务商都提供了加速器服务，例如：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;阿里云加速器&lt;/li&gt;
-&lt;li&gt;DaoCloud 加速器&lt;/li&gt;
-&lt;li&gt;灵雀云加速器&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;以阿里云加速器为例&lt;br&gt;1.首先进入&lt;a href=&quot;https://dev.aliyun.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;阿里云docker库首页&lt;/a&gt;&lt;br&gt;注册用户并登录，点击右上角“管理中心”。如果第一次，会提示“您还没有开通服务”，点击“确定”，然后会出现弹窗“初始化设置”，设置docker登录时使用的密码。&lt;br&gt;2.点击左侧菜单“Docker Hub镜像站点”，可以看到“您的专属加速器地址：&lt;a href=&quot;https://6101v8g5.mirror.aliyuncs.com”，我们需要将其配置到Docker&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://6101v8g5.mirror.aliyuncs.com”，我们需要将其配置到Docker&lt;/a&gt; 引擎。&lt;br&gt;3.修改daemon配置文件/etc/docker/daemon.json来使用加速器：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# vim /etc/docker/daemon.json
-{
-  &amp;quot;registry-mirrors&amp;quot;: [&amp;quot;https://6101v8g5.mirror.aliyuncs.com&amp;quot;]
-}
-[root@spark32 ~]# systemctl daemon-reload
-[root@spark32 ~]# systemctl restart docker
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;卸载Docker-CE&quot;&gt;&lt;a href=&quot;#卸载Docker-CE&quot; class=&quot;headerlink&quot; title=&quot;卸载Docker CE&quot;&gt;&lt;/a&gt;卸载Docker CE&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# yum remove docker-ce
-# rm -rf /var/lib/docker
-&lt;/code&gt;&lt;/pre&gt;</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how registries are handled.”，并且建议我尝试较新的版本。在2017年4月份的DockerCon会议上，Docker公司直接将 Github 上原隶属于 Docker 组织的 Docker 项目，直接 transfer 到了一个新的、名叫 Moby 的组织下，并将其重命名为 Moby 项目。由此先来了解下这个Moby项目。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
-    
-    
-      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
     
   </entry>
   

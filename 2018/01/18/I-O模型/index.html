@@ -119,7 +119,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/5.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/6.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/7.png">
-<meta property="og:updated_time" content="2018-01-19T01:47:50.000Z">
+<meta property="og:updated_time" content="2018-01-21T12:12:42.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="I&#x2F;O模型">
 <meta name="twitter:description" content="I/O类型从不同的角度来划分，有两种不同的方式：同步I/O和异步I/O    ——synchronous, asynchronous同步和异步关注的是消息通知机制。说白了就是如何通知调用者的。I/O就是一方能够提供服务，一方需要调用别人的服务，">
@@ -352,8 +352,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-01-19T09:47:50+08:00" content="2018-01-19">
-              2018-01-19
+              <time itemprop="dateUpdated" datetime="2018-01-21T20:12:42+08:00" content="2018-01-21">
+              2018-01-21
               </time>
               </span>
             
@@ -423,7 +423,7 @@
 <h3 id="事件驱动式I-O-signal-driven-I-O"><a href="#事件驱动式I-O-signal-driven-I-O" class="headerlink" title="事件驱动式I/O(signal driven I/O)"></a>事件驱动式I/O(signal driven I/O)</h3><p>调用者发起调用之后，在第一阶段，内核立即返回结果给调用者，告诉调用者：你的请求我已经收到了，你该干嘛干嘛去，一旦我这边完成了，我会通知你。就相当于你去吃面了，老板告诉你面做好了我会打电话通知你的。这不是盲等，你该干嘛干嘛，不需要回来看，过一会老板通知你OK了，你就回来了。回来后，面在柜台上，我们去端面。端面的过程才是真正的I/O过程，这个过程是不能干其他事情的。(也像我们去餐馆，没位置，留了个电话号码，然后出去玩了，等服务员电话。)<br>这个过程中，第一段是非阻塞的，第二段是阻塞的。作为web服务器来讲，这有什么用呢？一个进程，第一个用户请求来了，进程向内核发起系统调用，加载文件，内核说你该干嘛干嘛去。于是这个进程就闲下来了，这样它就可以处理其它请求了。这就是为什么一个进程可以处理多个请求的原因。但是这个并不意味着性能一定好。虽然已经比阻塞和盲等有优势了，但是它第二段依然是阻塞的。面已经OK了，你仍然得自己端，所以在内核空间数据复制到进程空间这段，仍然是阻塞的。<br>为什么叫事件驱动呢？因为一旦数据从磁盘到内核空间后，内核会通知调用者。所以调用者本身使用回调函数来处理。<br>假如第二个请求数据已经准备好了，等着调用者进程将数据从内核空间复制到用户空间，但是假如此时调用者阻塞在第一个请求上，正在复制第一个请求的数据到进程空间，怎么办？内核通知完了在特定时间内你没有接收，这个信号就消失了。怎么办？所以通知与否，怎么通知，这就引入了两种通知机制。</p>
 <ul>
 <li>第一种：水平触发。通知一次，你没响应，没来处理，内核就再通知一次。没来处理留再通知一次，直到你处理为止。多次通知看上去更可靠，但是浪费资源。(类似老板一直打电话给你，直到你接电话)</li>
-<li>第二种：边缘触发。只通知一次，但是如果调用者没响应怎么办呢？把通知事件通过回调函数让调用者自行获取，或者把通知信息放置某处，或者过一会儿调用者自己去要。(老板打了一遍电话，你没接，怕面凉了，就端到厨房。过一会你看到未接电话，知道面好了，就回来了，跟老板要。这叫回调。)<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/5.png" alt=""></li>
+<li>第二种：边缘触发。只通知一次，但是如果调用者没响应怎么办呢？把通知事件通过回调函数让调用者自行获取，或者把通知信息放置某处，或者过一会儿调用者自己去要。(老板打了一遍电话，你没接，怕面凉了，就端到厨房。过一会你看到未接电话，知道面好了，就回来了，跟老板要。这叫回调。至于什么是回调函数，可以看：<a href="https://www.zhihu.com/question/19801131" target="_blank" rel="external">https://www.zhihu.com/question/19801131</a>)<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/5.png" alt=""></li>
 </ul>
 <h3 id="异步I-O-asynchronous-I-O"><a href="#异步I-O-asynchronous-I-O" class="headerlink" title="异步I/O(asynchronous I/O)"></a>异步I/O(asynchronous I/O)</h3><p>当调用者向内核发调用，内核说请求已收到，该干嘛干嘛去。于是内核在后台默默地完成第一步，默默地完成第二步。然后才告诉调用者，饭已OK了，过来吃吧。饭都不用你端了，直接由营业员端到你事先定义好的座位上。因此第一个阶段不用阻塞，第二个阶段不用阻塞。<br>作为一个web服务器来讲，当第一个用户请求进来时，用户请求资源，这个进程向内核发起系统调用，内核自己把数据从磁盘到内核空间，在复制到进程空间，所有东西都准备好了，告诉进程OK了，进程就立即打包响应报文响应给客户端。<br>httpd的event模型就是事件驱动型I/O，但是据说新版2.4也支持异步I/O。在异步模型下，生产力大大解放。内核从磁盘加载数据到内核内存中，一般都会缓存下来。如果第二个用户请求的资源和前面的用户请求的资源是一样的，直接响应就可以了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/6.png" alt=""></p>
 <h2 id="五种I-O模型对比"><a href="#五种I-O模型对比" class="headerlink" title="五种I/O模型对比"></a>五种I/O模型对比</h2><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/7.png" alt=""><br>有通知机制的我们称为异步I/O，无通知机制的我们称为同步I/O。见上图最下面，前面3个是同步I/O，后面2个是异步I/O。</p>
@@ -472,6 +472,10 @@
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/21/安装部署Openresty/" rel="prev" title="安装部署Openresty">
+                安装部署Openresty <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -541,7 +545,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">54</span>
+              <span class="site-state-item-count">55</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -674,7 +678,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共133.4k字</span>
+  <span class="post-count">博客全站共136.1k字</span>
 </div>
 
         
