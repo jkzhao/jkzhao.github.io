@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-01-21T13:07:59.000Z</updated>
+  <updated>2018-01-23T13:02:15.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,39 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Nginx配置详解及优化</title>
+    <link href="http://yoursite.com/2018/01/23/Nginx%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3%E5%8F%8A%E4%BC%98%E5%8C%96/"/>
+    <id>http://yoursite.com/2018/01/23/Nginx配置详解及优化/</id>
+    <published>2018-01-23T07:06:27.000Z</published>
+    <updated>2018-01-23T13:02:15.000Z</updated>
+    
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。&lt;/p&gt;
+&lt;/blockquote&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+    
+    </summary>
+    
+      <category term="Nginx" scheme="http://yoursite.com/categories/Nginx/"/>
+    
+    
+      <category term="Nginx" scheme="http://yoursite.com/tags/Nginx/"/>
+    
+  </entry>
+  
+  <entry>
     <title>安装部署Openresty</title>
     <link href="http://yoursite.com/2018/01/21/%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2Openresty/"/>
     <id>http://yoursite.com/2018/01/21/安装部署Openresty/</id>
     <published>2018-01-21T11:55:10.000Z</published>
-    <updated>2018-01-21T13:07:59.000Z</updated>
+    <updated>2018-01-23T13:14:35.000Z</updated>
     
     <content type="html">&lt;blockquote&gt;
 &lt;p&gt;由于公司的一个产品用了Nginx Lua写了认证，所以在选型时选了OpenResty。&lt;/p&gt;
@@ -75,8 +103,19 @@
 # wget https://openresty.org/download/openresty-1.9.7.3.tar.gz
 # tar zxf openresty-1.9.7.3.tar.gz
 # cd openresty-1.9.7.3/
-# ./configure
-# gmake &amp;amp;&amp;amp; gmake install
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看可配置的选项：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# ./configure --help
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;常用的配置参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;–-prefix=path&lt;br&gt;设置安装目录，默认为/usr/local/openresty&lt;/li&gt;
+&lt;li&gt;–user=name&lt;br&gt;设置工作进程使用的非特权用户的用户名，默认为nobody。安装完成后可以在nginx.conf中通过user指令修改。&lt;/li&gt;
+&lt;li&gt;–group=name&lt;br&gt;设置工作进程使用的非特权用户组的名称，默认组名和–user的名称一致。安装完成后可以在nginx.conf配置文件中通过user指令指定。&lt;/li&gt;
+&lt;li&gt;–-with-http_ssl_module&lt;br&gt;启用添加HTTPS协议支持到HTTP服务器的模块，该模块默认不启用。构建和运行该模块需要OpenSSL库。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;配置：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# ./configure
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;编译和安装：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# gmake &amp;amp;&amp;amp; gmake install
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;安装完成后，在/usr/local/下多了个openresty目录，nginx部署安装在/usr/local/openresty/nginx。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;3.将nginx加入系统服务&lt;/strong&gt;&lt;br&gt;&lt;strong&gt;【Redhat7之前的版本】：&lt;/strong&gt;&lt;br&gt;(1)    上传脚本nginx启动脚本到/etc/init.d/目录下&lt;br&gt;(2)    授权脚本执行权限&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# chmod a+x nginx
@@ -4369,254 +4408,6 @@ ca0c50dd3a49             net1                    overlay
     
     
       <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Registry私有仓库搭建及认证</title>
-    <link href="http://yoursite.com/2017/09/01/Registry%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA%E5%8F%8A%E8%AE%A4%E8%AF%81/"/>
-    <id>http://yoursite.com/2017/09/01/Registry私有仓库搭建及认证/</id>
-    <published>2017-09-01T09:44:19.000Z</published>
-    <updated>2017-11-10T04:20:42.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;Registry相关概念&quot;&gt;&lt;a href=&quot;#Registry相关概念&quot; class=&quot;headerlink&quot; title=&quot;Registry相关概念&quot;&gt;&lt;/a&gt;Registry相关概念&lt;/h2&gt;&lt;p&gt;前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。&lt;br&gt;image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。可以很容易和本地源代码以及远端Git服务的关系相对应。&lt;br&gt;Docker hub是Docker公司提供的一些存储镜像的空间，这部分空间是有限的。我们一般会自主建设Docker私有仓库Registry。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;Registry-V1和V2&quot;&gt;&lt;a href=&quot;#Registry-V1和V2&quot; class=&quot;headerlink&quot; title=&quot;Registry V1和V2&quot;&gt;&lt;/a&gt;Registry V1和V2&lt;/h2&gt;&lt;p&gt;Docker Registry 2.0版本在安全性和性能上做了诸多优化，并重新设计了镜像的存储的格式。Docker目前1.6之后支持V2。&lt;/p&gt;
-&lt;h2 id=&quot;安装Docker&quot;&gt;&lt;a href=&quot;#安装Docker&quot; class=&quot;headerlink&quot; title=&quot;安装Docker&quot;&gt;&lt;/a&gt;安装Docker&lt;/h2&gt;&lt;p&gt;见前面发布的文章《CentOS安装Docker CE》。&lt;/p&gt;
-&lt;h2 id=&quot;搭建本地registry-v2&quot;&gt;&lt;a href=&quot;#搭建本地registry-v2&quot; class=&quot;headerlink&quot; title=&quot;搭建本地registry v2&quot;&gt;&lt;/a&gt;搭建本地registry v2&lt;/h2&gt;&lt;p&gt;环境：172.16.7.151 CentOS 7.0&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -d -p 5000:5000 --name wisedu_registry registry:2
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;本地push镜像到仓库:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker pull ubuntu:16.04
-[root@node1 ~]# docker tag ubuntu:16.04 localhost:5000/my-ubuntu
-[root@node1 ~]# docker push localhost:5000/my-ubuntu
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;删除本地的ubuntu:16.04和localhost:5000/my-ubuntu镜像&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker image remove ubuntu:16.04
-[root@node1 ~]# docker image remove localhost:5000/my-ubuntu
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;从本地registry中拉取 localhost:5000/my-ubuntu 镜像：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker pull localhost:5000/my-ubuntu
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;但是这种registry只是本地能使用，我们找另外一台主机172.16.7.152往该registry中push镜像：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node2 ~]# docker pull ubuntu:16.04
-[root@node2 docker]# docker tag ubuntu:16.04 172.16.7.151:5000/ubuntu:v1
-[root@node2 docker]# docker push 172.16.7.151:5000/ubuntu:v1
-The push refers to a repository [172.16.7.151:5000/ubuntu]
-Get https://172.16.7.151:5000/v2/: http: server gave HTTP response to HTTPS client
-[root@node2 ~]# echo $?
-1
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这是因为从docker1.13.2版本开始，使用registry时，必须使用TLS保证其安全。&lt;/p&gt;
-&lt;p&gt;停止并删除本地registry：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker stop wisedu_registry         
-wisedu_registry
-[root@node1 ~]# docker rm -v wisedu_registry
-wisedu_registry
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;搭建外部可访问的Registry&quot;&gt;&lt;a href=&quot;#搭建外部可访问的Registry&quot; class=&quot;headerlink&quot; title=&quot;搭建外部可访问的Registry&quot;&gt;&lt;/a&gt;搭建外部可访问的Registry&lt;/h2&gt;&lt;p&gt;官方文档：&lt;a href=&quot;https://docs.docker.com/registry/deploying/#run-an-externally-accessible-registry&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.docker.com/registry/deploying/#run-an-externally-accessible-registry&lt;/a&gt;&lt;br&gt;Running a registry only accessible on localhost has limited usefulness. In order to make your registry accessible to external hosts, you must first secure it using TLS.&lt;/p&gt;
-&lt;p&gt;使用TLS认证registry容器时，必须有证书。一般情况下，是要去认证机构购买签名证书。这里使用openssl生成自签名的证书。&lt;br&gt;环境信息：172.16.206.32  CentOS 7.0  主机名：spark32&lt;/p&gt;
-&lt;p&gt;1.生成自签名证书&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# mkdir -p /opt/docker/registry/certs
-[root@spark32 ~]# openssl req -newkey rsa:4096 -nodes -sha256 -keyout /opt/docker/registry/certs/domain.key -x509 -days 365 -out /opt/docker/registry/certs/domain.crt
-Generating a 4096 bit RSA private key
-...
-Country Name (2 letter code) [XX]:CN
-State or Province Name (full name) []:JiangSu
-Locality Name (eg, city) [Default City]:NanJing
-Organization Name (eg, company) [Default Company Ltd]:wisedu
-Organizational Unit Name (eg, section) []:edu
-Common Name (eg, your name or your server&amp;apos;s hostname) []:registry.docker.com
-Email Address []:01115004@wisedu.com
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.创建带有TLS认证的registry容器&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# docker run -d --name registry2 -p 5000:5000 -v /opt/docker/registry/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.在每一个docker客户端宿主机上配置/etc/hosts，以使客户端宿主机可以解析域名”registry.docker.com”。并创建与这个registry服务器域名一致的目录（因为我这里的域名是假的）&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# vim /etc/hosts
-172.16.206.32 registry.docker.com
-[root@node1 ~]# cd /etc/docker/certs.d/
-[root@node1 certs.d]# mkdir registry.docker.com:5000
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.将证书 domain.crt 复制到每一个docker客户端宿主机/etc/docker/certs.d/registry.docker.com:5000/ca.crt，不需要重启docker&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# scp -p /opt/docker/registry/certs/domain.crt root@172.16.7.151:/etc/docker/certs.d/registry.docker.com\:5000/ca.crt
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.push镜像到registry&lt;br&gt;另找一台客户机，node1。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 certs.d]# docker tag ubuntu:16.04 registry.docker.com:5000/my-ubuntu:v1
-[root@node1 certs.d]# docker push registry.docker.com:5000/my-ubuntu:v1
-The push refers to a repository [registry.docker.com:5000/my-ubuntu]
-a09947e71dc0: Pushed 
-9c42c2077cde: Pushed 
-625c7a2a783b: Pushed 
-25e0901a71b8: Pushed 
-8aa4fcad5eeb: Pushed 
-v1: digest: sha256:634a341aa83f32b48949ef428db8fefcd897dbacfdac26f044b60c14d1b5e972 size: 1357
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;6.列出私有仓库中的所有镜像&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 certs.d]# curl -X GET https://registry.docker.com:5000/v2/_catalog -k
-{&amp;quot;repositories&amp;quot;:[&amp;quot;my-ubuntu&amp;quot;]}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;7.查看存储在registry:2宿主机上的镜像&lt;br&gt;在registry:2创建的私有仓库中，上传的镜像保存在容器的/var/lib/registry目录下。创建registry:2的容器时，会自动创建一个数据卷(Data Volumes)，数据卷对应的宿主机下的目录一般为：/var/lib/docker/volumes/XXX/_data。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# ls /var/lib/docker/volumes/91a0091963fa6d107dc988a60b61790bba843a115573e331db967921d5e83372/_data/docker/registry/v2/repositories/my-ubuntu/
-_layers  _manifests  _uploads
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可以在创建registry:2的容器时，通过-v参数，修改这种数据卷关系：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;–v /opt/docker/registry/data:/var/lib/registry
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;除了可以将数据保存在当前主机的文件系统上，registry也支持其他基于云的存储系统，比如S3，Microsoft Azure, Ceph Rados, OpenStack Swift and Aliyun OSS等。可以在配置文件中进行配置：&lt;a href=&quot;https://github.com/docker/distribution/blob/master/docs/configuration.md#storage&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/docker/distribution/blob/master/docs/configuration.md#storage&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;【补充】：&lt;br&gt;一般情况下，证书只支持域名访问，要使其支持IP地址访问，需要修改配置文件openssl.cnf。&lt;br&gt;在Redhat7系统中，文件所在位置是/etc/pki/tls/openssl.cnf。在其中的[ v3_ca]部分，添加subjectAltName选项：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[ v3_ca ]  
-subjectAltName = IP:192.168.1.104 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;生成证书：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;...  
-Country Name (2 letter code) [XX]:  
-State or Province Name (full name) []:  
-Locality Name (eg, city) [Default City]:  
-Organization Name (eg, company) [Default Company Ltd]:  
-Organizational Unit Name (eg, section) []:  
-Common Name (eg, your name or your server&amp;apos;s hostname) []:172.16.206.32:5000  
-Email Address []:  
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;添加认证&quot;&gt;&lt;a href=&quot;#添加认证&quot; class=&quot;headerlink&quot; title=&quot;添加认证&quot;&gt;&lt;/a&gt;添加认证&lt;/h2&gt;&lt;h3 id=&quot;Native-basic-auth&quot;&gt;&lt;a href=&quot;#Native-basic-auth&quot; class=&quot;headerlink&quot; title=&quot;Native basic auth&quot;&gt;&lt;/a&gt;Native basic auth&lt;/h3&gt;&lt;p&gt;The simplest way to achieve access restriction is through basic authentication (this is very similar to other web servers’ basic authentication mechanism). This example uses native basic authentication using htpasswd to store the secrets.&lt;/p&gt;
-&lt;p&gt;1.创建用户密码文件，testuser，testpassword&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# mkdir /opt/docker/registry/auth
-[root@spark32 ~]# docker run --entrypoint htpasswd registry:2 -Bbn testuser testpassword &amp;gt; /opt/docker/registry/auth/htpasswd
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.运行registry容器&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# docker run -d --name registry_native_auth -p 5000:5000 -v /opt/docker/registry/auth:/auth -e &amp;quot;REGISTRY_AUTH=htpasswd&amp;quot; -e &amp;quot;REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm&amp;quot; -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd -v /opt/docker/registry/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.现在尝试拉取镜像&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker pull registry.docker.com:5000/my-ubuntu:v1
-Error response from daemon: Get https://registry.docker.com:5000/v2/my-ubuntu/manifests/v1: no basic auth credentials
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.登录registry，push镜像&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker login registry.docker.com:5000
-Username: testuser
-Password: 
-Login Succeeded
-[root@node1 ~]# docker tag ubuntu:16.04 registry.docker.com:5000/my-ubuntu:v1
-[root@node1 ~]# docker push registry.docker.com:5000/my-ubuntu:v1 
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;更高级的认证&quot;&gt;&lt;a href=&quot;#更高级的认证&quot; class=&quot;headerlink&quot; title=&quot;更高级的认证&quot;&gt;&lt;/a&gt;更高级的认证&lt;/h2&gt;&lt;p&gt;更好的方式是在registry前使用代理，利用代理提供https的ssl的认证和basic authentication。&lt;a href=&quot;https://docs.docker.com/registry/recipes/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.docker.com/registry/recipes/&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&quot;配置Nginx作为认证代理&quot;&gt;&lt;a href=&quot;#配置Nginx作为认证代理&quot; class=&quot;headerlink&quot; title=&quot;配置Nginx作为认证代理&quot;&gt;&lt;/a&gt;配置Nginx作为认证代理&lt;/h3&gt;&lt;p&gt;&lt;a href=&quot;https://docs.docker.com/registry/recipes/nginx/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.docker.com/registry/recipes/nginx/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;1.创建需要的目录&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# mkdir -p /opt/nginx_proxy_registry/{auth,data}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.创建Nginx主配置文件&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# vim /opt/nginx_proxy_registry/auth/nginx.conf
-events {
-    worker_connections  1024;
-}
-
-http {
-
-  upstream docker-registry {
-    server registry:5000;
-  }
-
-  ## Set a variable to help us decide if we need to add the
-  ## &amp;apos;Docker-Distribution-Api-Version&amp;apos; header.
-  ## The registry always sets this header.
-  ## In the case of nginx performing auth, the header will be unset
-  ## since nginx is auth-ing before proxying.
-  map $upstream_http_docker_distribution_api_version $docker_distribution_api_version {
-    &amp;apos;&amp;apos; &amp;apos;registry/2.0&amp;apos;;
-  }
-
-  server {
-    listen 443 ssl;
-    server_name registry.docker.com;
-
-    # SSL
-    ssl_certificate /etc/nginx/conf.d/domain.crt;
-    ssl_certificate_key /etc/nginx/conf.d/domain.key;
-
-    # Recommendations from https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
-    ssl_protocols TLSv1.1 TLSv1.2;
-    ssl_ciphers &amp;apos;EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH&amp;apos;;
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:10m;
-
-    # disable any limits to avoid HTTP 413 for large image uploads
-    client_max_body_size 0;
-
-    # required to avoid HTTP 411: see Issue #1486 (https://github.com/moby/moby/issues/1486)
-    chunked_transfer_encoding on;
-
-    location /v2/ {
-      # Do not allow connections from docker 1.5 and earlier
-      # docker pre-1.6.0 did not properly set the user agent on ping, catch &amp;quot;Go *&amp;quot; user agents
-      if ($http_user_agent ~ &amp;quot;^(docker\/1\.(3|4|5(?!\.[0-9]-dev))|Go ).*$&amp;quot; ) {
-        return 404;
-      }
-
-      # To add basic authentication to v2 use auth_basic setting.
-      auth_basic &amp;quot;Registry realm&amp;quot;;
-      auth_basic_user_file /etc/nginx/conf.d/nginx.htpasswd;
-
-      ## If $docker_distribution_api_version is empty, the header will not be added.
-      ## See the map directive above where this variable is defined.
-      add_header &amp;apos;Docker-Distribution-Api-Version&amp;apos; $docker_distribution_api_version always;
-
-      proxy_pass                          http://docker-registry;
-      proxy_set_header  Host              $http_host;   # required for docker client&amp;apos;s sake
-      proxy_set_header  X-Real-IP         $remote_addr; # pass on real client&amp;apos;s IP
-      proxy_set_header  X-Forwarded-For   $proxy_add_x_forwarded_for;
-      proxy_set_header  X-Forwarded-Proto $scheme;
-      proxy_read_timeout                  900;
-    }
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.创建密码认证文件&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# docker run --rm --entrypoint htpasswd registry:2 -bn testuser testpassword &amp;gt; /opt/nginx_proxy_registry/auth/nginx.htpasswd
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.拷贝之前生成的证书和key到auth目录下&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# cp /opt/docker/registry/certs/domain.crt /opt/nginx_proxy_registry/auth/
-[root@spark32 ~]# cp /opt/docker/registry/certs/domain.key /opt/nginx_proxy_registry/auth/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.创建compose文件 &lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# cd /opt/nginx_proxy_registry/
-[root@spark32 nginx_proxy_registry]# vim docker-compose.yml
-nginx:
-  image: &amp;quot;nginx:1.9&amp;quot;
-  ports:
-    - 5043:443
-  links:
-    - registry:registry
-  volumes:
-    - ./auth:/etc/nginx/conf.d
-    - ./auth/nginx.conf:/etc/nginx/nginx.conf:ro
-
-registry:
-  image: registry:2
-  ports:
-    - 127.0.0.1:5000:5000
-  volumes:
-    - ./data:/var/lib/registry
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;6.启动&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 nginx_proxy_registry]# docker-compose up -d
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;7.验证启动的服务&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 nginx_proxy_registry]# docker-compose ps
-[root@spark32 ~]# docker ps 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;找一台docker客户端机器登录：&lt;br&gt;创建需要的目录：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# mkdir /etc/docker/certs.d/registry.docker.com:5043
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;把 domain.crt 传到上一步生成的目录里：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# scp -p /opt/nginx_proxy_registry/auth/domain.crt root@172.16.7.151:/etc/docker/certs.d/registry.docker.com:5043/ca.crt
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;登录：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker login -u=testuser -p=testpassword registry.docker.com:5043
-Login Succeeded
-[root@node1 ~]# docker tag ubuntu:16.04 registry.docker.com:5043/ubuntu-test:v1
-[root@node1 ~]# docker push registry.docker.com:5043/ubuntu-test:v1
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;8.停止服务&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# cd /opt/nginx_proxy_registry/
-[root@spark32 nginx_proxy_registry]# docker-compose stop
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;9.查看日志&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 nginx_proxy_registry]# docker-compose logs
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;补充Docker-compose&quot;&gt;&lt;a href=&quot;#补充Docker-compose&quot; class=&quot;headerlink&quot; title=&quot;补充Docker compose&quot;&gt;&lt;/a&gt;补充Docker compose&lt;/h3&gt;&lt;h4 id=&quot;Docker-compose是什么&quot;&gt;&lt;a href=&quot;#Docker-compose是什么&quot; class=&quot;headerlink&quot; title=&quot;Docker compose是什么&quot;&gt;&lt;/a&gt;Docker compose是什么&lt;/h4&gt;&lt;p&gt;Docker Compose是一个用来定义和运行复杂应用的Docker工具。使用Compose，你可以在一个文件中定义一个多容器应用，然后使用一条命令来启动你的应用，完成一切准备工作。&lt;br&gt;一个使用Docker容器的应用，通常由多个容器组成。使用Docker Compose，不再需要使用shell脚本来启动容器。&lt;br&gt;Docker Compose将所管理的容器分为三层，工程(project)、服务(service)以及容器(contaienr)。一个工程当中可包含多个服务，每个服务中定义了容器运行的镜像，参数，依赖。一个服务当中可包括多个容器实例，Docker Compose并没有解决负载均衡的问题，因此需要借助其他工具实现服务发现及负载均衡。&lt;/p&gt;
-&lt;h4 id=&quot;安装docker-compose&quot;&gt;&lt;a href=&quot;#安装docker-compose&quot; class=&quot;headerlink&quot; title=&quot;安装docker compose&quot;&gt;&lt;/a&gt;安装docker compose&lt;/h4&gt;&lt;p&gt;将变量 $dockerComposeVersion 换成指定的&lt;a href=&quot;https://github.com/docker/compose/releases&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;版本&lt;/a&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# curl -L https://github.com/docker/compose/releases/download/$dockerComposeVersion/docker-compose-`uname -m` -o /usr/local/bin/docker-compose
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;比如下载安装1.15.0版本：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# curl -L https://github.com/docker/compose/releases/download/1.15.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可能会下载失败，多试几次。实在不行就需要翻墙去下载。&lt;/p&gt;
-&lt;p&gt;赋予执行权限：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# chmod +x /usr/local/bin/docker-compose
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看docker compose版本：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# docker-compose --version
-docker-compose version 1.15.0, build e12f3b9
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;卸载docker-compose&quot;&gt;&lt;a href=&quot;#卸载docker-compose&quot; class=&quot;headerlink&quot; title=&quot;卸载docker compose&quot;&gt;&lt;/a&gt;卸载docker compose&lt;/h4&gt;&lt;p&gt;如果docker compose是通过curl安装的:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;rm /usr/local/bin/docker-compose
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果docker compose是通过pip安装的:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pip uninstall docker-compose
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;registry-web-ui&quot;&gt;&lt;a href=&quot;#registry-web-ui&quot; class=&quot;headerlink&quot; title=&quot;registry web ui&quot;&gt;&lt;/a&gt;registry web ui&lt;/h2&gt;&lt;p&gt;搭建完了docker registry，我们可以使用 docker 命令行工具对我们搭建的 registry 做各种操作了，如 push / pull。但是不够方便，比如不能直观的查看 registry 中的资源情况，如果有一个 ui 工具，能够看到仓库中有哪些镜像、每个镜像的版本是多少。&lt;br&gt;registry web ui主要有3个，一个是 &lt;a href=&quot;https://github.com/kwk/docker-registry-frontend&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;docker-registry-frontend&lt;/a&gt;，一个是 &lt;a href=&quot;https://hub.docker.com/r/hyper/docker-registry-web/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;hyper/docker-registry-web&lt;/a&gt;，还有一个是&lt;a href=&quot;http://port.us.org/documentation.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Portus&lt;/a&gt;。&lt;br&gt;关于registry ui的搭建会在后面的文章中介绍。&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Registry相关概念&quot;&gt;&lt;a href=&quot;#Registry相关概念&quot; class=&quot;headerlink&quot; title=&quot;Registry相关概念&quot;&gt;&lt;/a&gt;Registry相关概念&lt;/h2&gt;&lt;p&gt;前面的文章讲过Docker的组成部分，我们一般在使用Docker的过程中更为常用的是pull image、run image、build image和push image。主要是围绕image展开的。&lt;br&gt;image和Registry的关系可以想象成自己机器上的源码和远端SVN或者Git服务的关系。Registry是一个几种存放image并对外提供上传下载以及一系列API的服务。可以很容易和本地源代码以及远端Git服务的关系相对应。&lt;br&gt;Docker hub是Docker公司提供的一些存储镜像的空间，这部分空间是有限的。我们一般会自主建设Docker私有仓库Registry。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
-    
-    
-      <category term="Docker Registry" scheme="http://yoursite.com/tags/Docker-Registry/"/>
     
   </entry>
   

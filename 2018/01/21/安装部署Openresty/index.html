@@ -113,7 +113,7 @@
 <meta property="og:description" content="由于公司的一个产品用了Nginx Lua写了认证，所以在选型时选了OpenResty。  什么是OpenRestyNginx 是俄罗斯人发明的， Lua 是巴西几个教授发明的，中国人章亦春把 LuaJIT VM 嵌入到 Nginx 中，实现了 OpenResty 这个高性能服务端解决方案。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/8.png">
-<meta property="og:updated_time" content="2018-01-21T13:07:59.000Z">
+<meta property="og:updated_time" content="2018-01-23T13:14:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安装部署Openresty">
 <meta name="twitter:description" content="由于公司的一个产品用了Nginx Lua写了认证，所以在选型时选了OpenResty。  什么是OpenRestyNginx 是俄罗斯人发明的， Lua 是巴西几个教授发明的，中国人章亦春把 LuaJIT VM 嵌入到 Nginx 中，实现了 OpenResty 这个高性能服务端解决方案。">
@@ -346,8 +346,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-01-21T21:07:59+08:00" content="2018-01-21">
-              2018-01-21
+              <time itemprop="dateUpdated" datetime="2018-01-23T21:14:35+08:00" content="2018-01-23">
+              2018-01-23
               </time>
               </span>
             
@@ -459,8 +459,19 @@
 # wget https://openresty.org/download/openresty-1.9.7.3.tar.gz
 # tar zxf openresty-1.9.7.3.tar.gz
 # cd openresty-1.9.7.3/
-# ./configure
-# gmake &amp;&amp; gmake install
+</code></pre><p>查看可配置的选项：</p>
+<pre><code># ./configure --help
+</code></pre><p>常用的配置参数：</p>
+<ul>
+<li>–-prefix=path<br>设置安装目录，默认为/usr/local/openresty</li>
+<li>–user=name<br>设置工作进程使用的非特权用户的用户名，默认为nobody。安装完成后可以在nginx.conf中通过user指令修改。</li>
+<li>–group=name<br>设置工作进程使用的非特权用户组的名称，默认组名和–user的名称一致。安装完成后可以在nginx.conf配置文件中通过user指令指定。</li>
+<li>–-with-http_ssl_module<br>启用添加HTTPS协议支持到HTTP服务器的模块，该模块默认不启用。构建和运行该模块需要OpenSSL库。</li>
+</ul>
+<p>配置：</p>
+<pre><code># ./configure
+</code></pre><p>编译和安装：</p>
+<pre><code># gmake &amp;&amp; gmake install
 </code></pre><p>安装完成后，在/usr/local/下多了个openresty目录，nginx部署安装在/usr/local/openresty/nginx。</p>
 <p><strong>3.将nginx加入系统服务</strong><br><strong>【Redhat7之前的版本】：</strong><br>(1)    上传脚本nginx启动脚本到/etc/init.d/目录下<br>(2)    授权脚本执行权限</p>
 <pre><code># chmod a+x nginx
@@ -532,6 +543,10 @@ WantedBy=multi-user.target
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2018/01/23/Nginx配置详解及优化/" rel="prev" title="Nginx配置详解及优化">
+                Nginx配置详解及优化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -600,7 +615,7 @@ WantedBy=multi-user.target
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">55</span>
+              <span class="site-state-item-count">56</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -733,7 +748,7 @@ WantedBy=multi-user.target
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共136.1k字</span>
+  <span class="post-count">博客全站共136.3k字</span>
 </div>
 
         
