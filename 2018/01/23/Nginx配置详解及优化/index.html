@@ -115,7 +115,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/10.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/11.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/12.png">
-<meta property="og:updated_time" content="2018-01-27T10:45:50.000Z">
+<meta property="og:updated_time" content="2018-01-27T10:57:53.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx配置详解及优化">
 <meta name="twitter:description" content="上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。  NginxNginx的代码是由一个核心和一系列的模块组成, 核心主要用于提供Web Server的基本功能，以及Web和Mail反向代理的功能；">
@@ -348,7 +348,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-01-27T18:45:50+08:00" content="2018-01-27">
+              <time itemprop="dateUpdated" datetime="2018-01-27T18:57:53+08:00" content="2018-01-27">
               2018-01-27
               </time>
               </span>
@@ -481,7 +481,7 @@ events {
     use epoll;
     worker_connections 2048;
 }
-</code></pre><h2 id="http段配置"><a href="#http段配置" class="headerlink" title="http段配置"></a>http段配置</h2><p>http上下文专用于配置用于http的各模块，此类指令非常的多，每个模块都有其专用指定，具体请参数<a href="http://nginx.org/en/docs/http/ngx_http_core_module.html" target="_blank" rel="external">nginx官方文档关于模块部分的说明</a>。大体上来讲，这些模块所提供的配置指令还可以分为如下几个类别。</p>
+</code></pre><h2 id="配置http段"><a href="#配置http段" class="headerlink" title="配置http段"></a>配置http段</h2><p>http上下文专用于配置用于http的各模块，此类指令非常的多，每个模块都有其专用指定，具体请参数<a href="http://nginx.org/en/docs/http/ngx_http_core_module.html" target="_blank" rel="external">nginx官方文档关于模块部分的说明</a>。大体上来讲，这些模块所提供的配置指令还可以分为如下几个类别。</p>
 <ul>
 <li>客户端类指令：如client_body_buffer_size、client_header_buffer_size、client_header_timeout和keepalive_timeout等；</li>
 <li>文件IO类指令：如aio、directio、open_file_cache、open_file_cache_min_uses、open_file_cache_valid和sendfile等；</li>
@@ -539,10 +539,18 @@ You can read more about the TCP_NOPUSH and TCP_CORKsocket options here.
 <p><strong>5.sendfile on|off;</strong><br>是否启用sendfile功能；<br>先来看下nginx作为web服务器的工作方式：<br>用户请求进来了，先到达网卡，由内核处理下交给了监听在80套接字上的应用程序，即交给worker进程，这个worker进程通过连接建立、通过接入分析发现用户请求的是一个静态页面，下面就是I/O了。首先进程向内核发出系统调用。内核为它准备一个缓冲，然后内核从磁盘中加载这个文件到缓冲中，然后将这个文件复制给worker进程自己的地址空间，然后进程将这个文件封装成响应报文，这个封装过程是，进程封装http请求首部，然后交给内核封装TCP首部、IP首部，然后交给客户端。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/10.png" alt=""><br>然后你会发现这个文件是这么走的：从硬盘到内核空间，从内核到用户空间，从用户空间再到内核空间，白白绕一圈。如果说这个请求直接在内核中就封装好(http请求首部封装其实也是在内核封装的)，这样就避免了两次复制(注意是复制，内核任何时候和进程交互都是复制，除非共享内存)。复制虽然时间短，但是架不住多啊。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/11.png" alt=""><br>这就是sendfile机制，读过来就响应了。send只支持很小的文件，sendfile64支持更大的文件。<br>现在流行的web 服务器里面都提供 sendfile 选项用来提高服务器性能，那到底 sendfile是什么，怎么影响性能的呢？<br>sendfile实际上是 Linux2.0+以后的推出的一个系统调用，web服务器可以通过调整自身的配置来决定是否利用sendfile这个系统调用。先来看一下不用 sendfile的传统网络传输过程：</p>
 <pre><code>read(file,tmp_buf, len);
 write(socket,tmp_buf, len);
-</code></pre><p>硬盘 &gt;&gt; kernel buffer &gt;&gt; user buffer&gt;&gt; kernel socket buffer &gt;&gt;协议栈<br>一般来说一个网络应用是通过读硬盘数据，然后写数据到socket 来完成网络传输的。上面2行用代码解释了这一点，不过上面2行简单的代码掩盖了底层的很多操作。来看看底层是怎么执行上面2行代码的：<br>①系统调用 read()产生一个上下文切换：从 user mode 切换到 kernel mode，然后 DMA 执行拷贝，把文件数据从硬盘读到一个 kernel buffer 里。<br>②数据从 kernel buffer拷贝到 user buffer，然后系统调用 read() 返回，这时又产生一个上下文切换：从kernel mode 切换到 user mode。<br>③系统调用write()产生一个上下文切换：从 user mode切换到 kernel mode，然后把步骤2读到 user buffer的数据拷贝到 kernel buffer（数据第2次拷贝到 kernel buffer），不过这次是个不同的 kernel buffer，这个 buffer和 socket相关联。<br>④系统调用 write()返回，产生一个上下文切换：从 kernel mode 切换到 user mode（第4次切换了），然后 DMA 从 kernel buffer拷贝数据到协议栈（第4次拷贝了）。<br>上面4个步骤有4次上下文切换，有4次拷贝，我们发现如果能减少切换次数和拷贝次数将会有效提升性能。在kernel2.0+ 版本中，系统调用 sendfile() 就是用来简化上面步骤提升性能的。sendfile() 不但能减少切换次数而且还能减少拷贝次数。<br>再来看一下用 sendfile() 来进行网络传输的过程：</p>
-<pre><code>sendfile(socket,file, len);
-硬盘 &gt;&gt; kernel buffer (快速拷贝到kernel socket buffer) &gt;&gt;协议栈
-</code></pre><p>①系统调用sendfile()通过 DMA把硬盘数据拷贝到 kernel buffer，然后数据被 kernel直接拷贝到另外一个与 socket相关的 kernel buffer。这里没有 user mode和 kernel mode之间的切换，在 kernel中直接完成了从一个 buffer到另一个buffer的拷贝。<br>②DMA 把数据从 kernelbuffer 直接拷贝给协议栈，没有切换，也不需要数据从 user mode 拷贝到 kernel mode，因为数据就在 kernel 里。<br>步骤减少了，切换减少了，拷贝减少了，自然性能就提升了。这就是为什么说在 Nginx 配置文件里打开 sendfile on 选项能提高 web server性能的原因。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/12.png" alt=""></p>
+</code></pre><p>硬盘 &gt;&gt; kernel buffer &gt;&gt; user buffer&gt;&gt; kernel socket buffer &gt;&gt;协议栈<br>一般来说一个网络应用是通过读硬盘数据，然后写数据到socket 来完成网络传输的。上面2行用代码解释了这一点，不过上面2行简单的代码掩盖了底层的很多操作。来看看底层是怎么执行上面2行代码的：</p>
+<ul>
+<li>①系统调用 read()产生一个上下文切换：从 user mode 切换到 kernel mode，然后 DMA 执行拷贝，把文件数据从硬盘读到一个 kernel buffer 里。</li>
+<li>②数据从 kernel buffer拷贝到 user buffer，然后系统调用 read() 返回，这时又产生一个上下文切换：从kernel mode 切换到 user mode。</li>
+<li>③系统调用write()产生一个上下文切换：从 user mode切换到 kernel mode，然后把步骤2读到 user buffer的数据拷贝到 kernel buffer（数据第2次拷贝到 kernel buffer），不过这次是个不同的 kernel buffer，这个 buffer和 socket相关联。</li>
+<li><p>④系统调用 write()返回，产生一个上下文切换：从 kernel mode 切换到 user mode（第4次切换了），然后 DMA 从 kernel buffer拷贝数据到协议栈（第4次拷贝了）。<br>上面4个步骤有4次上下文切换，有4次拷贝，我们发现如果能减少切换次数和拷贝次数将会有效提升性能。在kernel2.0+ 版本中，系统调用 sendfile() 就是用来简化上面步骤提升性能的。sendfile() 不但能减少切换次数而且还能减少拷贝次数。<br>再来看一下用 sendfile() 来进行网络传输的过程：</p>
+<p>  sendfile(socket,file, len);<br>  硬盘 &gt;&gt; kernel buffer (快速拷贝到kernel socket buffer) &gt;&gt;协议栈</p>
+</li>
+<li><p>①系统调用sendfile()通过 DMA把硬盘数据拷贝到 kernel buffer，然后数据被 kernel直接拷贝到另外一个与 socket相关的 kernel buffer。这里没有 user mode和 kernel mode之间的切换，在 kernel中直接完成了从一个 buffer到另一个buffer的拷贝。</p>
+</li>
+<li>②DMA 把数据从 kernelbuffer 直接拷贝给协议栈，没有切换，也不需要数据从 user mode 拷贝到 kernel mode，因为数据就在 kernel 里。<br>步骤减少了，切换减少了，拷贝减少了，自然性能就提升了。这就是为什么说在 Nginx 配置文件里打开 sendfile on 选项能提高 web server性能的原因。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/12.png" alt=""></li>
+</ul>
 <p><strong>4.gzip  on;</strong><br>对于响应用户的内容是不是先压缩再发送，可以节省带宽。如果网络带宽小，用户访问量大的话可以使用这种方式。</p>
 <h3 id="路径相关的指令"><a href="#路径相关的指令" class="headerlink" title="路径相关的指令"></a>路径相关的指令</h3><p><strong>1.root</strong><br>设置web资源的路径映射；用于指明请求的URL所对应的文档的目录路径；</p>
 <pre><code>server {
@@ -609,35 +617,15 @@ error_page  404  =200  /404.html  （以指定的响应状态码进行响应）
 <ul>
 <li>1.项目环境：nginx（前段代理，仅作代理用途）+3个tomcat（都在同一个服务器上），做的web项目</li>
 <li>2.涉及到的业务逻辑：文件上传（可能有大文件，比如说android游戏，100m）；客户端接口请求；网站后台管理</li>
-<li>3.问题重现流程：</li>
-</ul>
-<ul>
-<li><ul>
+<li>3.问题重现流程：<ul>
 <li>3.1 配置好tomcat后，直接加上nginx前段代理（仅配置了http代理）</li>
-</ul>
-</li>
-<li><ul>
 <li>3.2 问题一：当管理员后台上传文件时，大文件无法上传成功，出现time-out，经重复测试，发现上传时间超过1分钟以后，就会返回超时信息，小文件没有问题</li>
-</ul>
-</li>
-<li><ul>
 <li>3.3 经调研得知nginx默认设置的http连接超时时间为75s，超过75s，会断掉当前的http连接，而大文件上传时经常会超过75s，这就导致大文件无法上传成功，当时的解决方案是，设置nginx http连接超时时间为30分钟，即参数keepalive_timeout=1800；文件上传问题基本解决；</li>
-</ul>
-</li>
-<li><ul>
 <li>3.4项目运行2天后，发现服务器突然宕机了，重启nginx可以解决问题，但是2个小时后又再次宕机，重启nginx又解决了问题，调研了一个中午，并且查看nginx的错误日志（socket() failed (24: Too many open files) while connecting to upstream），发现问题来源与nginx的连接数（设置的默认值为1024）达到上限</li>
-</ul>
-</li>
-<li><ul>
 <li>3.5发现这个问题后，我就想应该把nginx的连接数调大点，于是设置 worker_connections  10240；重启nginx，短时间没有出现问题，但是运行过程中，我再次查看错误日志，发现（socket() failed (24: Too many open files) while connecting to upstream）时不时的出现</li>
-</ul>
-</li>
-<li><ul>
 <li>3.6 此时发现调整nginx的连接数并不能完全解决问题，于是google，百度之，发现问题所在，罪魁祸首是：nginx的keepalive_timeout(参看<a href="http://fengzheng369.blog.163.com/blog/static/752209792012418103813580/" target="_blank" rel="external">http://fengzheng369.blog.163.com/blog/static/752209792012418103813580/</a> )设置项时间太长，客户端接口访问其实是一个比较快速的过程，访问完成了已经不需要继续使用http连接了，但是由于对nginx的错误配置，导致接口访问完成后http连接并没有被释放掉，所以导致连接数越来越大，最终nginx崩溃。</li>
 </ul>
 </li>
-</ul>
-<ul>
 <li>4.那么这个问题应该如何解决呢？<br>将keepalive_timeout时间调小会导致上传操作可能无法完成；调大点的话，许多无效的http连接占据着nginx的连接数。这貌似是一个两难的问题。<br>解决方案一：将接口请求，后台管理，文件上传这三个业务逻辑分开，nginx对这三种业务逻辑分开转发，每个业务逻辑单独设置一个keepalive-timeout(未实验)。</li>
 </ul>
 <p><strong>2.keepalive_requests number;</strong><br>在keepalived连接上所允许请求的最大资源数量；默认为100；</p>
@@ -847,7 +835,7 @@ error_page  404  =200  /404.html  （以指定的响应状态码进行响应）
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx"><span class="nav-number">1.</span> <span class="nav-text">Nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件有哪些"><span class="nav-number">2.</span> <span class="nav-text">配置文件有哪些</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件组织结构"><span class="nav-number">3.</span> <span class="nav-text">配置文件组织结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置main段"><span class="nav-number">4.</span> <span class="nav-text">配置main段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Events段"><span class="nav-number">5.</span> <span class="nav-text">配置Events段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#http段配置"><span class="nav-number">6.</span> <span class="nav-text">http段配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#套接字或主机相关配置"><span class="nav-number">6.1.</span> <span class="nav-text">套接字或主机相关配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路径相关的指令"><span class="nav-number">6.2.</span> <span class="nav-text">路径相关的指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端请求相关的配置"><span class="nav-number">6.3.</span> <span class="nav-text">客户端请求相关的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对客户端请求的进行限制（限流）"><span class="nav-number">6.4.</span> <span class="nav-text">对客户端请求的进行限制（限流）</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx"><span class="nav-number">1.</span> <span class="nav-text">Nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件有哪些"><span class="nav-number">2.</span> <span class="nav-text">配置文件有哪些</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件组织结构"><span class="nav-number">3.</span> <span class="nav-text">配置文件组织结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置main段"><span class="nav-number">4.</span> <span class="nav-text">配置main段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Events段"><span class="nav-number">5.</span> <span class="nav-text">配置Events段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置http段"><span class="nav-number">6.</span> <span class="nav-text">配置http段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#套接字或主机相关配置"><span class="nav-number">6.1.</span> <span class="nav-text">套接字或主机相关配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路径相关的指令"><span class="nav-number">6.2.</span> <span class="nav-text">路径相关的指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端请求相关的配置"><span class="nav-number">6.3.</span> <span class="nav-text">客户端请求相关的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对客户端请求的进行限制（限流）"><span class="nav-number">6.4.</span> <span class="nav-text">对客户端请求的进行限制（限流）</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
