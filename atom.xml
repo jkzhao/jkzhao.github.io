@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-01-27T10:57:53.000Z</updated>
+  <updated>2018-01-27T12:28:52.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2018/01/23/Nginx%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3%E5%8F%8A%E4%BC%98%E5%8C%96/"/>
     <id>http://yoursite.com/2018/01/23/Nginx配置详解及优化/</id>
     <published>2018-01-23T07:06:27.000Z</published>
-    <updated>2018-01-27T10:57:53.000Z</updated>
+    <updated>2018-01-27T12:28:52.000Z</updated>
     
     <content type="html">&lt;blockquote&gt;
 &lt;p&gt;上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。&lt;/p&gt;
@@ -191,9 +191,49 @@ http://www.wisedu.com/images/logo.jpg --&amp;gt; /data/imgs/images/logo.jpg
 &lt;li&gt;location ~&lt;em&gt; URI{}：模式匹配URI，此处的URI可使用正则表达式，~区分字符大小写。~&lt;/em&gt;不区分字符大小写。&lt;/li&gt;
 &lt;li&gt;location ^~ URI{}：明确说明不使用正则表达式。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;【注意】：如果被两个location匹配到，nginx是有优先级的。=优先级最高，^~优先级第二，模式匹配优先级第三，没加任何符号的优先级最低。&lt;br&gt;官方例子：&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_core_module.html#location&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://nginx.org/en/docs/http/ngx_http_core_module.html#location&lt;/a&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;location = / &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    [ configuration A ]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;location / &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    [ configuration B ]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;location /documents/ &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    [ configuration C ]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;location ^~ /images/ &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    [ configuration D ]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;location ~* \.(gif|jpg|jpeg)$ &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    [ configuration E ]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;The “/” request will match configuration A, the “/index.html” request will match configuration B, the “/documents/document.html” request will match configuration C, the “/images/1.gif” request will match configuration D, and the “/documents/1.jpg” request will match configuration E.&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;再来看下location @name { … }，命名的location&lt;/strong&gt;&lt;br&gt;The “@” prefix defines a named location. Such a location is not used for a regular request processing, but instead used for request redirection. They cannot be nested, and cannot contain nested locations.&lt;br&gt;@：内部服务跳转&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;server &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  location /img/ &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    set $memcached_key $uri;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    memcached_pass     name:11211;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    default_type       text/html;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    error_page         404 @fallback;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt; &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  location @fallback &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    proxy_pass http://backend;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  #以 /img/ 开头的请求，如果连接的状态为 404。则会匹配到 @fallback 这条规则上。&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;3.alias&lt;/strong&gt;&lt;br&gt;定义路径别名。&lt;/p&gt;
+&lt;p&gt;【注意】：如果被两个location匹配到，nginx是有优先级的。=优先级最高，^~优先级第二，模式匹配优先级第三，没加任何符号的优先级最低。&lt;br&gt;官方例子：&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_core_module.html#location&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://nginx.org/en/docs/http/ngx_http_core_module.html#location&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;location = / {
+    [ configuration A ]
+}
+
+location / {
+    [ configuration B ]
+}
+
+location /documents/ {
+    [ configuration C ]
+}
+
+location ^~ /images/ {
+    [ configuration D ]
+}
+
+location ~* \.(gif|jpg|jpeg)$ {
+    [ configuration E ]
+}
+The “/” request will match configuration A, the “/index.html” request will match configuration B, the “/documents/document.html” request will match configuration C, the “/images/1.gif” request will match configuration D, and the “/documents/1.jpg” request will match configuration E.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;补充一个，&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;location / {
+    [ configuration A ]
+}
+location /abc {
+    [ configuration B ]
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;访问 &lt;a href=&quot;http://ip:port/abc&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://ip:port/abc&lt;/a&gt; 将被 location /abc 匹配到。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;再来看下location @name { … }，命名的location&lt;/strong&gt;&lt;br&gt;The “@” prefix defines a named location. Such a location is not used for a regular request processing, but instead used for request redirection. They cannot be nested, and cannot contain nested locations.&lt;br&gt;@：内部服务跳转&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;server {
+  location /img/ {
+    set $memcached_key $uri;
+    memcached_pass     name:11211;
+    default_type       text/html;
+    error_page         404 @fallback; #以 /img/ 开头的请求，如果连接的状态为 404。则会匹配到 @fallback 这条规则上。
+  }
+
+  location @fallback {
+    proxy_pass http://backend;
+  } 
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.alias&lt;/strong&gt;&lt;br&gt;定义路径别名。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;location  /images/ {
     root /data/imgs/;
 }
@@ -218,9 +258,21 @@ location  /images/  {
 &lt;p&gt;&lt;strong&gt;5.error_page code … [=[response]] uri;&lt;/strong&gt;&lt;br&gt;根据http的状态码重定向错误页面；&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;error_page  404  /404.html
 error_page  404  =200  /404.html  （以指定的响应状态码进行响应）
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;6.try_files file … uri;&lt;br&gt;  try_files file … =code;&lt;/strong&gt;&lt;br&gt;其作用是按顺序检查文件是否存在，尝试查找第1至第N-1个文件，返回第一个找到的文件或文件夹（结尾加斜线表示为文件夹），如果所有的文件或文件夹都找不到，会进行一个内部重定向到最后一个参数。（必须不能匹配至当前location，而应该匹配至其它location，否则会导致死循环）。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;location / &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    try_files $uri $uri/ @fallback;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    root   /home/data/FS/desgin_style/;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;location @fallback &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    proxy_pass_header Server;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    proxy_set_header Host $http_host;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    proxy_set_header X-Real-IP $remote_addr;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    proxy_set_header X-Scheme $scheme;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt; &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    proxy_pass http://backend;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;$uri为Nginx内置变量，下面会讲到。&lt;/p&gt;
-&lt;h3 id=&quot;客户端请求相关的配置&quot;&gt;&lt;a href=&quot;#客户端请求相关的配置&quot; class=&quot;headerlink&quot; title=&quot;客户端请求相关的配置&quot;&gt;&lt;/a&gt;客户端请求相关的配置&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1.keepalive_timeout timeout [header_timeout];&lt;/strong&gt;&lt;br&gt;设定keepalive连接的超时时长；0表示禁止长连接；默认为75s。&lt;br&gt;KeepAlive，意思为是否长连接。如果设置了超时时间，那么在这个时间内，那么当Nginx完成用户的请求后，那么Nginx进程不会断开用户的请求连接，依然保持连接状态。设置成0s则当Nginx完成用户的请求后，那么Nginx进程会立即断开和用户的请求连接。&lt;br&gt;完成用户的请求后，连接依然存在着，这样的好处是：当该用户的请求在过来时，Nginx会用这个已经建立的连接，不需要重新创建连接。这样会节省CPU的资源。但是却耗费了内存。为什么呢？可以假设这样的场景。假如keepalive 超时时间为10s，而每1s中有100个用户请求访问，每个用户3次连接，每个连接耗费2M内存，那么10s内建立的连接次数为1000次（跟用户每s请求次数无关），消耗内存为1000x2=2000M，相反，如果不保持长连接，同样的环境场景下，每1s内有100x3个连接，下一秒还是100x3个连接，也就是说永远都是100x3个连接，那么1s内甚至10s内消耗的内存为100x3x2=600M。 然而，在这10s内创建的连接次数100x3x10=3000次，这样肯定消耗了更多的cpu资源。毕竟每次tcp连接都是需要cpu去处理的。&lt;br&gt;问题来了，既然知道长连接与否的利与弊，那么如何判定什么时候On，什么时候Off？&lt;br&gt;在上面的举例中，涉及到了一个数，那就是每个用户在1s内请求的次数，如果把3改为1，是不是10s内得到的连接次数总和是一样的。那么这样无论是On还是Off，消耗的CPU资源是一样的。所以，我们考虑3种情况：&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;6.try_files file … uri;&lt;br&gt;  try_files file … =code;&lt;/strong&gt;&lt;br&gt;其作用是按顺序检查文件是否存在，尝试查找第1至第N-1个文件，返回第一个找到的文件或文件夹（结尾加斜线表示为文件夹），如果所有的文件或文件夹都找不到，会进行一个内部重定向到最后一个参数。（必须不能匹配至当前location，而应该匹配至其它location，否则会导致死循环）。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;location / {
+    try_files $uri $uri/ @fallback; # $uri为Nginx内置变量，下面会讲到。
+    root   /home/data/FS/desgin_style/;
+}
+
+location @fallback {
+    proxy_pass_header Server;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Scheme $scheme;
+
+    proxy_pass http://backend;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;客户端请求相关的配置&quot;&gt;&lt;a href=&quot;#客户端请求相关的配置&quot; class=&quot;headerlink&quot; title=&quot;客户端请求相关的配置&quot;&gt;&lt;/a&gt;客户端请求相关的配置&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1.keepalive_timeout timeout [header_timeout];&lt;/strong&gt;&lt;br&gt;设定keepalive连接的超时时长；0表示禁止长连接；默认为75s。&lt;br&gt;KeepAlive，意思为是否长连接。如果设置了超时时间，那么在这个时间内，那么当Nginx完成用户的请求后，那么Nginx进程不会断开用户的请求连接，依然保持连接状态。设置成0s则当Nginx完成用户的请求后，那么Nginx进程会立即断开和用户的请求连接。&lt;br&gt;完成用户的请求后，连接依然存在着，这样的好处是：当该用户的请求在过来时，Nginx会用这个已经建立的连接，不需要重新创建连接。这样会节省CPU的资源。但是却耗费了内存。为什么呢？可以假设这样的场景。假如keepalive 超时时间为10s，而每1s中有100个用户请求访问，每个用户3次连接，每个连接耗费2M内存，那么10s内建立的连接次数为1000次（跟用户每s请求次数无关），消耗内存为1000x2=2000M，相反，如果不保持长连接，同样的环境场景下，每1s内有100x3个连接，下一秒还是100x3个连接，也就是说永远都是100x3个连接，那么1s内甚至10s内消耗的内存为100x3x2=600M。 然而，在这10s内创建的连接次数100x3x10=3000次，这样肯定消耗了更多的cpu资源。毕竟每次tcp连接都是需要cpu去处理的。&lt;br&gt;问题来了，既然知道长连接与否的利与弊，那么如何判定什么时候On，什么时候Off？&lt;br&gt;在上面的举例中，涉及到了一个数，那就是每个用户在1s内请求的次数，如果把3改为1，是不是10s内得到的连接次数总和是一样的。那么这样无论是On还是Off，消耗的CPU资源是一样的。所以，我们考虑3种情况：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;①用户浏览一个网页时，除了网页本身外，还引用了多个 javascript 文件，多个 css 文件，多个图片文件，并且这些文件都在同一个 HTTP 服务器上。&lt;/li&gt;
 &lt;li&gt;②用户浏览一个网页时，除了网页本身外，还引用一个 javascript 文件，一个图片文件。&lt;/li&gt;
@@ -249,14 +301,133 @@ error_page  404  =200  /404.html  （以指定的响应状态码进行响应）
 &lt;p&gt;&lt;strong&gt;6.client_body_temp_path path [level1 [level2 [level3]]];&lt;/strong&gt;&lt;br&gt;设定用于存储客户端请求body的临时存储路径及子目录结构和数量；&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;client_body_temp_path  /var/tmp/client_body  2 2;
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;7.client_max_body_size 10m;&lt;/strong&gt;&lt;br&gt;允许客户端请求的最大的单个文件字节数，这个参数可以限制body的大小，默认是1m。如果上传的文件较大，那么需要调大这个参数。&lt;/p&gt;
-&lt;h3 id=&quot;对客户端请求的进行限制（限流）&quot;&gt;&lt;a href=&quot;#对客户端请求的进行限制（限流）&quot; class=&quot;headerlink&quot; title=&quot;对客户端请求的进行限制（限流）&quot;&gt;&lt;/a&gt;对客户端请求的进行限制（限流）&lt;/h3&gt;&lt;p&gt;nginx的限速功能通过limit_zone、limit_conn和limit_rate指令进行配置。首先需要在http上下文配置一个limit_zone，然后在需要的地方使用limit_conn和limit_rate 进行限速设置。下面是一个简单的例子。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;http &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  limit_zone  first  $binary_remote_addr  10m;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  server &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    location /downloads/ &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      limit_conn   first  1;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      limit_rate 50k;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;【说明】:&lt;/p&gt;
+&lt;h3 id=&quot;对客户端请求的进行限制&quot;&gt;&lt;a href=&quot;#对客户端请求的进行限制&quot; class=&quot;headerlink&quot; title=&quot;对客户端请求的进行限制&quot;&gt;&lt;/a&gt;对客户端请求的进行限制&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1.limit_excpet  METHOD {…}&lt;/strong&gt;&lt;br&gt;对指定范围之外的其它的方法进行访问控制；&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;limit_except  GET {
+    allow  172.16.0.0/16;
+    deny all;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.对客户端限速&lt;/strong&gt;&lt;br&gt;我们经常会遇到这种情况，服务器流量异常，负载过大等等。对于大流量恶意的攻击访问，会带来带宽的浪费，服务器压力，影响业务，往往考虑对同一个ip的连接数，并发数进行限制。下面说说ngx_http_limit_conn_module 模块来实现该需求。该模块可以根据定义的键来限制每个键值的连接数，如同一个IP来源的连接数。并不是所有的连接都会被该模块计数，只有那些正在被处理的请求（这些请求的头信息已被完全读入）所在的连接才会被计数。&lt;br&gt;nginx的限速功能通过limit_zone、limit_conn和limit_rate指令进行配置。首先需要在http上下文配置一个limit_zone，然后在需要的地方使用limit_conn和limit_rate 进行限速设置。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;limit_conn_zone&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;语法: limit_conn_zone $variable zone=name:size;
+默认值: none
+配置段: http
+该指令描述会话状态存储区域。键的状态中保存了当前连接数，键的值可以是特定变量的任何非空值（空值将不会被考虑）。$variable定义键，zone=name定义区域名称，后面的limit_conn指令会用到的。size定义各个键共享内存空间大小。如：
+
+limit_conn_zone $binary_remote_addr zone=addr:10m;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【说明】：&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;limit_zone：语法格式“limit_req_zone $variable zone=name:size rate=rate;”，实现针对每个IP定义一个存储session状态的容器。这个示例中定义了一个名叫first的10m大小的容器，这个名字会在后面的limit_conn中使用。&lt;/li&gt;
-&lt;li&gt;limit_conn first 1; 限制在first中记录状态的每个IP只能发起一个并发连接。&lt;/li&gt;
-&lt;li&gt;limit_rate 50k; 对每个连接限速50k. 注意，这里是对连接限速，而不是对IP限速。如果一个IP允许三个并发连接，那么这个IP就是限速为limit_rate×3，在设置的时候要根据自己的需要做设置调整，要不然会达不到自己希望的目的。&lt;/li&gt;
+&lt;li&gt;客户端的IP地址作为键。注意，这里使用的是$binary_remote_addr变量，而不是$remote_addr变量。&lt;/li&gt;
+&lt;li&gt;$remote_addr变量的长度为7字节到15字节，而存储状态在32位平台中占用32字节或64字节，在64位平台中占用64字节。&lt;/li&gt;
+&lt;li&gt;$binary_remote_addr变量的长度是固定的4字节，存储状态在32位平台中占用32字节或64字节，在64位平台中占用64字节。&lt;/li&gt;
+&lt;li&gt;1M共享空间可以保存3.2万个32位的状态，1.6万个64位的状态。如果共享内存空间被耗尽，服务器将会对后续所有的请求返回 503 (Service Temporarily Unavailable) 错误。&lt;/li&gt;
+&lt;li&gt;limit_zone 指令和limit_conn_zone指令同等意思，已经被弃用，就不再做说明了。&lt;/li&gt;
 &lt;/ul&gt;
-</content>
+&lt;p&gt;&lt;strong&gt;limit_conn&lt;/strong&gt;&lt;br&gt;语法：limit_conn zone_name number&lt;br&gt;默认值：none&lt;br&gt;配置段：http, server, location&lt;br&gt;指定每个给定键值的最大同时连接数，当超过这个数字时被返回503 (Service Temporarily Unavailable)错误。如：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;limit_conn_zone $binary_remote_addr zone=addr:10m;
+server {
+    location /www.ttlsa.com/ {
+        limit_conn addr 1;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;同一IP同一时间只允许有一个连接。&lt;br&gt;当多个 limit_conn 指令被配置时，所有的连接数限制都会生效。比如，下面配置不仅会限制单一IP来源的连接数，同时也会限制单一虚拟服务器的总连接数：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;limit_conn_zone $binary_remote_addr zone=perip:10m;
+limit_conn_zone $server_name zone=perserver:10m;
+server {
+    limit_conn perip 10;
+    limit_conn perserver 100;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;limit_rate&lt;/strong&gt;&lt;br&gt;语法：limit_rate rate&lt;br&gt;默认值：0&lt;br&gt;配置段：http, server, location, if in location&lt;br&gt;对每个连接的速率限制。参数rate的单位是字节/秒，设置为0将关闭限速。 按连接限速而不是按IP限制，因此如果某个客户端同时开启了两个连接，那么客户端的整体速率是这条指令设置值的2倍。&lt;/p&gt;
+&lt;h3 id=&quot;Nginx反向代理配置&quot;&gt;&lt;a href=&quot;#Nginx反向代理配置&quot; class=&quot;headerlink&quot; title=&quot;Nginx反向代理配置&quot;&gt;&lt;/a&gt;Nginx反向代理配置&lt;/h3&gt;&lt;p&gt;Nginx通过proxy模块实现反向代理功能。在作为web反向代理服务器时，nginx负责接收客户请求，并能够根据URI、客户端参数或其它的处理逻辑将用户请求调度至上游服务器上(upstream server)。nginx在实现反向代理功能时的最重要指令为proxy_pass，它能够将location定义的某URI代理至指定的上游服务器(组)上。如下面的示例中，location的/uri将被替换为上游服务器上的/newuri。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;location /uri {
+    proxy_pass http://www.magedu.com:8080/newuri; # 指定将请求代理至upstream server的URL路径；
+} 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;补充：&lt;strong&gt;上游&lt;/strong&gt;，有发源的意思。故上游服务器指的产生内容的服务器。&lt;/p&gt;
+&lt;p&gt;不过，这种处理机制中有两个例外。一个是如果location的URI是通过模式匹配定义的，其URI将直接被传递至上游服务器，而不能为其指定转换的另一个URI。例如下面示例中的/forum将被代理为&lt;a href=&quot;http://www.magedu.com/forum。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://www.magedu.com/forum。&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;location ~ ^/bbs {
+    proxy_pass http://www.magedu.com;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;第二个例外是，如果在loation中使用的URL重定向，那么nginx将使用重定向后的URI处理请求，而不再考虑上游服务器上定义的URI。如下面所示的例子中，传送给上游服务器的URI为/index.php?page=&lt;match&gt;，而不是/index。&lt;/match&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;location / {
+    rewrite /(.*)$ /index.php?page=$1 break;
+    proxy_pass http://localhost:8080/index;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;proxy模块的指令&quot;&gt;&lt;a href=&quot;#proxy模块的指令&quot; class=&quot;headerlink&quot; title=&quot;proxy模块的指令&quot;&gt;&lt;/a&gt;proxy模块的指令&lt;/h4&gt;&lt;p&gt;proxy模块的可用配置指令非常多，它们分别用于定义proxy模块工作时的诸多属性，如连接超时时长、代理时使用http协议版本等。下面对常用的指令做一个简单说明。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;proxy_connect_timeout：nginx将一个请求发送至upstream server之前等待的最大时长；&lt;/li&gt;
+&lt;li&gt;proxy_cookie_domain：将upstream server通过Set-Cookie首部设定的domain属性修改为指定的值，其值可以为一个字符串、正则表达式的模式或一个引用的变量；&lt;/li&gt;
+&lt;li&gt;proxy_cookie_path: 将upstream server通过Set-Cookie首部设定的path属性修改为指定的值，其值可以为一个字符串、正则表达式的模式或一个引用的变量；&lt;/li&gt;
+&lt;li&gt;proxy_hide_header：设定发送给客户端的报文中需要隐藏的首部；&lt;/li&gt;
+&lt;li&gt;proxy_pass：指定将请求代理至upstream server的URL路径；&lt;/li&gt;
+&lt;li&gt;proxy_set_header：将发送至upsream server的报文的某首部进行重写；&lt;/li&gt;
+&lt;li&gt;proxy_redirect：重写location并刷新从upstream server收到的报文的首部；&lt;/li&gt;
+&lt;li&gt;proxy_send_timeout：在连接断开之前两次发送至upstream server的写操作的最大间隔时长；&lt;/li&gt;
+&lt;li&gt;proxy_read_timeout：在连接断开之前两次从接收upstream server接收读操作的最大间隔时长；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如下面的一个示例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;proxy_redirect off;
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+client_max_body_size 10m;
+client_body_buffer_size 128k;
+proxy_connect_timeout 30;
+proxy_send_timeout 15;
+proxy_read_timeout 15;
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;Nginx实现负载均衡-–upstream模块&quot;&gt;&lt;a href=&quot;#Nginx实现负载均衡-–upstream模块&quot; class=&quot;headerlink&quot; title=&quot;Nginx实现负载均衡 –upstream模块&quot;&gt;&lt;/a&gt;Nginx实现负载均衡 –upstream模块&lt;/h4&gt;&lt;p&gt;与proxy模块结合使用的模块中，最常用的当属upstream模块。upstream模块可定义一个新的上下文，它包含了一组服务器，这些服务器可能被赋予了不同的权重、不同的类型甚至可以基于维护等原因被标记为down。直白点就是说如果后端一个服务器是在抗不住了，nginx还可以代理用户请求至多个服务器，也就是一个location里定义多个服务器，即实现负载均衡的效果。还能检查后端server的健康状况。&lt;br&gt;例如：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;upstream backend {
+    server 172.16.7.151:8080 weight=5;
+    server 172.16.7.152:8090 weight=3;
+}
+
+server {
+    listen 80;
+    server_name www.wisedu.com;
+
+    location / {
+        proxy_pass http://backend;
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;upstream模块定义在http段，可以定义多个upstream，但是每一个都要有自己独立的名称。&lt;br&gt;upstream模块常用的指令有：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ip_hash：基于客户端IP地址完成请求的分发，它可以保证来自于同一个客户端的请求始终被转发至同一个upstream服务器；&lt;pre&gt;&lt;code&gt;upstream lb {
+       server 172.16.7.151:8080;
+       server 172.16.7.151:8080;
+       ip_hash;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;keepalive：每个worker进程为发送到upstream服务器的连接所缓存的个数；&lt;/li&gt;
+&lt;li&gt;least_conn：最少连接调度算法；&lt;/li&gt;
+&lt;li&gt;server：定义一个upstream服务器的地址，还可包括一系列可选参数，如：&lt;ul&gt;
+&lt;li&gt;weight：权重；&lt;/li&gt;
+&lt;li&gt;max_fails：最大失败连接次数，失败连接的超时时长由fail_timeout指定；&lt;/li&gt;
+&lt;li&gt;fail_timeout：等待请求的目标服务器发送响应的时长；&lt;/li&gt;
+&lt;li&gt;backup：用于fallback的目的，所有服务均故障时才启动此服务器；&lt;/li&gt;
+&lt;li&gt;down：手动标记其不再处理任何请求；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;upstream模块的负载均衡算法主要有三种，轮调(round-robin)、ip哈希(ip_hash)和最少连接(least_conn)三种。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;upstream模块常用的指令有：&lt;/strong&gt;&lt;br&gt;ip_hash：基于客户端IP地址完成请求的分发，它可以保证来自于同一个客户端的请求始终被转发至同一个upstream服务器；&lt;br&gt;keepalive：每个worker进程为发送到upstream服务器的连接所缓存的个数；&lt;br&gt;least_conn：最少连接调度算法；&lt;br&gt;server：定义一个upstream服务器的地址，还可包括一系列可选参数，如：&lt;br&gt;    weight：权重；&lt;br&gt;    max_fails：最大失败连接次数，失败连接的超时时长由fail_timeout指定；&lt;br&gt;    fail_timeout：等待请求的目标服务器发送响应的时长；&lt;br&gt;    backup：用于fallback的目的，所有服务均故障时才启动此服务器；&lt;br&gt;    down：手动标记其不再处理任何请求；&lt;/p&gt;
+&lt;p&gt;server也可以使用域名，但是需要内网有DNS服务器，或者在hosts文件做解析。也可以是IP:port。&lt;/p&gt;
+&lt;h2 id=&quot;http核心模块的内置变量&quot;&gt;&lt;a href=&quot;#http核心模块的内置变量&quot; class=&quot;headerlink&quot; title=&quot;http核心模块的内置变量&quot;&gt;&lt;/a&gt;http核心模块的内置变量&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;$uri: 当前请求的uri，不带参数；
+$request_uri: 请求的uri，带完整参数；
+$host: http请求报文中host首部；如果请求中没有host首部，则以处理此请求的虚拟主机的主机名代替；
+$hostname: nginx服务运行在的主机的主机名；
+$remote_addr: 客户端IP
+$remote_port: 客户端Port
+$remote_user: 使用用户认证时客户端用户输入的用户名；
+$request_filename: 用户请求中的URI经过本地root或alias转换后映射的本地的文件路径；
+$request_method: 请求方法
+$server_addr: 服务器地址
+$server_name: 服务器名称
+$server_port: 服务器端口
+$server_protocol: 服务器向客户端发送响应时的协议，如http/1.1, http/1.0
+$scheme: 在请求中使用scheme, 如https://www.magedu.com/中的https；
+$http_HEADER: 匹配请求报文中指定的HEADER，$http_host匹配请求报文中的host首部
+$sent_http_HEADER: 匹配响应报文中指定的HEADER，例如$http_content_type匹配响应报文中的content-type首部；
+$document_root：当前请求映射到的root配置；
+&lt;/code&gt;&lt;/pre&gt;</content>
     
     <summary type="html">
     
