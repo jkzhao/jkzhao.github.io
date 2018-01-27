@@ -104,18 +104,22 @@
 
 
 
-<meta name="description" content="上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。">
+<meta name="description" content="上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。  NginxNginx的代码是由一个核心和一系列的模块组成, 核心主要用于提供Web Server的基本功能，以及Web和Mail反向代理的功能；">
 <meta name="keywords" content="Nginx">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Nginx配置详解及优化">
 <meta property="og:url" content="http://yoursite.com/2018/01/23/Nginx配置详解及优化/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。">
+<meta property="og:description" content="上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。  NginxNginx的代码是由一个核心和一系列的模块组成, 核心主要用于提供Web Server的基本功能，以及Web和Mail反向代理的功能；">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-23T13:02:15.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/10.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/12.png">
+<meta property="og:updated_time" content="2018-01-27T10:45:50.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx配置详解及优化">
-<meta name="twitter:description" content="上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。">
+<meta name="twitter:description" content="上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。  NginxNginx的代码是由一个核心和一系列的模块组成, 核心主要用于提供Web Server的基本功能，以及Web和Mail反向代理的功能；">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/10.png">
 
 
 
@@ -344,8 +348,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-01-23T21:02:15+08:00" content="2018-01-23">
-              2018-01-23
+              <time itemprop="dateUpdated" datetime="2018-01-27T18:45:50+08:00" content="2018-01-27">
+              2018-01-27
               </time>
               </span>
             
@@ -407,6 +411,249 @@
         <blockquote>
 <p>上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。</p>
 </blockquote>
+<h2 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx"></a>Nginx</h2><p>Nginx的代码是由一个核心和一系列的模块组成, 核心主要用于提供Web Server的基本功能，以及Web和Mail反向代理的功能；<a id="more"></a>还用于启用网络协议，创建必要的运行时环境以及确保不同的模块之间平滑地进行交互。不过，大多跟协议相关的功能和某应用特有的功能都是由nginx的模块实现的。这些功能模块大致可以分为事件模块、阶段性处理器、输出过滤器、变量处理器、协议、upstream和负载均衡几个类别，这些共同组成了nginx的http功能。事件模块主要用于提供OS独立的(不同操作系统的事件机制有所不同)事件通知机制如kqueue或epoll等。协议模块则负责实现nginx通过http、tls/ssl、smtp、pop3以及imap与对应的客户端建立会话。</p>
+<p>Nginx的核心模块为Main和Events，此外还包括标准HTTP模块、可选HTTP模块和邮件模块，其还可以支持诸多第三方模块。Main用于配置错误日志、进程及权限等相关的参数，Events用于配置IO模型，如epoll、kqueue、select或poll等，它们是必备模块。</p>
+<p>Nginx的主配置文件由几个段组成，这个段通常也被称为nginx的上下文，每个段的定义格式如下所示。需要注意的是，其每一个指令都必须使用分号(;)结束，否则为语法错误。</p>
+<pre><code>&lt;section&gt; {
+    &lt;directive&gt; &lt;parameters&gt;;
+}
+</code></pre><h2 id="配置文件有哪些"><a href="#配置文件有哪些" class="headerlink" title="配置文件有哪些"></a>配置文件有哪些</h2><p>1.主配置文件：nginx.conf<br>2.可以使用include指令引入其他地方的配置文件，比如</p>
+<pre><code>include conf.d/*.conf
+</code></pre><p>3.fastcgi的配置文件：</p>
+<pre><code>fastcgi_params、uwsgi_params
+</code></pre><p>4.配置指令(必须以分号结尾)</p>
+<pre><code>Directive  value1 [value2...];
+
+支持使用变量：
+    内置变量：由模块引入；
+    自定义变量：
+        set  variable  value; 
+
+    引用变量：$variable
+</code></pre><h2 id="配置文件组织结构"><a href="#配置文件组织结构" class="headerlink" title="配置文件组织结构"></a>配置文件组织结构</h2><p>主配置文件结构：</p>
+<pre><code>main block
+event {
+    ...
+}
+http {
+    ...
+    server{
+        location{  
+            ...          
+        }           
+    }
+}
+mail{
+    ...
+}
+</code></pre><h2 id="配置main段"><a href="#配置main段" class="headerlink" title="配置main段"></a>配置main段</h2><p><strong>1.user USERNAME  [GROUPNAME];</strong><br>指定用于运行worker进程的用户和组，如果不设置，默认是nobody。比如：</p>
+<pre><code>user  nginx  nginx;
+</code></pre><p><strong>2.pid  /PATH/TO/PID_FILE;</strong><br>指定nginx进程的pid文件路径，也可以使用默认的。比如：</p>
+<pre><code>pid  /var/run/nginx.pid;
+</code></pre><p><strong>3.error_log</strong><br>用于配置错误日志，可用于main、http、server及location上下文中；语法格式为：</p>
+<pre><code>error_log file | stderr [ debug | info | notice | warn | error | crit | alert | emerg ]
+</code></pre><p>比如：</p>
+<pre><code>error_log  logs/error.log debug;
+</code></pre><p><strong>4.worker_processes</strong><br>worker进程是单线程进程。如果Nginx用于CPU密集型的场景中，如SSL或gzip，且主机上的CPU个数至少有2个，那么应该将此参数值设定为与CPU核心数相同；如果负载以IO密集型为主，如响应大量内容给客户端，则worker数应该为CPU个数的1.5或2倍。比如：Nginx所在服务器有2颗CPU，每颗两核，那么可以配置：</p>
+<pre><code>worker_processes  4; #启动的work线程数
+</code></pre><p>此参数与Events上下文中的work_connections变量一起决定了maxclient的值：<br>maxclients = work_processes * work_connections</p>
+<p><strong>5.worker_cpu_affinity</strong><br>通过sched_setaffinity()将worker绑定至CPU上，只能用于main上下文。语法格式为：</p>
+<pre><code>worker_cpu_affinity cpumask ...
+</code></pre><p>例如：</p>
+<pre><code>worker_processes     4;
+worker_cpu_affinity 0001 0010 0100 1000;
+</code></pre><p><strong>6.worker_priority</strong><br>为worker进程设定优先级(指定nice值)，此参数只能用于main上下文中，默认为0；语法格式为：</p>
+<pre><code>worker_priority number
+</code></pre><p><strong>7.worker_rlimit_nofile</strong><br>设定worker进程所能够打开的文件描述符个数的最大值。语法格式：</p>
+<pre><code>worker_rlimit_nofile number
+</code></pre><h2 id="配置Events段"><a href="#配置Events段" class="headerlink" title="配置Events段"></a>配置Events段</h2><p><strong>1.worker_connections</strong><br>设定每个worker所处理的最大连接数，它与来自main上下文的worker_processes一起决定了maxclients的值。</p>
+<pre><code>max clients = worker_processes * worker_connections
+</code></pre><p><strong>2.use</strong><br>在有着多于一个的事件模型IO的应用场景中，可以使用此指令设定nginx所使用的IO机制，默认为./configure脚本选定的各机制中最适用当前OS的版本。语法格式：</p>
+<pre><code>use [ kqueue | rtsig | epoll | /dev/poll | select | poll | eventport ]
+</code></pre><p><strong>一个配置示例</strong></p>
+<pre><code>user nginx;
+# the load is CPU-bound and we have 16 cores
+worker_processes 16;
+error_log logs/error.log debug;
+pid logs/nginx.pid;
+
+events {
+    use epoll;
+    worker_connections 2048;
+}
+</code></pre><h2 id="http段配置"><a href="#http段配置" class="headerlink" title="http段配置"></a>http段配置</h2><p>http上下文专用于配置用于http的各模块，此类指令非常的多，每个模块都有其专用指定，具体请参数<a href="http://nginx.org/en/docs/http/ngx_http_core_module.html" target="_blank" rel="external">nginx官方文档关于模块部分的说明</a>。大体上来讲，这些模块所提供的配置指令还可以分为如下几个类别。</p>
+<ul>
+<li>客户端类指令：如client_body_buffer_size、client_header_buffer_size、client_header_timeout和keepalive_timeout等；</li>
+<li>文件IO类指令：如aio、directio、open_file_cache、open_file_cache_min_uses、open_file_cache_valid和sendfile等；</li>
+<li>hash类指令：用于定义Nginx为某特定的变量分配多大的内存空间，如types_hash_bucket_size、server_names_hash_bucket_size和variables_hash_bucket_size等；</li>
+<li>套接字类指令：用于定义Nginx如何处理tcp套接字相关的功能，如tcp_nodelay(用于keepalive功能启用时)和tcp_nopush(用于sendfile启用时)等；</li>
+</ul>
+<h3 id="套接字或主机相关配置"><a href="#套接字或主机相关配置" class="headerlink" title="套接字或主机相关配置"></a>套接字或主机相关配置</h3><pre><code>server {
+    &lt;directive&gt; &lt;parameters&gt;;
+}
+</code></pre><p>用于定义虚拟主机相关的属性。比如：</p>
+<pre><code>server {
+    listen PORT; #listen指令监听在不同的端口；
+    server_name NAME; #server_name指令指向不同的主机名；
+    root /PATH/TO/DOCUMENTROOT;
+}
+</code></pre><p><strong>1.listen</strong></p>
+<pre><code>listen address[:port] [default_server] [ssl] [http2 | spdy] 
+listen port [default_server] [ssl] [http2 | spdy]
+</code></pre><ul>
+<li>default_server：设置默认虚拟主机；用于基于IP地址，或使用了任意不能对应于任何一个server的name时所返回站点；</li>
+<li>ssl：用于限制只能通过ssl连接提供服务；</li>
+<li>spdy：SPDY protocol（speedy），在编译了spdy模块的情况下，用于支持SPDY协议；</li>
+<li>http2：http version 2；</li>
+</ul>
+<p><strong>2.server_name NAME […];</strong><br>后可跟一个或多个主机名；名称还可以使用通配符和正则表达式(~)；</p>
+<ul>
+<li>首先做精确匹配；例如：www.wisedu.com</li>
+<li>左侧通配符；例如：*.wisedu.com</li>
+<li>右侧通配符，例如：www.wisedu.*</li>
+<li>正则表达式，例如：~^.*.wisedu.com$</li>
+<li>default_server </li>
+</ul>
+<p><strong>3.tcp_nodelay on|off;</strong></p>
+<pre><code>Syntax:    tcp_nodelay on | off;
+Default:    tcp_nodelay on;
+Context:    http, server, location
+</code></pre><p>对keepalive模式下的连接是否使用TCP_NODELAY选项；</p>
+<p><strong>4.tcp_nopush on|off;</strong></p>
+<pre><code>Syntax:    tcp_nopush on | off;
+Default:    tcp_nopush off;
+Context:    http, server, location
+</code></pre><p>是否启用TCP_NOPUSH(FREEBSE）或TCP_CORK(Linux)选项；仅在sendfile为on时有用；<br><strong>tcp_nopush和tcp_nodelay选项：</strong><br><strong>先来了解下Nagle算法：</strong><br>在网络拥塞控制领域，有一个非常有名的算法叫做<strong>Nagle算法（Nagle algorithm）</strong>，这是使用它的发明人John Nagle的名字来命名的，John Nagle在1984年首次用这个算法来尝试解决福特汽车公司的网络拥塞问题（RFC 896），该问题的具体描述是：如果我们的应用程序一次产生1个字节的数据，而这个1个字节数据又以网络数据包的形式发送到远端服务器，那么就很容易导致网络由于太多的数据包而过载。比如，当用户使用Telnet连接到远程服务器时，每一次击键操作就会产生1个字节数据，进而发送出去一个数据包，所以，在典型情况下，传送一个只拥有1个字节有效数据的数据包，却要发费40个字节长包头（即ip头20字节+tcp头20字节）的额外开销，这种有效载荷（payload）利用率极其低下的情况被统称之为愚蠢窗口症候群（Silly Window Syndrome）。可以看到，这种情况对于轻负载的网络来说，可能还可以接受，但是对于重负载的网络而言，就极有可能承载不了而轻易的发生拥塞瘫痪。<br>针对上面提到的这个状况，Nagle算法的改进在于：如果发送端欲多次发送包含少量字符的数据包（一般情况下，后面统一称长度小于MSS的数据包为小包，与此相对，称长度等于MSS的数据包为大包，为了某些对比说明，还有中包，即长度比小包长，但又不足一个MSS的包），则发送端会先将第一个小包发送出去，而将后面到达的少量字符数据都缓存起来而不立即发送，直到收到接收端对前一个数据包报文段的ACK确认、或当前字符属于紧急数据，或者积攒到了一定数量的数据（比如缓存的字符数据已经达到数据包报文段的最大长度）等多种情况才将其组成一个较大的数据包发送出去。<br>TCP中的Nagle算法默认是启用的，但是它并不是适合任何情况，对于telnet或rlogin这样的远程登录应用的确比较适合（原本就是为此而设计），但是在某些应用场景下我们却又需要关闭它。<br>Nagle算法是指发送方发送的数据不会立即发出, 而是先放在缓冲区, 等缓存区满了再发出。发送完一批数据后, 会等待接收方对这批数据的回应, 然后再发送下一批数据。Negale 算法适用于发送方需要发送大批量数据, 并且接收方会及时作出回应的场合, 这种算法通过减少传输数据的次数来提高通信效率。如果发送方持续地发送小批量的数据, 并且接收方不一定会立即发送响应数据, 那么Negale算法会使发送方运行很慢. 对于GUI 程序, 如网络游戏程序(服务器需要实时跟踪客户端鼠标的移动), 这个问题尤其突出。客户端鼠标位置改动的信息需要实时发送到服务器上, 由于Negale 算法采用缓冲, 大大减低了实时响应速度, 导致客户程序运行很慢。这个时候就需要使用TCP_NODELAY选项。</p>
+<p><strong>tcp_nopush</strong><br>官方:</p>
+<pre><code>tcp_nopush
+Syntax: tcp_nopush on | off
+Default: off
+Context: http, server, location
+Reference: tcp_nopush
+
+This directive permits or forbids the use of thesocket options TCP_NOPUSH on FreeBSD or TCP_CORK on Linux. This option is onlyavailable when using sendfile.
+Setting this option causes nginx to attempt to sendit’s HTTP response headers in one packet on Linux and FreeBSD 4.x
+You can read more about the TCP_NOPUSH and TCP_CORKsocket options here.
+</code></pre><p>linux 下是tcp_cork，上面的意思就是说，当使用sendfile函数时，tcp_nopush才起作用，它和指令tcp_nodelay是互斥的。tcp_cork是linux下tcp/ip传输的一个标准了，这个标准的大概的意思是，一般情况下，在tcp交互的过程中，当应用程序接收到数据包后马上传送出去，不等待，而tcp_cork选项是数据包不会马上传送出去，等到数据包最大时，一次性的传输出去，这样有助于解决网络堵塞。<br>也就是说tcp_nopush = on 会设置调用tcp_cork方法，这个也是默认的，结果就是数据包不会马上传送出去，等到数据包最大时，一次性的传输出去，这样有助于解决网络堵塞。<br>以快递投递举例说明一下（以下是我的理解，也许是不正确的），当快递东西时，快递员收到一个包裹，马上投递，这样保证了即时性，但是会耗费大量的人力物力，在网络上表现就是会引起网络堵塞，而当快递收到一个包裹，把包裹放到集散地，等一定数量后统一投递，这样就是tcp_cork的选项干的事情，这样的话，会最大化的利用网络资源，虽然有一点点延迟。<br>对于nginx配置文件中的tcp_nopush，tcp_nopush on;这个选项对于www，ftp等大文件很有帮助。</p>
+<p><strong>tcp_nodelay</strong><br>TCP_NODELAY和TCP_CORK基本上控制了包的“Nagle化”，Nagle化在这里的含义是采用Nagle算法把较小的包组装为更大的帧。 John Nagle是Nagle算法的发明人，后者就是用他的名字来命名的，他在1984年首次用这种方法来尝试解决福特汽车公司的网络拥塞问题（欲了解详情请参看IETF RFC 896）。他解决的问题就是所谓的silly window syndrome，中文称“愚蠢窗口症候群”，具体含义是，因为普遍终端应用程序每产生一次击键操作就会发送一个包，而典型情况下一个包会拥有一个字节的数据载荷以及40个字节长的包头，于是产生4000%的过载，很轻易地就能令网络发生拥塞,。 Nagle化后来成了一种标准并且立即在因特网上得以实现。它现在已经成为缺省配置了，但在我们看来，有些场合下把这一选项关掉也是合乎需要的。<br>现在让我们假设某个应用程序发出了一个请求，希望发送小块数据。我们可以选择立即发送数据或者等待产生更多的数据然后再一次发送两种策略。如果我们马上发送数据，那么交互性的以及客户/服务器型的应用程序将极大地受益。如果请求立即发出那么响应时间也会快一些。以上操作可以通过设置套接字的TCP_NODELAY = on 选项来完成，这样就禁用了Nagle 算法。<br>另外一种情况则需要我们等到数据量达到最大时才通过网络一次发送全部数据，这种数据传输方式有益于大量数据的通信性能，典型的应用就是文件服务器。应用 Nagle算法在这种情况下就会产生问题。但是，如果你正在发送大量数据，你可以设置TCP_CORK选项禁用Nagle化，其方式正好同 TCP_NODELAY相反（TCP_CORK和 TCP_NODELAY是互相排斥的）。</p>
+<p><strong>5.sendfile on|off;</strong><br>是否启用sendfile功能；<br>先来看下nginx作为web服务器的工作方式：<br>用户请求进来了，先到达网卡，由内核处理下交给了监听在80套接字上的应用程序，即交给worker进程，这个worker进程通过连接建立、通过接入分析发现用户请求的是一个静态页面，下面就是I/O了。首先进程向内核发出系统调用。内核为它准备一个缓冲，然后内核从磁盘中加载这个文件到缓冲中，然后将这个文件复制给worker进程自己的地址空间，然后进程将这个文件封装成响应报文，这个封装过程是，进程封装http请求首部，然后交给内核封装TCP首部、IP首部，然后交给客户端。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/10.png" alt=""><br>然后你会发现这个文件是这么走的：从硬盘到内核空间，从内核到用户空间，从用户空间再到内核空间，白白绕一圈。如果说这个请求直接在内核中就封装好(http请求首部封装其实也是在内核封装的)，这样就避免了两次复制(注意是复制，内核任何时候和进程交互都是复制，除非共享内存)。复制虽然时间短，但是架不住多啊。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/11.png" alt=""><br>这就是sendfile机制，读过来就响应了。send只支持很小的文件，sendfile64支持更大的文件。<br>现在流行的web 服务器里面都提供 sendfile 选项用来提高服务器性能，那到底 sendfile是什么，怎么影响性能的呢？<br>sendfile实际上是 Linux2.0+以后的推出的一个系统调用，web服务器可以通过调整自身的配置来决定是否利用sendfile这个系统调用。先来看一下不用 sendfile的传统网络传输过程：</p>
+<pre><code>read(file,tmp_buf, len);
+write(socket,tmp_buf, len);
+</code></pre><p>硬盘 &gt;&gt; kernel buffer &gt;&gt; user buffer&gt;&gt; kernel socket buffer &gt;&gt;协议栈<br>一般来说一个网络应用是通过读硬盘数据，然后写数据到socket 来完成网络传输的。上面2行用代码解释了这一点，不过上面2行简单的代码掩盖了底层的很多操作。来看看底层是怎么执行上面2行代码的：<br>①系统调用 read()产生一个上下文切换：从 user mode 切换到 kernel mode，然后 DMA 执行拷贝，把文件数据从硬盘读到一个 kernel buffer 里。<br>②数据从 kernel buffer拷贝到 user buffer，然后系统调用 read() 返回，这时又产生一个上下文切换：从kernel mode 切换到 user mode。<br>③系统调用write()产生一个上下文切换：从 user mode切换到 kernel mode，然后把步骤2读到 user buffer的数据拷贝到 kernel buffer（数据第2次拷贝到 kernel buffer），不过这次是个不同的 kernel buffer，这个 buffer和 socket相关联。<br>④系统调用 write()返回，产生一个上下文切换：从 kernel mode 切换到 user mode（第4次切换了），然后 DMA 从 kernel buffer拷贝数据到协议栈（第4次拷贝了）。<br>上面4个步骤有4次上下文切换，有4次拷贝，我们发现如果能减少切换次数和拷贝次数将会有效提升性能。在kernel2.0+ 版本中，系统调用 sendfile() 就是用来简化上面步骤提升性能的。sendfile() 不但能减少切换次数而且还能减少拷贝次数。<br>再来看一下用 sendfile() 来进行网络传输的过程：</p>
+<pre><code>sendfile(socket,file, len);
+硬盘 &gt;&gt; kernel buffer (快速拷贝到kernel socket buffer) &gt;&gt;协议栈
+</code></pre><p>①系统调用sendfile()通过 DMA把硬盘数据拷贝到 kernel buffer，然后数据被 kernel直接拷贝到另外一个与 socket相关的 kernel buffer。这里没有 user mode和 kernel mode之间的切换，在 kernel中直接完成了从一个 buffer到另一个buffer的拷贝。<br>②DMA 把数据从 kernelbuffer 直接拷贝给协议栈，没有切换，也不需要数据从 user mode 拷贝到 kernel mode，因为数据就在 kernel 里。<br>步骤减少了，切换减少了，拷贝减少了，自然性能就提升了。这就是为什么说在 Nginx 配置文件里打开 sendfile on 选项能提高 web server性能的原因。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/12.png" alt=""></p>
+<p><strong>4.gzip  on;</strong><br>对于响应用户的内容是不是先压缩再发送，可以节省带宽。如果网络带宽小，用户访问量大的话可以使用这种方式。</p>
+<h3 id="路径相关的指令"><a href="#路径相关的指令" class="headerlink" title="路径相关的指令"></a>路径相关的指令</h3><p><strong>1.root</strong><br>设置web资源的路径映射；用于指明请求的URL所对应的文档的目录路径；</p>
+<pre><code>server {
+    ...
+    root  /data/www/vhost1;
+}
+http://www.wisedu.com/images/logo.jpg --&gt; /data/www/vhosts/images/logo.jpg
+
+server {
+    ...
+    server_name  www.wisedu.com;
+
+    location /images/ {
+         root  /data/imgs/;
+         ...
+    }
+}
+http://www.wisedu.com/images/logo.jpg --&gt; /data/imgs/images/logo.jpg
+</code></pre><p><strong>2.location [ = | ~ | ~* | ^~ ] uri { … }<br>  location @name { … }</strong><br>功能：允许根据用户请求的URI来匹配定义的各location，匹配到时，此请求将被相应的location块中的配置所处理；简言之，即用于为需要用到专用配置的uri提供特定配置。<br><strong>先来看下location [ = | ~ | ~* | ^~ ] uri { … } </strong></p>
+<ul>
+<li>location URI{}：对当前路径及所有对象都生效。</li>
+<li>location = URI{}：只对当前路径生效，不包括子路径。这是精确匹配。</li>
+<li>location ~ URI{}：</li>
+<li>location ~<em> URI{}：模式匹配URI，此处的URI可使用正则表达式，~区分字符大小写。~</em>不区分字符大小写。</li>
+<li>location ^~ URI{}：明确说明不使用正则表达式。</li>
+</ul>
+<p>【注意】：如果被两个location匹配到，nginx是有优先级的。=优先级最高，^~优先级第二，模式匹配优先级第三，没加任何符号的优先级最低。<br>官方例子：<a href="http://nginx.org/en/docs/http/ngx_http_core_module.html#location" target="_blank" rel="external">http://nginx.org/en/docs/http/ngx_http_core_module.html#location</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">location = / &#123;</div><div class="line">    [ configuration A ]</div><div class="line">&#125;</div><div class="line"></div><div class="line">location / &#123;</div><div class="line">    [ configuration B ]</div><div class="line">&#125;</div><div class="line"></div><div class="line">location /documents/ &#123;</div><div class="line">    [ configuration C ]</div><div class="line">&#125;</div><div class="line"></div><div class="line">location ^~ /images/ &#123;</div><div class="line">    [ configuration D ]</div><div class="line">&#125;</div><div class="line"></div><div class="line">location ~* \.(gif|jpg|jpeg)$ &#123;</div><div class="line">    [ configuration E ]</div><div class="line">&#125;</div><div class="line">The “/” request will match configuration A, the “/index.html” request will match configuration B, the “/documents/document.html” request will match configuration C, the “/images/1.gif” request will match configuration D, and the “/documents/1.jpg” request will match configuration E.</div></pre></td></tr></table></figure></p>
+<p><strong>再来看下location @name { … }，命名的location</strong><br>The “@” prefix defines a named location. Such a location is not used for a regular request processing, but instead used for request redirection. They cannot be nested, and cannot contain nested locations.<br>@：内部服务跳转<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">  location /img/ &#123;</div><div class="line">    set $memcached_key $uri;</div><div class="line">    memcached_pass     name:11211;</div><div class="line">    default_type       text/html;</div><div class="line">    error_page         404 @fallback;</div><div class="line">  &#125;</div><div class="line"> </div><div class="line">  location @fallback &#123;</div><div class="line">    proxy_pass http://backend;</div><div class="line">  &#125;</div><div class="line">  #以 /img/ 开头的请求，如果连接的状态为 404。则会匹配到 @fallback 这条规则上。</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>3.alias</strong><br>定义路径别名。</p>
+<pre><code>location  /images/ {
+    root /data/imgs/;
+}
+
+location  /images/  {
+    alias /data/imgs/;
+}
+</code></pre><p>访问/images/test.jpg，对应的结果如下：</p>
+<ul>
+<li>root指令：给定的路径对应于location的“/”这个URL；<br>/images/test.jpg –&gt;  /data/imgs/images/test.jpg </li>
+<li>alias指令：给定的路径对应于location的“/uri/“这个URL；<br>/images/test.jpg –&gt;  /data/imgs/test.jpg，注意alias把location后配置的路径images丢弃掉了。</li>
+</ul>
+<p>【注意】：</p>
+<ul>
+<li>使用alias时，目录名后面一定要加”/“。</li>
+<li>alias在使用正则匹配时，必须捕捉要匹配的内容并在指定的内容处使用。</li>
+<li>alias只能位于location块中。（root可以不放在location中）</li>
+</ul>
+<p><strong>4.index</strong> </p>
+<pre><code>index file ...;
+</code></pre><p>设置默认主页面。</p>
+<p><strong>5.error_page code … [=[response]] uri;</strong><br>根据http的状态码重定向错误页面；</p>
+<pre><code>error_page  404  /404.html
+error_page  404  =200  /404.html  （以指定的响应状态码进行响应）
+</code></pre><p><strong>6.try_files file … uri;<br>  try_files file … =code;</strong><br>其作用是按顺序检查文件是否存在，尝试查找第1至第N-1个文件，返回第一个找到的文件或文件夹（结尾加斜线表示为文件夹），如果所有的文件或文件夹都找不到，会进行一个内部重定向到最后一个参数。（必须不能匹配至当前location，而应该匹配至其它location，否则会导致死循环）。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">location / &#123;</div><div class="line">    try_files $uri $uri/ @fallback;</div><div class="line">    root   /home/data/FS/desgin_style/;</div><div class="line">&#125;</div><div class="line"></div><div class="line">location @fallback &#123;</div><div class="line">    proxy_pass_header Server;</div><div class="line">    proxy_set_header Host $http_host;</div><div class="line">    proxy_set_header X-Real-IP $remote_addr;</div><div class="line">    proxy_set_header X-Scheme $scheme;</div><div class="line"> </div><div class="line">    proxy_pass http://backend;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>$uri为Nginx内置变量，下面会讲到。</p>
+<h3 id="客户端请求相关的配置"><a href="#客户端请求相关的配置" class="headerlink" title="客户端请求相关的配置"></a>客户端请求相关的配置</h3><p><strong>1.keepalive_timeout timeout [header_timeout];</strong><br>设定keepalive连接的超时时长；0表示禁止长连接；默认为75s。<br>KeepAlive，意思为是否长连接。如果设置了超时时间，那么在这个时间内，那么当Nginx完成用户的请求后，那么Nginx进程不会断开用户的请求连接，依然保持连接状态。设置成0s则当Nginx完成用户的请求后，那么Nginx进程会立即断开和用户的请求连接。<br>完成用户的请求后，连接依然存在着，这样的好处是：当该用户的请求在过来时，Nginx会用这个已经建立的连接，不需要重新创建连接。这样会节省CPU的资源。但是却耗费了内存。为什么呢？可以假设这样的场景。假如keepalive 超时时间为10s，而每1s中有100个用户请求访问，每个用户3次连接，每个连接耗费2M内存，那么10s内建立的连接次数为1000次（跟用户每s请求次数无关），消耗内存为1000x2=2000M，相反，如果不保持长连接，同样的环境场景下，每1s内有100x3个连接，下一秒还是100x3个连接，也就是说永远都是100x3个连接，那么1s内甚至10s内消耗的内存为100x3x2=600M。 然而，在这10s内创建的连接次数100x3x10=3000次，这样肯定消耗了更多的cpu资源。毕竟每次tcp连接都是需要cpu去处理的。<br>问题来了，既然知道长连接与否的利与弊，那么如何判定什么时候On，什么时候Off？<br>在上面的举例中，涉及到了一个数，那就是每个用户在1s内请求的次数，如果把3改为1，是不是10s内得到的连接次数总和是一样的。那么这样无论是On还是Off，消耗的CPU资源是一样的。所以，我们考虑3种情况：</p>
+<ul>
+<li>①用户浏览一个网页时，除了网页本身外，还引用了多个 javascript 文件，多个 css 文件，多个图片文件，并且这些文件都在同一个 HTTP 服务器上。</li>
+<li>②用户浏览一个网页时，除了网页本身外，还引用一个 javascript 文件，一个图片文件。</li>
+<li>③用户浏览的是一个动态网页，由程序即时生成内容，并且不引用其他内容。<br>对于上面3中情况，我认为：1 最适合打开 KeepAlive ，2 随意，3 最适合关闭 KeepAlive（连接消耗的内存比较大）</li>
+</ul>
+<p>总结一下：<br>在内存非常充足的服务器上，不管是否关闭 KeepAlive 功能，服务器性能不会有明显变化；<br>如果服务器内存较少，或者服务器有非常大量的文件系统访问时，或者主要处理动态网页服务，关闭 KeepAlive 后可以节省很多内存，而节省出来的内存用于文件系统Cache，可以提高文件系统访问的性能，并且系统会更加稳定。<br>目前的服务器，CPU很强，所以不用考虑频繁的tcp连接对cpu造成的压力，那还让它长连接干什么，故，建议关闭你的长连接吧！！！<br>PS： 如果，你的服务器上请求量很大，那你最好还是关闭这个参数吧。我试过一次，打开长连接，并且设置超时时间为30s，结果仅仅十几s就把所有的Nginx进程跑满。这样很危险的，直接让用户等待，等30s，这不扯淡嘛？即使是你设置成3s，照样会让用户等待3s，这样很不合理的。所以，归根结蒂还是关闭长连接吧，这样效率会更高。</p>
+<p>举个网上的具体例子：</p>
+<ul>
+<li>1.项目环境：nginx（前段代理，仅作代理用途）+3个tomcat（都在同一个服务器上），做的web项目</li>
+<li>2.涉及到的业务逻辑：文件上传（可能有大文件，比如说android游戏，100m）；客户端接口请求；网站后台管理</li>
+<li>3.问题重现流程：</li>
+</ul>
+<ul>
+<li><ul>
+<li>3.1 配置好tomcat后，直接加上nginx前段代理（仅配置了http代理）</li>
+</ul>
+</li>
+<li><ul>
+<li>3.2 问题一：当管理员后台上传文件时，大文件无法上传成功，出现time-out，经重复测试，发现上传时间超过1分钟以后，就会返回超时信息，小文件没有问题</li>
+</ul>
+</li>
+<li><ul>
+<li>3.3 经调研得知nginx默认设置的http连接超时时间为75s，超过75s，会断掉当前的http连接，而大文件上传时经常会超过75s，这就导致大文件无法上传成功，当时的解决方案是，设置nginx http连接超时时间为30分钟，即参数keepalive_timeout=1800；文件上传问题基本解决；</li>
+</ul>
+</li>
+<li><ul>
+<li>3.4项目运行2天后，发现服务器突然宕机了，重启nginx可以解决问题，但是2个小时后又再次宕机，重启nginx又解决了问题，调研了一个中午，并且查看nginx的错误日志（socket() failed (24: Too many open files) while connecting to upstream），发现问题来源与nginx的连接数（设置的默认值为1024）达到上限</li>
+</ul>
+</li>
+<li><ul>
+<li>3.5发现这个问题后，我就想应该把nginx的连接数调大点，于是设置 worker_connections  10240；重启nginx，短时间没有出现问题，但是运行过程中，我再次查看错误日志，发现（socket() failed (24: Too many open files) while connecting to upstream）时不时的出现</li>
+</ul>
+</li>
+<li><ul>
+<li>3.6 此时发现调整nginx的连接数并不能完全解决问题，于是google，百度之，发现问题所在，罪魁祸首是：nginx的keepalive_timeout(参看<a href="http://fengzheng369.blog.163.com/blog/static/752209792012418103813580/" target="_blank" rel="external">http://fengzheng369.blog.163.com/blog/static/752209792012418103813580/</a> )设置项时间太长，客户端接口访问其实是一个比较快速的过程，访问完成了已经不需要继续使用http连接了，但是由于对nginx的错误配置，导致接口访问完成后http连接并没有被释放掉，所以导致连接数越来越大，最终nginx崩溃。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>4.那么这个问题应该如何解决呢？<br>将keepalive_timeout时间调小会导致上传操作可能无法完成；调大点的话，许多无效的http连接占据着nginx的连接数。这貌似是一个两难的问题。<br>解决方案一：将接口请求，后台管理，文件上传这三个业务逻辑分开，nginx对这三种业务逻辑分开转发，每个业务逻辑单独设置一个keepalive-timeout(未实验)。</li>
+</ul>
+<p><strong>2.keepalive_requests number;</strong><br>在keepalived连接上所允许请求的最大资源数量；默认为100；</p>
+<p><strong>3.keepalive_disable none | browser …;</strong><br>指明禁止为何种浏览器使用keepalive功能；</p>
+<p><strong>4.send_timeout #;</strong><br>发送响应报文的超时时长，默认为60s; </p>
+<p><strong>5.client_body_buffer_size size;</strong><br>接收客户请求报文body的缓冲区大小；默认为16k；超出此指定大小时，其将被移存于磁盘上；</p>
+<p><strong>6.client_body_temp_path path [level1 [level2 [level3]]];</strong><br>设定用于存储客户端请求body的临时存储路径及子目录结构和数量；</p>
+<pre><code>client_body_temp_path  /var/tmp/client_body  2 2;
+</code></pre><p><strong>7.client_max_body_size 10m;</strong><br>允许客户端请求的最大的单个文件字节数，这个参数可以限制body的大小，默认是1m。如果上传的文件较大，那么需要调大这个参数。</p>
+<h3 id="对客户端请求的进行限制（限流）"><a href="#对客户端请求的进行限制（限流）" class="headerlink" title="对客户端请求的进行限制（限流）"></a>对客户端请求的进行限制（限流）</h3><p>nginx的限速功能通过limit_zone、limit_conn和limit_rate指令进行配置。首先需要在http上下文配置一个limit_zone，然后在需要的地方使用limit_conn和limit_rate 进行限速设置。下面是一个简单的例子。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">http &#123;</div><div class="line"></div><div class="line">  limit_zone  first  $binary_remote_addr  10m;</div><div class="line"></div><div class="line">  server &#123;</div><div class="line">    location /downloads/ &#123;</div><div class="line">      limit_conn   first  1;</div><div class="line">      limit_rate 50k;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>【说明】:</p>
+<ul>
+<li>limit_zone：语法格式“limit_req_zone $variable zone=name:size rate=rate;”，实现针对每个IP定义一个存储session状态的容器。这个示例中定义了一个名叫first的10m大小的容器，这个名字会在后面的limit_conn中使用。</li>
+<li>limit_conn first 1; 限制在first中记录状态的每个IP只能发起一个并发连接。</li>
+<li>limit_rate 50k; 对每个连接限速50k. 注意，这里是对连接限速，而不是对IP限速。如果一个IP允许三个并发连接，那么这个IP就是限速为limit_rate×3，在设置的时候要根据自己的需要做设置调整，要不然会达不到自己希望的目的。</li>
+</ul>
 
       
     </div>
@@ -600,7 +847,7 @@
               
             
             
-              <p class="post-toc-empty">此文章未包含目录</p>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx"><span class="nav-number">1.</span> <span class="nav-text">Nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件有哪些"><span class="nav-number">2.</span> <span class="nav-text">配置文件有哪些</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件组织结构"><span class="nav-number">3.</span> <span class="nav-text">配置文件组织结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置main段"><span class="nav-number">4.</span> <span class="nav-text">配置main段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Events段"><span class="nav-number">5.</span> <span class="nav-text">配置Events段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#http段配置"><span class="nav-number">6.</span> <span class="nav-text">http段配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#套接字或主机相关配置"><span class="nav-number">6.1.</span> <span class="nav-text">套接字或主机相关配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路径相关的指令"><span class="nav-number">6.2.</span> <span class="nav-text">路径相关的指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端请求相关的配置"><span class="nav-number">6.3.</span> <span class="nav-text">客户端请求相关的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对客户端请求的进行限制（限流）"><span class="nav-number">6.4.</span> <span class="nav-text">对客户端请求的进行限制（限流）</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
@@ -646,7 +893,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共136.3k字</span>
+  <span class="post-count">博客全站共143.7k字</span>
 </div>
 
         
