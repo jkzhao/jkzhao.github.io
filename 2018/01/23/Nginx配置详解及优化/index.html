@@ -115,7 +115,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/10.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/11.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/12.png">
-<meta property="og:updated_time" content="2018-01-27T12:28:52.000Z">
+<meta property="og:updated_time" content="2018-01-27T13:17:45.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx配置详解及优化">
 <meta name="twitter:description" content="上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。  NginxNginx的代码是由一个核心和一系列的模块组成, 核心主要用于提供Web Server的基本功能，以及Web和Mail反向代理的功能；">
@@ -348,7 +348,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-01-27T20:28:52+08:00" content="2018-01-27">
+              <time itemprop="dateUpdated" datetime="2018-01-27T21:17:45+08:00" content="2018-01-27">
               2018-01-27
               </time>
               </span>
@@ -759,7 +759,33 @@ client_body_buffer_size 128k;
 proxy_connect_timeout 30;
 proxy_send_timeout 15;
 proxy_read_timeout 15;
-</code></pre><h4 id="Nginx实现负载均衡-–upstream模块"><a href="#Nginx实现负载均衡-–upstream模块" class="headerlink" title="Nginx实现负载均衡 –upstream模块"></a>Nginx实现负载均衡 –upstream模块</h4><p>与proxy模块结合使用的模块中，最常用的当属upstream模块。upstream模块可定义一个新的上下文，它包含了一组服务器，这些服务器可能被赋予了不同的权重、不同的类型甚至可以基于维护等原因被标记为down。直白点就是说如果后端一个服务器是在抗不住了，nginx还可以代理用户请求至多个服务器，也就是一个location里定义多个服务器，即实现负载均衡的效果。还能检查后端server的健康状况。<br>例如：</p>
+</code></pre><p><strong>nginx proxy_pass 后面的url 加与不加/的区别：</strong><br>在nginx中配置proxy_pass时，当在后面的url加上了/，相当于是绝对根路径，则nginx不会把location中匹配的路径部分代理走;如果没有/，则会把匹配的路径部分也给代理走。<br>下面四种情况分别用<a href="http://192.168.1.4/proxy/test.html" target="_blank" rel="external">http://192.168.1.4/proxy/test.html</a> 进行访问。</p>
+<p>第一种：</p>
+<pre><code>location  /proxy/ {
+    proxy_pass http://127.0.0.1:81/;
+}
+会被代理到http://127.0.0.1:81/test.html 这个url
+</code></pre><p>第二种(相对于第一种，最后少一个 /)</p>
+<pre><code>location  /proxy/ {
+    proxy_pass http://127.0.0.1:81;
+}
+会被代理到http://127.0.0.1:81/proxy/test.html 这个url
+</code></pre><p>第三种：</p>
+<pre><code>location  /proxy/ {
+    proxy_pass http://127.0.0.1:81/ftlynx/;
+}
+会被代理到http://127.0.0.1:81/ftlynx/test.html 这个url。
+</code></pre><p>第四种情况(相对于第三种，最后少一个 / )：</p>
+<pre><code>location  /proxy/ {
+    proxy_pass http://127.0.0.1:81/ftlynx;
+}
+会被代理到http://127.0.0.1:81/ftlynxtest.html 这个url
+</code></pre><p><strong>location后加/和不加/的区别</strong><br>首先是location进行的是模糊匹配</p>
+<ul>
+<li>没有“/”时，location /abc/def可以匹配/abc/defghi请求，也可以匹配/abc/def/ghi等</li>
+<li>而有“/”时，location /abc/def/不能匹配/abc/defghi请求，只能匹配/abc/def/anything这样的请求</li>
+</ul>
+<h4 id="Nginx实现负载均衡-–upstream模块"><a href="#Nginx实现负载均衡-–upstream模块" class="headerlink" title="Nginx实现负载均衡 –upstream模块"></a>Nginx实现负载均衡 –upstream模块</h4><p>与proxy模块结合使用的模块中，最常用的当属upstream模块。upstream模块可定义一个新的上下文，它包含了一组服务器，这些服务器可能被赋予了不同的权重、不同的类型甚至可以基于维护等原因被标记为down。直白点就是说如果后端一个服务器是在抗不住了，nginx还可以代理用户请求至多个服务器，也就是一个location里定义多个服务器，即实现负载均衡的效果。还能检查后端server的健康状况。<br>例如：</p>
 <pre><code>upstream backend {
     server 172.16.7.151:8080 weight=5;
     server 172.16.7.152:8090 weight=3;
@@ -774,16 +800,17 @@ server {
     }
 
 }
-</code></pre><p>upstream模块定义在http段，可以定义多个upstream，但是每一个都要有自己独立的名称。<br>upstream模块常用的指令有：</p>
+</code></pre><p>server也可以使用域名，但是需要内网有DNS服务器，或者在hosts文件做解析。也可以是IP:port。<br>upstream模块定义在http段，可以定义多个upstream，但是每一个都要有自己独立的名称。</p>
+<p>upstream模块常用的指令有：</p>
 <ul>
 <li>ip_hash：基于客户端IP地址完成请求的分发，它可以保证来自于同一个客户端的请求始终被转发至同一个upstream服务器；<pre><code>upstream lb {
-       server 172.16.7.151:8080;
-       server 172.16.7.151:8080;
        ip_hash;
+       server 172.16.7.151:8080;
+       server 172.16.7.152:8090;
 }
 </code></pre></li>
 <li>keepalive：每个worker进程为发送到upstream服务器的连接所缓存的个数；</li>
-<li>least_conn：最少连接调度算法；</li>
+<li>least_conn：最少连接调度算法；检查后端的连接状况，挑一个当前连接数最少的来负责响应。</li>
 <li>server：定义一个upstream服务器的地址，还可包括一系列可选参数，如：<ul>
 <li>weight：权重；</li>
 <li>max_fails：最大失败连接次数，失败连接的超时时长由fail_timeout指定；</li>
@@ -793,10 +820,86 @@ server {
 </ul>
 </li>
 </ul>
-<p>upstream模块的负载均衡算法主要有三种，轮调(round-robin)、ip哈希(ip_hash)和最少连接(least_conn)三种。</p>
-<p><strong>upstream模块常用的指令有：</strong><br>ip_hash：基于客户端IP地址完成请求的分发，它可以保证来自于同一个客户端的请求始终被转发至同一个upstream服务器；<br>keepalive：每个worker进程为发送到upstream服务器的连接所缓存的个数；<br>least_conn：最少连接调度算法；<br>server：定义一个upstream服务器的地址，还可包括一系列可选参数，如：<br>    weight：权重；<br>    max_fails：最大失败连接次数，失败连接的超时时长由fail_timeout指定；<br>    fail_timeout：等待请求的目标服务器发送响应的时长；<br>    backup：用于fallback的目的，所有服务均故障时才启动此服务器；<br>    down：手动标记其不再处理任何请求；</p>
-<p>server也可以使用域名，但是需要内网有DNS服务器，或者在hosts文件做解析。也可以是IP:port。</p>
-<h2 id="http核心模块的内置变量"><a href="#http核心模块的内置变量" class="headerlink" title="http核心模块的内置变量"></a>http核心模块的内置变量</h2><pre><code>$uri: 当前请求的uri，不带参数；
+<p>upstream模块的负载均衡算法主要有三种，轮调(round-robin)、ip哈希(ip_hash)和最少连接(least_conn)三种。默认是轮调算法。</p>
+<p><strong>健康状况检查</strong><br>如果某台机器挂了怎么办？可以进行健康状况检查。</p>
+<pre><code>upstream webserv {
+    server 172.16.7.151:8080 weight=1 max_fails=2 fail_timeout=2;
+    server 172.16.7.152:8090 weight=1 max_fails=2 fail_timeout=2;
+}
+</code></pre><p>健康状况检查还应该有一个功能，万一所有服务器都宕掉怎么办？必须要有个Sorry-Server，下面以本机作为Sorry-Server，可以在定义个虚拟主机:</p>
+<pre><code>server {
+    listen 8080;
+    server_name localhost;
+
+    root /web/errorpages;
+    index index.html
+}
+</code></pre><p>upstream添加配置：</p>
+<pre><code>upstream webserv {
+    server 172.16.7.151:8080 weight=1 max_fails=2 fail_timeout=2;
+    server 172.16.7.152:8090 weight=1 max_fails=2 fail_timeout=2;
+    server 127.0.0.1:8080 backup;
+}
+</code></pre><p>backup： 其它所有的非backup机器down或者忙的时候，请求backup机器。所以这台机器压力会最轻。</p>
+<h3 id="Nginx的URL重写功能和if指令"><a href="#Nginx的URL重写功能和if指令" class="headerlink" title="Nginx的URL重写功能和if指令"></a>Nginx的URL重写功能和if指令</h3><h4 id="URL重写rewrite"><a href="#URL重写rewrite" class="headerlink" title="URL重写rewrite"></a>URL重写rewrite</h4><p><strong>1.什么叫rewrite</strong><br>举个例子：</p>
+<pre><code>location /images/ {       ——这是我们当前服务器上的目录
+    rewrite http://172.16.2.27/images/;      ——把你转到另外一台服务器上的目录去了。
+}
+</code></pre><p>2.Nginx的rewrite<br>Nginx的rewrite支持正则表达式   ——可以将一类URL转成另一类URL</p>
+<pre><code>Syntax: rewrite regex replacement [flag];
+Default:    —
+Context:    server, location, if
+</code></pre><p>server区块中如果有包含rewrite规则,则会最先执行,而且只会执行一次, 然后再判断命中哪个location的配置。如果location中也配置了rewrite，会再去执行该location中的rewrite，当该location中的rewrite执行完毕时，rewrite并不会停止，而是根据rewrite过的URL再次判断location并执行其中的配置。那么，这里就存在一个问题，如果rewrite写的不正确的话，是会在location区块间造成无限循环的。所以nginx才会加一个最多重试10次的上限。比如：</p>
+<pre><code>location / {
+    root html;
+    index index.html index.htm;
+    rewrite ^/bbs/(.*)$ /forum/$1
+}
+</code></pre><p>flag：支持4种标志。</p>
+<ul>
+<li>last：本次重写完成之后重启下一轮检查。一般场景下用的都是last。</li>
+<li>break：本次重写完成之后不启用下一轮检查，直接响应。</li>
+<li>redirect：返回302临时重定向，地址栏会显示跳转后的地址</li>
+<li>permanent： 返回301永久重定向，地址栏会显示跳转后的地址</li>
+</ul>
+<p>测验一下break与last的区别:</p>
+<pre><code>location /test1.txt/ {
+    rewrite /test1.txt/ /test2.txt break;
+}
+
+location ~ test2.txt {
+    return 508;
+}
+</code></pre><p>使用break会停止匹配下面的location,直接发起请求www.xxx.com/test2.txt，由于不存在文件test2.txt，则会直接显示404。<br>使用last的话，会继续搜索下面是否有符合条件(符合重写后的/test2.txt请求)的location。此时，/test2.txt刚好与面location的条件对应上了，进入花括号{}里面的代码执行，这里会返回508。</p>
+<h4 id="if指令"><a href="#if指令" class="headerlink" title="if指令"></a>if指令</h4><p>在location中使用if语句可以实现条件判断，其通常有一个return语句，且一般与有着last或break标记的rewrite规则一同使用。但其也可以按需要使用在多种场景下，需要注意的是，不当的使用可能会导致不可预料的后果。</p>
+<pre><code>upstream imageservers {
+    server 172.16.100.8:80 weight 2;
+    server 172.16.100.9:80 weight 3;
+}
+
+location / {
+    if ($request_method == “PUT”) {
+        proxy_pass http://upload.wisedu.com:8080;
+    } 
+
+    if ($request_uri ~ &quot;\.(jpg|gif|jpeg|png)$&quot;) {
+        proxy_pass http://imageservers;
+        break; #这里的break也是停止rewrite检查
+    }
+}
+</code></pre><p>if语句中的判断条件</p>
+<p>正则表达式匹配：</p>
+<pre><code>==: 等值比较；
+~：与指定正则表达式模式匹配时返回“真”，判断匹配与否时区分字符大小写；
+~*：与指定正则表达式模式匹配时返回“真”，判断匹配与否时不区分字符大小写；
+!~：与指定正则表达式模式不匹配时返回“真”，判断匹配与否时区分字符大小写；
+!~*：与指定正则表达式模式不匹配时返回“真”，判断匹配与否时不区分字符大小写；
+</code></pre><p>文件及目录匹配判断：</p>
+<pre><code>-f, !-f：判断指定的路径是否为存在且为文件；
+-d, !-d：判断指定的路径是否为存在且为目录；
+-e, !-e：判断指定的路径是否存在，文件或目录均可；
+-x, !-x：判断指定路径的文件是否存在且可执行；
+</code></pre><h2 id="http核心模块的内置变量"><a href="#http核心模块的内置变量" class="headerlink" title="http核心模块的内置变量"></a>http核心模块的内置变量</h2><pre><code>$uri: 当前请求的uri，不带参数；
 $request_uri: 请求的uri，带完整参数；
 $host: http请求报文中host首部；如果请求中没有host首部，则以处理此请求的虚拟主机的主机名代替；
 $hostname: nginx服务运行在的主机的主机名；
@@ -1006,7 +1109,7 @@ $document_root：当前请求映射到的root配置；
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx"><span class="nav-number">1.</span> <span class="nav-text">Nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件有哪些"><span class="nav-number">2.</span> <span class="nav-text">配置文件有哪些</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件组织结构"><span class="nav-number">3.</span> <span class="nav-text">配置文件组织结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置main段"><span class="nav-number">4.</span> <span class="nav-text">配置main段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Events段"><span class="nav-number">5.</span> <span class="nav-text">配置Events段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置http段"><span class="nav-number">6.</span> <span class="nav-text">配置http段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#套接字或主机相关配置"><span class="nav-number">6.1.</span> <span class="nav-text">套接字或主机相关配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路径相关的指令"><span class="nav-number">6.2.</span> <span class="nav-text">路径相关的指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端请求相关的配置"><span class="nav-number">6.3.</span> <span class="nav-text">客户端请求相关的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对客户端请求的进行限制"><span class="nav-number">6.4.</span> <span class="nav-text">对客户端请求的进行限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx反向代理配置"><span class="nav-number">6.5.</span> <span class="nav-text">Nginx反向代理配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#proxy模块的指令"><span class="nav-number">6.5.1.</span> <span class="nav-text">proxy模块的指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Nginx实现负载均衡-–upstream模块"><span class="nav-number">6.5.2.</span> <span class="nav-text">Nginx实现负载均衡 –upstream模块</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#http核心模块的内置变量"><span class="nav-number">7.</span> <span class="nav-text">http核心模块的内置变量</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx"><span class="nav-number">1.</span> <span class="nav-text">Nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件有哪些"><span class="nav-number">2.</span> <span class="nav-text">配置文件有哪些</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件组织结构"><span class="nav-number">3.</span> <span class="nav-text">配置文件组织结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置main段"><span class="nav-number">4.</span> <span class="nav-text">配置main段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Events段"><span class="nav-number">5.</span> <span class="nav-text">配置Events段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置http段"><span class="nav-number">6.</span> <span class="nav-text">配置http段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#套接字或主机相关配置"><span class="nav-number">6.1.</span> <span class="nav-text">套接字或主机相关配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路径相关的指令"><span class="nav-number">6.2.</span> <span class="nav-text">路径相关的指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端请求相关的配置"><span class="nav-number">6.3.</span> <span class="nav-text">客户端请求相关的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对客户端请求的进行限制"><span class="nav-number">6.4.</span> <span class="nav-text">对客户端请求的进行限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx反向代理配置"><span class="nav-number">6.5.</span> <span class="nav-text">Nginx反向代理配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#proxy模块的指令"><span class="nav-number">6.5.1.</span> <span class="nav-text">proxy模块的指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Nginx实现负载均衡-–upstream模块"><span class="nav-number">6.5.2.</span> <span class="nav-text">Nginx实现负载均衡 –upstream模块</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx的URL重写功能和if指令"><span class="nav-number">6.6.</span> <span class="nav-text">Nginx的URL重写功能和if指令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#URL重写rewrite"><span class="nav-number">6.6.1.</span> <span class="nav-text">URL重写rewrite</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#if指令"><span class="nav-number">6.6.2.</span> <span class="nav-text">if指令</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#http核心模块的内置变量"><span class="nav-number">7.</span> <span class="nav-text">http核心模块的内置变量</span></a></li></ol></div>
             
           </div>
         </section>
@@ -1052,7 +1155,7 @@ $document_root：当前请求映射到的root配置；
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共145.9k字</span>
+  <span class="post-count">博客全站共147.1k字</span>
 </div>
 
         
