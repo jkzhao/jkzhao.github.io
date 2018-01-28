@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Nginx," />
 
 
 
@@ -104,13 +104,18 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="jkzhao&#39;s blog">
-<meta property="og:url" content="http://yoursite.com/tags/Docker-Registry/index.html">
+<meta name="description" content="nginx在版本1.9.0以后支持tcp的负载均衡，具体可以参照官网关于模块ngx_stream_core_module的说明。一直以来，Nginx 并不支持tcp协议，所以后台的一些基于TCP的业务就只能通过其他高可用负载软件来完成了，比如Haproxy或者LVS。">
+<meta name="keywords" content="Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx实现TCP负载均衡">
+<meta property="og:url" content="http://yoursite.com/2018/01/28/Nginx实现TCP负载均衡/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="nginx在版本1.9.0以后支持tcp的负载均衡，具体可以参照官网关于模块ngx_stream_core_module的说明。一直以来，Nginx 并不支持tcp协议，所以后台的一些基于TCP的业务就只能通过其他高可用负载软件来完成了，比如Haproxy或者LVS。">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-01-28T02:35:15.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="jkzhao&#39;s blog">
+<meta name="twitter:title" content="Nginx实现TCP负载均衡">
+<meta name="twitter:description" content="nginx在版本1.9.0以后支持tcp的负载均衡，具体可以参照官网关于模块ngx_stream_core_module的说明。一直以来，Nginx 并不支持tcp协议，所以后台的一些基于TCP的业务就只能通过其他高可用负载软件来完成了，比如Haproxy或者LVS。">
 
 
 
@@ -128,7 +133,7 @@
   };
 </script>
 
-  <title> 标签: Docker Registry | jkzhao's blog </title>
+  <title> Nginx实现TCP负载均衡 | jkzhao's blog </title>
 </head>
 <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 
@@ -160,7 +165,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
@@ -300,74 +305,239 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        Docker Registry
-        <small>标签</small>
-      </h2>
-    </div>
-
+  <div id="posts" class="posts-expand">
     
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2017/09/08/企业级Docker-Registry-——-Harbor搭建和使用/" itemprop="url">
-              
-                <span itemprop="name">企业级Docker Registry —— Harbor搭建和使用</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-09-08T16:38:52+08:00"
-              content="2017-09-08" >
-          09-08
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2017/09/01/Registry私有仓库搭建及认证/" itemprop="url">
-              
-                <span itemprop="name">Registry私有仓库搭建及认证</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-09-01T17:44:19+08:00"
-              content="2017-09-01" >
-          09-01
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-  </div>
 
   
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Nginx实现TCP负载均衡
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-01-28T09:45:57+08:00" content="2018-01-28">
+              2018-01-28
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2018-01-28T10:35:15+08:00" content="2018-01-28">
+              2018-01-28
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">Nginx</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2018/01/28/Nginx实现TCP负载均衡/" class="leancloud_visitors" data-flag-title="Nginx实现TCP负载均衡">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>nginx在版本1.9.0以后支持tcp的负载均衡，具体可以参照官网关于模块<a href="https://nginx.org/en/docs/stream/ngx_stream_core_module.html#tcp_nodelay" target="_blank" rel="external">ngx_stream_core_module</a>的说明。一直以来，Nginx 并不支持tcp协议，所以后台的一些基于TCP的业务就只能通过其他高可用负载软件来完成了，比如Haproxy或者LVS。<a id="more"></a></p>
+</blockquote>
+<h2 id="编译Nginx启用ngx-stream-core-module模块"><a href="#编译Nginx启用ngx-stream-core-module模块" class="headerlink" title="编译Nginx启用ngx_stream_core_module模块"></a>编译Nginx启用ngx_stream_core_module模块</h2><p>ngx_stream_core_module 这个模块在1.90版本后将被启用。但是并不会默认安装，需要在编译时通过指定 –with-stream 参数来激活这个模块。</p>
+<pre><code># cd /usr/local/
+# wget https://nginx.org/download/nginx-1.12.2.tar.gz
+# tar zxf nginx-1.12.2.tar.gz
+# cd nginx-1.12.2/
+# ./configure --prefix=/usr/local/nginx --with-stream
+# make &amp;&amp; make install
+</code></pre><h2 id="配置Nginx负载均衡MySQL"><a href="#配置Nginx负载均衡MySQL" class="headerlink" title="配置Nginx负载均衡MySQL"></a>配置Nginx负载均衡MySQL</h2><pre><code># cd /usr/local/nginx/conf/
+# vim nginx.conf
+#user  nobody;
+worker_processes  1;
+
+error_log  logs/error.log debug;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+stream {
+    upstream mysql {
+        server 172.16.206.30:3306;
+    }
+    server {
+        listen 3306;
+        proxy_connect_timeout 8s;
+        proxy_timeout 24h;
+        proxy_pass mysql;
+    }
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;
+                  &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;
+                  &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    gzip  on;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        #charset koi8-r;
+
+        #access_log  logs/access.log  main;
+
+        location / {
+            root   html;
+            index  index.html index.htm;
+        }
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+
+    }
+
+}
+</code></pre><p>stream与http同级别。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Nginx/" rel="tag"><i class="fa fa-tag"></i>Nginx</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/23/Nginx配置详解及优化/" rel="next" title="Nginx配置详解及优化">
+                <i class="fa fa-chevron-left"></i> Nginx配置详解及优化
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -375,6 +545,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
       <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
 
@@ -396,8 +570,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -488,6 +671,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#编译Nginx启用ngx-stream-core-module模块"><span class="nav-number">1.</span> <span class="nav-text">编译Nginx启用ngx_stream_core_module模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Nginx负载均衡MySQL"><span class="nav-number">2.</span> <span class="nav-text">配置Nginx负载均衡MySQL</span></a></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -603,6 +797,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 

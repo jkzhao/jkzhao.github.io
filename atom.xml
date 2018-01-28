@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-01-27T13:17:45.000Z</updated>
+  <updated>2018-01-28T02:35:15.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,115 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Nginx实现TCP负载均衡</title>
+    <link href="http://yoursite.com/2018/01/28/Nginx%E5%AE%9E%E7%8E%B0TCP%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/"/>
+    <id>http://yoursite.com/2018/01/28/Nginx实现TCP负载均衡/</id>
+    <published>2018-01-28T01:45:57.000Z</published>
+    <updated>2018-01-28T02:35:15.000Z</updated>
+    
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;nginx在版本1.9.0以后支持tcp的负载均衡，具体可以参照官网关于模块&lt;a href=&quot;https://nginx.org/en/docs/stream/ngx_stream_core_module.html#tcp_nodelay&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;ngx_stream_core_module&lt;/a&gt;的说明。一直以来，Nginx 并不支持tcp协议，所以后台的一些基于TCP的业务就只能通过其他高可用负载软件来完成了，比如Haproxy或者LVS。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;编译Nginx启用ngx-stream-core-module模块&quot;&gt;&lt;a href=&quot;#编译Nginx启用ngx-stream-core-module模块&quot; class=&quot;headerlink&quot; title=&quot;编译Nginx启用ngx_stream_core_module模块&quot;&gt;&lt;/a&gt;编译Nginx启用ngx_stream_core_module模块&lt;/h2&gt;&lt;p&gt;ngx_stream_core_module 这个模块在1.90版本后将被启用。但是并不会默认安装，需要在编译时通过指定 –with-stream 参数来激活这个模块。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /usr/local/
+# wget https://nginx.org/download/nginx-1.12.2.tar.gz
+# tar zxf nginx-1.12.2.tar.gz
+# cd nginx-1.12.2/
+# ./configure --prefix=/usr/local/nginx --with-stream
+# make &amp;amp;&amp;amp; make install
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;配置Nginx负载均衡MySQL&quot;&gt;&lt;a href=&quot;#配置Nginx负载均衡MySQL&quot; class=&quot;headerlink&quot; title=&quot;配置Nginx负载均衡MySQL&quot;&gt;&lt;/a&gt;配置Nginx负载均衡MySQL&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# cd /usr/local/nginx/conf/
+# vim nginx.conf
+#user  nobody;
+worker_processes  1;
+
+error_log  logs/error.log debug;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+stream {
+    upstream mysql {
+        server 172.16.206.30:3306;
+    }
+    server {
+        listen 3306;
+        proxy_connect_timeout 8s;
+        proxy_timeout 24h;
+        proxy_pass mysql;
+    }
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  &amp;apos;$remote_addr - $remote_user [$time_local] &amp;quot;$request&amp;quot; &amp;apos;
+                  &amp;apos;$status $body_bytes_sent &amp;quot;$http_referer&amp;quot; &amp;apos;
+                  &amp;apos;&amp;quot;$http_user_agent&amp;quot; &amp;quot;$http_x_forwarded_for&amp;quot;&amp;apos;;
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    gzip  on;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        #charset koi8-r;
+
+        #access_log  logs/access.log  main;
+
+        location / {
+            root   html;
+            index  index.html index.htm;
+        }
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;stream与http同级别。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;nginx在版本1.9.0以后支持tcp的负载均衡，具体可以参照官网关于模块&lt;a href=&quot;https://nginx.org/en/docs/stream/ngx_stream_core_module.html#tcp_nodelay&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;ngx_stream_core_module&lt;/a&gt;的说明。一直以来，Nginx 并不支持tcp协议，所以后台的一些基于TCP的业务就只能通过其他高可用负载软件来完成了，比如Haproxy或者LVS。
+    
+    </summary>
+    
+      <category term="Nginx" scheme="http://yoursite.com/categories/Nginx/"/>
+    
+    
+      <category term="Nginx" scheme="http://yoursite.com/tags/Nginx/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Nginx配置详解及优化</title>
     <link href="http://yoursite.com/2018/01/23/Nginx%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3%E5%8F%8A%E4%BC%98%E5%8C%96/"/>
     <id>http://yoursite.com/2018/01/23/Nginx配置详解及优化/</id>
     <published>2018-01-23T07:06:27.000Z</published>
-    <updated>2018-01-27T13:17:45.000Z</updated>
+    <updated>2018-01-27T13:21:04.000Z</updated>
     
     <content type="html">&lt;blockquote&gt;
 &lt;p&gt;上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。&lt;/p&gt;
@@ -4759,160 +4863,6 @@ vmware/registry     2.6.1-photon        0f6c96580032        3 months ago        
     
     
       <category term="Docker Registry" scheme="http://yoursite.com/tags/Docker-Registry/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>overlay实现容器跨主机通信</title>
-    <link href="http://yoursite.com/2017/09/05/overlay%E5%AE%9E%E7%8E%B0%E5%AE%B9%E5%99%A8%E8%B7%A8%E4%B8%BB%E6%9C%BA%E9%80%9A%E4%BF%A1/"/>
-    <id>http://yoursite.com/2017/09/05/overlay实现容器跨主机通信/</id>
-    <published>2017-09-05T05:42:06.000Z</published>
-    <updated>2017-11-07T13:06:15.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;a href=&quot;#Docker容器跨主机通信方案&quot; class=&quot;headerlink&quot; title=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;/a&gt;Docker容器跨主机通信方案&lt;/h2&gt;&lt;p&gt;实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。&lt;br&gt;Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是docker 1.11版本，这是我以前做的一个方案，现整理出来。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h2&gt;&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;主机名&lt;/th&gt;
-&lt;th&gt;操作系统版本&lt;/th&gt;
-&lt;th&gt;IP地址&lt;/th&gt;
-&lt;th&gt;Docker版本&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;node1&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;172.16.7.151&lt;/td&gt;
-&lt;td&gt;1.11.0&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;node2&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;172.16.7.152&lt;/td&gt;
-&lt;td&gt;1.11.0&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h2 id=&quot;升级内核&quot;&gt;&lt;a href=&quot;#升级内核&quot; class=&quot;headerlink&quot; title=&quot;升级内核&quot;&gt;&lt;/a&gt;升级内核&lt;/h2&gt;&lt;p&gt;默认内核：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# uname -r
-3.10.0-229.el7.x86_64
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;1.升级内核需要使用 elrepo 的yum 源&lt;br&gt;首先我们导入 elrepo 的key&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.安装 elrepo 源&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.在yum的ELRepo源中，mainline 为最新版本的内核&lt;br&gt;安装 ml 的内核&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# yum --enablerepo=elrepo-kernel install  kernel-ml-devel kernel-ml -y
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.修改内核启动顺序，默认启动的顺序应该为1，升级以后内核是往前面插入，为0&lt;br&gt;由于CentOS 7使用grub2作为引导程序 ，所以和CentOS 6有所不同，并不是修改/etc/grub.conf来修改启动项，需要如下操作：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# cat /boot/grub2/grub.cfg |grep menuentry   #查看有哪些内核选项
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/21.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# grub2-editenv list
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/22.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# grub2-set-default 0
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.重启系统&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# shutdown -r now
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;6.查看内核版本&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# uname -r
-4.5.2-1.el7.elrepo.x86_64
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装docker&quot;&gt;&lt;a href=&quot;#安装docker&quot; class=&quot;headerlink&quot; title=&quot;安装docker&quot;&gt;&lt;/a&gt;安装docker&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim /etc/yum.repos.d/docker.repo
-[dockerrepo]
-name=Docker Repository
-baseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/
-enabled=1
-gpgcheck=1
-gpgkey=https://yum.dockerproject.org/gpg
-
-[root@node1 ~]# yum install -y docker-engine
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果后面升级：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# yum update docker-engine
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;卸载：yum remove  &lt;/p&gt;
-&lt;h2 id=&quot;防火墙设置和开启内核转发&quot;&gt;&lt;a href=&quot;#防火墙设置和开启内核转发&quot; class=&quot;headerlink&quot; title=&quot;防火墙设置和开启内核转发&quot;&gt;&lt;/a&gt;防火墙设置和开启内核转发&lt;/h2&gt;&lt;p&gt;停止firewalld，安装iptables-services&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# systemctl stop firewalld.service
-[root@node1 ~]# systemctl disable firewalld.service
-[root@node1 ~]# yum install -y iptables-services
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;修改防火墙策略：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim /etc/sysconfig/iptables
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/23.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;        [root@node1 ~]# systemctl start iptables.service&lt;br&gt;        [root@node1 ~]# systemctl enable iptables.service&lt;/p&gt;
-&lt;p&gt;开启内核转发，在/etc/sysctl.conf中添加一行配置：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim /etc/sysctl.conf 
-net.ipv4.ip_forward=1
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行下面的命令使内核修改生效：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# sysctl -p
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装启动consul&quot;&gt;&lt;a href=&quot;#安装启动consul&quot; class=&quot;headerlink&quot; title=&quot;安装启动consul&quot;&gt;&lt;/a&gt;安装启动consul&lt;/h2&gt;&lt;p&gt;overlay一般需要一个全局的KV存储（sdn controller、etcd、consul）来存储各个主机节点在overlay网络中的配置信息。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# wget https://releases.hashicorp.com/consul/0.6.4/consul_0.6.4_linux_amd64.zip
-# unzip -oq consul_0.6.4_linux_amd64.zip
-# mv consul /usr/local/bin/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动consul：&lt;br&gt;host-1 Start Consul as a server in bootstrap mode:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# nohup consul agent -server -bootstrap -data-dir /tmp/consul -bind=172.16.7.151 &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;host-2 Start the Consul agent:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node2 ~]# nohup consul agent -data-dir /tmp/consul -bind=172.16.7.152 &amp;amp;
-[root@node2 ~]# consul join 172.16.7.151
-Successfully joined cluster by contacting 1 nodes.
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/24.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;启动Docker&quot;&gt;&lt;a href=&quot;#启动Docker&quot; class=&quot;headerlink&quot; title=&quot;启动Docker&quot;&gt;&lt;/a&gt;启动Docker&lt;/h2&gt;&lt;h3 id=&quot;修改docker-daemon配置&quot;&gt;&lt;a href=&quot;#修改docker-daemon配置&quot; class=&quot;headerlink&quot; title=&quot;修改docker daemon配置&quot;&gt;&lt;/a&gt;修改docker daemon配置&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# cp /usr/lib/systemd/system/docker.service /etc/systemd/system/
-# vim /etc/systemd/system/docker.service
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在ExecStart那行加上如下的选项，其中ens32是网卡名字：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;--cluster-store=consul://localhost:8500 --cluster-advertise=ens32:2376
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/25.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;其中–cluster-store是指向key-value存储的地址，我这里就是consul的地址，consul里保存着整个overlay网络配置和节点信息。–cluster-advertise中是Host1和Host2互通的端口。&lt;/p&gt;
-&lt;h3 id=&quot;启动Docker-1&quot;&gt;&lt;a href=&quot;#启动Docker-1&quot; class=&quot;headerlink&quot; title=&quot;启动Docker&quot;&gt;&lt;/a&gt;启动Docker&lt;/h3&gt;&lt;p&gt;执行systemctl daemon-reload使配置生效，然后执行systemctl start docker.service启动docker服务。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# systemctl daemon-reload
-# systemctl start docker.service
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;加入开机自启动：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# systemctl enable docker.service
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;创建overlay-network&quot;&gt;&lt;a href=&quot;#创建overlay-network&quot; class=&quot;headerlink&quot; title=&quot;创建overlay network&quot;&gt;&lt;/a&gt;创建overlay network&lt;/h2&gt;&lt;h3 id=&quot;vxlan简介&quot;&gt;&lt;a href=&quot;#vxlan简介&quot; class=&quot;headerlink&quot; title=&quot;vxlan简介&quot;&gt;&lt;/a&gt;vxlan简介&lt;/h3&gt;&lt;p&gt;overlay network这种方式一般也是只需要三层可达，容器就能互通。overlay模式容器有独立IP，不同overlay方案之间的性能差别也是很大的。我这里采用的的vxlan技术。&lt;br&gt;vxlan(virtual Extensible LAN)虚拟可扩展局域网，是一种overlay的网络技术，使用MAC in UDP的方法进 行封装，共50字节的封装报文头。&lt;br&gt;用于对VXLAN报文进行封装/解封装，包括ARP请求报文和正常的VXLAN数据报文，在一段封装报文 后通过隧道向另一端VTEP发送封装报文，另一端VTEP接收到封装的报文解封装后根据封装的MAC地址进行转发。VTEP可由支持VXLAN的硬件设备或软件来实现。&lt;br&gt;从封装的结构上来看，VXLAN提供了将二层网络overlay在三层网络上的能力。&lt;/p&gt;
-&lt;h3 id=&quot;创建overlay-network-1&quot;&gt;&lt;a href=&quot;#创建overlay-network-1&quot; class=&quot;headerlink&quot; title=&quot;创建overlay network&quot;&gt;&lt;/a&gt;创建overlay network&lt;/h3&gt;&lt;p&gt;默认情况下，docker启动后初始化3种网络，这3种都是不能删除的。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# docker network ls
-NETWORK ID          NAME                DRIVER
-5944745e7d6d             bridge                   bridge              
-ce5d1ba0be32             host                       host                
-244bb9a34016             none                      null  
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在node1主机上创建overlay network:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker network create -d overlay --subnet=10.10.10.0/24 net1
-ca0c50dd3a49e028c3323024b9d6e8f837f4b76889b8d5848046ec0a5948ee2d
-[root@node1 ~]# docker network ls
-NETWORK ID          NAME                DRIVER
-5944745e7d6d             bridge                  bridge              
-ce5d1ba0be32             host                     host                
-ca0c50dd3a49             net1                    overlay             
-244bb9a34016             none                    null
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在其他主机上执行docker network ls，也会看到新建的这个名字叫net1的overlay网络。&lt;/p&gt;
-&lt;h2 id=&quot;创建容器&quot;&gt;&lt;a href=&quot;#创建容器&quot; class=&quot;headerlink&quot; title=&quot;创建容器&quot;&gt;&lt;/a&gt;创建容器&lt;/h2&gt;&lt;p&gt;node1主机创建容器：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker run -it --net=net1 --name=contain1 --hostname=test1 --ip=10.10.10.3 --add-host test2:10.10.10.4 centos:centos7
-[root@test1 /]# yum install -y iproute net-tools
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/26.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/27.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;node2上创建容器：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node2 ~]# docker run -it --net=net1 --name=contain2 --hostname=test2 --ip=10.10.10.4 --add-host test1:10.10.10.3 centos:centos7
-[root@test2 /]# yum install -y iproute net-tools
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/28.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/29.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;测试容器跨主机通信&quot;&gt;&lt;a href=&quot;#测试容器跨主机通信&quot; class=&quot;headerlink&quot; title=&quot;测试容器跨主机通信&quot;&gt;&lt;/a&gt;测试容器跨主机通信&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/30.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/31.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;网络拓扑&quot;&gt;&lt;a href=&quot;#网络拓扑&quot; class=&quot;headerlink&quot; title=&quot;网络拓扑&quot;&gt;&lt;/a&gt;网络拓扑&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/32.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;容器内部有两个网络接口eth0、eth1。实际上，eth1连接到docker_gwbridge，这可以从ip就能看出。eth0即为overlay network的接口。&lt;/p&gt;
-&lt;h2 id=&quot;抓包分析&quot;&gt;&lt;a href=&quot;#抓包分析&quot; class=&quot;headerlink&quot; title=&quot;抓包分析&quot;&gt;&lt;/a&gt;抓包分析&lt;/h2&gt;&lt;p&gt;在node2主机上使用tcpdump抓包，然后在windows上用wireshark分析。&lt;br&gt;1.container1容器里ping container2的ip地址：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/33.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;2.node2主机上抓包&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node2 ~]# tcpdump -i ens32 -s 0 -X -nnn -vvv -w /tmp/package.pcap
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.把package.pcap传下来放到wireshark上分析&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/34.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/35.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;以在container1中ping container2，分析数据包流向：&lt;/strong&gt;&lt;br&gt;①container1(10.10.10.3)中ping container2(10.10.10.4)，根据container1的路由表，数据包可通过直连网络到达container2。于是arp请求获取container2的MAC地址(在xvlan上的arp这里不详述)，得到mac地址后，封包，从eth0发出；&lt;br&gt;②eth0桥接在net ns 1-ca0c50dd3a中的br0上，这个br0是个网桥(交换机)虚拟设备，需要将来自eth0的包转发出去，于是包转给了vxlan设备；这个可以通过arp -a看到一些端倪：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# ip netns exec 1-ca0c50dd3a arp -a
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;③vxlan是个特殊设备，收到包后，由vxlan设备创建时注册的设备处理程序对包进行处理，即进行VXLAN封包（这期间会查询consul中存储的net1信息），将ICMP包整体作为UDP包的payload封装起来，并将UDP包通过宿主机的eth0发送出去。&lt;br&gt;④152宿主机收到UDP包后，发现是VXLAN包，根据VXLAN包中的相关信息（比如Vxlan Network Identifier，VNI=256)找到vxlan设备，并转给该vxlan设备处理。vxlan设备的处理程序进行解包，并将UDP中的payload取出，整体通过br0转给veth口，net1c2从eth0收到ICMP数据包，回复icmp reply。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;从这个通信过程中来看，跨主机通信过程中的步骤如下：&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;容器的网络命名空间与overlay网络的网络命名空间通过一对veth pair连接起来，当容器对外通信时，veth pair起到网线的作用，将流量发送到overlay网络的网络命名空间中。 &lt;/li&gt;
-&lt;li&gt;容器的veth pair对端eth2与vxlan设备通过br0这个Linux bridge桥接在一起，br0在同一宿主机上起到虚拟机交换机的作用，如果目标地址在同一宿主机上，则直接通信，如果不再则通过设置在vxlan1这个vxlan设备进行跨主机通信。 &lt;/li&gt;
-&lt;li&gt;vxlan1设备上会在创建时，由docker daemon为其分配vxlan隧道ID，起到网络隔离的作用。 &lt;/li&gt;
-&lt;li&gt;docker主机集群通过key/value存储共享数据，在7946端口上，相互之间通过gossip协议学习各个宿主机上运行了哪些容器。守护进程根据这些数据来在vxlan1设备上生成静态MAC转发表。 &lt;/li&gt;
-&lt;li&gt;根据静态MAC转发表的设置，通过UDP端口4789，将流量转发到对端宿主机的网卡上。&lt;br&gt;根据流量包中的vxlan隧道ID，将流量转发到对端宿主机的overlay网络的网络命名空间中。 &lt;/li&gt;
-&lt;li&gt;对端宿主机的overlay网络的网络命名空间中br0网桥，起到虚拟交换机的作用，将流量根据MAC地址转发到对应容器内部。&lt;/li&gt;
-&lt;/ul&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;a href=&quot;#Docker容器跨主机通信方案&quot; class=&quot;headerlink&quot; title=&quot;Docker容器跨主机通信方案&quot;&gt;&lt;/a&gt;Docker容器跨主机通信方案&lt;/h2&gt;&lt;p&gt;实现跨主机的容器通信有很多种方案，需要看实际的网络状况，是云上环境，私有云环境，还是混合云环境；是否有SDN对网络做特殊控制等等。网络状况不一样，适用的方案也会不一样。比如有的环境可以使用路由的方案，有的却不能使用。不考虑网络模型的话，基本是两个派别：overlay和路由方案。&lt;br&gt;Docker 1.12中把swarmkit集成到了docker中，本篇博客使用的版本是docker 1.11版本，这是我以前做的一个方案，现整理出来。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="容器" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8/"/>
-    
-    
-      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
     
   </entry>
   
