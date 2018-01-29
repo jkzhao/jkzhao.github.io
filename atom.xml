@@ -657,7 +657,7 @@ $document_root：当前请求映射到的root配置；
     <link href="http://yoursite.com/2018/01/21/%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2Openresty/"/>
     <id>http://yoursite.com/2018/01/21/安装部署Openresty/</id>
     <published>2018-01-21T11:55:10.000Z</published>
-    <updated>2018-01-27T02:28:22.000Z</updated>
+    <updated>2018-01-29T01:57:59.000Z</updated>
     
     <content type="html">&lt;blockquote&gt;
 &lt;p&gt;由于公司的一个产品用了Nginx Lua写了认证，所以在选型时选了OpenResty。&lt;/p&gt;
@@ -757,6 +757,22 @@ PrivateTmp=true
 [Install]
 WantedBy=multi-user.target
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【补充】:&lt;br&gt;RHEL/CentOS 7.0中一个最主要的改变，就是切换到了systemd。它用于替代红帽企业版Linux前任版本中的SysV和Upstart，对系统和服务进行管理。systemd兼容SysV和Linux标准组的启动脚本。&lt;br&gt;Systemd 是 Linux 系统中最新的初始化系统（init），它主要的设计目标是克服 sysvinit 固有的缺点，提高系统的启动速度。systemd 和 ubuntu 的 upstart 是竞争对手，已经取代了UpStart。&lt;br&gt;Systemd也是一个Linux操作系统下的系统和服务管理器。它被设计成向后兼容SysV启动脚本，并提供了大量的特性，如开机时平行启动系统服务，按需启动守护进程，支持系统状态快照，或者基于依赖的服务控制逻辑。&lt;br&gt;先前的使用SysV初始化或Upstart的红帽企业版Linux版本中，使用位于/etc/rc.d/init.d/目录中的bash初始化脚本进行管理。而在RHEL 7/CentOS 7中，这些启动脚本被服务单元取代了。服务单元以.service文件扩展结束，提供了与初始化脚本同样的用途。要查看、启动、停止、重启、启用或者禁用系统服务，你要使用systemctl来代替旧的service命令。&lt;br&gt;注：为了向后兼容，旧的service命令在CentOS 7中仍然可用，它会重定向所有命令到新的systemctl工具。&lt;/p&gt;
+&lt;h2 id=&quot;Nginx日志切割&quot;&gt;&lt;a href=&quot;#Nginx日志切割&quot; class=&quot;headerlink&quot; title=&quot;Nginx日志切割&quot;&gt;&lt;/a&gt;Nginx日志切割&lt;/h2&gt;&lt;p&gt;日志对于统计排错来说非常有利的。nginx日志相关的配置如access_log、log_format、error_log等。这部分配置内容将在下一篇博文中讲解，这里先来简单提一下。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;log_format res &amp;apos;$http_host $remote_addr [$time_local] &amp;quot;$request&amp;quot; $status $body_bytes_sent &amp;quot;$http_referer&amp;quot; &amp;quot;$http_user_agent&amp;quot; $request_time $upstream_response_time&amp;apos;; #定义日志格式，并给这个日志格式命名为res
+access_log  logs/res.access.log  res; #access_log在虚拟主机段中配置，logs/res.access.log定义了存放该虚拟主机日志文件的名字及存放路径，记录的日志格式为上面定义的res所对应的日志格式
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Nginx每个虚拟主机都应该使用一个单独的日志，这里使用Linux自带的logrotate进行切割。如果不切割，每个日志文件会越来越大。&lt;br&gt;关于logrotate的介绍及配置这里不多介绍，可以自行google。下面开始定义切割Nginx的logrotate的配置文件：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# vim /etc/logrotate.d/nginx
+/usr/local/openresty/nginx/logs/*.log {
+    notifempty
+    weekly
+    rotate 4
+    nocompress
+    copytruncate
+    postrotate
+    systemctl reload nginx.service 
+    endscript
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;上面的配置是每周切割一次Nginx日志，保留最近的4个日志文件。&lt;br&gt;对于配置中的 &lt;strong&gt;systemctl reload nginx.service&lt;/strong&gt; 需要换成服务器上重载Nginx的命令，如果是centos6系列，可能命令就是 &lt;strong&gt;service nginx reload&lt;/strong&gt;。&lt;br&gt;&lt;/p&gt;
 &lt;p&gt;关于Nginx的具体配置将在下篇博文中分享。&lt;/p&gt;
 </content>
     
