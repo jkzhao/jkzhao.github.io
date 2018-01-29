@@ -842,7 +842,7 @@ access_log  logs/res.access.log  res; #access_log在虚拟主机段中配置，l
     <link href="http://yoursite.com/2018/01/16/Nginx%E9%85%8D%E7%BD%AEHTTP-2-0/"/>
     <id>http://yoursite.com/2018/01/16/Nginx配置HTTP-2-0/</id>
     <published>2018-01-16T05:53:17.000Z</published>
-    <updated>2018-01-16T10:49:01.000Z</updated>
+    <updated>2018-01-29T11:57:21.000Z</updated>
     
     <content type="html">&lt;blockquote&gt;
 &lt;p&gt;最近将公司前端组件的Nginx配置了http 2.0，特此在此记录一下。突然发现博客里竟然没有什么关于Nginx的文章，毕竟是一直在使用的，后面会写几篇关于自己这几年使用Nginx的一些总结。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
@@ -907,6 +907,8 @@ server {
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;关于ssl使用的证书，由于是公司对外的服务环境，证书是购买的。当然做实验时也可以建立私有CA，模拟颁发证书。&lt;/p&gt;
 &lt;p&gt;启动Nginx：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# systemctl start nginx.service
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;访问&lt;a href=&quot;https://res.wisedu.com，查看Nginx的access.log，可以看到协议已经是HTTP/2.0了。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://res.wisedu.com，查看Nginx的access.log，可以看到协议已经是HTTP/2.0了。&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;res.wisedu.com 172.16.0.12 [29/Jan/2018:19:54:20 +0800] &amp;quot;GET /static/img/logo.484ce8c.png HTTP/2.0&amp;quot; 200 17354 &amp;quot;https://res.wisedu.com/&amp;quot; &amp;quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36&amp;quot; 0.000 -
 &lt;/code&gt;&lt;/pre&gt;</content>
     
     <summary type="html">

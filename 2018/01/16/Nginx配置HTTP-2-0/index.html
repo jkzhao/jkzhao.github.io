@@ -112,7 +112,7 @@
 <meta property="og:site_name" content="jkzhao&#39;s blog">
 <meta property="og:description" content="最近将公司前端组件的Nginx配置了http 2.0，特此在此记录一下。突然发现博客里竟然没有什么关于Nginx的文章，毕竟是一直在使用的，后面会写几篇关于自己这几年使用Nginx的一些总结。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-16T10:49:01.000Z">
+<meta property="og:updated_time" content="2018-01-29T11:57:21.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx配置HTTP&#x2F;2.0">
 <meta name="twitter:description" content="最近将公司前端组件的Nginx配置了http 2.0，特此在此记录一下。突然发现博客里竟然没有什么关于Nginx的文章，毕竟是一直在使用的，后面会写几篇关于自己这几年使用Nginx的一些总结。">
@@ -344,8 +344,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-01-16T18:49:01+08:00" content="2018-01-16">
-              2018-01-16
+              <time itemprop="dateUpdated" datetime="2018-01-29T19:57:21+08:00" content="2018-01-29">
+              2018-01-29
               </time>
               </span>
             
@@ -467,6 +467,8 @@ server {
 </code></pre><p>关于ssl使用的证书，由于是公司对外的服务环境，证书是购买的。当然做实验时也可以建立私有CA，模拟颁发证书。</p>
 <p>启动Nginx：</p>
 <pre><code># systemctl start nginx.service
+</code></pre><p>访问<a href="https://res.wisedu.com，查看Nginx的access.log，可以看到协议已经是HTTP/2.0了。" target="_blank" rel="external">https://res.wisedu.com，查看Nginx的access.log，可以看到协议已经是HTTP/2.0了。</a></p>
+<pre><code>res.wisedu.com 172.16.0.12 [29/Jan/2018:19:54:20 +0800] &quot;GET /static/img/logo.484ce8c.png HTTP/2.0&quot; 200 17354 &quot;https://res.wisedu.com/&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36&quot; 0.000 -
 </code></pre>
       
     </div>
@@ -710,7 +712,7 @@ server {
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共147.7k字</span>
+  <span class="post-count">博客全站共147.8k字</span>
 </div>
 
         
