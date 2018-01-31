@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Docker," />
+  <meta name="keywords" content="Nginx," />
 
 
 
@@ -104,18 +104,29 @@
 
 
 
-<meta name="description" content="背景在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how">
-<meta name="keywords" content="Docker">
+<meta name="description" content="HTTPS简介1.https简介HTTPS其实是有两部分组成：HTTP + SSL / TLS，也就是在HTTP上又加了一层处理加密信息的模块。服务端和客户端的信息传输都会通过TLS进行加密，所以传输的数据都是加密后的数据。">
+<meta name="keywords" content="Nginx">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CentOS安装Docker CE">
-<meta property="og:url" content="http://yoursite.com/2017/08/28/CentOS安装Docker-CE/index.html">
+<meta property="og:title" content="Nginx配置HTTPS">
+<meta property="og:url" content="http://yoursite.com/2018/01/30/Nginx配置HTTPS/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="背景在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how">
+<meta property="og:description" content="HTTPS简介1.https简介HTTPS其实是有两部分组成：HTTP + SSL / TLS，也就是在HTTP上又加了一层处理加密信息的模块。服务端和客户端的信息传输都会通过TLS进行加密，所以传输的数据都是加密后的数据。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-11-07T07:46:34.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/13.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/14.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/15.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/16.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/17.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/18.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/19.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/20.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/21.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/22.png">
+<meta property="og:updated_time" content="2018-01-31T11:02:15.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CentOS安装Docker CE">
-<meta name="twitter:description" content="背景在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how">
+<meta name="twitter:title" content="Nginx配置HTTPS">
+<meta name="twitter:description" content="HTTPS简介1.https简介HTTPS其实是有两部分组成：HTTP + SSL / TLS，也就是在HTTP上又加了一层处理加密信息的模块。服务端和客户端的信息传输都会通过TLS进行加密，所以传输的数据都是加密后的数据。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/13.png">
 
 
 
@@ -133,7 +144,7 @@
   };
 </script>
 
-  <title> CentOS安装Docker CE | jkzhao's blog </title>
+  <title> Nginx配置HTTPS | jkzhao's blog </title>
 </head>
 <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 
@@ -326,7 +337,7 @@
             
             
               
-                CentOS安装Docker CE
+                Nginx配置HTTPS
               
             
           </h1>
@@ -338,14 +349,14 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-08-28T13:29:47+08:00" content="2017-08-28">
-              2017-08-28
+            <time itemprop="dateCreated" datetime="2018-01-30T12:24:12+08:00" content="2018-01-30">
+              2018-01-30
             </time>
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-07T15:46:34+08:00" content="2017-11-07">
-              2017-11-07
+              <time itemprop="dateUpdated" datetime="2018-01-31T19:02:15+08:00" content="2018-01-31">
+              2018-01-31
               </time>
               </span>
             
@@ -360,8 +371,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/容器/" itemprop="url" rel="index">
-                    <span itemprop="name">容器</span>
+                  <a href="/categories/Nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">Nginx</span>
                   </a>
                 </span>
 
@@ -380,7 +391,7 @@
 
           
           
-             <span id="/2017/08/28/CentOS安装Docker-CE/" class="leancloud_visitors" data-flag-title="CentOS安装Docker CE">
+             <span id="/2018/01/30/Nginx配置HTTPS/" class="leancloud_visitors" data-flag-title="Nginx配置HTTPS">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -404,78 +415,134 @@
       
 
       
-        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>在搭建Registry的过程中，发现使用Docker 1.12版本，在push镜像到Registry时会报错误，几经查询解决之道无果后，去github的docker项目上提问，得到的回答是”Also note you appear running an unsupported version of docker which has changes specifically around how registries are handled.”，并且建议我尝试较新的版本。在2017年4月份的DockerCon会议上，Docker公司直接将 Github 上原隶属于 Docker 组织的 Docker 项目，直接 transfer 到了一个新的、名叫 Moby 的组织下，并将其重命名为 Moby 项目。由此先来了解下这个Moby项目。<br><a id="more"></a></p>
-<h2 id="Moby项目"><a href="#Moby项目" class="headerlink" title="Moby项目"></a>Moby项目</h2><p>为什么会产生Moby这个项目呢？可以看到最近几年里面，在2015年之后的Docker 1.17版本之后，引入了很多的新特性，比如Network、runC等，Docker的组件越来越多，提供支持的场景也越来越复杂，比如微服务、机器学习、物联网等，所以Docker镜像的下载量也呈现指数型上升，最终Docker运行的环境，也是越来越复杂，越来越多，比如在Linux，Windows，还有在嵌入式设备上。<br>所以Docker原本的发行版本已经不能适配于这些越来越复杂的场景了，举个例子，其实在IoT里面，树莓派的性能是比较好的，但是它去运行Docker的话，Docker就会占整个性能的一大部分，这样它上面就已经无法运行其他的一些自己的应用了，那用户要怎么去解决这些事情，难道自己去再写一个Docker容器引擎吗？这个成本是很高的，需要自己去造轮子。所以为了提供更加开放的生态，Docker公司把Docker项目中现在的一些组件抽象成Moby项目，这样系统构建者就可以通过Moby项目把现有的组件去进行组装，然后组装成自己所需要的一个容器引擎。<br>Moby项目现在有80多个组件，通过这些组件，用户可以避免重复地去造轮子。用户可以按照自己的需要去组装组件，做出自己的一个容器系统。这些组件有一个标准化的调用方式，他们之间通过gRPC通信，它的语言也是可以去定制的，不会像之前一样必须用Go语言去写。通过标准化的方式，通过Moby这个项目就可以把这些组件进行组合，成为自己所依赖的容器系统。<br>Docker项目现在改名成Moby项目，但是Docker会逐渐的从Moby项目中去抽象和剥离出来，作为Moby的一种组装方式，比如Docker依赖于这里面的一些库，它就特化成一种组装，组装成自己的Docker CE的版本，也就是Docker的社区版。Docker社区版后面也会继续做开源，所以用户和开发者不需要担心以后用Docker就会收费了，对于Docker用户来说，他也无须感知用户接口的变化，使用的命令还是Docker不是Moby，需要更多运维支持的可以选择Docker EE的版本，让Docker公司的工程师去替你去做运维和更复杂的线上支持，如果自己开发可以继续选择Docker社区版。对于架构师而言，现在就可以不强依赖于Docker项目，而是通过这些组件去拼装出来一个容器引擎去满足自己的需求。</p>
-<h2 id="安装Docker-CE"><a href="#安装Docker-CE" class="headerlink" title="安装Docker CE"></a>安装Docker CE</h2><h3 id="版本说明"><a href="#版本说明" class="headerlink" title="版本说明"></a>版本说明</h3><p>2017年2月份，Docker公司发布了全新的Docker版本：V1.13.0。从2017年3月1号开始，Docker的版本命名发生如下变化：</p>
-<table>
+        <h2 id="HTTPS简介"><a href="#HTTPS简介" class="headerlink" title="HTTPS简介"></a>HTTPS简介</h2><p>1.https简介<br>HTTPS其实是有两部分组成：HTTP + SSL / TLS，也就是在HTTP上又加了一层处理加密信息的模块。服务端和客户端的信息传输都会通过TLS进行加密，所以传输的数据都是加密后的数据。<a id="more"></a></p>
+<p>2.https协议原理<br>首先，客户端与服务器建立连接，各自生成私钥和公钥，是不同的。服务器返给客户端一个公钥，然后客户端拿着这个公钥把要搜索的东西加密，称之为密文，并连并自己的公钥一起返回给服务器，服务器拿着自己的私钥解密密文，然后把响应到的数据用客户端的公钥加密，返回给客户端，客户端拿着自己的私钥解密密文，把数据呈现出来。</p>
+<h3 id="TLS-SSL"><a href="#TLS-SSL" class="headerlink" title="TLS/SSL"></a>TLS/SSL</h3><p>TCP/IP的4层模型：最底层物理层、网络层、传输层、应用层。<br>OSI7层模型：物理层、数据链路层、网络层、传输层、会话层、表示层、应用层。<br>以TCP/IP层为例，哪一层可以实现数据的加密和解密？在TCP层和应用层之间引入了半个层，并且称这半个层位为SSL。可以这么理解，把SSL当成一个库，让上层应用层的某种协议如果在传输数据到TCP层之前调用了SSL的功能，那么这个协议就可以实现加密的功能了。比如说，本来http在应用层封装起来，接下来就要交给应用层了，但是加了SSL层，http在传送给TCP层之前经过SSL进行了一次封装，而SSL本身就是实现数据安全通信的，因此，http变成了https。同样，smtp就变成了smtps，ftp就变成了ftps。众多的应用层的协议都可以通过调用SSL库的功能来实现数据的安全传输的。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/13.png" alt=""><br>SSL(Secure Socket Layer,，安全的套接字层)，目前比较流行的是SSLv2、SSLv3。它只是一个库，因此要想实现SSL的功能，只需要在我们系统中提供SSL相关的库文件，就能够将http封装成https，也就意味着可以支持https协议了。http和https是两个不同的协议。但是SSL到底是某一家公司的协议，虽然也是开放的，国际标准化组织就不干了，他们决定研发一个更为开放的，通用的协议，TLS就出现了。<br>TLS(Transport Layer Security，传输层安全)：TLSv1，相当于SSLv3。</p>
+<h3 id="两台主机间TLS-SSL会话的建立：以http为例"><a href="#两台主机间TLS-SSL会话的建立：以http为例" class="headerlink" title="两台主机间TLS/SSL会话的建立：以http为例"></a>两台主机间TLS/SSL会话的建立：以http为例</h3><ul>
+<li>第一步：http是基于TCP的，因此双方在建立会话之前需要3次握手。<br>这是http会话的建立，下面就可以互相通信了。但是有了https后就不是3次握手后直接通信了。</li>
+<li>第二步：双方协商。客户端向服务器端发起请求，双方协商建立SSL会话，比如选择SSL协议的哪个版本、密钥加密算法等等。</li>
+<li>第三步：server端将自己的证书发给客户端。(一般而言客户端都是没有证书的) 。客户端拿到证书后要验证拿到的证书是不是自己信任的机构颁发的，再验证证书完整性。</li>
+<li>第四步：客户端传递加密后的对称密码给服务器端。https的主要作用在于web服务器的数据传递或者称为会话交换通过加密的方式实现的。加密一定要使用对称加密的方式，非对称加密方式速度太慢，既然是对称加密了，就需要对称加密密钥。如何生成这个密码呢？这里不是密钥交换实现的，而是客户端选择生成一个随机的对称密钥。并且将这个密码通过server端的公钥加密后传递给server端。</li>
+<li>第五步：拿着客户端发来的密码给数据加密，并发送给客户端。<br>【注意】:密钥是客户端自己选择的，加密后发送给客户端的。</li>
+</ul>
+<h3 id="常用的加解密算法简介"><a href="#常用的加解密算法简介" class="headerlink" title="常用的加解密算法简介"></a>常用的加解密算法简介</h3><p><strong>1.对称加密：加密和解密使用同样的密码</strong></p>
+<ul>
+<li>DES：数据加密标准，56位的密钥长度。</li>
+<li>3DES：3重DES。</li>
+<li>AES：高级加密标准，Advanced。使用128的密钥。AES192、AES256、AES512。。。</li>
+<li>Blowfish</li>
+<li>IDEA</li>
+</ul>
+<p><strong>2.单向加密</strong></p>
+<ul>
+<li>MD4</li>
+<li>MD5:128位。指输出长度，不是密钥长度。</li>
+<li>SHA1:160位。SHA192、SHA256、SHA384</li>
+<li>CRC-32：循环冗余校验码。不是加密算法，只是一种校验码机制，提供校验功能。</li>
+</ul>
+<p><strong>3.公钥加密：</strong>一对密钥，长度也是可以变化的，512、768、1024、2048、4096。。。越长速度越慢。核心：加密/签名。一般不会使用公钥加密来加密数据的。</p>
+<ul>
+<li>身份认证（数字签名）</li>
+<li>数据加密</li>
+<li>密钥交换</li>
+</ul>
+<p>RSA算法：既能实现加密，也能实现签名。有公开有要钱的。<br>DSA算法：只能实现签名。公开的。<br>ElGamal算法：商业算法，要钱的。</p>
+<p>加密解密需要算法来实现，因此需要一种工具或程序能够在主机上提供算法的实现。在Linux上，不同的加密机制所提供的工具是不同的。比如说，对于能够实现对称加密的工具叫openssl，gpg也可以。</p>
+<h2 id="OpenSSL"><a href="#OpenSSL" class="headerlink" title="OpenSSL"></a>OpenSSL</h2><p>SSL的开源实现。OpenSSL功能非常强大，几乎实现了市面上主流的所有加密算法。OpenSSL是个软件，由3部分组成。</p>
+<ul>
+<li>libcrpto：通用加密库。提供了各种加密函数。</li>
+<li>libssl：TLS/SSL协议的实现。就是那半层。基于会话的、实现了身份认证、数据机密性、会话完整性的TLS/SSL库。</li>
+<li>openssl：多用途命令行工具。能够实现单向加密、对称加密和非对称加密。</li>
+</ul>
+<p>OpenSSL还可实现私有证书颁发机构。为什么要实现私有证书颁发机构？我们很多功能都是建立在证书上，假如说我们买不起证书，我们就想在公司内部实现加密解密，而且我们也不跟外人通信。因此就需要个私有的证书颁发机构。</p>
+<p>查看系统上有没有安装openssl：</p>
+<pre><code>rpm -q openssl   
+</code></pre><p>如果需要新版本，去 <a href="http://www.openssl.org/" target="_blank" rel="external">http://www.openssl.org/</a> 下载编译安装。<br>下面开始建立私有CA，颁发证书，配置Nginx实现HTTPS访问网站。</p>
+<h2 id="OpenSSL实现私有CA"><a href="#OpenSSL实现私有CA" class="headerlink" title="OpenSSL实现私有CA"></a>OpenSSL实现私有CA</h2><h3 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h3><table>
 <thead>
 <tr>
-<th>项目</th>
-<th>说明</th>
+<th>主机名</th>
+<th>操作系统版本</th>
+<th>IP地址</th>
+<th>安装软件</th>
+<th>作用</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>版本格式</td>
-<td>YY.MM</td>
+<td>res</td>
+<td>CentOS 7.0</td>
+<td>172.16.7.75</td>
+<td>openssl</td>
+<td>私有CA</td>
 </tr>
 <tr>
-<td>stable版本</td>
-<td>每个季度发行</td>
-</tr>
-<tr>
-<td>edge版本</td>
-<td>每个月发行</td>
+<td>res</td>
+<td>CentOS 7.0</td>
+<td>172.16.7.180</td>
+<td>openresty</td>
+<td>Nginx服务器</td>
 </tr>
 </tbody>
 </table>
-<p>同时将Docker分成CE和EE 2个版本。CE版本即社区版（免费，支持周期三个月），EE即企业版，强调安全，付费使用。<br>Docker 会每月发布一个 edge 版本(17.03, 17.04, 17.05…)，每三个月发布一个 stable 版本(17.03, 17.06, 17.09…)，企业版(EE) 和 stable 版本号保持一致，但每个版本提供一年维护。<br>Docker 的 Linux 发行版的软件仓库也从以前的<a href="https://apt.dockerproject.org和https://yum.dockerproject.org" target="_blank" rel="external">https://apt.dockerproject.org和https://yum.dockerproject.org</a> 变更为目前的 <a href="https://download.docker.com" target="_blank" rel="external">https://download.docker.com</a> 。软件包名变更为 docker-ce(社区版) 和 docker-ee(企业版)。<br>当前的CE版本为17.03.0，基于V1.13.0。主要修复错误，没有重大功能增加，API亦保持不变。本文以此版本安装。<br>此版本的发行说明，请参考：<a href="https://github.com/docker/docker/releases" target="_blank" rel="external">https://github.com/docker/docker/releases</a></p>
-<h3 id="安装Docker"><a href="#安装Docker" class="headerlink" title="安装Docker"></a>安装Docker</h3><p>官方安装文档：<a href="https://docs.docker.com/engine/installation/linux/docker-ce/centos/" target="_blank" rel="external">https://docs.docker.com/engine/installation/linux/docker-ce/centos/</a></p>
-<h4 id="环境要求"><a href="#环境要求" class="headerlink" title="环境要求"></a>环境要求</h4><p>To install Docker CE, you need the 64-bit version of CentOS 7.<br>The centos-extras repository must be enabled. This repository is enabled by default, but if you have disabled it, you need to re-enable it.</p>
-<h4 id="卸载安装的所有Docker组件"><a href="#卸载安装的所有Docker组件" class="headerlink" title="卸载安装的所有Docker组件"></a>卸载安装的所有Docker组件</h4><pre><code>[root@spark32 lib]# systemctl stop docker.service
-[root@spark32 lib]# yum remove docker docker-common docker-selinux docker-engine container-selinux
-[root@spark32 lib]# rm -rf docker/
-</code></pre><h4 id="通过仓库安装Docker-CE"><a href="#通过仓库安装Docker-CE" class="headerlink" title="通过仓库安装Docker CE"></a>通过仓库安装Docker CE</h4><p>1.安装依赖包</p>
-<pre><code>[root@spark32 ~]# yum install -y yum-utils device-mapper-persistent-data lvm2
-</code></pre><p>2.下载docker yum源</p>
-<pre><code>[root@spark32 ~]# yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-</code></pre><p>3.更新软件缓存</p>
-<pre><code>[root@spark32 ~]# yum makecache fast
-</code></pre><p>4.安装Docker CE</p>
-<pre><code>[root@spark32 ~]# yum install docker-ce -y
-</code></pre><p>5.启动docker</p>
-<pre><code>[root@spark32 ~]# systemctl start docker.service
-</code></pre><p>6.查看docker版本信息</p>
-<pre><code>[root@spark32 ~]# docker info
-Containers: 0
- Running: 0
- Paused: 0
- Stopped: 0
-Images: 0
-Server Version: 17.06.1-ce
-Storage Driver: overlay
- Backing Filesystem: extfs
- Supports d_type: true
-Logging Driver: json-file
-Cgroup Driver: cgroupfs
-</code></pre><p>【注意】:在生产环境中，可能需要使用某一个特定版本的Docker，而不是使用最新的版本，我们可以先列出版本，然后安装指定版本：</p>
-<pre><code>[root@spark32 ~]# yum list docker-ce.x86_64  --showduplicates | sort -r
-[root@spark32 ~]# yum install docker-ce-&lt;VERSION&gt;
-</code></pre><h3 id="配置镜像加速"><a href="#配置镜像加速" class="headerlink" title="配置镜像加速"></a>配置镜像加速</h3><p>国内访问 Docker Hub 有时会遇到困难，此时可以配置镜像加速器。国内很多云服务商都提供了加速器服务，例如：</p>
-<ul>
-<li>阿里云加速器</li>
-<li>DaoCloud 加速器</li>
-<li>灵雀云加速器</li>
-</ul>
-<p>以阿里云加速器为例<br>1.首先进入<a href="https://dev.aliyun.com/" target="_blank" rel="external">阿里云docker库首页</a><br>注册用户并登录，点击右上角“管理中心”。如果第一次，会提示“您还没有开通服务”，点击“确定”，然后会出现弹窗“初始化设置”，设置docker登录时使用的密码。<br>2.点击左侧菜单“Docker Hub镜像站点”，可以看到“您的专属加速器地址：<a href="https://6101v8g5.mirror.aliyuncs.com”，我们需要将其配置到Docker" target="_blank" rel="external">https://6101v8g5.mirror.aliyuncs.com”，我们需要将其配置到Docker</a> 引擎。<br>3.修改daemon配置文件/etc/docker/daemon.json来使用加速器：</p>
-<pre><code>[root@spark32 ~]# vim /etc/docker/daemon.json
-{
-  &quot;registry-mirrors&quot;: [&quot;https://6101v8g5.mirror.aliyuncs.com&quot;]
+<p>比如在公司内部模拟实现https，就得给web服务器发一个证书，不用去买，自己做一个。在给自己颁发证书之前，自己先建立一个证书颁发机构。Openssl可以帮你去实现私有CA。首先私有CA自己要有证书。</p>
+<h3 id="创建私有CA"><a href="#创建私有CA" class="headerlink" title="创建私有CA"></a>创建私有CA</h3><p><strong>1.生成一对密钥</strong></p>
+<pre><code>[root@res ~]# cd /etc/pki/CA/ 
+[root@res CA]# openssl genrsa -out private/cakey.pem 2048
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/14.png" alt=""></p>
+<p><strong>2.生成自签发证书</strong><br>CA机构也有自己的证书的</p>
+<pre><code>[root@res CA]# openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 3655
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/15.png" alt=""></p>
+<p><strong>3.要想把它扮演成私有CA来使用，还要修改openssl.cnf，新建几个需要的文件</strong></p>
+<pre><code>[root@res CA]# cd /etc/pki/tls/
+[root@res tls]# vim openssl.cnf
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/16.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/17.png" alt=""></p>
+<p><strong>4.生成几个必备的文件和目录</strong></p>
+<pre><code>[root@res tls]# cd /etc/pki/CA/
+[root@res CA]# mkdir certs crl newcerts
+[root@res CA]# touch index.txt
+[root@res CA]# echo 01 &gt; serial
+</code></pre><p>以上是CA的环境准备和密钥生成以及自签证书的过程。别的主机可以到这个CA申请证书。比如说Nginx服务器过来申请证书。</p>
+<h3 id="Nginx服务器申请证书"><a href="#Nginx服务器申请证书" class="headerlink" title="Nginx服务器申请证书"></a>Nginx服务器申请证书</h3><p>以下操作都是在172.16.7.180机器上操作。<br>任何一个应用要想用到证书，它必须要有私钥，因为必须从私钥中提取出公钥，每一种应用都必须有自己的证书。第一步：生成私钥。【注意】：如果生成的密钥长度不合适，可以重新生成导出到同一个文件中就覆盖了。</p>
+<p><strong>1.生成一对密钥</strong><br>这里我在生成时对密钥进行了加密</p>
+<pre><code>[root@res ~]# mkdir /opt/ssl/
+[root@res ~]# cd /opt/ssl/
+[root@res ssl]# (umask 077; openssl genrsa 2048 &gt; res.key)
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/18.png" alt=""></p>
+<p><strong>2.生成证书签署请求</strong></p>
+<pre><code>[root@res ssl]# openssl req -new -key res.key -out res.csr
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/19.png" alt=""><br>Commone Name一定要是你要授予证书的服务器域名或主机名。</p>
+<p><strong>3.把证书签署请求送给CA机构，CA生成证书</strong><br>【注意】:这个请求要发给CA才可以，要让CA去签名才有效。当然在一台主机上就不用了，直接签了。如果不在一台主机上，要发给服务器的，远程传过去。可以传到CA机器的/tmp目录下。</p>
+<p><strong>登录上CA机器172.16.7.75：</strong></p>
+<pre><code>[root@res CA]# cd /etc/pki/tls/
+[root@res tls]# openssl ca -in /tmp/res.csr -out /tmp/res.crt -days 3650
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/20.png" alt=""></p>
+<p><strong>4.CA机构将证书返回给申请单位，这里即172.16.7.180机器，我将证书放到/opt/ssl目录下</strong></p>
+<h2 id="配置Nginx"><a href="#配置Nginx" class="headerlink" title="配置Nginx"></a>配置Nginx</h2><p><strong>1.配置Nginx支持http和https共存</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/21.png" alt=""></p>
+<p><strong>2.如果只需要https，禁止http，配置如下：</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/22.png" alt=""></p>
+<p><strong>3.配置http强制转https</strong></p>
+<pre><code>server {
+    listen       80;
+    server_name  static.res.com;
+
+    rewrite ^(.*)$  https://$host$1 permanent;
+
 }
-[root@spark32 ~]# systemctl daemon-reload
-[root@spark32 ~]# systemctl restart docker
-</code></pre><h2 id="卸载Docker-CE"><a href="#卸载Docker-CE" class="headerlink" title="卸载Docker CE"></a>卸载Docker CE</h2><pre><code># yum remove docker-ce
-# rm -rf /var/lib/docker
+
+server {
+    listen       443 ssl;
+    server_name  static.res.com;
+
+    ssl on;
+    #证书和私钥
+    ssl_certificate /opt/ssl/res.crt;
+    ssl_certificate_key /opt/ssl/res.key;
+
+
+    access_log  logs/res.access.log  res;
+    ...
+</code></pre><p>【注意】：我这里这个域名是假的，所以需要在客户端编辑hosts文件，配置如下的解析：</p>
+<pre><code>172.16.7.180 static.res.com
 </code></pre>
       
     </div>
@@ -497,7 +564,7 @@ Cgroup Driver: cgroupfs
       
         <div class="post-tags">
           
-            <a href="/tags/Docker/" rel="tag"><i class="fa fa-tag"></i>Docker</a>
+            <a href="/tags/Nginx/" rel="tag"><i class="fa fa-tag"></i>Nginx</a>
           
         </div>
       
@@ -506,17 +573,13 @@ Cgroup Driver: cgroupfs
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/08/25/Dockerfile构建镜像/" rel="next" title="Dockerfile构建镜像">
-                <i class="fa fa-chevron-left"></i> Dockerfile构建镜像
+              <a href="/2018/01/28/Nginx实现TCP负载均衡/" rel="next" title="Nginx实现TCP负载均衡">
+                <i class="fa fa-chevron-left"></i> Nginx实现TCP负载均衡
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/09/01/Registry私有仓库搭建及认证/" rel="prev" title="Registry私有仓库搭建及认证">
-                Registry私有仓库搭建及认证 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -673,7 +736,7 @@ Cgroup Driver: cgroupfs
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Moby项目"><span class="nav-number">2.</span> <span class="nav-text">Moby项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Docker-CE"><span class="nav-number">3.</span> <span class="nav-text">安装Docker CE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#版本说明"><span class="nav-number">3.1.</span> <span class="nav-text">版本说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Docker"><span class="nav-number">3.2.</span> <span class="nav-text">安装Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#环境要求"><span class="nav-number">3.2.1.</span> <span class="nav-text">环境要求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#卸载安装的所有Docker组件"><span class="nav-number">3.2.2.</span> <span class="nav-text">卸载安装的所有Docker组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过仓库安装Docker-CE"><span class="nav-number">3.2.3.</span> <span class="nav-text">通过仓库安装Docker CE</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置镜像加速"><span class="nav-number">3.3.</span> <span class="nav-text">配置镜像加速</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#卸载Docker-CE"><span class="nav-number">4.</span> <span class="nav-text">卸载Docker CE</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTPS简介"><span class="nav-number">1.</span> <span class="nav-text">HTTPS简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TLS-SSL"><span class="nav-number">1.1.</span> <span class="nav-text">TLS/SSL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两台主机间TLS-SSL会话的建立：以http为例"><span class="nav-number">1.2.</span> <span class="nav-text">两台主机间TLS/SSL会话的建立：以http为例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常用的加解密算法简介"><span class="nav-number">1.3.</span> <span class="nav-text">常用的加解密算法简介</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenSSL"><span class="nav-number">2.</span> <span class="nav-text">OpenSSL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenSSL实现私有CA"><span class="nav-number">3.</span> <span class="nav-text">OpenSSL实现私有CA</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息"><span class="nav-number">3.1.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建私有CA"><span class="nav-number">3.2.</span> <span class="nav-text">创建私有CA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx服务器申请证书"><span class="nav-number">3.3.</span> <span class="nav-text">Nginx服务器申请证书</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Nginx"><span class="nav-number">4.</span> <span class="nav-text">配置Nginx</span></a></li></ol></div>
             
           </div>
         </section>
