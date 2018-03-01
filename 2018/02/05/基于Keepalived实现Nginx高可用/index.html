@@ -113,7 +113,7 @@
 <meta property="og:description" content="高可用集群介绍前面介绍的Nginx可以实现对后端服务的负载均衡，Nginx就是调度器。但是我们还要考虑一个，调度器本身在工作的时候仍然会有一个风险，因为我们把整个站点的请求的依赖性都建立在了调度器上，调度器坏了怎么办？">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/23.png">
-<meta property="og:updated_time" content="2018-03-01T09:05:47.000Z">
+<meta property="og:updated_time" content="2018-03-01T09:16:13.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于Keepalived实现Nginx高可用">
 <meta name="twitter:description" content="高可用集群介绍前面介绍的Nginx可以实现对后端服务的负载均衡，Nginx就是调度器。但是我们还要考虑一个，调度器本身在工作的时候仍然会有一个风险，因为我们把整个站点的请求的依赖性都建立在了调度器上，调度器坏了怎么办？">
@@ -346,7 +346,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-03-01T17:05:47+08:00" content="2018-03-01">
+              <time itemprop="dateUpdated" datetime="2018-03-01T17:16:13+08:00" content="2018-03-01">
               2018-03-01
               </time>
               </span>
@@ -465,9 +465,100 @@
 [nginx @master soft]#mkdir  /opt/keepalived/log
 [nginx @master soft]#mkdir  /opt/keepalived/scripts
 </code></pre><h3 id="配置Keepalived"><a href="#配置Keepalived" class="headerlink" title="配置Keepalived"></a>配置Keepalived</h3><p>将提供的主、从keepalived.conf配置文件拷贝到/etc/keepalived目录下，参考配置文件中的配置项说明调整配置文件。</p>
-<p><strong>1.Master上的Keeplived配置文件，keepalived.conf</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">! Configuration File for keepalivedglobal_defs &#123;        router_id LVS_DEVEL            #负载均衡器标识，同一网段内，可以相同&#125;vrrp_script chk_nginx &#123;            #调用定义的检测模块        script &quot;/opt/keepalived/scripts/check_nginx.sh&quot;        interval 2        weight 2&#125;vrrp_instance VI_1 &#123;    #设置为主    state MASTER    #监控网卡     interface eth0    #主备服务器必须一样           virtual_router_id 51    #权重值MASTER 一定要高于备用机器    priority 101    # MASTER与BACKUP负载均衡器之间同步检查的时间间隔，单位是秒         advert_int 1                 track_script &#123;           chk_nginx    &#125;        cast_src_ip  10.108.72.110        unicast_peer &#123;    	10.108.72.111    &#125;authentication &#123;        #加密        auth_type PASS        #加密密码，主备要一致               auth_pass fudan123      &#125;    virtual_ipaddress &#123;       #虚拟IP         10.108.72.112          &#125;&#125;</div></pre></td></tr></table></figure></p>
-<p><strong>2.backup上的Keeplived配置文件，keepalived.conf</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">! Configuration File for keepalivedglobal_defs &#123;        #负载均衡器标识，同一网段内，可以相同        router_id LVS_DEVEL&#125;#调用定义的检测模块vrrp_script chk_nginx &#123;       #检查脚本        script &quot;/etc/keepalived/scripts/check_nginx.sh&quot;        #检查时间间隔         interval 2        weight 2&#125;vrrp_instance VI_1 &#123;    #设置为备    state BACKUP    #监控网卡            interface eth0    #主备服务器必须一样    virtual_router_id 51    #权重值 BACKUP 一定要低于 MASTER    priority 100    # MASTER与BACKUP负载均衡器之间同步检查的时间间隔，单位是秒       advert_int 1            track_script &#123;        chk_nginx    &#125;    #多播的源IP，设置为本机IP    cast_src_ip  10.108.72.111        unicast_peer &#123;        10.108.72.110    &#125;    authentication &#123;        auth_type PASS        auth_pass fudan123    &#125;    virtual_ipaddress &#123;        #虚拟IP        10.108.72.112    &#125;&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="Keepalived监控脚本"><a href="#Keepalived监控脚本" class="headerlink" title="Keepalived监控脚本"></a>Keepalived监控脚本</h3><p>将提供的keepalived监控脚本分别拷贝到主、从服务器的/opt/keepalived/scripts目录下，并将脚本设置为可执行。</p>
+<p><strong>1.Master上的Keeplived配置文件，keepalived.conf</strong><br>    ! Configuration File for keepalived</p>
+<pre><code>global_defs {
+        router_id LVS_DEVEL    
+        #负载均衡器标识，同一网段内，可以相同
+}
+
+vrrp_script chk_nginx {    
+        #调用定义的检测模块
+        script &quot;/opt/keepalived/scripts/check_nginx.sh&quot;
+        interval 2
+        weight 2
+}
+
+vrrp_instance VI_1 {
+    #设置为主
+    state MASTER
+    #监控网卡 
+    interface eth0
+    #主备服务器必须一样       
+    virtual_router_id 51
+    #权重值MASTER 一定要高于备用机器
+    priority 101
+    # MASTER与BACKUP负载均衡器之间同步检查的时间间隔，单位是秒     
+    advert_int 1         
+
+    track_script {
+           chk_nginx
+    }
+
+    cast_src_ip  10.108.72.110
+
+    unicast_peer {
+        10.108.72.111
+    }
+
+    authentication {
+         #加密
+        auth_type PASS
+        #加密密码，主备要一致       
+        auth_pass fudan123  
+    }
+    virtual_ipaddress {
+       #虚拟IP 
+        10.108.72.112      
+    }
+}
+</code></pre><p><strong>2.backup上的Keeplived配置文件，keepalived.conf</strong></p>
+<pre><code>! Configuration File for keepalived
+
+global_defs {
+        #负载均衡器标识，同一网段内，可以相同
+        router_id LVS_DEVEL
+}
+
+#调用定义的检测模块
+vrrp_script chk_nginx {
+       #检查脚本
+        script &quot;/etc/keepalived/scripts/check_nginx.sh&quot;
+        #检查时间间隔 
+        interval 2
+        weight 2
+}
+
+vrrp_instance VI_1 {
+    #设置为备
+    state BACKUP
+    #监控网卡        
+    interface eth0
+    #主备服务器必须一样
+    virtual_router_id 51
+    #权重值 BACKUP 一定要低于 MASTER
+    priority 100
+    # MASTER与BACKUP负载均衡器之间同步检查的时间间隔，单位是秒   
+    advert_int 1        
+
+    track_script {
+        chk_nginx
+    }
+    #多播的源IP，设置为本机IP
+    cast_src_ip  10.108.72.111
+
+    unicast_peer {
+        10.108.72.110
+    }
+    authentication {
+        auth_type PASS
+        auth_pass fudan123
+    }
+    virtual_ipaddress {
+        #虚拟IP
+        10.108.72.112
+    }
+}
+</code></pre><h3 id="Keepalived监控脚本"><a href="#Keepalived监控脚本" class="headerlink" title="Keepalived监控脚本"></a>Keepalived监控脚本</h3><p>将提供的keepalived监控脚本分别拷贝到主、从服务器的/opt/keepalived/scripts目录下，并将脚本设置为可执行。</p>
 <p><strong>1.Master机器的监控脚本</strong><br>check_nginx.sh</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">counter=$(ps -C nginx --no-heading|wc -l)</div><div class="line">if [ &quot;$&#123;counter&#125;&quot; = &quot;0&quot; ]; then</div><div class="line">        service nginx start</div><div class="line">        counter=$(ps -C nginx --no-heading|wc -l)</div><div class="line">        if [ &quot;$&#123;counter&#125;&quot; = &quot;0&quot; ]; then</div><div class="line">         /etc/init.d/keepalived stop</div><div class="line">        fi</div><div class="line">fi</div></pre></td></tr></table></figure>
 <p><strong>2.Backup机器的监控脚本</strong><br>check_nginx.sh<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">counter=$(ps -C nginx --no-heading|wc -l)</div><div class="line">if [ &quot;$&#123;counter&#125;&quot; = &quot;0&quot; ]; then</div><div class="line">         service nginx start</div><div class="line">        counter=$(ps -C nginx --no-heading|wc -l)</div><div class="line">        if [ &quot;$&#123;counter&#125;&quot; = &quot;0&quot; ]; then</div><div class="line">                /etc/init.d/keepalived stop</div><div class="line">        fi</div><div class="line">fi</div></pre></td></tr></table></figure></p>
