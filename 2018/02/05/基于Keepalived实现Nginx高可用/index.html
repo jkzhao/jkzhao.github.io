@@ -1,0 +1,943 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Nginx," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="高可用集群介绍前面介绍的Nginx可以实现对后端服务的负载均衡，Nginx就是调度器。但是我们还要考虑一个，调度器本身在工作的时候仍然会有一个风险，因为我们把整个站点的请求的依赖性都建立在了调度器上，调度器坏了怎么办？">
+<meta name="keywords" content="Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于Keepalived实现Nginx高可用">
+<meta property="og:url" content="http://yoursite.com/2018/02/05/基于Keepalived实现Nginx高可用/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="高可用集群介绍前面介绍的Nginx可以实现对后端服务的负载均衡，Nginx就是调度器。但是我们还要考虑一个，调度器本身在工作的时候仍然会有一个风险，因为我们把整个站点的请求的依赖性都建立在了调度器上，调度器坏了怎么办？">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/23.png">
+<meta property="og:updated_time" content="2018-03-01T09:05:47.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于Keepalived实现Nginx高可用">
+<meta name="twitter:description" content="高可用集群介绍前面介绍的Nginx可以实现对后端服务的负载均衡，Nginx就是调度器。但是我们还要考虑一个，调度器本身在工作的时候仍然会有一个风险，因为我们把整个站点的请求的依赖性都建立在了调度器上，调度器坏了怎么办？">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/23.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> 基于Keepalived实现Nginx高可用 | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                基于Keepalived实现Nginx高可用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-02-05T17:07:21+08:00" content="2018-02-05">
+              2018-02-05
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2018-03-01T17:05:47+08:00" content="2018-03-01">
+              2018-03-01
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">Nginx</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2018/02/05/基于Keepalived实现Nginx高可用/" class="leancloud_visitors" data-flag-title="基于Keepalived实现Nginx高可用">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="高可用集群介绍"><a href="#高可用集群介绍" class="headerlink" title="高可用集群介绍"></a>高可用集群介绍</h2><p>前面介绍的Nginx可以实现对后端服务的负载均衡，Nginx就是调度器。但是我们还要考虑一个，调度器本身在工作的时候仍然会有一个风险，因为我们把整个站点的请求的依赖性都建立在了调度器上，调度器坏了怎么办？<a id="more"></a>只要是设备，都有可能会损坏。它一挂，整个服务器集群就挂了，我们不能允许这情况出现。怎么办？做一个备用的调度器，只是备用。随时监控祝调度器的心跳，只要它挂了就接替。调度器本身也是个服务，怎么工作成调度器。把主调度器的地址夺过来，自身启动调度服务，由它来负责调度。主调度器通过网络连接把自己的心跳信息随时向外传输，只要辅调度器能收到。这也是一种集群，高可用集群（HA，High Availability）。但是高可用集群必然有一台空闲着，资源浪费。<br>负载均衡集群具有高可用能力(但不是高可用集群)，因为比如说用户请求被分发到第三台服务器上，而这时候第三台挂了，调度器只需要重新分发请求到好的服务器上就可以了。<br>HA集群，每一个主节点(就是指服务器)需要向其他节点通知自己的心跳信息，但是LB集群的节点是没有的。所以LB集群具有高可用能力，而这个能力不是依赖于后面的服务器的，而是依赖于前端服务器调度的。现在的问题是如果前端服务器不知道这第三台服务器挂了依然将用户请求分发至第三台怎么办？这种机制称为后端服务器的健康状况检查。检查好了到坏了，也检查坏的到好的。一般说来前端主机都应该具备这样的能力，这才是一个正常情况下的负载集群。<br>负载均衡集群是以提高服务的并发处理能力为根本着眼点的，而高可用集群是以提供服务始终在线能力为根本着眼点的，它不管你能应付多个个请求，但是一定要让你随时在线，不会因为宕机而使服务不用用了。<br>如何衡量一个服务的可用性？服务正常在线时间/(正常在线时间+故障处理时间)=可用性。</p>
+<h2 id="实现高可用集群的一些开源方案"><a href="#实现高可用集群的一些开源方案" class="headerlink" title="实现高可用集群的一些开源方案"></a>实现高可用集群的一些开源方案</h2><ul>
+<li>heartbeat</li>
+<li>corosync(openais分裂出来的一个项目)</li>
+<li>cman</li>
+<li>keepalived</li>
+</ul>
+<p>前面的3套组件工作模式基本都是相同的，keepalived则不相同。keepalived最初的诞生是为了给ipvs提供高可用性。而ipvs说白了就是内核中的一些规则而已，keepalived最初的主要目的就是能够自己调用ipvs的adm命令来生成规则，并且能够自动实现将用户所请求的访问地址转移到其他节点上实现的。</p>
+<h2 id="Keepalived介绍"><a href="#Keepalived介绍" class="headerlink" title="Keepalived介绍"></a>Keepalived介绍</h2><p>对于Master和Backup来讲，Master这个节点会不停的向另外一个节点通告自己的心跳，但是通告机制是基于VRRP协议实现的，backup一旦接收不到主节点的心跳，就会把vip资源抢过来。而在backup节点，只需要把本地keepalived中那个生效的服务中某一个模块，把它生效起来就可以了。所以keepalived自身是模块化设计的，它有着诸多模块，有些模块就是去监控并生效ipvs规则的。而且keepalived还可以实现后端realserver的健康状况检查。<br>    虽然一开始是为了ipvs提供高可用，但是后来慢慢发展到可以为其他的服务提供高可用，比如对轻量级的调度器haproxy和nginx提供高可用。但是需要自己创建额外的脚本来实现。站在这个角度来讲，keepalived的核心大概是这个样子的：</p>
+<ul>
+<li><strong>1.vrrp的实现</strong></li>
+<li><strong>2.跟vrrp相关的一些配置virtual server</strong>   ——针对的是ipvs。<br>比如：基于vrrp所谓通告机制之上的对于其他资源的控制：比如对于虚拟服务器的控制。</li>
+<li><strong>3.vrrp_script：</strong>vrrp能够调用外部脚本的实现。</li>
+</ul>
+<p>说白了，keepalived就是vrrp协议的实现。<strong>vrrp：虚拟冗余路由协议。</strong>为什么需要这个协议？比如说，公司有个局域网，有很多很多客户机，这些客户机都需要访问互联网或者其他网络的主机，要想和非本网段的主机通信都需要网关，但是一旦这个网关挂了怎么办？那所有非同网段的都访问不了了。那么如何去实现网关的可用性呢？第一种是让客户端自己发现问题，如果他发现上不了网了，我们在前面提供两个网关，这两个网关之间没有任何心跳信息传递，反正告诉客户端有两网关，其中一个不可用了自己改成另一个网关。第二种：在每一个主机上配置动态路由协议，让主机自动生成路由表。但是我们把pc机上的操作系统都配置为支持动态路由协议，这不是一件小工作。第三种：使用ARP网关。在每个主机上装一个ARP客户端，在前面的路由上装好ARP服务器端，那ARP客户端会自行去判定哪个可以用，哪个不可以用。这三种办法都需要依赖于客户端主机自身去做一些配置，才能保证其可用性。VRRP能够把两个网关虚拟成一个网关来使用，简单来讲，在两个网关前面抹上一层协议，这两个路由器之间可以通过选举决定谁是当前活动节点。一般情况下，只有一个是活动节点。<strong>【注意】:vrrp的ip地址是虚拟的，连mac地址也是虚拟的。vrrp协议专门生成了一段虚拟的mac地址来使用。所以这个活动节点拿到的不仅是是vip，还有vmac地址。</strong>所以客户端网关地址指向vip就可以了，无论实际上是哪个网关对客户端来讲是透明的。<br>很多路由设备都是支持vrrp协议的，像华为的等。因为vrrp是个开放式协议，几乎所有的厂商生产的设备都能够支持。那keepalived就是在Linux操作系统上实现了vrrp。比如说我们想用keepalived实现对nginx的高可用，不仅需要转移vip，还需要将相应节点上的nginx服务启动起来，同时还要监控本机上的nginx服务。</p>
+<h2 id="keepalived架构"><a href="#keepalived架构" class="headerlink" title="keepalived架构"></a>keepalived架构</h2><p>在一个节点上，会启动一个主进程。一般来讲，在一个主进程下会生成两个子进程。一个是用来实现VRRP，另外一个是实现Checkers，检查服务可用性。【注意】:这里提供的check是对ipvs后端realserver的健康状态监测，而我们去监控服务的健康状况则需要自己写脚本。只不过我们仍然把这些脚本归类于checkers。<br>    还有其他的组件，比如：I/O复用器、内存管理组件。还有最左边的是配置文件分析器，这个就是主进程，读取keepalived核心配置文件，分析主配置文件，生效主配置文件，并指挥这两个子进程工作。<br>    WatchDog：是Linux内核中的一个模块，它也是一个计时器，它可以帮助主进程去盯着这两个子进程。主进程并不负责具体的工作，所有的具体工作都是由子进程完成的。这两个子进程任何一个挂了，keepalived就不完整了。keepalived启动以后，这两个子进程每隔两秒钟定期的向主进程打开的unix套接字文件写数据，就是发心跳信息。万一哪一个子进程不再发了，那么主进程就认为子进程挂了，然后去重启这个子进程。基于watchdog监控子进程。<br>    看图中，官方给的图就说明主要是为ipvs提供高可用的，所以配置文件中的一大部分都是定义跟ipvs相关的配置。如果我们不用ipvs，这些配置大多都用不着。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/23.png" alt=""><br>对于想要实现对nginx等服务的高可用，使用keepalived实现vrrp协议还不够，因为我们只转移VIP和VMAC，还需要监控和转移服务。有了chechers，我们就可以自己写一个脚本，这个checkers基于脚本调用每隔1秒钟或者两秒钟就来检查这个服务本身状态是否正常，比如取检查status，一旦得不到running信息，可以先重启这个服务。重启之后还不running就转移。怎么转移啊？vrrp是基于什么机制转移的？此时心跳信息依然正常的，并不是不通告心跳了，这个场景下心跳信息是正常的。此时就不能抢了，这个场景下的转移，依靠每个节点的优先级。优先级是从0-255。一般0和255不用，它们有特殊的用法。数字越大优先级越高。因此我们可以这么来定义，首先上来定义两个物理路由的优先级一大一小，比如100和99。一启动，100那个肯定是主的，99那个是从的。这个选举是通过比较物理路由的优先级的。每个节点上线都是backup，就比如一上来，大家都是村民，等人到齐了，就通过比较优先级选举村长。但是如果某个节点上线等了半天，其他节点不来，于是可以自认为自己是最高优先级的节点。这么个场景：100的那个节点服务已经挂了，脚本里重启服务也不行，但是心跳信息是好的，99那个又抢占不了，怎么办？这就是checkers的作用了，我们可以在检测到服务故障以后，人为的把当前节点的优先级降低，这样99那个就能依靠优先级高抢占VIP资源，然后尝试在99节点上启动服务。如何启动服务需要我们自己去写脚本。<br>    VIP资源转移，我们管理员应该知晓这些转移情况，所以还应该有一个通知机制。万一某个节点发生了故障，应该尽可能早的给管理员发封邮件。你如果配置了有邮件服务器的话，这样节点上资源发生转移的时候会收到邮件通知的。<br>    keepalived的转移速度和监控是非常轻量级的，尤其是对于那些用不着共享存储的、节点非常少的场景等应用的。但是对keepalived来讲，支不支持多节点呢？支持多个节点。但是对于同一组服务来讲，只能有一个节点是活动的，因为VIP和VMAC只能在一个节点上运行。所以是一主多从的模式，但是这种模式下，从越多，浪费越大。其实我们可以这样来做，让两个节点都活动起来。很简单，在两个节点上运行两组服务，一组服务是不可能的。在两个物理路由的基础上做两组虚拟路由。<br>如果说keepalived实现nginx的高可用，弄了两个vip，两台机器A和B都有Nginx服务，如何让用户访问到两个不同的节点呢？现在两个节点都是活动的，两个节点上nginx服务都在运行。而客户端端访问的时候只能访问一个，怎么能让客户端访问两个？<strong>使用DNS的两条A记录。</strong>不同的用户解析的结果是不同的主机，我们并不要求绝对的均衡，因此这里nginx提供的是轻量级的反向代理，nginx本身不是提供web服务的。如果是web服务的话，最好就不要使用这种方案了。由此，两个nginx都能正常工作，都能分发用户请求到后端的上游服务器上去。<br>    基于DNS的转发，用户请求被解析的结果在一段时间内会缓存下来的，请求所访问的是同一个nginx。这就是分担负载模型的VRRP机制。基于这个机制，比如说你有3个节点，那就定义3组虚拟路由，其中每一组中，一个是组的，其他两个是备的。但是这多组虚拟路由之间不能干扰。如何让同一组物理路由设备上的不同虚拟路由呢？所以VRRP必须提供一套完善的管理机制。简单来讲，每一组虚拟路由得有自己独有的标识，称为虚拟路由VRID，虚拟路由id号。<br>    还有一个问题，如果有人知道你这做了高可用，他拿来一个主机放在这，并且配置好了vrrp协议，请问这个主机是否有机会成为主节点呢？之前讲其他的高可用集群解决方案时提到不可以让别人的节点随意加到集群中来，那么怎么解决这个问题？要通过认证来解决。VRRP的认证支持两种认证机制，明文字符串认证和MD5、SSHA-1散列认证。明文字符串认证是指各节点间配置好共享域密钥。散列认证配置起来麻烦一点。<br>    keepalived核心就是VRRP，能把VRRP玩转，服务可以通过写脚本，明白是怎么调用脚本的就可以了。如果需要对VRRP有个详细的了解，请搜索H3C的VRRP技术白皮书或者华为的。</p>
+<h2 id="安装配置Keepalived"><a href="#安装配置Keepalived" class="headerlink" title="安装配置Keepalived"></a>安装配置Keepalived</h2><h3 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h3><table>
+<thead>
+<tr>
+<th>服务名称</th>
+<th>操作系统版本</th>
+<th>IP地址</th>
+<th>角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>vip</td>
+<td>CentOS 7.0</td>
+<td>10.108.72.112</td>
+<td>JDK1.7、elasticsearch-2.2.3</td>
+</tr>
+<tr>
+<td>Nignx1、Keepalived</td>
+<td>CentOS 6.5</td>
+<td>10.108.72.110</td>
+<td>Master</td>
+</tr>
+<tr>
+<td>Nignx2、Keepalived</td>
+<td>CentOS 6.5</td>
+<td>10.108.72.110</td>
+<td>Backup</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Nginx安装"><a href="#Nginx安装" class="headerlink" title="Nginx安装"></a>Nginx安装</h3><p>关于Nginx的安装，参见前面的博客，这里不再赘述。</p>
+<h3 id="安装Keepalived"><a href="#安装Keepalived" class="headerlink" title="安装Keepalived"></a>安装Keepalived</h3><p>可以rpm安装，也可以源码安装，我这里选择了源码安装。<br>将keepalived-1.2.15.tar.gz上传到/opt/soft目录下。</p>
+<pre><code>[nginx@master soft]# tar  -zxvf keepalived-1.2.15.tar.gz
+[nginx @master soft]# ./configure --prefix=/opt/keepalived
+[nginx @master soft]# make &amp;&amp; make install
+[nginx @master soft]# cp /opt/keepalived/etc/rc.d/init.d/keepalived  /etc/rc.d/init.d/
+[nginx @master soft]# cp /opt/keepalived/etc/sysconfig/keepalived  /etc/sysconfig/
+[nginx @master soft]# mkdir /etc/keepalived
+[nginx @master soft]# cp /opt/keepalived/etc/keepalived/keepalived.conf  /etc/keepalived/
+[nginx @master soft]# cp /opt/keepalived/sbin/keepalived  /usr/sbin/
+[nginx @master soft]#mkdir  /opt/keepalived/log
+[nginx @master soft]#mkdir  /opt/keepalived/scripts
+</code></pre><h3 id="配置Keepalived"><a href="#配置Keepalived" class="headerlink" title="配置Keepalived"></a>配置Keepalived</h3><p>将提供的主、从keepalived.conf配置文件拷贝到/etc/keepalived目录下，参考配置文件中的配置项说明调整配置文件。</p>
+<p><strong>1.Master上的Keeplived配置文件，keepalived.conf</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">! Configuration File for keepalivedglobal_defs &#123;        router_id LVS_DEVEL            #负载均衡器标识，同一网段内，可以相同&#125;vrrp_script chk_nginx &#123;            #调用定义的检测模块        script &quot;/opt/keepalived/scripts/check_nginx.sh&quot;        interval 2        weight 2&#125;vrrp_instance VI_1 &#123;    #设置为主    state MASTER    #监控网卡     interface eth0    #主备服务器必须一样           virtual_router_id 51    #权重值MASTER 一定要高于备用机器    priority 101    # MASTER与BACKUP负载均衡器之间同步检查的时间间隔，单位是秒         advert_int 1                 track_script &#123;           chk_nginx    &#125;        cast_src_ip  10.108.72.110        unicast_peer &#123;    	10.108.72.111    &#125;authentication &#123;        #加密        auth_type PASS        #加密密码，主备要一致               auth_pass fudan123      &#125;    virtual_ipaddress &#123;       #虚拟IP         10.108.72.112          &#125;&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>2.backup上的Keeplived配置文件，keepalived.conf</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">! Configuration File for keepalivedglobal_defs &#123;        #负载均衡器标识，同一网段内，可以相同        router_id LVS_DEVEL&#125;#调用定义的检测模块vrrp_script chk_nginx &#123;       #检查脚本        script &quot;/etc/keepalived/scripts/check_nginx.sh&quot;        #检查时间间隔         interval 2        weight 2&#125;vrrp_instance VI_1 &#123;    #设置为备    state BACKUP    #监控网卡            interface eth0    #主备服务器必须一样    virtual_router_id 51    #权重值 BACKUP 一定要低于 MASTER    priority 100    # MASTER与BACKUP负载均衡器之间同步检查的时间间隔，单位是秒       advert_int 1            track_script &#123;        chk_nginx    &#125;    #多播的源IP，设置为本机IP    cast_src_ip  10.108.72.111        unicast_peer &#123;        10.108.72.110    &#125;    authentication &#123;        auth_type PASS        auth_pass fudan123    &#125;    virtual_ipaddress &#123;        #虚拟IP        10.108.72.112    &#125;&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="Keepalived监控脚本"><a href="#Keepalived监控脚本" class="headerlink" title="Keepalived监控脚本"></a>Keepalived监控脚本</h3><p>将提供的keepalived监控脚本分别拷贝到主、从服务器的/opt/keepalived/scripts目录下，并将脚本设置为可执行。</p>
+<p><strong>1.Master机器的监控脚本</strong><br>check_nginx.sh</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">counter=$(ps -C nginx --no-heading|wc -l)</div><div class="line">if [ &quot;$&#123;counter&#125;&quot; = &quot;0&quot; ]; then</div><div class="line">        service nginx start</div><div class="line">        counter=$(ps -C nginx --no-heading|wc -l)</div><div class="line">        if [ &quot;$&#123;counter&#125;&quot; = &quot;0&quot; ]; then</div><div class="line">         /etc/init.d/keepalived stop</div><div class="line">        fi</div><div class="line">fi</div></pre></td></tr></table></figure>
+<p><strong>2.Backup机器的监控脚本</strong><br>check_nginx.sh<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">counter=$(ps -C nginx --no-heading|wc -l)</div><div class="line">if [ &quot;$&#123;counter&#125;&quot; = &quot;0&quot; ]; then</div><div class="line">         service nginx start</div><div class="line">        counter=$(ps -C nginx --no-heading|wc -l)</div><div class="line">        if [ &quot;$&#123;counter&#125;&quot; = &quot;0&quot; ]; then</div><div class="line">                /etc/init.d/keepalived stop</div><div class="line">        fi</div><div class="line">fi</div></pre></td></tr></table></figure></p>
+<h3 id="Keepalived启动、关闭"><a href="#Keepalived启动、关闭" class="headerlink" title="Keepalived启动、关闭"></a>Keepalived启动、关闭</h3><p>1.将Keepalived加入系统服务</p>
+<pre><code>chkconfig  --add keepalived
+</code></pre><p>2.设置为开机自启动</p>
+<pre><code>chkconfig keepalived on
+</code></pre><p>3.启动、关闭</p>
+<pre><code>service keepalived start/stop
+</code></pre><h3 id="测试Nginx高可用"><a href="#测试Nginx高可用" class="headerlink" title="测试Nginx高可用"></a>测试Nginx高可用</h3><p>1.在主服务器（10.108.72.110）测试与备服务器连接</p>
+<pre><code>tcpdump -vvv  -i ens160 host  10.108.72.111
+</code></pre><p>2.在备服务器（10.108.72.111）测试与主服务器连接</p>
+<pre><code>tcpdump -vvv  -i ens160 host  10.108.72.110
+</code></pre><p>3.先是两台都开启keepalived，然后通过VIP（10.108.72.112）访问；<br>4.再关掉第一台的keepalived，再通过VIP（10.108.72.112）访问，看看能否访问。</p>
+<h3 id="查看VIP在哪台机器上"><a href="#查看VIP在哪台机器上" class="headerlink" title="查看VIP在哪台机器上"></a>查看VIP在哪台机器上</h3><pre><code>ip addr show
+</code></pre>
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Nginx/" rel="tag"><i class="fa fa-tag"></i>Nginx</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/30/Nginx配置HTTPS/" rel="next" title="Nginx配置HTTPS">
+                <i class="fa fa-chevron-left"></i> Nginx配置HTTPS
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">59</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#高可用集群介绍"><span class="nav-number">1.</span> <span class="nav-text">高可用集群介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现高可用集群的一些开源方案"><span class="nav-number">2.</span> <span class="nav-text">实现高可用集群的一些开源方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Keepalived介绍"><span class="nav-number">3.</span> <span class="nav-text">Keepalived介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#keepalived架构"><span class="nav-number">4.</span> <span class="nav-text">keepalived架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置Keepalived"><span class="nav-number">5.</span> <span class="nav-text">安装配置Keepalived</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息"><span class="nav-number">5.1.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx安装"><span class="nav-number">5.2.</span> <span class="nav-text">Nginx安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Keepalived"><span class="nav-number">5.3.</span> <span class="nav-text">安装Keepalived</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Keepalived"><span class="nav-number">5.4.</span> <span class="nav-text">配置Keepalived</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Keepalived监控脚本"><span class="nav-number">5.5.</span> <span class="nav-text">Keepalived监控脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Keepalived启动、关闭"><span class="nav-number">5.6.</span> <span class="nav-text">Keepalived启动、关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试Nginx高可用"><span class="nav-number">5.7.</span> <span class="nav-text">测试Nginx高可用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看VIP在哪台机器上"><span class="nav-number">5.8.</span> <span class="nav-text">查看VIP在哪台机器上</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共154.6k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+    <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+</body>
+</html>
