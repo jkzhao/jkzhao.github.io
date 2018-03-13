@@ -1,0 +1,918 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="最近开始做报表，于是把之前学习的mysql相关知识整理回顾下，温故而知新。  数据库程序=指令+数据    指令是CPU能够逐条解析运行的命令，CPU运行指令的主要目的是处理数据的。其实对于CPU所能够执行的程序，无论是指令还是数据都在内存当中。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关系数据库理论基础">
+<meta property="og:url" content="http://yoursite.com/2018/03/13/关系数据库理论基础/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="最近开始做报表，于是把之前学习的mysql相关知识整理回顾下，温故而知新。  数据库程序=指令+数据    指令是CPU能够逐条解析运行的命令，CPU运行指令的主要目的是处理数据的。其实对于CPU所能够执行的程序，无论是指令还是数据都在内存当中。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/1.png">
+<meta property="og:updated_time" content="2018-03-13T06:23:57.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关系数据库理论基础">
+<meta name="twitter:description" content="最近开始做报表，于是把之前学习的mysql相关知识整理回顾下，温故而知新。  数据库程序=指令+数据    指令是CPU能够逐条解析运行的命令，CPU运行指令的主要目的是处理数据的。其实对于CPU所能够执行的程序，无论是指令还是数据都在内存当中。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> 关系数据库理论基础 | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                关系数据库理论基础
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-03-13T13:51:55+08:00" content="2018-03-13">
+              2018-03-13
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2018-03-13T14:23:57+08:00" content="2018-03-13">
+              2018-03-13
+              </time>
+              </span>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2018/03/13/关系数据库理论基础/" class="leancloud_visitors" data-flag-title="关系数据库理论基础">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>最近开始做报表，于是把之前学习的mysql相关知识整理回顾下，温故而知新。</p>
+</blockquote>
+<h2 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h2><p>程序=指令+数据<br>    指令是CPU能够逐条解析运行的命令，CPU运行指令的主要目的是处理数据的。其实对于CPU所能够执行的程序，无论是指令还是数据都在内存当中。<a id="more"></a>但是数据从何而来，数据是需要持久存储的。假设我们不需要用户通过键盘输入数据，程序的执行结果有可能产生输出。任何程序都很依赖I/O，说白了I/O提供数据，并保存数据。<br>    数据从何而来？第一种方式是程序员在开发程序时初始化的一些变量值，但是这些变量值在初始化时给到的数据量是很小的。还有其他的方式，文件、交互式输入，这两种都是I/O中的I。<br>    那么输出呢？当程序处理结束了，它的所有处理结果都在内存中，如果这个时候我们把进程终止了，所有数据都会丢失了，我们应该把输出保存在一个持久存储中。<br>    但是要考虑一个问题，我们如何将持久存储中的数据原样不动的载入内存中？能够存储在文件中的数据通常要做扁平化或者流式化的。要把这些扁平化或流式化的数据还原到内存中，如何还原？所有保存在文件中的内容都是字符。当然这里指的是文本文件，就算是二进制文件，里面就是01字节码。但是有些时候，比如我们希望读进内存时不是字符，而是数值。很显然一个文本文件是不能提供这个功能的。<br>    在考虑一种场景，现在有一个用户帐号文件，用户帐号200或者300个，我们把这些帐号密码保存到文本文件中。当用户登录时，我们需要去文件中逐个比较用户输入的字符串，前提是得把整个文件装入内存。就算你grep “root” /etc/passwd，也是需要先把/etc/passwd装入到内存中才行。如果用户数增加到1000万个，这个文本文件可能有10个G，而我们为了查找一个用户得把10个G从磁盘产生大量I/O调入内存，性能奇差。这显然也是无法想象的，无法接受。<br>    因此我们需要在更高层次的逻辑结构上将数据分割成片。如果我们把数据存于一个单个文件，而访问接口又只是文件接口的话，每次访问这个文件的数据，都得把整个文件装入内存。因此需要在文件的物理结构的基础之上在提供一层逻辑结构，在这个逻辑视角上，把物理层次所保存的所有数据切割成块，或者切割成片。当需要查找用户信息时，我们没必要把整个文件载入内存，而只要把那个数据所在的一个片或多个片装入内存。因此我们在文件系统层次更高级别之上提供一层逻辑性的管理机制，这种机制能够使得我们去装载数据时而不用牵一发而动全身。而提供这个管理机制的工具，向下负责管理这个文件，将文件切割成片，向上将文件切割成片的结果用一种用户习惯的方式展示给用户。用户看到的将是数据。这样的工具就是数据库管理系统(DBMS)。</p>
+<h2 id="数据库分类"><a href="#数据库分类" class="headerlink" title="数据库分类"></a>数据库分类</h2><ul>
+<li><p>文件</p>
+<ul>
+<li>数据冗余和不一致型</li>
+<li>数据访问困难</li>
+<li>数据孤立</li>
+<li>完整性问题</li>
+<li>原子性问题</li>
+<li>并发访问异常</li>
+<li>安全性问题 </li>
+</ul>
+</li>
+<li><p>DBMS</p>
+<ul>
+<li>层次模型</li>
+<li>网状模型</li>
+<li>关系模型</li>
+</ul>
+</li>
+<li><p>RDBMS</p>
+</li>
+</ul>
+<p>关系型数据库：将数据组织在一个有字段和记录组成的二维关系表中，并且在这个关系表之外提供了很多辅助性工具以完成关系表中关系的维持及数据访问等功能。核心是二维关系表。<br>    一个数据库管理系统还应该提供安全性的机制，所以我们还得为管理系统提供认证、授权等功能。<br>    我们要想实现对数据访问时载入有限片的数据而不用是所有数据，还要提供索引等。<br>    对于用户来讲，需要只看到自己需要的数据，还要提供视图等。<br>    但是关系型数据库还遇到一个问题，如何把文件存入到数据库中？不大可能，除非把图片编码重新编码成字符保存到数据库中。如果不能，我们可以把一个文件在文件系统中的路径(字符串)存在表中。<br>    <strong>【注意】:关系型数据库只是一种概念，只是一种设计理念，能够把这种理念实现的通常是软件。这和前面讲协议是一样的，http是一种协议，其实现是由httpd、nginx等等来实现的。</strong></p>
+<h2 id="常见的关系型数据库产品"><a href="#常见的关系型数据库产品" class="headerlink" title="常见的关系型数据库产品"></a>常见的关系型数据库产品</h2><ul>
+<li>SQL Server</li>
+<li>DB2</li>
+<li>MySQL</li>
+<li>MariaDB</li>
+<li>PostgreSQL</li>
+</ul>
+<p><strong>1.早期三巨头</strong><br>Sybase  —&gt;早期和Microsoft合作过。一起研发了一个面向windows的关系型数据库产品，后来Sybase不玩了。Microsoft就买断发展，后来就成了SQL Server。今天Sybase今天依然存在。<br>Informix  —&gt;被IBM收购了。IBM有自己的DB2。<br>Oracle  —&gt;oracle的产品不一定是最好的，但是oracle的销售做的是最好的。所以你把技术做的在牛在精，卖不出去就是没用。所以刚开始工作时9分靠技术，1分靠沟通。而两年到三年以后，工作业绩7分靠沟通，3分靠技术。当然，技术做好安身立命没问题。</p>
+<p><strong>2.MySQL —&gt; MariaDB</strong><br>    早期属于瑞典的AB公司，2009年卖给了sun公司，不幸的是sun被oracle收购了。oracle有些很不光彩的前科，把竞争对手买下来然后打入冷宫。虽然oracle承诺了5年不下手，但实际上这期间MySQL已经被蹂躏了无数遍。到今天为止，和MySQL合作的，用MySQL软件的，比如Facebook、Google、Twitter都在纷纷转向MariaDB。<br>    MySQL的原作者在sun被oracle收购以后，就另立门户了。在早期MySQL的基础上重新提供了另外一个分支MariaDB。MariaDB在兼容MySQL的基础上而且又整合了开源社区中的很强大的技术力量。比如早期MySQL整合进的存储引擎中有个innodb，innodb属于innobase公司，而innobase早在2008年被oracle收购了。但好在percona公司致力于MySQL优化方面，这个组织在改进早期innodb的基础上提供了增强版的innodb叫xtradb。而MariaDB中用的就是xtradb。<br>    早些年Facebook、Google、Twitter(还有一家公司，记不得了)内部的研发团队所研发出来的一些新技术不断的反馈回MySQL社区，但是MySQL可能变成oracle的商用产品，这些公司肯定也是不同意的。因此双方在MySQL的发展上产生了很大的分歧，所以这几家公司中的工程师整合了后来他们所研发的新技术又开发了另外一个分支，专门为互联网应用而生的增强版的、支持多主复制等的新产品，叫webscaledb。专门为web应用而生的数据库管理系统。诞生时间2014年。</p>
+<p><strong>3.另外一个开源产品：PostgreSQL，简称pgsql</strong><br>    前身是互联网上最早的一批关系型数据库产品egresql，早期诞生在加州大学伯克利分校的。只是egresql在商业运作上和oracle竞争时完全败下阵来。以至于后来销声匿迹的比Sybase和Informix还早。<br>    事实上，就关系型数据库本身来讲，pgsql比mysql在技术上要优秀的多。不过市场决定一切。<br>    RHEL7内置不在是MySQL，而是MariaDB。<br>    这个世界唯一不变的是”不断的变化”。</p>
+<p>以上讲的产品都是C/S架构，以mysql为例，有客户端，也有服务端。两者之间的通信时通过mysql协议来通信的。另外一种独立的产品叫sqlite。这仅是一个简单的、工作在本地的、非服务化的、纯粹基于API的关系型数据库接口。【注意】:sqlite仅是一个引擎。说白了就是讲，你通过它能够将数据组织成关系型数据库的格式，背后仍然是把数据存于文件中。因此我们要通过sqlite存储数据怎么办呢？sqlite不监听在任何服务上，只有API。因此只有程序员在开发程序时调用这个API，就能够基于sqlite这个引擎来完成基于关系型数据库模式的数据存储了。所以它尤其适用于嵌入式平台上。</p>
+<h2 id="关系型数据库分析"><a href="#关系型数据库分析" class="headerlink" title="关系型数据库分析"></a>关系型数据库分析</h2><p><strong>1.一个通用的关系型数据库管理系统应该具有的逻辑架构</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/1.png" alt=""><br>首先作为一个数据库管理系统来讲，必须要能接收用户发出的请求，而用户的请求的来源方式有多种。大多是通过sql协议来的，只不过通过sql协议连进来的有这么两种模式，一种是基于API接口的，一种是基于交互式客户端的。而sqlite这种只有一种方式就是基于API。<br>    对于关系型数据库来讲，怎么接进来？对于sqlite来讲，它没有监听在C/S模式下，只要调用API。但是对于MySQL来讲，需要支持更大的并发连接请求，sqlite就没有并发的概念。所以前端应该有一个连接管理器，需要对用户发来的sql语句进行解析。SQL(Structure Query Language)语句分为以下几类：</p>
+<ul>
+<li>DDL: CREATE, DROP, ALTER    ——数据定义语言：操作数据库对象的。比如库、表、索引、视图等。</li>
+<li>DML: SELECT, INSERT, UPDATE, DELETE    ——数据操作语言：管理数据的。</li>
+<li>DCL: GRANT, REVOKE    ——授权<br>  现在几乎所有的关系型数据库向外的接口都是通过sql语句输出的，只不过联络方式有所不同而已。因此一旦一个sql语句来了，查询求解引擎分析语法，然后执行语句，说白了就是mysql的解释器。这个执行引擎就类似于Linux内核，这和我们通过shell运行命令类似。这个解释器应该具备的功能包括：分析器、优化器、操作求解器和计划执行器等。当然这种分类并不严格。<br>  数据最后一定是存放在磁盘的文件中。因此这个查询执行引擎要和文件打交道，于是就有了文件访问接口，也就是文件存取方法接口。但是怎么样能避免I/O给系统带来的影响呢？把数据缓存到内存中操作，并且通过一些比较靠谱的机制保证这些数据不会因为系统断电丢失，或者说不会因为断电导致数据不一致。因此我们就需要缓存管理器。<br>  这些数据文件存放的是单个文件还是多个文件，我们需要一个磁盘空间管理器。怎么管理磁盘空间，怎么组织文件为一个文件还是多个文件等。</li>
+</ul>
+<p><strong>2.一个关系型数据库管理系统必然会面临以下几个问题：</strong><br>数据一致性、提供事务机制、提高性能等。<br>事务：事务就是 管理并发过程中，万一出现问题怎么办的。<br>ACID</p>
+<ul>
+<li>A: 原子性</li>
+<li>C: 一致性</li>
+<li>I：隔离性</li>
+<li>D：持久性</li>
+</ul>
+<p><strong>隔离：隔离级别</strong>    ——隔离事务，自上而下，级别越来越高。不同的数据库管理系统，必须有一个默认的事务隔离级别的。很多的关系型数据库，其默认隔离级别都是第二个读提交，这样性能会好一点。而MySQL是第三个可重读的。</p>
+<ul>
+<li>读未提交：read uncommitted</li>
+<li>读提交：  read committed</li>
+<li>可重读：  repeatable read</li>
+<li>串行化：  serializable</li>
+</ul>
+<p><strong>机械式硬盘：</strong></p>
+<ul>
+<li>随机读写</li>
+<li>顺序读写      </li>
+</ul>
+<p>这两种方式对内存而言没什么影响，但是对机械硬盘来讲就不一样了。很多时候对数据的写操作都是随机的，性能非常差。为了避免这种情况，所有的写操作先在内存中完成，也就是在缓存中完成。也就是说当需要写入数据时不是直接往数据库文件上写的，而是往日志中写。也就是说日志是补充性的存储空间，通常还不止一个，可能是一组。当你执行写操作时，不管你是往哪个数据库中写的，也无论你写的是什么，都先往日志文件上写，这个日志文件通常是大小固定的，在磁盘上有连续的存储空间。所以缓存管理器一旦缓存1秒钟的数据，或者一旦有个事务提交了，先把这个数据放到日志文件中。因为日志文件是连续的存储空间，所以存起来速度快多了。<strong>但是这有个前提，写的是事务日志。</strong>日志文件会定期向磁盘上数据文件同步。同步完日志文件里的数据就清掉了。这些事务日志很重要，通常放在有硬件冗余的设备上。这就是通过事务日志把随机I/O转换成顺序I/O以提高用户体验的。<br>日志分为事务日志和历史日志。</p>
+<p>【考虑一种场景】：<br>万一事务走了一半，它里面有80个语句都发生了写操作，已经执行了50个，这50可能会导致一个日志文件存不下，日志文件中的某些数据已经存到磁盘中的数据文件中去了，这个时候服务器进程崩溃了，或者系统断电了，下次启动起来后，这个事务其实并没有完成，怎么办呢？应该撤回才对。事务本身有两种状态：提交/未提交。把这些未完成的事务都回滚回去，因此需要一个恢复管理器。恢复管理器不需要用户手动参与，下次开机以后会自动发现哪些事务提交了，还在日志文件中，它会把这些数据同步到磁盘文件中。而那些未提交的事务都回滚到事务执行前的状态。</p>
+<p><strong>索引：</strong>将数据库中表的某个字段抽取出来创建成索引，这个一般是排好序的。<strong>索引怎么存呢？树状结构，B树。索引可能有n种数据格式，看场景。对于MySQL而言，通常是B树索引，但也有空间索引。</strong>微信可以摇一摇，它开始找离你比较近的，你想过这个问题没有？什么人，在哪个数据库中找，怎么标注他是离你比较近的？这必须要根据你的空间地址位置。要计算你当前所在位置，然后根据距离做测算。所以索引有很多种存储机制。<br>    如果索引查询到，文件依然很大，可能有2G，所以还需要对索引在索引。所以索引有很多种类型。</p>
+<h2 id="数据库范式"><a href="#数据库范式" class="headerlink" title="数据库范式"></a>数据库范式</h2><p>数据库设计遵循数据库范式。<br><strong>RDMBS设计范式：</strong><br>设计关系数据库时，遵从不同的规范要求，设计出合理的关系型数据库，这些不同的规范要求被称为不同的范式，各种范式呈递次规范，越高的范式数据库冗余越小。<br>目前关系数据库有六种范式：第一范式（1NF）、第二范式（2NF）、第三范式（3NF）、巴德斯科范式（BCNF）、第四范式(4NF）和第五范式（5NF，又称完美范式）。满足最低要求的范式是第一范式（1NF）。在第一范式的基础上进一步满足更多规范要求的称为第二范式（2NF），其余范式以次类推。一般说来，数据库只需满足第三范式(3NF）就行了。</p>
+<p><strong>(1) 第一范式（1NF）</strong><br>    所谓第一范式（1NF）是指在关系模型中，对域(指的是字段)添加的一个规范要求，所有的域都应该是原子性的，即数据库表的每一列都是不可分割的原子数据项，而不能是集合，数组，记录等非原子数据项。即实体中的某个属性有多个值时，必须拆分为不同的属性。在符合第一范式（1NF）表中的每个域值只能是实体的一个属性或一个属性的一部分。简而言之，第一范式就是无重复的域。<br>【说明】：在任何一个关系数据库中，第一范式（1NF）是对关系模式的设计基本要求，一般设计中都必须满足第一范式（1NF）。不过有些关系模型中突破了1NF的限制，这种称为非1NF的关系模型。换句话说，是否必须满足1NF的最低要求，主要依赖于所使用的关系模型。</p>
+<p><strong>(2) 第二范式(2NF)</strong><br>    第二范式（2NF）是在第一范式（1NF）的基础上建立起来的，即满足第二范式（2NF）必须先满足第一范式（1NF）。第二范式（2NF）要求数据库表中的每个实例或记录必须可以被唯一地区分。选取一个能区分每个实体的属性或属性组，作为实体的唯一标识。<br>    第二范式（2NF）要求实体的属性完全依赖于主关键字。所谓完全依赖是指不能存在仅依赖主关键字一部分的属性，如果存在，那么这个属性和主关键字的这一部分应该分离出来形成一个新的实体，新实体与原实体之间是一对多的关系。为实现区分通常需要为表加上一个列，以存储各个实例的唯一标识。简而言之，第二范式就是在第一范式的基础上属性完全依赖于主键。</p>
+<p><strong>(3) 第三范式（3NF）</strong><br>    第三范式（3NF）是第二范式（2NF）的一个子集，即满足第三范式（3NF）必须满足第二范式（2NF）。简而言之，第三范式（3NF）要求一个关系中不包含已在其它关系已包含的非主关键字信息。简而言之，第三范式就是属性不依赖于其它非主属性，也就是在满足2NF的基础上，任何非主属性不得传递依赖于主属性。</p>
+<p>【总结】:关系型数据库设计前三范式：</p>
+<ul>
+<li>字段的原子性</li>
+<li>主键</li>
+<li>非主属性不允许重复</li>
+</ul>
+<h2 id="SQL"><a href="#SQL" class="headerlink" title="SQL"></a>SQL</h2><p>SQL: 是一种规范。早期只提供C/C++的API，后来IBM公司的一个研究员率先为关系型数据库引入SQL接口这种机制，这种规范，在后来，其他的关系型数据库都纷纷引入了SQL机制。这就像shell一样，bash、csh、ksh、zsh使用方式不尽相同，但是命令机制命令语法都是一样的。ANSI指定标准。<br>   SQL-86， SQL-89， SQL-92， SQL-99， SQL-03<br>MySQL遵循的是SQL-99。MySQL支持XML。</p>
+<p>关系数据库的约束：<br>    主键约束，外键约束，惟一键约束，条件约束，非空约束。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/05/基于Keepalived实现Nginx高可用/" rel="next" title="基于Keepalived实现Nginx高可用">
+                <i class="fa fa-chevron-left"></i> 基于Keepalived实现Nginx高可用
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">60</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库"><span class="nav-number">1.</span> <span class="nav-text">数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库分类"><span class="nav-number">2.</span> <span class="nav-text">数据库分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见的关系型数据库产品"><span class="nav-number">3.</span> <span class="nav-text">常见的关系型数据库产品</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关系型数据库分析"><span class="nav-number">4.</span> <span class="nav-text">关系型数据库分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库范式"><span class="nav-number">5.</span> <span class="nav-text">数据库范式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SQL"><span class="nav-number">6.</span> <span class="nav-text">SQL</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共159.7k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+    <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+</body>
+</html>
