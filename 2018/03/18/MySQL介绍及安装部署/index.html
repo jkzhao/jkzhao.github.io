@@ -1,0 +1,984 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="MySQL," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="MySQL产品当年Sun公司买下了MySQL，后来Sun公司被Oracle收购了。也就是MySQL也变成Oracle的了。Oracle向来视MySQL为眼中钉，所以Oracle在收购Sun的时候遭到了欧盟的极力反对，他们担心MySQL。">
+<meta name="keywords" content="MySQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL介绍及安装部署">
+<meta property="og:url" content="http://yoursite.com/2018/03/18/MySQL介绍及安装部署/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="MySQL产品当年Sun公司买下了MySQL，后来Sun公司被Oracle收购了。也就是MySQL也变成Oracle的了。Oracle向来视MySQL为眼中钉，所以Oracle在收购Sun的时候遭到了欧盟的极力反对，他们担心MySQL。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/6.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/7.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/8.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/9.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/10.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/12.png">
+<meta property="og:updated_time" content="2018-03-18T05:20:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MySQL介绍及安装部署">
+<meta name="twitter:description" content="MySQL产品当年Sun公司买下了MySQL，后来Sun公司被Oracle收购了。也就是MySQL也变成Oracle的了。Oracle向来视MySQL为眼中钉，所以Oracle在收购Sun的时候遭到了欧盟的极力反对，他们担心MySQL。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/2.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> MySQL介绍及安装部署 | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                MySQL介绍及安装部署
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-03-18T12:08:49+08:00" content="2018-03-18">
+              2018-03-18
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2018-03-18T13:20:55+08:00" content="2018-03-18">
+              2018-03-18
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2018/03/18/MySQL介绍及安装部署/" class="leancloud_visitors" data-flag-title="MySQL介绍及安装部署">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="MySQL产品"><a href="#MySQL产品" class="headerlink" title="MySQL产品"></a>MySQL产品</h2><p>当年Sun公司买下了MySQL，后来Sun公司被Oracle收购了。也就是MySQL也变成Oracle的了。Oracle向来视MySQL为眼中钉，所以Oracle在收购Sun的时候遭到了欧盟的极力反对，他们担心MySQL。<a id="more"></a>Oracle有前科的，对于自己的产品，有竞争对手的，把对方公司收购，在把产品打入冷宫，不卖了。Oracle当前做出承诺，5年内花人力物力研发MySQL。Oracle也的确这么做了，但是MySQL有两个版本：社区版和商业版。在Oracle收购Sun之后，在不到两年的时间，商业版价格翻了4倍。好在Oracle在收购Sun的时候还收购了一个Openoffice的组件，是Linux上的一个办公套件。Oracle收购之后第一件事，就是openoffice不再开源，开始收钱了。很遗憾的是，Oracle毙掉之后，大家不认账，没人买他的。后来，openoffice那个团队又在早期的openoffice基础上做了另外一套office叫Libreoffice，比openoffice还要好，依然开源。没过多久，Oracle把openoffice又开源了，但是没人在用了。所以不知道MySQL会不会面临这个命运。MySQL的原作者当前在Oracle收购Sun时就极力反对，在Sun被收购后，他又组织了当年的开源团队，在早期MySQL的基础上重新创建了另外一套叫做MariaDB。MariaDB开源，并且其在设计上比早期的MySQL更先进。而且其API和MySQL完全兼容，所以Redhat7不再附带MySQL，而是MariaDB。现在MySQL家族的产品主要有：</p>
+<ul>
+<li>MySQL Server（mysqld、mysql）</li>
+<li>MySQL Cluster</li>
+<li>MySQL Proxy</li>
+<li>MySQL Adminitrator</li>
+<li>MySQL Query Browser</li>
+<li>MySQL Workbench    </li>
+<li>MySQL Migration Toolkit</li>
+<li>MySQL Embedded Server</li>
+<li>MySQL Drivers and Connectors</li>
+</ul>
+<p><strong>MySQL Server：</strong>分为企业级DB和社区版DB。<br><strong>MySQL Cluster：</strong>市面上几乎没有使用这种企业级集群。<br><strong>MySQL Proxy：</strong>由代理来判断谁能被读，谁能被写。<br>对于我们来说，会用到MySQL Server、MySQL Proxy和MySQL Drivers and Connectors。</p>
+<h2 id="MySQL逻辑架构"><a href="#MySQL逻辑架构" class="headerlink" title="MySQL逻辑架构"></a>MySQL逻辑架构</h2><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/2.png" alt=""><br> MySQL是个多用户服务器，支持多个连接同时连接进来。可以通过线程池来定义最多可以有多少个用户同时连进来。多余的连接请求放在连接队列中，线程池里出去一个，就从队列里进去线程池一个。据说oracle为mysql的商业版引入了很强大的线程池机制。连接/线程处理是MySQL的重要组成部分。<br>    用户请求接进来以后，如果是个select语句，先查询缓存(mysql缓存是根据查询语句的hash码对比的，select的大小写都会导致hash码不一样)。如果命中，直接返回结果，如果未命中，接下来分析器做语句分析，分析之后缓存中还有可能命中。所以分析器分析后仍然要去查缓存。如果缓存还是未命中，接下来交给优化器，优化以后由执行引擎交给存储引擎做查询操作。<br>    优化器优化之后，真正负责执行语句的是存储引擎。mysql是插件式存储引擎的，所以不同的表可以使用不同的存储引擎。</p>
+<h2 id="MySQL逻辑组件"><a href="#MySQL逻辑组件" class="headerlink" title="MySQL逻辑组件"></a>MySQL逻辑组件</h2><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/3.png" alt=""><br>Connection Pool：Authentication, Thread Reuse, Connection Limits, Check Memory, Caches。<br>认证，线程重用， 连接限制， 检查内存， 实现连接缓存。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/4.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/5.png" alt=""><br>存储引擎将数据转换成存储在文件系统中的文件，文件系统可以是NTFS、ufs、ext2/3、NFS、SAN、NAS。文件系统上的文件表现为文件和日志。文件有数据文件和索引文件。日志有重做、撤销、二进制、错误、查询和慢查询日志，一般不涉及撤销日志，所以这边日志有5种。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/6.png" alt=""><br>备份工具、安全工具、恢复工具复制工具、集群工具等。</p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/7.png" alt=""><br>用户请求接进来了，<strong>连接管理器</strong>负责接收用户请求，接进来后，<strong>线程管理器</strong>需要生成一个线程响应用户请求(MySQL是单进程多线程模型的)，用户输入了帐号和密码后，需要一个<strong>用户模块</strong>，用户肯定需要和用户模块打交道的，因为需要认证。只要连接进来，后续的sql语句也是和用户模块打交道，而不会和连接管理器打交道了。<br>    用户认证后，会发出很多SQL命令，由<strong>命令派发器</strong>来派发给<strong>查询缓存</strong>，查询缓存如果命中了则直接返回结果，当然完成了就需要<strong>记录日志</strong>(记录日志是可选步骤)。如果查询缓存没命中，就要交给<strong>分析器</strong>分析了。用户的语句有DDL、DML，分析结束后，如果是select就交给<strong>优化器</strong>，如果是update、insert、delete、replace就交给<strong>表修改模块</strong>，如果是repair就交给<strong>表维护模块</strong>，如果是replication类操作就交给复制模块，还需要个<strong>状态报告模块</strong>报告服务器执行状态。<br>    这些组件最终由<strong>访问控制模块</strong>来控制，你到底有没有权限来操作，这个模块是做访问检查的。前面那个用户模块是做认证检查的，帐号密码没问题不代表可以访问里面的数据。访问控制模块检查没问题后，接下来就真正执行操作了。<strong>表管理器接口</strong>的真正执行的操作依赖于<strong>存储引擎</strong>。所以接下来要交给存储引擎的抽象接口。存储引擎抽象接口将用户请求在转发给各存储引擎。</p>
+<h2 id="MySQL安装部署"><a href="#MySQL安装部署" class="headerlink" title="MySQL安装部署"></a>MySQL安装部署</h2><p><strong>1.MySQL的安装方式</strong></p>
+<ul>
+<li>源码编译</li>
+<li>rpm包：<ul>
+<li>OS Vendor提供的</li>
+<li>MySQL官方提供的</li>
+</ul>
+</li>
+<li>通用二进制格式</li>
+</ul>
+<p><strong>2.MySQL版本</strong></p>
+<ul>
+<li>GA（General Availability）：要选择GA版</li>
+<li>RC（Release Candidate）：候选版，马上要发布为GA版本</li>
+<li>beta：公测版</li>
+<li>alpha：内测版</li>
+</ul>
+<p><strong>3.MySQL官方提供的rpm包</strong></p>
+<ul>
+<li>MySQL-devel：开发需要的头文件和额外的库文件。</li>
+<li>MySQL-embedded：嵌入式环境下专用的。</li>
+<li>MySQL-ndb-management：MySQL集群管理器。</li>
+<li>MySQL-shared：被各种应用程序所依赖的贡献库。</li>
+<li>MySQL-shared-compat：兼容库。有些老的应用程序可能依赖mysql老版本的库。</li>
+<li>MySQL-test：测试套件。包含一些压测工具等等。</li>
+<li>MySQL-VERSION.PLATFORM.src.rpm：源代码包。</li>
+</ul>
+<p>对我们而言，需要MySQL-client、MySQL-server、MySQL-shared、MySQL-shared-compat和MySQL-test。</p>
+<p><strong>4.二进制方式部署MySQL 5.6</strong><br>下载地址：<a href="http://mirrors.sohu.com/mysql" target="_blank" rel="external">http://mirrors.sohu.com/mysql</a></p>
+<table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>操作系统版本</th>
+<th>IP地址</th>
+<th>安装软件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>console</td>
+<td>CentOS 7.0</td>
+<td>114.55.29.246</td>
+<td>mysql-5.6.27-linux-glibc2.5-x86_64.tar.gz</td>
+</tr>
+</tbody>
+</table>
+<p><strong>（1）安装依赖包</strong></p>
+<pre><code>[root@console local]# yum install libaio* -y
+</code></pre><p><strong>（2）解压安装</strong></p>
+<pre><code>[root@console local]# tar zxf mysql-5.6.27-linux-glibc2.5-x86_64.tar.gz 
+[root@console local]# ln -sv mysql-5.6.27-linux-glibc2.5-x86_64 mysql
+‘mysql’ -&gt; ‘mysql-5.6.27-linux-glibc2.5-x86_64’
+</code></pre><p><strong>（3）新建用户</strong><br>运行mysql最好不要用root去运行，而以普通用户身份。添加用户mysql。</p>
+<pre><code>[root@console local]# groupadd -r -g 300 mysql
+[root@console local]# useradd -g mysql -r -s /sbin/nologin -u 300 mysql
+[root@console local]# id mysql
+uid=300(mysql) gid=300(mysql) groups=300(mysql)
+</code></pre><p><strong>（4）修改mysql文件权限为mysql.mysql</strong></p>
+<pre><code>[root@console local]# cd mysql
+[root@console mysql]# chown -R mysql.mysql ./*
+</code></pre><p><strong>（5）执行初始化操作，生成一个系统库叫mysql，它里面保存着有当前所有能够使用mysql服务器的用户帐号、所有数据库的名字、每个库中表的名字、表中字段的名字等等。</strong><br>脚本路径：/usr/local/mysql/scripts<br>创建数据文件目录：</p>
+<pre><code>[root@console mysql]# mkdir -pv /data/{mydata,binlog}
+[root@console mysql]# scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/data/mydata
+[root@console mysql]# ls /data/mydata
+</code></pre><p><strong>（6）修改mysql目录下的文件属主为root，属组为mysql</strong></p>
+<pre><code>[root@console mysql]# chown -R root .
+</code></pre><p><strong>（7）修改data目录属主、属组为mysql</strong></p>
+<pre><code>[root@console mysql]# chown -R mysql.mysql /data
+</code></pre><p><strong>（8）拷贝修改mysql的配置文件</strong></p>
+<p>copy写好的my.cnf到/etc/目录下。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line"># The following options will be passed to all MySQL clients</div><div class="line">[client]</div><div class="line">#password       = your_password</div><div class="line">port            = 3306</div><div class="line">socket          = /tmp/mysql.sock</div><div class="line"></div><div class="line"># The MySQL server</div><div class="line">[mysqld]</div><div class="line">port            = 3306</div><div class="line">socket          = /tmp/mysql.sock</div><div class="line">skip-external-locking</div><div class="line">key_buffer_size = 256M</div><div class="line">max_allowed_packet = 1M</div><div class="line">table_open_cache = 256</div><div class="line">sort_buffer_size = 1M</div><div class="line">read_buffer_size = 1M</div><div class="line">read_rnd_buffer_size = 4M</div><div class="line">myisam_sort_buffer_size = 64M</div><div class="line">thread_cache_size = 8</div><div class="line">query_cache_size= 16M</div><div class="line"># Try number of CPU&apos;s*2 for thread_concurrency</div><div class="line">thread_concurrency = 4</div><div class="line">datadir=/data/mydata</div><div class="line"></div><div class="line">sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES </div><div class="line"></div><div class="line">character-set-server = utf8</div><div class="line"></div><div class="line">max_connections = 1000</div><div class="line"></div><div class="line"># Replication Master Server (default)</div><div class="line"># binary logging is required for replication</div><div class="line">log-bin=/data/binlog/master-bin</div><div class="line"></div><div class="line"># binary logging format - mixed recommended</div><div class="line">binlog_format=mixed</div><div class="line"></div><div class="line"># required unique id between 1 and 2^32 - 1</div><div class="line"># defaults to 1 if master-host is not set</div><div class="line"># but will not function as a master if omitted</div><div class="line">server-id       = 1</div><div class="line"></div><div class="line">[mysqldump]</div><div class="line">quick</div><div class="line">max_allowed_packet = 16M</div><div class="line"></div><div class="line">[mysql]</div><div class="line">no-auto-rehash</div><div class="line"></div><div class="line">[myisamchk]</div><div class="line">key_buffer_size = 128M</div><div class="line">sort_buffer_size = 128M</div><div class="line">read_buffer = 2M</div><div class="line">write_buffer = 2M</div><div class="line"></div><div class="line">[mysqlhotcopy]</div><div class="line">interactive-timeout</div></pre></td></tr></table></figure></p>
+<p><strong>（9）拷贝mysql的启动脚本，并加入系统服务</strong></p>
+<pre><code>[root@console mysql]# cp support-files/mysql.server /etc/init.d/mysqld 
+[root@console mysql]# chkconfig --add mysqld
+</code></pre><p><strong>（10）启动mysql</strong></p>
+<pre><code>[root@console mysql]# service mysqld start
+</code></pre><p><strong>（11）配置环境变量，配置完重新打开一个shell</strong></p>
+<pre><code>[root@console mysql]# vim /etc/profile.d/mysql.sh
+export PATH=/usr/local/mysql/bin:$PATH
+</code></pre><p><strong>（12）修改root密码，因为一装完root密码是空的</strong></p>
+<pre><code>[root@console ~]# mysql -uroot mysql 
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/8.png" alt=""></p>
+<pre><code>mysql&gt; UPDATE user SET Password=PASSWORD(&apos;wisedu123&apos;) where USER=&apos;root&apos;;
+mysql&gt; FLUSH PRIVILEGES;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/9.png" alt=""><br>此时再以root登录就需要密码了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/10.png" alt=""></p>
+<p><strong>（13）删除两个匿名帐号</strong></p>
+<pre><code>mysql&gt; use mysql
+mysql&gt; SELECT host,user,password FROM user;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/11.png" alt=""></p>
+<pre><code>mysql&gt; DROP USER &apos;&apos;@localhost;   #注意’’@localhost是两个单引号
+mysql&gt; DROP USER &apos;&apos;@console; 
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/12.png" alt=""></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"><i class="fa fa-tag"></i>MySQL</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/13/关系数据库理论基础/" rel="next" title="关系数据库理论基础">
+                <i class="fa fa-chevron-left"></i> 关系数据库理论基础
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">61</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL产品"><span class="nav-number">1.</span> <span class="nav-text">MySQL产品</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL逻辑架构"><span class="nav-number">2.</span> <span class="nav-text">MySQL逻辑架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL逻辑组件"><span class="nav-number">3.</span> <span class="nav-text">MySQL逻辑组件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL安装部署"><span class="nav-number">4.</span> <span class="nav-text">MySQL安装部署</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共162.4k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+    <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+</body>
+</html>
