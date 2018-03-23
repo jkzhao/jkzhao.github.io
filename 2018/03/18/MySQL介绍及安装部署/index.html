@@ -123,7 +123,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/10.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/11.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/12.png">
-<meta property="og:updated_time" content="2018-03-23T08:27:50.000Z">
+<meta property="og:updated_time" content="2018-03-23T08:38:23.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL介绍及安装部署">
 <meta name="twitter:description" content="MySQL产品当年Sun公司买下了MySQL，后来Sun公司被Oracle收购了。也就是MySQL也变成Oracle的了。Oracle向来视MySQL为眼中钉，所以Oracle在收购Sun的时候遭到了欧盟的极力反对，他们担心MySQL。">
@@ -356,7 +356,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-03-23T16:27:50+08:00" content="2018-03-23">
+              <time itemprop="dateUpdated" datetime="2018-03-23T16:38:23+08:00" content="2018-03-23">
               2018-03-23
               </time>
               </span>
@@ -527,19 +527,19 @@ mysql&gt; DROP USER &apos;&apos;@console;
 <h2 id="MySQL初始化"><a href="#MySQL初始化" class="headerlink" title="MySQL初始化"></a>MySQL初始化</h2><p>MySQL是基于TCP的3306端口。虽然如此，但是还支持其他的通信方式，比如socket、memory、pipe。tcp是远程通信时用的，Linux或unix本机是基于socket，windows本机是基于memory或pipe。<br>MySQL服务器无论是通用二进制方式安装还是编译的方式安装，安装完成后要做MySQL的初始化。系统初始化时，默认库是mysql。这个库存储了当前mysql的各种元数据。这些初始化包含以下工作：</p>
 <h3 id="提供配置文件"><a href="#提供配置文件" class="headerlink" title="提供配置文件"></a>提供配置文件</h3><p>配置文件：.cnf结尾 </p>
 <ul>
-<li><p>集中式的配置:多个应用程序共用的配置文件</p>
-<ul>
+<li>集中式的配置:多个应用程序共用的配置文件<ul>
 <li>[mysqld]</li>
 <li>[mysqld_safe]</li>
 <li>[client]</li>
 </ul>
-<h1 id="usr-local-mysql-bin-mysqld-–help-–verbose-head-20"><a href="#usr-local-mysql-bin-mysqld-–help-–verbose-head-20" class="headerlink" title="/usr/local/mysql/bin/mysqld –help –verbose | head -20"></a>/usr/local/mysql/bin/mysqld –help –verbose | head -20</h1><p>Default options are read from the following files in the given order:<br>/etc/mysql/my.cnf  /etc/my.cnf  ~/.my.cnf</p>
 </li>
 </ul>
 <p>使用配置文件的方式（安装mysql的方式不同，读取配置文件的顺序可能不同）</p>
 <ul>
 <li>1.它依次查找每个需要查找的文件，结果是所有文件并集；</li>
-<li>2.如果某参数在多个文件中出现多次，后读取的最终生效；</li>
+<li><p>2.如果某参数在多个文件中出现多次，后读取的最终生效；</p>
+<h1 id="usr-local-mysql-bin-mysqld-–help-–verbose-head-20"><a href="#usr-local-mysql-bin-mysqld-–help-–verbose-head-20" class="headerlink" title="/usr/local/mysql/bin/mysqld –help –verbose | head -20"></a>/usr/local/mysql/bin/mysqld –help –verbose | head -20</h1><p>  Default options are read from the following files in the given order:<br>  /etc/mysql/my.cnf  /etc/my.cnf  ~/.my.cnf</p>
+</li>
 </ul>
 <h3 id="删除所有匿名用户（5-7之前的版本）"><a href="#删除所有匿名用户（5-7之前的版本）" class="headerlink" title="删除所有匿名用户（5.7之前的版本）"></a>删除所有匿名用户（5.7之前的版本）</h3><pre><code>mysql&gt; DROP USER &apos;&apos;@&apos;localhost&apos;;
 mysql&gt; DROP USER &apos;&apos;@&apos;www.abc.com&apos;; #www.abc.com为主机名

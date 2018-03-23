@@ -93,7 +93,7 @@ MySQL [(none)]&amp;gt; quit;
     <link href="http://yoursite.com/2018/03/18/MySQL%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
     <id>http://yoursite.com/2018/03/18/MySQL介绍及安装部署/</id>
     <published>2018-03-18T04:08:49.000Z</published>
-    <updated>2018-03-23T08:27:50.000Z</updated>
+    <updated>2018-03-23T08:38:23.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;MySQL产品&quot;&gt;&lt;a href=&quot;#MySQL产品&quot; class=&quot;headerlink&quot; title=&quot;MySQL产品&quot;&gt;&lt;/a&gt;MySQL产品&lt;/h2&gt;&lt;p&gt;当年Sun公司买下了MySQL，后来Sun公司被Oracle收购了。也就是MySQL也变成Oracle的了。Oracle向来视MySQL为眼中钉，所以Oracle在收购Sun的时候遭到了欧盟的极力反对，他们担心MySQL。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;Oracle有前科的，对于自己的产品，有竞争对手的，把对方公司收购，在把产品打入冷宫，不卖了。Oracle当前做出承诺，5年内花人力物力研发MySQL。Oracle也的确这么做了，但是MySQL有两个版本：社区版和商业版。在Oracle收购Sun之后，在不到两年的时间，商业版价格翻了4倍。好在Oracle在收购Sun的时候还收购了一个Openoffice的组件，是Linux上的一个办公套件。Oracle收购之后第一件事，就是openoffice不再开源，开始收钱了。很遗憾的是，Oracle毙掉之后，大家不认账，没人买他的。后来，openoffice那个团队又在早期的openoffice基础上做了另外一套office叫Libreoffice，比openoffice还要好，依然开源。没过多久，Oracle把openoffice又开源了，但是没人在用了。所以不知道MySQL会不会面临这个命运。MySQL的原作者当前在Oracle收购Sun时就极力反对，在Sun被收购后，他又组织了当年的开源团队，在早期MySQL的基础上重新创建了另外一套叫做MariaDB。MariaDB开源，并且其在设计上比早期的MySQL更先进。而且其API和MySQL完全兼容，所以Redhat7不再附带MySQL，而是MariaDB。现在MySQL家族的产品主要有：&lt;/p&gt;
 &lt;ul&gt;
@@ -206,19 +206,19 @@ mysql&amp;gt; DROP USER &amp;apos;&amp;apos;@console;
 &lt;h2 id=&quot;MySQL初始化&quot;&gt;&lt;a href=&quot;#MySQL初始化&quot; class=&quot;headerlink&quot; title=&quot;MySQL初始化&quot;&gt;&lt;/a&gt;MySQL初始化&lt;/h2&gt;&lt;p&gt;MySQL是基于TCP的3306端口。虽然如此，但是还支持其他的通信方式，比如socket、memory、pipe。tcp是远程通信时用的，Linux或unix本机是基于socket，windows本机是基于memory或pipe。&lt;br&gt;MySQL服务器无论是通用二进制方式安装还是编译的方式安装，安装完成后要做MySQL的初始化。系统初始化时，默认库是mysql。这个库存储了当前mysql的各种元数据。这些初始化包含以下工作：&lt;/p&gt;
 &lt;h3 id=&quot;提供配置文件&quot;&gt;&lt;a href=&quot;#提供配置文件&quot; class=&quot;headerlink&quot; title=&quot;提供配置文件&quot;&gt;&lt;/a&gt;提供配置文件&lt;/h3&gt;&lt;p&gt;配置文件：.cnf结尾 &lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;集中式的配置:多个应用程序共用的配置文件&lt;/p&gt;
-&lt;ul&gt;
+&lt;li&gt;集中式的配置:多个应用程序共用的配置文件&lt;ul&gt;
 &lt;li&gt;[mysqld]&lt;/li&gt;
 &lt;li&gt;[mysqld_safe]&lt;/li&gt;
 &lt;li&gt;[client]&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h1 id=&quot;usr-local-mysql-bin-mysqld-–help-–verbose-head-20&quot;&gt;&lt;a href=&quot;#usr-local-mysql-bin-mysqld-–help-–verbose-head-20&quot; class=&quot;headerlink&quot; title=&quot;/usr/local/mysql/bin/mysqld –help –verbose | head -20&quot;&gt;&lt;/a&gt;/usr/local/mysql/bin/mysqld –help –verbose | head -20&lt;/h1&gt;&lt;p&gt;Default options are read from the following files in the given order:&lt;br&gt;/etc/mysql/my.cnf  /etc/my.cnf  ~/.my.cnf&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;使用配置文件的方式（安装mysql的方式不同，读取配置文件的顺序可能不同）&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;1.它依次查找每个需要查找的文件，结果是所有文件并集；&lt;/li&gt;
-&lt;li&gt;2.如果某参数在多个文件中出现多次，后读取的最终生效；&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;2.如果某参数在多个文件中出现多次，后读取的最终生效；&lt;/p&gt;
+&lt;h1 id=&quot;usr-local-mysql-bin-mysqld-–help-–verbose-head-20&quot;&gt;&lt;a href=&quot;#usr-local-mysql-bin-mysqld-–help-–verbose-head-20&quot; class=&quot;headerlink&quot; title=&quot;/usr/local/mysql/bin/mysqld –help –verbose | head -20&quot;&gt;&lt;/a&gt;/usr/local/mysql/bin/mysqld –help –verbose | head -20&lt;/h1&gt;&lt;p&gt;  Default options are read from the following files in the given order:&lt;br&gt;  /etc/mysql/my.cnf  /etc/my.cnf  ~/.my.cnf&lt;/p&gt;
+&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&quot;删除所有匿名用户（5-7之前的版本）&quot;&gt;&lt;a href=&quot;#删除所有匿名用户（5-7之前的版本）&quot; class=&quot;headerlink&quot; title=&quot;删除所有匿名用户（5.7之前的版本）&quot;&gt;&lt;/a&gt;删除所有匿名用户（5.7之前的版本）&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;mysql&amp;gt; DROP USER &amp;apos;&amp;apos;@&amp;apos;localhost&amp;apos;;
 mysql&amp;gt; DROP USER &amp;apos;&amp;apos;@&amp;apos;www.abc.com&amp;apos;; #www.abc.com为主机名
