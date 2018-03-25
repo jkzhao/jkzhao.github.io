@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-03-20T11:41:40.000Z</updated>
+  <updated>2018-03-25T11:54:53.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,211 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL数据类型和sql_mode</title>
+    <link href="http://yoursite.com/2018/03/23/MySQL%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%92%8Csql-mode/"/>
+    <id>http://yoursite.com/2018/03/23/MySQL数据类型和sql-mode/</id>
+    <published>2018-03-23T08:48:07.000Z</published>
+    <updated>2018-03-25T11:54:53.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;DBA&quot;&gt;&lt;a href=&quot;#DBA&quot; class=&quot;headerlink&quot; title=&quot;DBA&quot;&gt;&lt;/a&gt;DBA&lt;/h2&gt;&lt;h3 id=&quot;开发DBA&quot;&gt;&lt;a href=&quot;#开发DBA&quot; class=&quot;headerlink&quot; title=&quot;开发DBA&quot;&gt;&lt;/a&gt;开发DBA&lt;/h3&gt;&lt;p&gt;数据库设计(E-R关系图)、SQL开发、内置函数、存储例程(存储过程和存储函数，存储过程没有返回值，函数有返回值)、触发器、事件调度器(event scheduler) 。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;&lt;strong&gt;1.什么是mysql存储过程?&lt;/strong&gt;&lt;br&gt;存储过程是存储在数据库服务器中的一组sql语句，通过在查询中调用一个指定的名称来执行这些sql语句命令。&lt;br&gt;&lt;strong&gt;2.为什么要使用mysql存储过程？&lt;/strong&gt;&lt;br&gt;应用程序分为两种，一种是基于web，一种是基于桌面，他们都和数据库进行交互来完成数据的存取工作。假设现在有一种应用程序包含了这两种，现在要修改其中的一个查询sql语句，那么我们可能要同时修改他们中对应的查询sql语句，当我们的应用程序很庞大很复杂的时候问题就出现这，不易维护！另外把sql查询语句放在我们的web程序或桌面中很容易遭到sql注入的破坏。而存储过程正好可以帮我们解决这些问题。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;存储函数(stored function)。返回一个计算结果，该结果可以用在表达式里。&lt;/li&gt;
+&lt;li&gt;存储过程(stored procedure)。不直接返回一个结果，但可以用来完成一般的运算或是生成一个结果集并传递回客户。&lt;/li&gt;
+&lt;li&gt;触发器(trigger)。与数据表相关联，当那个数据表被INSERT、DELETE或UPDATE语句修改时，触发器将自动执行。&lt;/li&gt;
+&lt;li&gt;事件(event)。根据时间表在预定时刻自动执行。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;管理DBA&quot;&gt;&lt;a href=&quot;#管理DBA&quot; class=&quot;headerlink&quot; title=&quot;管理DBA&quot;&gt;&lt;/a&gt;管理DBA&lt;/h3&gt;&lt;p&gt;安装、升级，备份、恢复，用户管理、权限管理，监控、分析、基准测试，语句优化(要会写SQL语句)，数据字典，按需要配置服务器（服务器变量：MyISAM, InnoDB, 缓存, 日志）&lt;br&gt;运维人员虽然不是开发SQL的，但是我们需要对别人写出来的SQL语句做性能评估，去分析他写的SQL是不是足够高效。如果不是，我们需要对对方的SQL语句做改写。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;SQL注入攻击&lt;/strong&gt;指的是通过构建特殊的输入作为参数传入Web应用程序，而这些输入大都是SQL语法里的一些组合，通过执行SQL语句进而执行攻击者所要的操作，其主要原因是程序没有细致地过滤用户输入的数据，致使非法数据侵入系统。&lt;/p&gt;
+&lt;h2 id=&quot;SQL语言组成部分&quot;&gt;&lt;a href=&quot;#SQL语言组成部分&quot; class=&quot;headerlink&quot; title=&quot;SQL语言组成部分&quot;&gt;&lt;/a&gt;SQL语言组成部分&lt;/h2&gt;&lt;p&gt;DDL:&lt;br&gt;DML:&lt;br&gt;完整性定义语言：DDL的一部分功能&lt;br&gt;    主键、外键、惟一键、条件、非空、事务&lt;br&gt;视图定义：视图是一个虚表，实际上是存储下来的SELECT语句，是保存在mysql某个特定位置的查询语句。&lt;br&gt;事务控制：启动事务、提交事务、回滚事务等。&lt;br&gt;嵌入式SQL和动态SQL：&lt;br&gt;DCL：授权&lt;/p&gt;
+&lt;h2 id=&quot;MySQL数据类型&quot;&gt;&lt;a href=&quot;#MySQL数据类型&quot; class=&quot;headerlink&quot; title=&quot;MySQL数据类型&quot;&gt;&lt;/a&gt;MySQL数据类型&lt;/h2&gt;&lt;h3 id=&quot;数据类型的作用&quot;&gt;&lt;a href=&quot;#数据类型的作用&quot; class=&quot;headerlink&quot; title=&quot;数据类型的作用&quot;&gt;&lt;/a&gt;数据类型的作用&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;1、存储的值类型；比如如果定义成字符型，往里面存数值是不允许的。就算你存1，也是被存储为字符了。
+2、占据的存储空间大小；
+3、定长，变长；
+4、如何被索引及排序；
+5、是否能够被索引。有些数据类型不能被索引的。
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;数据字典&quot;&gt;&lt;a href=&quot;#数据字典&quot; class=&quot;headerlink&quot; title=&quot;数据字典&quot;&gt;&lt;/a&gt;数据字典&lt;/h3&gt;&lt;p&gt;系统编目(system catalog)&lt;br&gt;保存数据库服务器上的元数据。可以把初始化后的mysql库理解为mysql的数据字典。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;元数据：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;关系的名字    ——关系就是表&lt;/li&gt;
+&lt;li&gt;每个关系的各字段的名字   ——字段就是属性&lt;/li&gt;
+&lt;li&gt;各字段的数据类型和长度&lt;/li&gt;
+&lt;li&gt;约束&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;每个关系上的视图的名字及视图的定义&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;授权用户的名字&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;用户的授权和帐户信息  ——这些元数据是存储在user表&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;统计类的数据：   ——很重要，可以评估数据库性能&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;每个关系字段的个数；&lt;/li&gt;
+&lt;li&gt;每个关系中行数；&lt;/li&gt;
+&lt;li&gt;每个关系的存储方法；   ——表使用哪种存储引擎存储的&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;保存元数据的数据库：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;information_schema    ——存储统计类元数据&lt;/li&gt;
+&lt;li&gt;mysql&lt;/li&gt;
+&lt;li&gt;performance_schema   &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;performance_schema和information_schma一样，是两个虚库，有点类似于Linux的/proc文件系统，开机里面会有很多文件，但是一关机去看磁盘那个目录，里面没有任何数据。提供这两个接口就是为了兼容SQL语句的，能够实现对于整个数据库中任何信息的查找都能够基于SQL语句实现。所以mysql把这些信息虚拟成关系了。就像Linux一样，为什么提供/proc？/proc中存储的都是linux的内核参数，它把每个参数映射成一个文件中的数据。说白了就是把一个本来不是文件系统的东西映射成了一个文件系统，所以我们称/proc为伪文件系统。这样我们就可以操作文件系统的统一接口来操作内核。mysql也是同样的道理，本来获取mysql的这些数据需要通过其他方式，但是对于mysql的接口的操作方式绝大多数是通过SQL语句实现的。所以它也把这些信息抽象为关系的形式了。&lt;/p&gt;
+&lt;h3 id=&quot;MySQL数据类型-1&quot;&gt;&lt;a href=&quot;#MySQL数据类型-1&quot; class=&quot;headerlink&quot; title=&quot;MySQL数据类型&quot;&gt;&lt;/a&gt;MySQL数据类型&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;字符型&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;char&lt;/li&gt;
+&lt;li&gt;varchar&lt;/li&gt;
+&lt;li&gt;binary&lt;/li&gt;
+&lt;li&gt;varbinary&lt;/li&gt;
+&lt;li&gt;text&lt;/li&gt;
+&lt;li&gt;blob&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;数值型&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;精确数值型&lt;ul&gt;
+&lt;li&gt;整型&lt;/li&gt;
+&lt;li&gt;十进制数据：decimal&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;近似数值型&lt;ul&gt;
+&lt;li&gt;单精度浮点型&lt;/li&gt;
+&lt;li&gt;双精度浮点型&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;日期时间型&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;日期型 DATE&lt;/li&gt;
+&lt;li&gt;时间型 TIME&lt;/li&gt;
+&lt;li&gt;日期时间型 DATETIME&lt;/li&gt;
+&lt;li&gt;时间戳 TIMESTAMP&lt;/li&gt;
+&lt;li&gt;YEAR&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;布尔型：mysql没有真正意义上的布尔型，实际上使用tinyint来表示的，且只用1位表示。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;内建类型&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ENUM &lt;/li&gt;
+&lt;li&gt;SET&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;数值型&quot;&gt;&lt;a href=&quot;#数值型&quot; class=&quot;headerlink&quot; title=&quot;数值型&quot;&gt;&lt;/a&gt;数值型&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;TINYINT、SMALLINT、MEDIUMINT、INT和BIGINT 这5种是整型&lt;/li&gt;
+&lt;li&gt;DECIMAL是十进制&lt;/li&gt;
+&lt;li&gt;FLOAT：单精度&lt;/li&gt;
+&lt;li&gt;DOUBLE：双精度&lt;/li&gt;
+&lt;li&gt;BIT：按位实现数据存取的，但是不建议使用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;字符型&quot;&gt;&lt;a href=&quot;#字符型&quot; class=&quot;headerlink&quot; title=&quot;字符型&quot;&gt;&lt;/a&gt;字符型&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;CHAR、VARCHAR、TINYTEXT、TEXT、MEDIUMTEXT和LONGTEXT，这几种不区分大小写&lt;/li&gt;
+&lt;li&gt;BINARY、VARBINARY、TINYBLOB、BLOB、MEDIUMBLOB、LONGBLOB、ENUM、SET，这些都是二进制形式存取的，区分大小写，没有字符集      &lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;日期时间型&quot;&gt;&lt;a href=&quot;#日期时间型&quot; class=&quot;headerlink&quot; title=&quot;日期时间型&quot;&gt;&lt;/a&gt;日期时间型&lt;/h4&gt;&lt;p&gt;DATE、TIME、DATETIME、TIMESTAMP、YEAR&lt;br&gt;会涉及到很多转换：&lt;br&gt;1、字符串varchar/char转日期&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;select STR_TO_DATE(&amp;apos;2013-01-29 13:49:18&amp;apos;, &amp;apos;%Y-%m-%d %H:%i:%s&amp;apos;)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2、日期转字符串&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;select DATE_FORMAT(&amp;apos;2013-01-29 13:49:18&amp;apos;, &amp;apos;%Y-%m-%d %H:%i:%s&amp;apos;) 
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;数据类型的修饰符&quot;&gt;&lt;a href=&quot;#数据类型的修饰符&quot; class=&quot;headerlink&quot; title=&quot;数据类型的修饰符&quot;&gt;&lt;/a&gt;数据类型的修饰符&lt;/h3&gt;&lt;h4 id=&quot;CHAR、VARCHAR和TEXT几种字符型常用的属性修饰符&quot;&gt;&lt;a href=&quot;#CHAR、VARCHAR和TEXT几种字符型常用的属性修饰符&quot; class=&quot;headerlink&quot; title=&quot;CHAR、VARCHAR和TEXT几种字符型常用的属性修饰符&quot;&gt;&lt;/a&gt;CHAR、VARCHAR和TEXT几种字符型常用的属性修饰符&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;NOT NULL：非空约束&lt;/li&gt;
+&lt;li&gt;NULL：允许为空&lt;/li&gt;
+&lt;li&gt;DEFAULT ‘string’：指定默认值，只适用于char和varchar，不适用于TEXT类型&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;CHARACTER SET ‘字符集’  #如果你不指定，默认从表继承，如果表没有，默认从库继承，如果库也没有，就从数据库服务器的全局继承。字符集对于我们将来存储、检索、比较等等是很关键的。&lt;/p&gt;
+&lt;p&gt;  mysql&amp;gt; SHOW VARIABLES LIKE ‘%char%’; #查看当前数据库服务器的默认字符集&lt;br&gt;  mysql&amp;gt; SHOW CHARACTER SET  #查看支持的字符集&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;COLLATION ‘规则’: 排序规则。什么是排序规则呢？就算是gb2312的中文编码，你怎么对中文字符排序呢？谁应该大于谁，谁应该小于谁呢？我们有很多种方式，第一按拼音字母表，第二按照起笔(. — 丿)，第三按照笔画的多少排序等。所以同一种字符集内部要定义排序规则。&lt;/p&gt;
+&lt;p&gt;  mysql&amp;gt; SHOW COLLATION;   #查看支持的排序规则。如果设定了字符集没有指定排序规则，每一种字符集都有其默认的排序规则。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;【注意】:char是不需要字符结束符的，而varchar是有结束符的。char本身最多能存储255个字符，varchar最多能使用两个字节，65535个字符。而且能使用定长就不要使用变长，这跟我们在磁盘上快速查找记录有关系。变长的记录维护起来非常困难。无论是对插入、删除等对性能上都有负面影响。&lt;br&gt;另外要想存储大段文本，就要用text。但是不到万不得已的时候不要使用text，因为text本身索引起来很困难，并且text是作为对象存储的。什么对象存储？就是说不会直接存储到表中，而是存储在表之外的某个存储空间，而表中的那个字段存的仅仅是指向这个存储位置的指针。而且text不能使用全字段索引，但是char可以。&lt;/p&gt;
+&lt;h4 id=&quot;BINARY、VARBINARY和BLOB几种字符型常用的属性修饰符&quot;&gt;&lt;a href=&quot;#BINARY、VARBINARY和BLOB几种字符型常用的属性修饰符&quot; class=&quot;headerlink&quot; title=&quot;BINARY、VARBINARY和BLOB几种字符型常用的属性修饰符&quot;&gt;&lt;/a&gt;BINARY、VARBINARY和BLOB几种字符型常用的属性修饰符&lt;/h4&gt;&lt;p&gt;默认是没有字符集的，因为它们是以二进制字节串的方式或者说是字节码的方式存储的。因此它们排序的时候是按照字节大小排序&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;NOT NULL&lt;/li&gt;
+&lt;li&gt;NULL&lt;/li&gt;
+&lt;li&gt;DEFAULT: 不适用于BLOB&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;整型的常用属性修饰符：&quot;&gt;&lt;a href=&quot;#整型的常用属性修饰符：&quot; class=&quot;headerlink&quot; title=&quot;整型的常用属性修饰符：&quot;&gt;&lt;/a&gt;整型的常用属性修饰符：&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;AUTO_INCREMENT：自动增长。前提：非空，且惟一；支持索引，非负值；&lt;br&gt;【注意】:清空表后，重新插入数值，这个值继续增长，而不会从头开始计数。如果想把表中数据清空以后从头开始计数，alter表重置计数器，或者是清空表时用truncate，不用delete。&lt;/li&gt;
+&lt;li&gt;UNSIGNED：无符号，表示不支持负值。&lt;/li&gt;
+&lt;li&gt;NULL&lt;/li&gt;
+&lt;li&gt;NOT NULL&lt;/li&gt;
+&lt;li&gt;DEFAULT&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;浮点型常用修饰符&quot;&gt;&lt;a href=&quot;#浮点型常用修饰符&quot; class=&quot;headerlink&quot; title=&quot;浮点型常用修饰符&quot;&gt;&lt;/a&gt;浮点型常用修饰符&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;NOT NULL&lt;/li&gt;
+&lt;li&gt;NULL&lt;/li&gt;
+&lt;li&gt;DEFAULT&lt;/li&gt;
+&lt;li&gt;UNSIGNED&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;日期时间型的修饰符&quot;&gt;&lt;a href=&quot;#日期时间型的修饰符&quot; class=&quot;headerlink&quot; title=&quot;日期时间型的修饰符&quot;&gt;&lt;/a&gt;日期时间型的修饰符&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;NOT NULL&lt;/li&gt;
+&lt;li&gt;NULL&lt;/li&gt;
+&lt;li&gt;DEFAULT&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;ENUM和SET的修饰符&quot;&gt;&lt;a href=&quot;#ENUM和SET的修饰符&quot; class=&quot;headerlink&quot; title=&quot;ENUM和SET的修饰符&quot;&gt;&lt;/a&gt;ENUM和SET的修饰符&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;NOT NULL&lt;/li&gt;
+&lt;li&gt;NULL&lt;/li&gt;
+&lt;li&gt;DEFAULT ‘’&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;SQL-MODE&quot;&gt;&lt;a href=&quot;#SQL-MODE&quot; class=&quot;headerlink&quot; title=&quot;SQL_MODE&quot;&gt;&lt;/a&gt;SQL_MODE&lt;/h2&gt;&lt;h3 id=&quot;MySQL-SQL-MODE&quot;&gt;&lt;a href=&quot;#MySQL-SQL-MODE&quot; class=&quot;headerlink&quot; title=&quot;MySQL SQL_MODE&quot;&gt;&lt;/a&gt;MySQL SQL_MODE&lt;/h3&gt;&lt;p&gt;MySQL SQL_MODE: SQL模式。&lt;br&gt;SQL模式就是定义mysql的工作模式的。比如下面那个例子，超出了范围怎么办呢？是截取后发waringings还是直接拒绝插入呢？SQL模式还能定义mysql在某些特性场景下能够模拟其他关系型数据库的行为，比如mysql有自己的工作特性，但是在一定程度上可以模拟oracle的工作特性。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; create table t2 (name CHAR(3));
+Query OK, 0 rows affected (0.04 sec)
+
+mysql&amp;gt; INSERT INTO t2 VALUES (&amp;apos;jerry&amp;apos;);
+ERROR 1406 (22001): Data too long for column &amp;apos;name&amp;apos; at row 1
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;修改sql_mode是通过修改全局变量的值来实现的。&lt;br&gt;有这几种模式：TRADITIONAL, STRICT_TRANS_TABLES(只对支持事务的表有效), or STRICT_ALL_TABLES(对所有表都支持严格模式)。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SHOW GLOBAL VARIABLES like &amp;apos;sql_mode&amp;apos;;
++---------------+--------------------------------------------+
+| Variable_name | Value                                      |
++---------------+--------------------------------------------+
+| sql_mode      | STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION |
++---------------+--------------------------------------------+
+1 row in set (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;服务器变量&quot;&gt;&lt;a href=&quot;#服务器变量&quot; class=&quot;headerlink&quot; title=&quot;服务器变量&quot;&gt;&lt;/a&gt;服务器变量&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1.设定服务器变量的值：（仅用于支持动态的变量，比如dataDir改了也没用）&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;支持修改的服务器变量：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;动态变量：可以MySQL运行时修改。sql_mode支持运行时修改。&lt;/li&gt;
+&lt;li&gt;静态变量：于配置文件中修改其值，并重启后方能生效。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;服务器变量从其生效范围来讲，有两类：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;全局变量：服务器级别，修改之后仅对新建立的会话有效。&lt;/li&gt;
+&lt;li&gt;会话变量：会话级别，仅对当前会话有效。&lt;br&gt;会话建立时，从全局继承各变量。继承完了，每个会话都独立管理自己的会话变量。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;2.查看服务器变量&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SHOW [{GLOBAL|SESSION}] VARIABLES [LIKE &amp;apos;&amp;apos;];   默认是查SESSION的变量值
+mysql&amp;gt; SELECT @@{GLOBAL|SESSION}.VARILABLE_NAME; 
+mysql&amp;gt; SELECT * FROM INFORMATION_SCHEMA.GLOBAL_VARIABLES WHERE VARIABLE_NAME=&amp;apos;SOME_VARIABLE_NAME&amp;apos;;      #information_schema这个库里有个表叫GLOBAL_VARIABLES。
+mysql&amp;gt; SELECT * FROM INFORMATION_SCHEMA.SESSION_VARIABLES WHERE VARIABLE_NAME=&amp;apos;SOME_VARIABLE_NAME&amp;apos;;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;【示例】：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/14.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3.修改变量&lt;/strong&gt;&lt;br&gt;前提：默认仅管理员有权限修改全局变量&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SET {GLOBAL|SESSION} VARIABLE_NAME=&amp;apos;VALUE&amp;apos;;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】:无论是全局还是会话级别的动态变量修改，在重启mysqld后都会失效；想永久有效，可定义在配置文件中的相应段中[mysqld]；另外，不是所有的服务器变量都可以写在配置文件中，绝大多数都可以。所以mysql服务器变量很独特，有3种生效方式：动态修改、定义配置文件或者执行命令时传递命令行参数。但这3者能使用的变量并不完全相同。有些变量可以作为命令行参数但是不能配置文件中。&lt;/p&gt;
+&lt;p&gt;查看mysql支持的命令行参数有哪些以及哪些可以写在配置文件中：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@console ~]# mysqld --help --verbose
+&lt;/code&gt;&lt;/pre&gt;</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;DBA&quot;&gt;&lt;a href=&quot;#DBA&quot; class=&quot;headerlink&quot; title=&quot;DBA&quot;&gt;&lt;/a&gt;DBA&lt;/h2&gt;&lt;h3 id=&quot;开发DBA&quot;&gt;&lt;a href=&quot;#开发DBA&quot; class=&quot;headerlink&quot; title=&quot;开发DBA&quot;&gt;&lt;/a&gt;开发DBA&lt;/h3&gt;&lt;p&gt;数据库设计(E-R关系图)、SQL开发、内置函数、存储例程(存储过程和存储函数，存储过程没有返回值，函数有返回值)、触发器、事件调度器(event scheduler) 。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
+    
+    
+      <category term="MySQL" scheme="http://yoursite.com/tags/MySQL/"/>
+    
+  </entry>
   
   <entry>
     <title>CentOS 7安装mysql 5.7.21(二进制版本)</title>
@@ -3306,305 +3511,6 @@ docker run -d --name godseye_web -p 8080:8080 ${HARBOR_IP}/${REPOSITORIES}:${TAG
     
     
       <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>在Kubernetes上使用Traefik</title>
-    <link href="http://yoursite.com/2017/09/25/%E5%9C%A8Kubernetes%E4%B8%8A%E4%BD%BF%E7%94%A8Traefik/"/>
-    <id>http://yoursite.com/2017/09/25/在Kubernetes上使用Traefik/</id>
-    <published>2017-09-25T03:30:01.000Z</published>
-    <updated>2017-12-01T13:22:25.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;Traefik介绍&quot;&gt;&lt;a href=&quot;#Traefik介绍&quot; class=&quot;headerlink&quot; title=&quot;Traefik介绍&quot;&gt;&lt;/a&gt;Traefik介绍&lt;/h2&gt;&lt;p&gt;traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等编排工具具有良好的支持；同 nginx 等相比，traefik 能够自动感知后端容器变化，从而实现自动服务发现。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;由于微服务架构以及 Docker 技术和 kubernetes 编排工具最近几年才开始逐渐流行，所以一开始的反向代理服务器比如 nginx、apache 并未提供其支持，毕竟他们也不是先知；所以才会出现 Ingress Controller 这种东西来做 kubernetes 和前端负载均衡器如 nginx 之间做衔接；即 Ingress Controller 的存在就是为了能跟 kubernetes 交互，又能写 nginx 配置，还能 reload 它，这是一种折中方案；而 traefik 天生就是提供了对 kubernetes 的支持，也就是说 traefik 本身就能跟 kubernetes API 交互，感知后端变化，因此可以得知: 在使用 traefik 时，Ingress Controller 已经没什么用了，整体架构如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;部署测试用的两个服务&quot;&gt;&lt;a href=&quot;#部署测试用的两个服务&quot; class=&quot;headerlink&quot; title=&quot;部署测试用的两个服务&quot;&gt;&lt;/a&gt;部署测试用的两个服务&lt;/h2&gt;&lt;p&gt;部署两个服务nginx1-7和nginx1-8，后面用Traefik去负载这两个服务：&lt;br&gt;nginx1-7.yaml：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;apiVersion: v1
-kind: Service
-metadata:
-  name: frontend
-spec:
-  ports:
-    - port: 80
-      targetPort: 80
-  selector:
-    app: nginx1-7
----
-apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: nginx1-7-deployment
-spec:
-  replicas: 2
-  template:
-    metadata:
-      labels:
-        app: nginx1-7
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.7.9
-        ports:
-        - containerPort: 80
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;nginx1-8.yaml：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;apiVersion: v1
-kind: Service
-metadata:
-  name: my-nginx
-spec:
-  ports:
-    - port: 80
-      targetPort: 80
-  selector:
-    app: nginx1-8
----
-apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: nginx1-8-deployment
-spec:
-  replicas: 2
-  template:
-    metadata:
-      labels:
-        app: nginx1-8
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.8
-        ports:
-        - containerPort: 80
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;运行两个服务：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 nginx_ingress]# kubectl create -f nginx1-7.yaml
-service &amp;quot;frontend&amp;quot; created
-deployment &amp;quot;nginx1-7-deployment&amp;quot; created
-[root@node1 nginx_ingress]# kubectl create -f nginx1-8.yaml
-service &amp;quot;my-nginx&amp;quot; created
-deployment &amp;quot;nginx1-8-deployment&amp;quot; created
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;Role-Based-Access-Control-configuration-Kubernetes-1-6-only&quot;&gt;&lt;a href=&quot;#Role-Based-Access-Control-configuration-Kubernetes-1-6-only&quot; class=&quot;headerlink&quot; title=&quot;Role Based Access Control configuration (Kubernetes 1.6+ only)&quot;&gt;&lt;/a&gt;Role Based Access Control configuration (Kubernetes 1.6+ only)&lt;/h2&gt;&lt;p&gt;我这里部署的是1.6.0集群，开启了RBAC，授权需要使用角色和绑定角色。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# pwd
-/opt/traefik
-[root@node1 traefik]# vim ingress-rbac.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: ingress
-  namespace: kube-system
-
----
-
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: ingress
-subjects:
-  - kind: ServiceAccount
-    name: ingress
-    namespace: kube-system
-roleRef:
-  kind: ClusterRole
-  name: cluster-admin
-  apiGroup: rbac.authorization.k8s.io
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;部署Traefik&quot;&gt;&lt;a href=&quot;#部署Traefik&quot; class=&quot;headerlink&quot; title=&quot;部署Traefik&quot;&gt;&lt;/a&gt;部署Traefik&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# pwd
-/opt/traefik
-[root@node1 traefik]# vim traefik-deploy.yaml
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: traefik-ingress-lb
-  namespace: kube-system
-  labels:
-    k8s-app: traefik-ingress-lb
-spec:
-  template:
-    metadata:
-      labels:
-        k8s-app: traefik-ingress-lb
-        name: traefik-ingress-lb
-    spec:
-      terminationGracePeriodSeconds: 60
-      hostNetwork: true
-      restartPolicy: Always
-      serviceAccountName: ingress
-      containers:
-      - image: traefik
-        name: traefik-ingress-lb
-        resources:
-          limits:
-            cpu: 200m
-            memory: 30Mi
-          requests:
-            cpu: 100m
-            memory: 20Mi
-        ports:
-        - name: http
-          containerPort: 80
-          hostPort: 80
-        - name: admin
-          containerPort: 8580
-          hostPort: 8580
-        args:
-        - --web
-        - --web.address=:8580
-        - --kubernetes  
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中 traefik 监听 node 的 80 和 8580 端口，80 提供正常服务，8580 是其自带的 UI 界面，原本默认是 8080，因为环境里端口冲突了，所以这里临时改一下。&lt;br&gt;【注意】：这里用的是Deploy类型，没有限定该pod运行在哪个主机上。&lt;/p&gt;
-&lt;h2 id=&quot;部署-Ingress&quot;&gt;&lt;a href=&quot;#部署-Ingress&quot; class=&quot;headerlink&quot; title=&quot;部署 Ingress&quot;&gt;&lt;/a&gt;部署 Ingress&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# cat traefik.yaml 
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: traefik-ingress
-  namespace: default
-spec:
-  rules:
-  - host: traefik.nginx.io
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: my-nginx
-          servicePort: 80
-  - host: traefik.frontend.io
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: frontend
-          servicePort: 80
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中的backend中要配置default namespace中启动的service名字，如果你没有配置namespace名字，默认使用default namespace，如果你在其他namespace中创建服务想要暴露到kubernetes集群外部，可以创建新的ingress.yaml文件，同时在文件中指定该namespace，其他配置与上面的文件格式相同。path就是URL地址后的路径，如traefik.frontend.io/path，service将会接受path这个路径，host最好使用service-name.filed1.filed2.domain-name这种类似主机名称的命名方式，方便区分服务。&lt;br&gt;根据实际环境中部署的service的名字和端口自行修改，有新service增加时，修改该文件后可以使用kubectl replace -f traefik.yaml来更新。&lt;/p&gt;
-&lt;h2 id=&quot;部署Traefik-UI&quot;&gt;&lt;a href=&quot;#部署Traefik-UI&quot; class=&quot;headerlink&quot; title=&quot;部署Traefik UI&quot;&gt;&lt;/a&gt;部署Traefik UI&lt;/h2&gt;&lt;p&gt;traefik 本身还提供了一套 UI 供我们使用，其同样以 Ingress 方式暴露，只需要创建一下即可。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# cat traefik-ui-service.yaml 
-apiVersion: v1
-kind: Service
-metadata:
-  name: traefik-web-ui
-  namespace: kube-system
-spec:
-  selector:
-    k8s-app: traefik-ingress-lb
-  ports:
-  - name: web
-    port: 80
-    targetPort: 8580
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: traefik-web-ui
-  namespace: kube-system
-spec:
-  rules:
-  - host: traefik-ui.local
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: traefik-web-ui
-          servicePort: web
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;最后一起创建：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# kubectl create -f .
-serviceaccount &amp;quot;ingress&amp;quot; created
-clusterrolebinding &amp;quot;ingress&amp;quot; created
-deployment &amp;quot;traefik-ingress-lb&amp;quot; created
-service &amp;quot;traefik-web-ui&amp;quot; created
-ingress &amp;quot;traefik-web-ui&amp;quot; created
-ingress &amp;quot;traefik-ingress&amp;quot; created
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;访问测试&quot;&gt;&lt;a href=&quot;#访问测试&quot; class=&quot;headerlink&quot; title=&quot;访问测试&quot;&gt;&lt;/a&gt;访问测试&lt;/h2&gt;&lt;p&gt;查看traefik pod被分配到了哪台主机上：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# kubectl get pods -n kube-system -l k8s-app=traefik-ingress-lb -o wide                       
-NAME                                  READY     STATUS    RESTARTS   AGE       IP             NODE
-traefik-ingress-lb-4237248072-1dg9n   1/1       Running   0          2m        172.16.7.152   172.16.7.152
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;浏览器输入&lt;a href=&quot;http://172.16.7.152:8580/，将可以看到dashboard。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.152:8580/，将可以看到dashboard。&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;左侧黄色部分部分列出的是所有的rule，右侧绿色部分是所有的backend。&lt;/p&gt;
-&lt;p&gt;在Kubernetes集群的任意一个节点上执行。假如现在我要访问nginx的”/“路径。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;curl -H Host:traefik.nginx.io http://172.16.7.152/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果需要在kubernetes集群以外访问就需要设置DNS，或者修改本机的hosts文件。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;172.16.7.152 traefik.nginx.io
-172.16.7.152 traefik.frontend.io
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;所有访问这些地址的流量都会发送给172.16.7.152这台主机，就是我们启动traefik的主机。&lt;br&gt;Traefik会解析http请求header里的Host参数将流量转发给Ingress配置里的相应service。&lt;br&gt;修改hosts后就就可以在kubernetes集群外访问以上两个service。&lt;/p&gt;
-&lt;h2 id=&quot;健康检查&quot;&gt;&lt;a href=&quot;#健康检查&quot; class=&quot;headerlink&quot; title=&quot;健康检查&quot;&gt;&lt;/a&gt;健康检查&lt;/h2&gt;&lt;p&gt;关于健康检查，测试可以使用 kubernetes 的 Liveness Probe 实现，如果 Liveness Probe检查失败，则 traefik 会自动移除该 pod。&lt;br&gt;【示例】：我们定义一个 test-health 的 deployment，健康检查方式是 cat /tmp/health，容器启动 2 分钟后会删掉这个文件，模拟健康检查失败。&lt;br&gt;test-health的deployment：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# vim test-health-deploy.yaml
-apiVersion: v1
-kind: Deployment
-apiVersion: extensions/v1beta1
-metadata:
-  name: test
-  namespace: default
-  labels:
-    test: alpine
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      test: alpine
-  template:
-    metadata:
-      labels:
-        test: alpine
-        name: test
-    spec:
-      containers:
-      - image: mritd/alpine:3.4
-        name: alpine
-        resources:
-          limits:
-            cpu: 200m
-            memory: 30Mi
-          requests:
-            cpu: 100m
-            memory: 20Mi
-        ports:
-        - name: http
-          containerPort: 80
-        args:
-        command:
-        - &amp;quot;bash&amp;quot;
-        - &amp;quot;-c&amp;quot;
-        - &amp;quot;echo ok &amp;gt; /tmp/health;sleep 120;rm -f /tmp/health&amp;quot;
-        livenessProbe:
-          exec:
-            command:
-            - cat
-            - /tmp/health
-          initialDelaySeconds: 20
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;test-health 的 service：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# vim test-health-service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: test 
-  labels:
-    name: test
-spec:
-  ports:
-  - port: 8123
-    targetPort: 80
-  selector:
-    name: test
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;test-health的 Ingress：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 traefik]# vim test-health-ingress.yaml
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: test
-spec:
-  rules:
-  - host: test.com
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: test
-          servicePort: 8123
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;全部创建好以后，进入 traefik ui 界面，可以观察到每隔 2 分钟健康检查失败后，kubernetes 重建 pod，同时 traefik 会从后端列表中移除这个 pod。&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Traefik介绍&quot;&gt;&lt;a href=&quot;#Traefik介绍&quot; class=&quot;headerlink&quot; title=&quot;Traefik介绍&quot;&gt;&lt;/a&gt;Traefik介绍&lt;/h2&gt;&lt;p&gt;traefik 是一个前端负载均衡器，对于微服务架构尤其是 kubernetes 等编排工具具有良好的支持；同 nginx 等相比，traefik 能够自动感知后端容器变化，从而实现自动服务发现。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="容器编排" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8%E7%BC%96%E6%8E%92/"/>
-    
-    
-      <category term="Kubernetes" scheme="http://yoursite.com/tags/Kubernetes/"/>
     
   </entry>
   
