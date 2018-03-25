@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-03-25T11:54:53.000Z</updated>
+  <updated>2018-03-25T11:59:41.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2018/03/23/MySQL%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%92%8Csql-mode/"/>
     <id>http://yoursite.com/2018/03/23/MySQL数据类型和sql-mode/</id>
     <published>2018-03-23T08:48:07.000Z</published>
-    <updated>2018-03-25T11:54:53.000Z</updated>
+    <updated>2018-03-25T11:59:41.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;DBA&quot;&gt;&lt;a href=&quot;#DBA&quot; class=&quot;headerlink&quot; title=&quot;DBA&quot;&gt;&lt;/a&gt;DBA&lt;/h2&gt;&lt;h3 id=&quot;开发DBA&quot;&gt;&lt;a href=&quot;#开发DBA&quot; class=&quot;headerlink&quot; title=&quot;开发DBA&quot;&gt;&lt;/a&gt;开发DBA&lt;/h3&gt;&lt;p&gt;数据库设计(E-R关系图)、SQL开发、内置函数、存储例程(存储过程和存储函数，存储过程没有返回值，函数有返回值)、触发器、事件调度器(event scheduler) 。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;&lt;strong&gt;1.什么是mysql存储过程?&lt;/strong&gt;&lt;br&gt;存储过程是存储在数据库服务器中的一组sql语句，通过在查询中调用一个指定的名称来执行这些sql语句命令。&lt;br&gt;&lt;strong&gt;2.为什么要使用mysql存储过程？&lt;/strong&gt;&lt;br&gt;应用程序分为两种，一种是基于web，一种是基于桌面，他们都和数据库进行交互来完成数据的存取工作。假设现在有一种应用程序包含了这两种，现在要修改其中的一个查询sql语句，那么我们可能要同时修改他们中对应的查询sql语句，当我们的应用程序很庞大很复杂的时候问题就出现这，不易维护！另外把sql查询语句放在我们的web程序或桌面中很容易遭到sql注入的破坏。而存储过程正好可以帮我们解决这些问题。&lt;/p&gt;
 &lt;ul&gt;
@@ -31,7 +31,6 @@
 &lt;/ul&gt;
 &lt;h3 id=&quot;管理DBA&quot;&gt;&lt;a href=&quot;#管理DBA&quot; class=&quot;headerlink&quot; title=&quot;管理DBA&quot;&gt;&lt;/a&gt;管理DBA&lt;/h3&gt;&lt;p&gt;安装、升级，备份、恢复，用户管理、权限管理，监控、分析、基准测试，语句优化(要会写SQL语句)，数据字典，按需要配置服务器（服务器变量：MyISAM, InnoDB, 缓存, 日志）&lt;br&gt;运维人员虽然不是开发SQL的，但是我们需要对别人写出来的SQL语句做性能评估，去分析他写的SQL是不是足够高效。如果不是，我们需要对对方的SQL语句做改写。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;SQL注入攻击&lt;/strong&gt;指的是通过构建特殊的输入作为参数传入Web应用程序，而这些输入大都是SQL语法里的一些组合，通过执行SQL语句进而执行攻击者所要的操作，其主要原因是程序没有细致地过滤用户输入的数据，致使非法数据侵入系统。&lt;/p&gt;
-&lt;h2 id=&quot;SQL语言组成部分&quot;&gt;&lt;a href=&quot;#SQL语言组成部分&quot; class=&quot;headerlink&quot; title=&quot;SQL语言组成部分&quot;&gt;&lt;/a&gt;SQL语言组成部分&lt;/h2&gt;&lt;p&gt;DDL:&lt;br&gt;DML:&lt;br&gt;完整性定义语言：DDL的一部分功能&lt;br&gt;    主键、外键、惟一键、条件、非空、事务&lt;br&gt;视图定义：视图是一个虚表，实际上是存储下来的SELECT语句，是保存在mysql某个特定位置的查询语句。&lt;br&gt;事务控制：启动事务、提交事务、回滚事务等。&lt;br&gt;嵌入式SQL和动态SQL：&lt;br&gt;DCL：授权&lt;/p&gt;
 &lt;h2 id=&quot;MySQL数据类型&quot;&gt;&lt;a href=&quot;#MySQL数据类型&quot; class=&quot;headerlink&quot; title=&quot;MySQL数据类型&quot;&gt;&lt;/a&gt;MySQL数据类型&lt;/h2&gt;&lt;h3 id=&quot;数据类型的作用&quot;&gt;&lt;a href=&quot;#数据类型的作用&quot; class=&quot;headerlink&quot; title=&quot;数据类型的作用&quot;&gt;&lt;/a&gt;数据类型的作用&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;1、存储的值类型；比如如果定义成字符型，往里面存数值是不允许的。就算你存1，也是被存储为字符了。
 2、占据的存储空间大小；
 3、定长，变长；
