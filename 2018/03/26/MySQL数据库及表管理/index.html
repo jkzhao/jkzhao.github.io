@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Ansible," />
+  <meta name="keywords" content="MySQL," />
 
 
 
@@ -104,41 +104,29 @@
 
 
 
-<meta name="description" content="ansible命令基础语法：ansible  [-f forks] [-m module_name] [-a args] [options]   host-pattern：这次的命令对哪些主机生效； -f forks：启动的并发线程数，就是一次并行处理多少主机； -m module_name：要使用的模块； -a args：模块特有的参数。">
-<meta name="keywords" content="Ansible">
+<meta name="description" content="MySQL中字符大小写1、SQL关键字及函数名不区分字符大小写； 但是为了提高缓存命中率，无论你使用大写或小写，风格上要一致。">
+<meta name="keywords" content="MySQL">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Ansible常见模块介绍">
-<meta property="og:url" content="http://yoursite.com/2017/07/07/Ansible常见模块介绍/index.html">
+<meta property="og:title" content="MySQL数据库及表管理">
+<meta property="og:url" content="http://yoursite.com/2018/03/26/MySQL数据库及表管理/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="ansible命令基础语法：ansible  [-f forks] [-m module_name] [-a args] [options]   host-pattern：这次的命令对哪些主机生效； -f forks：启动的并发线程数，就是一次并行处理多少主机； -m module_name：要使用的模块； -a args：模块特有的参数。">
+<meta property="og:description" content="MySQL中字符大小写1、SQL关键字及函数名不区分字符大小写； 但是为了提高缓存命中率，无论你使用大写或小写，风格上要一致。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/7.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/8.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/9.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/10.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/11.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/12.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/13.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/14.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/15.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/16.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/17.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/18.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/19.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/20.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/21.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/22.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/23.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/24.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/25.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/26.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/27.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/28.png">
-<meta property="og:updated_time" content="2017-11-07T07:45:37.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/15.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/16.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/17.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/18.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/19.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/20.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/21.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/22.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/23.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/24.png">
+<meta property="og:updated_time" content="2018-03-26T02:52:51.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Ansible常见模块介绍">
-<meta name="twitter:description" content="ansible命令基础语法：ansible  [-f forks] [-m module_name] [-a args] [options]   host-pattern：这次的命令对哪些主机生效； -f forks：启动的并发线程数，就是一次并行处理多少主机； -m module_name：要使用的模块； -a args：模块特有的参数。">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/7.png">
+<meta name="twitter:title" content="MySQL数据库及表管理">
+<meta name="twitter:description" content="MySQL中字符大小写1、SQL关键字及函数名不区分字符大小写； 但是为了提高缓存命中率，无论你使用大写或小写，风格上要一致。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/15.png">
 
 
 
@@ -156,7 +144,7 @@
   };
 </script>
 
-  <title> Ansible常见模块介绍 | jkzhao's blog </title>
+  <title> MySQL数据库及表管理 | jkzhao's blog </title>
 </head>
 <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 
@@ -349,7 +337,7 @@
             
             
               
-                Ansible常见模块介绍
+                MySQL数据库及表管理
               
             
           </h1>
@@ -361,14 +349,14 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-07T08:48:26+08:00" content="2017-07-07">
-              2017-07-07
+            <time itemprop="dateCreated" datetime="2018-03-26T09:16:02+08:00" content="2018-03-26">
+              2018-03-26
             </time>
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-07T15:45:37+08:00" content="2017-11-07">
-              2017-11-07
+              <time itemprop="dateUpdated" datetime="2018-03-26T10:52:51+08:00" content="2018-03-26">
+              2018-03-26
               </time>
               </span>
             
@@ -383,8 +371,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
+                  <a href="/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -403,7 +391,7 @@
 
           
           
-             <span id="/2017/07/07/Ansible常见模块介绍/" class="leancloud_visitors" data-flag-title="Ansible常见模块介绍">
+             <span id="/2018/03/26/MySQL数据库及表管理/" class="leancloud_visitors" data-flag-title="MySQL数据库及表管理">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -427,140 +415,119 @@
       
 
       
-        <h2 id="ansible命令基础"><a href="#ansible命令基础" class="headerlink" title="ansible命令基础"></a>ansible命令基础</h2><p>语法：ansible <host-pattern> [-f forks] [-m module_name] [-a args] [options] </host-pattern></p>
+        <h2 id="MySQL中字符大小写"><a href="#MySQL中字符大小写" class="headerlink" title="MySQL中字符大小写"></a>MySQL中字符大小写</h2><p>1、SQL关键字及函数名不区分字符大小写； 但是为了提高缓存命中率，无论你使用大写或小写，风格上要一致。<a id="more"></a><br>2、数据库、表及视图名称的大小区分与否取决于底层OS及FS。如果你是装在windows上的，是不区分大小写的，如果是安装在Linux上的，默认是区分大小写。因此很多时候我们把windows上的库移植到linux上就可能出问题。反过来移植更有问题。<br>3、存储过程、存储函数及事件调度器的名字不区分大小写，但触发器区分；<br>4、表的别名区分大小写；<br>5、对字段中的数据，如果字段类型为Binary类型，则区分大小写；非Binary不区分大小写(非Binary的排序取决于字符集及排序规则)。</p>
+<h2 id="MySQL-DDL"><a href="#MySQL-DDL" class="headerlink" title="MySQL DDL"></a>MySQL DDL</h2><h3 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h3><p><strong>1.创建数据库</strong></p>
+<pre><code>CREATE {DATABASE|SCHEMA} [IF NOT EXISTS] db_name [DEFAULT] [CHARACTER SET=&apos;&apos;] [DEFAULT] [COLLATE=&apos;&apos;]
+
+mysql&gt; HELP CREATE DATABASE
+Name: &apos;CREATE DATABASE&apos;
+Description:
+Syntax:
+CREATE {DATABASE | SCHEMA} [IF NOT EXISTS] db_name
+    [create_specification] ...
+
+create_specification:
+    [DEFAULT] CHARACTER SET [=] charset_name
+  | [DEFAULT] COLLATE [=] collation_name
+
+CREATE DATABASE creates a database with the given name. To use this statement, you need the CREATE privilege for the database. CREATE SCHEMA is a synonym for CREATE DATABASE.
+
+URL: http://dev.mysql.com/doc/refman/5.6/en/create-database.html
+</code></pre><p>【注意】:创建数据库时使用database或者schema都可以，对于oracle来讲，通常数据库被叫做schema，对Linux而言，schema或datable都表示数据库。<br>【示例】：</p>
+<pre><code>mysql&gt; create database t1 default charset utf8;
+Query OK, 1 row affected (0.00 sec)
+</code></pre><p><strong>2.删除和修改数据库</strong></p>
+<pre><code>DROP {DATABASE | SCHEMA} [IF EXISTS] db_name
+ALTER {DATABASE|SCHEMA} db_name [DEFAULT] [CHARACTER SET=&apos;&apos;] [DEFAULT] [COLLATE=&apos;&apos;]  #如果创建数据库时忘记指定其默认字符集默认排序规则，可以使用ALTER进行修改。
+</code></pre><p>【注意】:如果想换数据库的名字，没有什么好办法，只能把数据库删除再重新创建或者备份数据库，然后删除，创建个新库，把表在导进去，这是比较理想的做法。还有一种比较粗暴的方法，到数据目录下，把那个目录名改一下就可以了。但改完后，这个数据库的数据字典中的信息并没有改变。因此千万不要试图通过修改那个目录名称来达到修改数据库名的目的，所以唯一的可靠做法就是备份、删除、创建新库、导入表，这个代价是很大的。</p>
+<h3 id="表"><a href="#表" class="headerlink" title="表"></a>表</h3><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/15.png" alt=""></p>
+<h3 id="表创建"><a href="#表创建" class="headerlink" title="表创建"></a>表创建</h3><p><strong>1.第一种方式</strong></p>
+<pre><code>CREATE [TEMPORARY] TABLE [IF NOT EXISTS] tbl_name       
+(create_definition,...)
+[table_options]
+[partition_options]   # 把一张表切割开，分成几张小表。
+    TEMPORARY：创建临时表，临时表是保存在内存中，将占据内存空间，因此一般情况下非管理员在创建内存表上是没有权限的。
+
+(create_definition,...)：
+    字段的定义：字段名、类型和类型修饰符
+    键、约束或索引：
+        PRIMARY KEY, UNIQUE KEY, FOREIGN KEY, CHECK(检查约束)
+        {INDEX|KEY}
+
+[table_options]
+    ENGINE [=] engine_name   ——指定表的存储引擎，如果不指定，将使用默认存储引擎。
+</code></pre><p>【示例】：<br>查看默认存储引擎:<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/16.png" alt=""><br>查看表的存储引擎：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/17.png" alt=""><br>创建表时指定存储引擎为MyISAM：</p>
+<pre><code>mysql&gt; CREATE TABLE `t3`(Name VARCHAR(50) NOT NULL, Age TINYINT UNSIGNED NOT NULL, PRIMARY KEY(Name,Age)) ENGINE=&apos;MyISAM&apos;;
+Query OK, 0 rows affected (0.00 sec)
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/18.png" alt=""></p>
+<pre><code>AUTO_INCREMENT [=] value
+[DEFAULT] CHARACTER SET [=] charset_name
+[DEFAULT] COLLATE [=] collation_name
+COMMENT [=] &apos;string&apos;   #表的注释。如果表名不足以描述表的功能的话，给表加注释是一个好的习惯。
+DELAY_KEY_WRITE [=] {0 | 1}   ——延迟键写入。这一项在一定程度上能够提升性能的，但是有可能会影响查询。索引是加速查询的，但索引会降低写操作性能，为什么？因为我们更新表时必然得重建索引。所以一个修改非常频繁的表，其索引几乎是无效的。因为索引会经常被重建，索引的大量重建会导致性能很低。这就需要延迟键写入，把跟索引相关的信息几个合并起来，过一次会儿写入。
+ROW_FORMAT [=] {DEFAULT|DYNAMIC|FIXED|COMPRESSED|REDUNDANT|COMPACT}
+TABLESPACE tablespace_name [STORAGE {DISK|MEMORY|DEFAULT}]  #指定表空间。MySQL的表主要有两种类型，一种是MyISAM表，一种是InnoDB表。对于InnoDB表来说，如果使用默认的存储方式，我们可以通过TABLESPACE来指定多个共享表空间。如果是独立的表空间存储方式，也可以通过TABLESPACE来指定表空间名字。
+</code></pre><p><strong>MyISAM表，每张表有三个文件，都位于数据库目录中：</strong></p>
 <ul>
-<li>host-pattern：这次的命令对哪些主机生效；</li>
-<li>-f forks：启动的并发线程数，就是一次并行处理多少主机；</li>
-<li>-m module_name：要使用的模块；</li>
-<li>-a args：模块特有的参数。<a id="more"></a>
+<li>tb_name.frm: 表结构定义</li>
+<li>tb_name.MYD: 数据文件</li>
+<li>tb_name.MYI: 索引文件</li>
+</ul>
+<p><strong>InnoDB表，有两种存储方式：</strong><br>（1）默认：每表有一个独立文件和一个多表共享的文件</p>
+<ul>
+<li>tb_name.frm: 表结构的定义，位于数据库目录(与数据库名同名的目录)中；</li>
+<li>ibdata#: 所有数据库的所有Innodb表共享的表空间文件，默认位于数据目录(datadir指向的目录)中；管理起来不方便，所以一般很少这么用。采用第二种方式，将来备份恢复时也很方便。</li>
+</ul>
+<p>（2）独立的表空间：</p>
+<ul>
+<li>tb_name.frm: 每表有一个表结构文件</li>
+<li>tb_name.ibd: 一个独有的表空间文件</li>
+</ul>
+<p>【注意】:一般我们创建一张表时，表就会放在数据库目录下，但是对Innodb存储引擎例外。Innodb存储引擎的所有表默认都放在一个统一的表空间的文件中。<br>如何启用第二种方式呢？</p>
+<pre><code>mysql&gt; SHOW GLOBAL VARIABLES LIKE &apos;innodb%&apos;;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/19.png" alt=""><br>这里已经开启了第二种。可以修改这个值：</p>
+<pre><code>mysql&gt; SET GLOBAL innodb_file_per_table=OFF;
+</code></pre><p>【注意】：修改GLOBAL变量对当前会话不生效，需要退出重建会话。如果想要永久有效就得把这个配置写到配置文件的[mysqld]中。</p>
+<pre><code># vim /etc/my.cnf
+innodb_file_per_table=ON
+</code></pre><p><strong>2.表创建的第二种方式（复制表数据，也就是根据其他表来创建当前表）</strong></p>
+<pre><code>CREATE [TEMPORARY] TABLE [IF NOT EXISTS] tbl_name
+  [(create_definition,...)]
+  [table_options]
+  select_statement  #只是数据一致，但是字段属性跟源表并不一定一致。因此不是复制表，而是复制表中的数据。并自动判断实现字段的创建。对我们而言，这种方法不靠谱。
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/20.png" alt=""></p>
+<p><strong>3.表创建：第三种方式（只复制表结构，不复制数据）</strong></p>
+<pre><code>CREATE [TEMPORARY] TABLE [IF NOT EXISTS] tbl_name
+{ LIKE old_tbl_name | (LIKE old_tbl_name) }
+</code></pre><p>所以要先用第三种方式复制表结构，在使用INSERT语句往新表中插入数据，但数据不是自己手动创建的，而是从另外一张表中查询而来的。这样才能做到完整复制一张表。</p>
+<h3 id="表删除"><a href="#表删除" class="headerlink" title="表删除"></a>表删除</h3><pre><code>DROP [TEMPORARY] TABLE [IF EXISTS]
+  tbl_name [, tbl_name] ...
+  [RESTRICT | CASCADE]  #CASCADE做级联删除，就是说如果某张表被其他表依赖，那么删除这个某表，使用CASCADE就会删除依赖这张某表的其他表。
+</code></pre><h3 id="表修改"><a href="#表修改" class="headerlink" title="表修改"></a>表修改</h3><p>和表创建一样麻烦。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/21.png" alt=""></p>
+<pre><code>ALTER TABLE tbl_name
+  [alter_specification [, alter_specification] ...]
+</code></pre><h4 id="修改字段定义"><a href="#修改字段定义" class="headerlink" title="修改字段定义"></a>修改字段定义</h4><p><strong>1.插入新字段</strong><br>插入新字段：可以一次插入单个字段，也可以一次插入多个字段。插入多个字段时，多个字段需要用()括起来。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/22.png" alt=""></p>
+<p><strong>2.删除字段</strong></p>
+<pre><code>DROP [COLUMN] col_name
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/23.png" alt=""></p>
+<p><strong>3.修改字段</strong></p>
+<ul>
+<li><p>仅修改字段名称</p>
+<p>  CHANGE [COLUMN] old_col_name new_col_name column_definition<br>  [FIRST|AFTER col_name]</p>
+</li>
+<li><p>修改字段类型及属性等</p>
+<p>  MODIFY [COLUMN] col_name column_definition<br>  [FIRST | AFTER col_name]</p>
 </li>
 </ul>
-<p>常见的模块：</p>
-<ul>
-<li>user</li>
-<li>yum</li>
-<li>copy</li>
-<li>cron</li>
-<li>command：这是默认的模块，表示在被管理主机上运行一个命令。对于command模块，-a不再是指定参数，而是命令本身。</li>
-<li>shell</li>
-</ul>
-<h2 id="常见模块举例"><a href="#常见模块举例" class="headerlink" title="常见模块举例"></a>常见模块举例</h2><h3 id="etc-ansible-hosts配置文件内容"><a href="#etc-ansible-hosts配置文件内容" class="headerlink" title="/etc/ansible/hosts配置文件内容"></a>/etc/ansible/hosts配置文件内容</h3><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/7.png" alt=""></p>
-<h3 id="command模块"><a href="#command模块" class="headerlink" title="command模块"></a>command模块</h3><p>command模块是默认的模块，表示在被管理主机上运行一个命令。对于command模块，-a不再是指定参数，而是命令本身。所以这个模块有个缺陷，运行的命令中不能使用变量或者参数。<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible nginx -m command -a &quot;date&quot;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/8.png" alt=""></p>
-<pre><code>[root@node1 ~]# ansible mysql -m command -a &quot;tail -3 /etc/passwd&quot;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/9.png" alt=""></p>
-<h3 id="cron模块"><a href="#cron模块" class="headerlink" title="cron模块"></a>cron模块</h3><p>cron模块可以让每一个被管理节点能够自动生成一个定期任务计划。查看cron模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s cron
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/10.png" alt=""><br>几个主要参数：</p>
-<ul>
-<li>state：present表示安装crontab任务<pre><code>absent表示移除crontab任务
-</code></pre></li>
-<li>job：指明运行的命令是什么</li>
-<li><p>name：crontab任务的名字<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible mysql -m cron -a &apos;minute=&quot;*/10&quot; job=&quot;/usr/bin/echo hello&quot; name=&quot;test cron job&quot;&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/11.png" alt=""><br>注意：</p>
-</li>
-<li>所有的参数可以用””包含起来</li>
-<li>day之类的参数没有指定，默认都是*</li>
-<li>默认state参数的值为present<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/12.png" alt=""></li>
-</ul>
-<h3 id="user模块"><a href="#user模块" class="headerlink" title="user模块"></a>user模块</h3><p>user模块实现用户账号管理。查看user模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s user
-</code></pre><p>几个主要参数：</p>
-<ul>
-<li>name=：用户名</li>
-<li>uid：用户的uid</li>
-<li>group：所属组，即私有组</li>
-<li>groups：附加组。</li>
-<li><p>state：状态。<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible mysql -m user -a &apos;name=&quot;jack&quot;&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/13.png" alt=""></p>
-<pre><code>[root@node1 ~]# ansible mysql -m user -a &apos;name=&quot;jack&quot; state=absent&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/14.png" alt=""></p>
-</li>
-</ul>
-<h3 id="group模块"><a href="#group模块" class="headerlink" title="group模块"></a>group模块</h3><p>group模块：组管理。查看group模块的用法：<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible-doc -s group
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/15.png" alt=""></p>
-<pre><code>[root@node1 ~]# ansible mysql -m group -a &apos;name=mysql gid=306 system=yes&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/16.png" alt=""></p>
-<h3 id="copy模块"><a href="#copy模块" class="headerlink" title="copy模块"></a>copy模块</h3><p>copy模块实现文件复制。查看copy模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s copy
-</code></pre><p>几个主要参数：</p>
-<ul>
-<li>src=：指明源文件本地路径。可以是绝对路径，也可以是相对路径。可以不使用src，使用content。就是说用content内容来生成文件。</li>
-<li>dest=：定义远程目标文件路径，只能使用绝对路径。</li>
-<li><p>content=：可以不使用src，使用content。就是说用content内容来生成文件。<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible mysql -m copy -a &apos;src=/etc/fstab dest=/tmp/fstab.ansible owner=root mode=640&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/17.png" alt=""></p>
-<pre><code>[root@node1 ~]# ansible mysql -m copy -a &apos;content=&quot;Hello World\nGood boy&quot; dest=/tmp/test.txt owner=root mode=640&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/18.png" alt=""></p>
-</li>
-</ul>
-<h3 id="file模块"><a href="#file模块" class="headerlink" title="file模块"></a>file模块</h3><p>file模块可以设定文件属性，还可以创建文件的符号链接。查看file模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s file
-</code></pre><p>几个重要参数：</p>
-<ul>
-<li>path=：指明对哪个文件做管理。也可以使用dest和name。</li>
-<li><p>创建文件的符号链接：</p>
-<ul>
-<li>src=：指明源文件</li>
-<li><p>path=：指明符号链接文件路径<br><strong>示例：</strong></p>
-<p>  [root@node1 ~]# ansible mysql -m file -a ‘owner=root group=mysql mode=644 path=/tmp/test.txt’<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/19.png" alt=""></p>
-<p>  [root@node1 ~]# ansible mysql -m file -a ‘path=/tmp/test.link src=/tmp/test.txt state=link’<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/20.png" alt=""></p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="ping模块"><a href="#ping模块" class="headerlink" title="ping模块"></a>ping模块</h3><p>ping模块测试指定主机是否能连接。查看ping模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s ping
-</code></pre><p><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible nginx -m ping
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/21.png" alt=""></p>
-<h3 id="service模块"><a href="#service模块" class="headerlink" title="service模块"></a>service模块</h3><p>service模块是管理服务的。查看service模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s service
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/22.png" alt=""><br>几个重要参数：</p>
-<ul>
-<li>enabled=：是否开机自动启动，取值为true或false；</li>
-<li>name=：服务名字；</li>
-<li><p>state=：状态，取值有started，stoped，restarted。<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible 172.16.7.151 -m service -a &apos;enabled=true name=httpd state=stopped&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/23.png" alt=""></p>
-</li>
-</ul>
-<h3 id="shell模块"><a href="#shell模块" class="headerlink" title="shell模块"></a>shell模块</h3><p>和command模块类似，但是可以使用变量。用于执行一些复杂的命令。查看shell模块的使用方法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s shell
-</code></pre><p><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible mysql -m user -a &apos;name=&quot;test&quot;&apos;
-[root@node1 ~]# ansible mysql -m command -a &apos;echo wisedu | passwd --stdin test&apos;
-[root@node1 ~]# ansible mysql -m command -a &apos;tail -1 /etc/passwd&apos; 
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/24.png" alt=""></p>
-<pre><code>[root@node1 ~]# ansible mysql -m shell -a &apos;echo wisedu | passwd --stdin user1&apos;
-[root@node1 ~]# ansible mysql -m command -a &apos;tail -1 /etc/shadow&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/25.png" alt=""><br><strong>所以一旦有管道、变量之类的，你最好使用shell模块，而不要用command模块。</strong></p>
-<h3 id="script模块"><a href="#script模块" class="headerlink" title="script模块"></a>script模块</h3><p>script模块将本地脚本复制到远程主机并运行之。查看script模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s script
-</code></pre><p><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# vim test.sh
-#/bin/bash                                                                                                                                    
-echo &quot;hello world&quot; &gt;/tmp/nba.txt
- [root@node1 ~]# chmod +x test.sh 
- [root@node1 ~]# ansible mysql -m script -a &apos;/root/test.sh&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/26.png" alt=""></p>
-<h3 id="yum模块"><a href="#yum模块" class="headerlink" title="yum模块"></a>yum模块</h3><p>yum模块管理程序包。查看yum模块的用法：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s yum        
-</code></pre><p>几个重要参数：</p>
-<ul>
-<li>name=：指定要安装的程序包，可以带上版本号，否则安装最新版本；</li>
-<li><p>state=：present表示安装，absent表示卸载。<br><strong>示例：</strong></p>
-<pre><code>[root@node1 ~]# ansible mysql -m yum -a &apos;name=ksh&apos;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/27.png" alt=""> </p>
-</li>
-</ul>
-<h3 id="setup模块"><a href="#setup模块" class="headerlink" title="setup模块"></a>setup模块</h3><p>setup模块：收集远程主机的facts。ansbile在管理每一个主机时，这些主机在被运行管理命令之前，会首先向ansible节点报告自己主机当前的各种可能被ansible主机用到的状态信息，如操作系统版本、ip地址等信息，这些信息都是以变量的形式，ansible主机可以在jinjia2中调用，为不同的服务器生成不同的配置文件。</p>
-<pre><code>[root@node1 ~]# ansible mysql -m setup
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/28.png" alt="">  </p>
+<h4 id="修改约束、键或索引等"><a href="#修改约束、键或索引等" class="headerlink" title="修改约束、键或索引等"></a>修改约束、键或索引等</h4><pre><code>ADD {INDEX|KEY} [index_name]
+[index_type] (index_col_name,...) [index_option] ...
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/24.png" alt=""></p>
+<h4 id="表改名"><a href="#表改名" class="headerlink" title="表改名"></a>表改名</h4><p>使用ALTER命令：RENAME [TO|AS] new_tbl_name</p>
+<pre><code>mysql&gt; ALTER TABLE `t5` RENAME TO `t7`;
+Query OK, 0 rows affected (0.03 sec) 
+</code></pre><p>或者RENAME命令：</p>
+<pre><code>mysql&gt; RENAME TABLE old_name TO new_name;  
+</code></pre><h4 id="修改表的存储引擎"><a href="#修改表的存储引擎" class="headerlink" title="修改表的存储引擎"></a>修改表的存储引擎</h4><p>表引擎的修改背后mysql所执行的操作是创建一个你所指定存储引擎的新表，并把老的表中的数据导入到新表中。不建议通过ALTER直接修改表的存储引擎。</p>
 
       
     </div>
@@ -582,7 +549,7 @@ echo &quot;hello world&quot; &gt;/tmp/nba.txt
       
         <div class="post-tags">
           
-            <a href="/tags/Ansible/" rel="tag"><i class="fa fa-tag"></i>Ansible</a>
+            <a href="/tags/MySQL/" rel="tag"><i class="fa fa-tag"></i>MySQL</a>
           
         </div>
       
@@ -591,17 +558,13 @@ echo &quot;hello world&quot; &gt;/tmp/nba.txt
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/07/05/Ansible介绍及安装部署/" rel="next" title="Ansible介绍及安装部署">
-                <i class="fa fa-chevron-left"></i> Ansible介绍及安装部署
+              <a href="/2018/03/23/MySQL数据类型和sql-mode/" rel="next" title="MySQL数据类型和sql_mode">
+                <i class="fa fa-chevron-left"></i> MySQL数据类型和sql_mode
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/07/11/Ansible的基础元素和YAML介绍/" rel="prev" title="Ansible的基础元素和YAML介绍">
-                Ansible的基础元素和YAML介绍 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -758,7 +721,7 @@ echo &quot;hello world&quot; &gt;/tmp/nba.txt
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ansible命令基础"><span class="nav-number">1.</span> <span class="nav-text">ansible命令基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见模块举例"><span class="nav-number">2.</span> <span class="nav-text">常见模块举例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#etc-ansible-hosts配置文件内容"><span class="nav-number">2.1.</span> <span class="nav-text">/etc/ansible/hosts配置文件内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#command模块"><span class="nav-number">2.2.</span> <span class="nav-text">command模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cron模块"><span class="nav-number">2.3.</span> <span class="nav-text">cron模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#user模块"><span class="nav-number">2.4.</span> <span class="nav-text">user模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#group模块"><span class="nav-number">2.5.</span> <span class="nav-text">group模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#copy模块"><span class="nav-number">2.6.</span> <span class="nav-text">copy模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#file模块"><span class="nav-number">2.7.</span> <span class="nav-text">file模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ping模块"><span class="nav-number">2.8.</span> <span class="nav-text">ping模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#service模块"><span class="nav-number">2.9.</span> <span class="nav-text">service模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shell模块"><span class="nav-number">2.10.</span> <span class="nav-text">shell模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#script模块"><span class="nav-number">2.11.</span> <span class="nav-text">script模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yum模块"><span class="nav-number">2.12.</span> <span class="nav-text">yum模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#setup模块"><span class="nav-number">2.13.</span> <span class="nav-text">setup模块</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL中字符大小写"><span class="nav-number">1.</span> <span class="nav-text">MySQL中字符大小写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL-DDL"><span class="nav-number">2.</span> <span class="nav-text">MySQL DDL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据库"><span class="nav-number">2.1.</span> <span class="nav-text">数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#表"><span class="nav-number">2.2.</span> <span class="nav-text">表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#表创建"><span class="nav-number">2.3.</span> <span class="nav-text">表创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#表删除"><span class="nav-number">2.4.</span> <span class="nav-text">表删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#表修改"><span class="nav-number">2.5.</span> <span class="nav-text">表修改</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#修改字段定义"><span class="nav-number">2.5.1.</span> <span class="nav-text">修改字段定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改约束、键或索引等"><span class="nav-number">2.5.2.</span> <span class="nav-text">修改约束、键或索引等</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#表改名"><span class="nav-number">2.5.3.</span> <span class="nav-text">表改名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改表的存储引擎"><span class="nav-number">2.5.4.</span> <span class="nav-text">修改表的存储引擎</span></a></li></ol></li></ol></li></ol></div>
             
           </div>
         </section>
