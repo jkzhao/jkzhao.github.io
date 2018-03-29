@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Ansible," />
+  <meta name="keywords" content="MySQL," />
 
 
 
@@ -104,25 +104,33 @@
 
 
 
-<meta name="description" content="运维工具作为一个Linux运维人员，需要了解大量的运维工具，并熟知这些工具的差异，能够熟练运用这些工具去解决一些手动重复的劳动，一方面是避免人工操作失误，另一方面也可以提高工作效率。同时还能将自己从这些重复的工作中解放出来，以便研究更新和更深的技术。运维工具大体上可以分为3类：  OS Provisioning：提供操作系统安装的。PXE，Cobbler(repository,distrituti">
-<meta name="keywords" content="Ansible">
+<meta name="description" content="查询的执行路径查询执行路径：先查缓存，缓存未命中交给解析器。MySQL是允许多个用户连接进来的，因此有多个线程，如果每个线程上的用户都发起查询请求，而mysql真正能够执行查询的查询引擎只有一个，所以要排队，要给一个队列。">
+<meta name="keywords" content="MySQL">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Ansible介绍及安装部署">
-<meta property="og:url" content="http://yoursite.com/2017/07/05/Ansible介绍及安装部署/index.html">
+<meta property="og:title" content="MySQL查询和视图">
+<meta property="og:url" content="http://yoursite.com/2018/03/29/MySQL查询和视图/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="运维工具作为一个Linux运维人员，需要了解大量的运维工具，并熟知这些工具的差异，能够熟练运用这些工具去解决一些手动重复的劳动，一方面是避免人工操作失误，另一方面也可以提高工作效率。同时还能将自己从这些重复的工作中解放出来，以便研究更新和更深的技术。运维工具大体上可以分为3类：  OS Provisioning：提供操作系统安装的。PXE，Cobbler(repository,distrituti">
+<meta property="og:description" content="查询的执行路径查询执行路径：先查缓存，缓存未命中交给解析器。MySQL是允许多个用户连接进来的，因此有多个线程，如果每个线程上的用户都发起查询请求，而mysql真正能够执行查询的查询引擎只有一个，所以要排队，要给一个队列。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/1.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/2.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/3.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/4.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/5.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/6.png">
-<meta property="og:updated_time" content="2017-11-07T07:45:27.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/25.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/26.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/27.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/28.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/29.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/30.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/31.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/32.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/33.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/34.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/35.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/36.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/37.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/38.png">
+<meta property="og:updated_time" content="2018-03-29T07:32:17.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Ansible介绍及安装部署">
-<meta name="twitter:description" content="运维工具作为一个Linux运维人员，需要了解大量的运维工具，并熟知这些工具的差异，能够熟练运用这些工具去解决一些手动重复的劳动，一方面是避免人工操作失误，另一方面也可以提高工作效率。同时还能将自己从这些重复的工作中解放出来，以便研究更新和更深的技术。运维工具大体上可以分为3类：  OS Provisioning：提供操作系统安装的。PXE，Cobbler(repository,distrituti">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/1.png">
+<meta name="twitter:title" content="MySQL查询和视图">
+<meta name="twitter:description" content="查询的执行路径查询执行路径：先查缓存，缓存未命中交给解析器。MySQL是允许多个用户连接进来的，因此有多个线程，如果每个线程上的用户都发起查询请求，而mysql真正能够执行查询的查询引擎只有一个，所以要排队，要给一个队列。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/25.png">
 
 
 
@@ -140,7 +148,7 @@
   };
 </script>
 
-  <title> Ansible介绍及安装部署 | jkzhao's blog </title>
+  <title> MySQL查询和视图 | jkzhao's blog </title>
 </head>
 <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 
@@ -333,7 +341,7 @@
             
             
               
-                Ansible介绍及安装部署
+                MySQL查询和视图
               
             
           </h1>
@@ -345,14 +353,14 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-07-05T15:33:54+08:00" content="2017-07-05">
-              2017-07-05
+            <time itemprop="dateCreated" datetime="2018-03-29T09:20:40+08:00" content="2018-03-29">
+              2018-03-29
             </time>
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-07T15:45:27+08:00" content="2017-11-07">
-              2017-11-07
+              <time itemprop="dateUpdated" datetime="2018-03-29T15:32:17+08:00" content="2018-03-29">
+              2018-03-29
               </time>
               </span>
             
@@ -367,8 +375,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
-                    <span itemprop="name">运维自动化</span>
+                  <a href="/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -387,7 +395,7 @@
 
           
           
-             <span id="/2017/07/05/Ansible介绍及安装部署/" class="leancloud_visitors" data-flag-title="Ansible介绍及安装部署">
+             <span id="/2018/03/29/MySQL查询和视图/" class="leancloud_visitors" data-flag-title="MySQL查询和视图">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -411,86 +419,148 @@
       
 
       
-        <h2 id="运维工具"><a href="#运维工具" class="headerlink" title="运维工具"></a>运维工具</h2><p>作为一个Linux运维人员，需要了解大量的运维工具，并熟知这些工具的差异，能够熟练运用这些工具去解决一些手动重复的劳动，一方面是避免人工操作失误，另一方面也可以提高工作效率。同时还能将自己从这些重复的工作中解放出来，以便研究更新和更深的技术。<br>运维工具大体上可以分为3类：</p>
+        <h2 id="查询的执行路径"><a href="#查询的执行路径" class="headerlink" title="查询的执行路径"></a>查询的执行路径</h2><p><strong>查询执行路径：</strong>先查缓存，缓存未命中交给解析器。MySQL是允许多个用户连接进来的，因此有多个线程，如果每个线程上的用户都发起查询请求，而mysql真正能够执行查询的查询引擎只有一个，所以要排队，要给一个队列。<a id="more"></a>所以就需要有查询执行计划和查询执行引擎。但是查询执行引擎不能直接去硬盘取数据，所以查询引擎是接收查询执行计划传递而来的优化器优化后的查询语句，它负责转换为对应表的存储引擎的API调用。后面的数据获取是由对应的存储引擎负责到磁盘上取数据，并将数据返回给执行引擎，最后在层层返回给客户端，返回客户端之前有可能要判断要不要缓存下来。比如查当前系统时间，这个就没必要缓存下来了。查询的结果缓存与否，用户是可以定义的。当然不是说用户想缓存就一定能缓存。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/25.png" alt=""></p>
+<h2 id="MySQL的查询操作"><a href="#MySQL的查询操作" class="headerlink" title="MySQL的查询操作"></a>MySQL的查询操作</h2><p>使用SELECT语句查询数据，查询语句的通用语法格式：</p>
+<pre><code>SELECT values_to_dispaly
+FROM table_name 
+WHERE expression
+GROUP BY how_to_group
+HAVING expression
+ORDER BY how_to_sort
+LIMIT row_count;
+</code></pre><p>查询又可分为：</p>
 <ul>
-<li>OS Provisioning：提供操作系统安装的。PXE，Cobbler(repository,distritution,profile)。</li>
-<li>OS Config：cfengine、puppet、saltstack、chef、func、Task Excute工具(fabric、func、saltstack)</li>
-<li>Deployment：capistranoc、fabric</li>
+<li>单表查询：也称为简单查询</li>
+<li>多表查询：也称为连接查询</li>
+<li>联合查询</li>
 </ul>
-<p>而Ansible是一款较新的工具，可以实现OS Config、Task Excute和Deployment。<br><a id="more"></a><br>运维工具实现远程管理的两种方式：<br>1.有agent：puppet、saltstack、func<br>2.agentless：ansible、fabric</p>
-<h2 id="Ansible特性"><a href="#Ansible特性" class="headerlink" title="Ansible特性"></a>Ansible特性</h2><ul>
-<li>学习曲线平缓；</li>
-<li>不需要agent；</li>
-<li>没有有线状态图，没有次序，我们自己定义动作间的依赖关系就行，任何一个任务出错会很快出错，你可以立即进行修改；</li>
-<li>没有代理；</li>
-<li>没有服务端；</li>
-<li>依赖ssh来工作，无需ssl，也就无需证书等功能；</li>
-<li>模块可以使用任何编程语言来编写，包括shell脚本；</li>
-<li>默认使用ssh工作；</li>
-<li>支持多级的解决方案。</li>
-</ul>
-<h2 id="Ansible架构图和核心组件"><a href="#Ansible架构图和核心组件" class="headerlink" title="Ansible架构图和核心组件"></a>Ansible架构图和核心组件</h2><p><strong>架构图：</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/1.png" alt=""><br>ansible是Python编写的，Python有一个模块叫paramiko，paramiko组件能够实现并行地基于ssh协议远程连接至各主机的库。ansible就是用了paramiko。</p>
-<p><strong>核心组件：</strong></p>
+<p>选择和投影：就是关系代数，其实SELECT主要就包括这两方面</p>
 <ul>
-<li>ansible core：ansible核心。</li>
-<li>host inventory：主机池，或叫主机列表，主机归档文件。</li>
-<li>core modules：ansible核心模块。</li>
-<li>custom modules：用户可以自定义模块</li>
-<li>playbook：将多个任务写在一个yaml格式的配置文件中。支持使用Python的jinjia2来定义模板。同一个playbook应用带同一台主机上，无论你应用多少次，他们的结果都是相等的，不会重复执行。这种特性我们称为幂等性。</li>
-<li>connect plugins：连接插件</li>
-<li>plugins：其他的一些插件，比如email、logging等等。</li>
+<li>投影：挑选要显示的字段</li>
+<li>选择：挑选符合条件的行<ul>
+<li>投影：SELECT 字段1, 字段2, … FROM tb_name; <ul>
+<li>SELECT * FROM tb_name;</li>
 </ul>
-<h2 id="安装Ansible"><a href="#安装Ansible" class="headerlink" title="安装Ansible"></a>安装Ansible</h2><p>可以选择源码编译安装或者yum安装。ansible的rpm包在epel源中，事先安装好epel源。我这里实验环境是CentOS 7。<br>安装：</p>
-<pre><code># yum install ansible -y
-</code></pre><p>查看安装的rpm包里有哪些文件：</p>
-<pre><code># rpm -ql ansible | more
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/2.png" alt=""><br>ansible配置文件：/etc/ansible/ansible.cfg<br>inventory文件：/etc/ansible/hosts</p>
-<h2 id="演示使用示例"><a href="#演示使用示例" class="headerlink" title="演示使用示例"></a>演示使用示例</h2><h3 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h3><table>
-<thead>
-<tr>
-<th>主机名</th>
-<th>操作系统版本</th>
-<th>IP地址</th>
-<th>安装软件</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>node1</td>
-<td>CentOS 7.0</td>
-<td>172.16.7.151</td>
-<td>ansible-noarh-2.2.0.0-4.el7</td>
-</tr>
-<tr>
-<td>node2</td>
-<td>CentOS 7.0</td>
-<td>172.16.7.152</td>
-<td>无</td>
-</tr>
-<tr>
-<td>node3</td>
-<td>CentOS 7.0</td>
-<td>172.16.7.153</td>
-<td>无</td>
-</tr>
-</tbody>
-</table>
-<h3 id="配置Ansible主机登录其他主机使用密钥登录"><a href="#配置Ansible主机登录其他主机使用密钥登录" class="headerlink" title="配置Ansible主机登录其他主机使用密钥登录"></a>配置Ansible主机登录其他主机使用密钥登录</h3><p>由于Ansible默认使用ssh管理主机，所以首先需要配置Ansible所在主机登录其他被管理主机不需要输入密码。在node1主机上执行如下命令：</p>
-<pre><code>[root@node1 ~]# ssh-keygen -t rsa -P &apos;&apos;
-[root@node1 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@172.16.7.151
-[root@node1 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@172.16.7.152
-[root@node1 ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub root@172.16.7.153
-</code></pre><h3 id="定义主机"><a href="#定义主机" class="headerlink" title="定义主机"></a>定义主机</h3><p>每一个主机可以使用主机名，也可以使用ip地址。也可以把多个主机定义到一个组里。比如：</p>
-<pre><code>[root@node1 ~]# vim /etc/ansible/hosts
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/3.png" alt=""></p>
-<h3 id="使用模块"><a href="#使用模块" class="headerlink" title="使用模块"></a>使用模块</h3><p>Ansible是依赖模块进行工作的，里面有大量的模块帮助我们去完成任务。比如使用command模块：</p>
-<pre><code>[root@node1 ~]# ansible 172.16.7.152 -m command -a &quot;date&quot;
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/4.png" alt=""><br>如上，在执行任务时，可以指定IP，也可以指定组名，ansible有个默认的组叫all，代表/etc/ansible/hosts文件里的所有主机。</p>
-<p>列出当前主机可以使用的ansible模块：</p>
-<pre><code>[root@node1 ~]# ansible-doc -l
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/5.png" alt=""><br>常用的模块有：user、yum、copy、command等。如果想知道某个模块怎么使用的，比如想知道yum怎么用：</p>
-<pre><code>[root@node1 ~]# ansible-doc -s yum
-</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Ansible/6.png" alt=""></p>
+</li>
+<li>选择：SELECT 字段1, … FROM tb_name WHERE 子句; <ul>
+<li>WHERE 子句就是布尔条件表达式</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="WHERE子句"><a href="#WHERE子句" class="headerlink" title="WHERE子句"></a>WHERE子句</h3><p>HERE 子句就是布尔条件表达式</p>
+<ul>
+<li><p>布尔条件表达式操作符： </p>
+<ul>
+<li>=</li>
+<li>&lt;=&gt; ：空值安全比较。与空比较值的安全方式，跟空值比较不会产生意外情况的等值比较。和上面那个一样都是等值比较。</li>
+<li>&lt;&gt; ：不等于</li>
+<li>&lt;</li>
+<li>&lt;=</li>
+<li>&gt;</li>
+<li><blockquote>
+<p>=</p>
+</blockquote>
+</li>
+<li><p>IS NULL ：判断一个字段的值是否为空。</p>
+</li>
+<li><p>IS NOT NULL</p>
+</li>
+<li><p>LIKE: 支持的通配符: %(任意长度的任意字符)， _（任意单个字符） 。<br>【注意】:能用等值比较或不等值比较，就尽量不要用LIKE。因为它的性能要差得多。</p>
+</li>
+<li><p>RLIKE(REGEXP): 支持使用正则表达式 。<br>【注意】:性能比较低。LIKE和RLIKE是用来做字符串比较的，千万不要拿来做数值比较。</p>
+</li>
+<li><p>IN: 判断指定字段的值是否在给定在列表中。</p>
+</li>
+<li><p>BETWEEN … AND …: 位于指定的范围之间 。</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>【示例1】：NULL示例</strong></p>
+<pre><code>mysql&gt; CREATE TABLE `students` (`SID` int(100), `Name` varchar(50) NOT NULL, `Age` TINYINT UNSIGNED NOT NULL, `Gender` ENUM(&apos;M&apos;,&apos;F&apos;) NOT NULL DEFAULT &apos;M&apos;, `Tutor` varchar(50), PRIMARY KEY(`SID`));
+Query OK, 0 rows affected (0.04 sec)
+
+mysql&gt; INSERT INTO `students` VALUES (1,&apos;tom&apos;,13,&apos;M&apos;,&apos;Song Jiang&apos;);
+Query OK, 1 row affected (0.00 sec)
+
+mysql&gt; INSERT INTO `students` VALUES (2,&apos;jerry&apos;,14,&apos;F&apos;,&apos;Jiabaoyu&apos;); 
+Query OK, 1 row affected (0.01 sec)
+
+mysql&gt; INSERT INTO `students` VALUES (3,&apos;jack&apos;,14,&apos;M&apos;,&apos;JinJiao&apos;);
+Query OK, 1 row affected (0.01 sec)
+
+mysql&gt; INSERT INTO `students` VALUES (4,&apos;Lucy&apos;,14,&apos;F&apos;,NULL);
+Query OK, 1 row affected (0.00 sec)
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/26.png" alt=""></p>
+<p><strong>【示例2】：LIKE示例</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/27.png" alt=""></p>
+<p><strong>【示例3】：RLIKE示例</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/28.png" alt=""></p>
+<p><strong>【示例4】：IN示例</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/29.png" alt=""></p>
+<p><strong>【示例5】：BETWEEN … AND示例</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/30.png" alt=""></p>
+<p>组合条件测试： 逻辑操作符组合多个条件。</p>
+<ul>
+<li>NOT, 可以用 ! 表示。</li>
+<li>AND, 可以用&amp;&amp;表示</li>
+<li>OR, 可以用 || 表示</li>
+</ul>
+<h3 id="聚合函数"><a href="#聚合函数" class="headerlink" title="聚合函数"></a>聚合函数</h3><p>聚合函数是mysql内置的。<br><strong>SUM(), AVG(), MAX(), MIN(), COUNT()</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/31.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/32.png" alt=""></p>
+<h3 id="分组"><a href="#分组" class="headerlink" title="分组"></a>分组</h3><p><strong>GROUP BY</strong>。在聚合函数使用时，往往伴随着分组的使用，然后对一组进行聚合。分组的目的主要是来用聚合。我们可以在GROUP BY之前使用WHERE子句做条件过滤。具体前面写的通用查询格式。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/33.png" alt=""></p>
+<h3 id="HAVING子句"><a href="#HAVING子句" class="headerlink" title="HAVING子句"></a>HAVING子句</h3><p>对GROUP BY、聚合函数查出的结果做条件过滤用HAVING子句。</p>
+<pre><code>mysql&gt; ALTER TABLE students ADD column `ClassID` int(10);
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql&gt; UPDATE students SET ClassID=1 WHERE Name=&apos;Tom&apos;;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql&gt; UPDATE students SET ClassID=1 WHERE Name=&apos;Jerry&apos;;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql&gt; UPDATE students SET ClassID=1 WHERE Name=&apos;Jack&apos;;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql&gt; UPDATE students SET ClassID=2 WHERE Name=&apos;Lucy&apos;;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/34.png" alt=""></p>
+<h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><p><strong>ORDER BY。</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/35.png" alt=""></p>
+<h3 id="LIMIT"><a href="#LIMIT" class="headerlink" title="LIMIT"></a>LIMIT</h3><p><strong>【注意】:有的时候为了简单的判断工作，我们只需要查询结果返回一部分结果，这时候可以使用LIMIT子句。</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/36.png" alt=""></p>
+<h3 id="总结SELECT几种惯常用法"><a href="#总结SELECT几种惯常用法" class="headerlink" title="总结SELECT几种惯常用法"></a>总结SELECT几种惯常用法</h3><pre><code>SELECT ...
+FROM ...
+ORDER BY ...
+
+SELECT ...
+FROM ...
+GROUP BY ...
+HAVING ...
+
+SELECT ...
+FROM ...
+WHERE ...
+
+SELECT ...
+
+SELECT ...
+FROM ...
+WHERE ...
+GROUP BY ...
+LIMIT ...
+
+SELECT ...
+FROM ...
+HAVING ...
+</code></pre><h3 id="SELECT语句的执行流程"><a href="#SELECT语句的执行流程" class="headerlink" title="SELECT语句的执行流程"></a>SELECT语句的执行流程</h3><pre><code>FROM clause --&gt; WHERE clause --&gt; GROUP BY --&gt; HAVING clause --&gt; ORDER BY ... --&gt; SELECT --&gt; LIMIT
+</code></pre><p><strong>【注意】:where子句不能使用聚合函数</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/37.png" alt=""></p>
+<p>【补充】：SELECT语句:</p>
+<ul>
+<li>DISTINCT：指定的结果相同的只显示一次；</li>
+<li>SQL_CACHE：缓存于查询缓存中；</li>
+<li>SQL_NO_CACHE：不缓存查询结果。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/38.png" alt=""></li>
+</ul>
 
       
     </div>
@@ -512,7 +582,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Ansible/" rel="tag"><i class="fa fa-tag"></i>Ansible</a>
+            <a href="/tags/MySQL/" rel="tag"><i class="fa fa-tag"></i>MySQL</a>
           
         </div>
       
@@ -521,17 +591,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/07/01/FlumeNG介绍及安装部署/" rel="next" title="FlumeNG介绍及安装部署">
-                <i class="fa fa-chevron-left"></i> FlumeNG介绍及安装部署
+              <a href="/2018/03/26/MySQL数据库及表管理/" rel="next" title="MySQL数据库及表管理">
+                <i class="fa fa-chevron-left"></i> MySQL数据库及表管理
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/07/07/Ansible常见模块介绍/" rel="prev" title="Ansible常见模块介绍">
-                Ansible常见模块介绍 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -688,7 +754,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#运维工具"><span class="nav-number">1.</span> <span class="nav-text">运维工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ansible特性"><span class="nav-number">2.</span> <span class="nav-text">Ansible特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ansible架构图和核心组件"><span class="nav-number">3.</span> <span class="nav-text">Ansible架构图和核心组件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Ansible"><span class="nav-number">4.</span> <span class="nav-text">安装Ansible</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#演示使用示例"><span class="nav-number">5.</span> <span class="nav-text">演示使用示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境信息"><span class="nav-number">5.1.</span> <span class="nav-text">环境信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Ansible主机登录其他主机使用密钥登录"><span class="nav-number">5.2.</span> <span class="nav-text">配置Ansible主机登录其他主机使用密钥登录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定义主机"><span class="nav-number">5.3.</span> <span class="nav-text">定义主机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用模块"><span class="nav-number">5.4.</span> <span class="nav-text">使用模块</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#查询的执行路径"><span class="nav-number">1.</span> <span class="nav-text">查询的执行路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL的查询操作"><span class="nav-number">2.</span> <span class="nav-text">MySQL的查询操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#WHERE子句"><span class="nav-number">2.1.</span> <span class="nav-text">WHERE子句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#聚合函数"><span class="nav-number">2.2.</span> <span class="nav-text">聚合函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分组"><span class="nav-number">2.3.</span> <span class="nav-text">分组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HAVING子句"><span class="nav-number">2.4.</span> <span class="nav-text">HAVING子句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#排序"><span class="nav-number">2.5.</span> <span class="nav-text">排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LIMIT"><span class="nav-number">2.6.</span> <span class="nav-text">LIMIT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结SELECT几种惯常用法"><span class="nav-number">2.7.</span> <span class="nav-text">总结SELECT几种惯常用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SELECT语句的执行流程"><span class="nav-number">2.8.</span> <span class="nav-text">SELECT语句的执行流程</span></a></li></ol></li></ol></div>
             
           </div>
         </section>

@@ -122,7 +122,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/22.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/23.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/24.png">
-<meta property="og:updated_time" content="2018-03-26T02:52:51.000Z">
+<meta property="og:updated_time" content="2018-03-26T02:58:27.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL数据库及表管理">
 <meta name="twitter:description" content="MySQL中字符大小写1、SQL关键字及函数名不区分字符大小写； 但是为了提高缓存命中率，无论你使用大写或小写，风格上要一致。">
@@ -355,7 +355,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-03-26T10:52:51+08:00" content="2018-03-26">
+              <time itemprop="dateUpdated" datetime="2018-03-26T10:58:27+08:00" content="2018-03-26">
               2018-03-26
               </time>
               </span>
@@ -460,13 +460,14 @@ ALTER {DATABASE|SCHEMA} db_name [DEFAULT] [CHARACTER SET=&apos;&apos;] [DEFAULT]
 <pre><code>mysql&gt; CREATE TABLE `t3`(Name VARCHAR(50) NOT NULL, Age TINYINT UNSIGNED NOT NULL, PRIMARY KEY(Name,Age)) ENGINE=&apos;MyISAM&apos;;
 Query OK, 0 rows affected (0.00 sec)
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/18.png" alt=""></p>
-<pre><code>AUTO_INCREMENT [=] value
-[DEFAULT] CHARACTER SET [=] charset_name
-[DEFAULT] COLLATE [=] collation_name
-COMMENT [=] &apos;string&apos;   #表的注释。如果表名不足以描述表的功能的话，给表加注释是一个好的习惯。
-DELAY_KEY_WRITE [=] {0 | 1}   ——延迟键写入。这一项在一定程度上能够提升性能的，但是有可能会影响查询。索引是加速查询的，但索引会降低写操作性能，为什么？因为我们更新表时必然得重建索引。所以一个修改非常频繁的表，其索引几乎是无效的。因为索引会经常被重建，索引的大量重建会导致性能很低。这就需要延迟键写入，把跟索引相关的信息几个合并起来，过一次会儿写入。
-ROW_FORMAT [=] {DEFAULT|DYNAMIC|FIXED|COMPRESSED|REDUNDANT|COMPACT}
-TABLESPACE tablespace_name [STORAGE {DISK|MEMORY|DEFAULT}]  #指定表空间。MySQL的表主要有两种类型，一种是MyISAM表，一种是InnoDB表。对于InnoDB表来说，如果使用默认的存储方式，我们可以通过TABLESPACE来指定多个共享表空间。如果是独立的表空间存储方式，也可以通过TABLESPACE来指定表空间名字。
+<pre><code>[table_options]
+    AUTO_INCREMENT [=] value
+    [DEFAULT] CHARACTER SET [=] charset_name
+    [DEFAULT] COLLATE [=] collation_name
+    COMMENT [=] &apos;string&apos;   #表的注释。如果表名不足以描述表的功能的话，给表加注释是一个好的习惯。
+    DELAY_KEY_WRITE [=] {0 | 1}   ——延迟键写入。这一项在一定程度上能够提升性能的，但是有可能会影响查询。索引是加速查询的，但索引会降低写操作性能，为什么？因为我们更新表时必然得重建索引。所以一个修改非常频繁的表，其索引几乎是无效的。因为索引会经常被重建，索引的大量重建会导致性能很低。这就需要延迟键写入，把跟索引相关的信息几个合并起来，过一次会儿写入。
+    ROW_FORMAT [=] {DEFAULT|DYNAMIC|FIXED|COMPRESSED|REDUNDANT|COMPACT}
+    TABLESPACE tablespace_name [STORAGE {DISK|MEMORY|DEFAULT}]  #指定表空间。MySQL的表主要有两种类型，一种是MyISAM表，一种是InnoDB表。对于InnoDB表来说，如果使用默认的存储方式，我们可以通过TABLESPACE来指定多个共享表空间。如果是独立的表空间存储方式，也可以通过TABLESPACE来指定表空间名字。
 </code></pre><p><strong>MyISAM表，每张表有三个文件，都位于数据库目录中：</strong></p>
 <ul>
 <li>tb_name.frm: 表结构定义</li>
@@ -510,16 +511,13 @@ innodb_file_per_table=ON
 <p><strong>2.删除字段</strong></p>
 <pre><code>DROP [COLUMN] col_name
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/23.png" alt=""></p>
-<p><strong>3.修改字段</strong></p>
-<ul>
-<li><p>仅修改字段名称</p>
-<p>  CHANGE [COLUMN] old_col_name new_col_name column_definition<br>  [FIRST|AFTER col_name]</p>
-</li>
-<li><p>修改字段类型及属性等</p>
-<p>  MODIFY [COLUMN] col_name column_definition<br>  [FIRST | AFTER col_name]</p>
-</li>
-</ul>
-<h4 id="修改约束、键或索引等"><a href="#修改约束、键或索引等" class="headerlink" title="修改约束、键或索引等"></a>修改约束、键或索引等</h4><pre><code>ADD {INDEX|KEY} [index_name]
+<p><strong>3.修改字段</strong><br>(1)仅修改字段名称</p>
+<pre><code>CHANGE [COLUMN] old_col_name new_col_name column_definition
+[FIRST|AFTER col_name]
+</code></pre><p>(2)修改字段类型及属性等</p>
+<pre><code>MODIFY [COLUMN] col_name column_definition
+[FIRST | AFTER col_name]
+</code></pre><h4 id="修改约束、键或索引等"><a href="#修改约束、键或索引等" class="headerlink" title="修改约束、键或索引等"></a>修改约束、键或索引等</h4><pre><code>ADD {INDEX|KEY} [index_name]
 [index_type] (index_col_name,...) [index_option] ...
 </code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/24.png" alt=""></p>
 <h4 id="表改名"><a href="#表改名" class="headerlink" title="表改名"></a>表改名</h4><p>使用ALTER命令：RENAME [TO|AS] new_tbl_name</p>
@@ -565,6 +563,10 @@ Query OK, 0 rows affected (0.03 sec)
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/29/MySQL查询和视图/" rel="prev" title="MySQL查询和视图">
+                MySQL查询和视图 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -634,7 +636,7 @@ Query OK, 0 rows affected (0.03 sec)
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">64</span>
+              <span class="site-state-item-count">65</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -767,7 +769,7 @@ Query OK, 0 rows affected (0.03 sec)
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共169.6k字</span>
+  <span class="post-count">博客全站共170.8k字</span>
 </div>
 
         
