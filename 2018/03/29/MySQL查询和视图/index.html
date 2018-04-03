@@ -126,7 +126,30 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/36.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/37.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/38.png">
-<meta property="og:updated_time" content="2018-03-29T07:32:17.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/39.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/40.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/41.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/42.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/43.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/44.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/45.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/46.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/47.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/48.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/49.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/50.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/51.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/52.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/53.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/54.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/55.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/56.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/57.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/58.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/59.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/60.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/61.png">
+<meta property="og:updated_time" content="2018-04-03T06:23:16.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL查询和视图">
 <meta name="twitter:description" content="查询的执行路径查询执行路径：先查缓存，缓存未命中交给解析器。MySQL是允许多个用户连接进来的，因此有多个线程，如果每个线程上的用户都发起查询请求，而mysql真正能够执行查询的查询引擎只有一个，所以要排队，要给一个队列。">
@@ -359,8 +382,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-03-29T15:32:17+08:00" content="2018-03-29">
-              2018-03-29
+              <time itemprop="dateUpdated" datetime="2018-04-03T14:23:16+08:00" content="2018-04-03">
+              2018-04-03
               </time>
               </span>
             
@@ -561,7 +584,317 @@ HAVING ...
 <li>SQL_CACHE：缓存于查询缓存中；</li>
 <li>SQL_NO_CACHE：不缓存查询结果。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/38.png" alt=""></li>
 </ul>
+<h2 id="多表查询"><a href="#多表查询" class="headerlink" title="多表查询"></a>多表查询</h2><p>联结查询：事先将两张或多张表join，根据join的结果进行查询。<br>为什么会有多表查询？数据库设计要求降低冗余。如果一个数据我们来回存了n次，就建议拆分成两张表，并且在两张表中都有的字段建立关联关系。</p>
+<p>下面先初始化数据，导入一个sql脚本，用于举例子。脚本内容如下：</p>
+<pre><code>CREATE DATABASE /*!32312 IF NOT EXISTS*/ `test` /*!40100 DEFAULT CHARACTER SET utf8 */;
 
+USE `test`;
+
+--
+-- Table structure for table `classes`
+--
+
+DROP TABLE IF EXISTS `classes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `classes` (
+  `ClassID` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
+  `Class` varchar(100) DEFAULT NULL,
+  `NumOfStu` smallint(5) unsigned DEFAULT NULL,
+  PRIMARY KEY (`ClassID`)
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `classes`
+--
+
+LOCK TABLES `classes` WRITE;
+/*!40000 ALTER TABLE `classes` DISABLE KEYS */;
+INSERT INTO `classes` VALUES (1,&apos;Shaolin Pai&apos;,10),(2,&apos;Emei Pai&apos;,7),(3,&apos;QingCheng Pai&apos;,11),(4,&apos;Wudang Pai&apos;,12),(5,&apos;Riyue Shenjiao&apos;,31),(6,&apos;Lianshan Pai&apos;,27),(7,&apos;Ming Jiao&apos;,27),(8,&apos;Xiaoyao Pai&apos;,15);
+/*!40000 ALTER TABLE `classes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `coc`
+--
+
+DROP TABLE IF EXISTS `coc`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `coc` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `ClassID` tinyint(3) unsigned NOT NULL,
+  `CourseID` smallint(5) unsigned DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `coc`
+--
+
+LOCK TABLES `coc` WRITE;
+/*!40000 ALTER TABLE `coc` DISABLE KEYS */;
+INSERT INTO `coc` VALUES (1,1,2),(2,1,5),(3,2,2),(4,2,6),(5,3,1),(6,3,7),(7,4,5),(8,4,2),(9,5,1),(10,5,9),(11,6,3),(12,6,4),(13,7,4),(14,7,3);
+/*!40000 ALTER TABLE `coc` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `courses`
+--
+
+DROP TABLE IF EXISTS `courses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `courses` (
+  `CourseID` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `Course` varchar(100) NOT NULL,
+  PRIMARY KEY (`CourseID`)
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `courses`
+--
+
+LOCK TABLES `courses` WRITE;
+/*!40000 ALTER TABLE `courses` DISABLE KEYS */;
+INSERT INTO `courses` VALUES (1,&apos;Hamo Gong&apos;),(2,&apos;Kuihua Baodian&apos;),(3,&apos;Jinshe Jianfa&apos;),(4,&apos;Taiji Quan&apos;),(5,&apos;Daiyu Zanghua&apos;),(6,&apos;Weituo Zhang&apos;),(7,&apos;Dagou Bangfa&apos;);
+/*!40000 ALTER TABLE `courses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `scores`
+--
+
+DROP TABLE IF EXISTS `scores`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `scores` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `StuID` int(10) unsigned NOT NULL,
+  `CourseID` smallint(5) unsigned NOT NULL,
+  `Score` tinyint(3) unsigned DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `scores`
+--
+
+LOCK TABLES `scores` WRITE;
+/*!40000 ALTER TABLE `scores` DISABLE KEYS */;
+INSERT INTO `scores` VALUES (1,1,2,77),(2,1,6,93),(3,2,2,47),(4,2,5,97),(5,3,2,88),(6,3,6,75),(7,4,5,71),(8,4,2,89),(9,5,1,39),(10,5,7,63),(11,6,1,96),(12,7,1,86),(13,7,7,83),(14,8,4,57),(15,8,3,93);
+/*!40000 ALTER TABLE `scores` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `students`
+--
+
+DROP TABLE IF EXISTS `students`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `students` (
+  `StuID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Name` varchar(50) NOT NULL,
+  `Age` tinyint(3) unsigned NOT NULL,
+  `Gender` enum(&apos;F&apos;,&apos;M&apos;) NOT NULL,
+  `ClassID` tinyint(3) unsigned DEFAULT NULL,
+  `TeacherID` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`StuID`)
+) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `students`
+--
+
+LOCK TABLES `students` WRITE;
+/*!40000 ALTER TABLE `students` DISABLE KEYS */;
+INSERT INTO `students` VALUES (1,&apos;Shi Zhongyu&apos;,22,&apos;M&apos;,2,3),(2,&apos;Shi Potian&apos;,22,&apos;M&apos;,1,7),(3,&apos;Xie Yanke&apos;,53,&apos;M&apos;,2,16),(4,&apos;Ding Dian&apos;,32,&apos;M&apos;,4,4),(5,&apos;Yu Yutong&apos;,26,&apos;M&apos;,3,1),(6,&apos;Shi Qing&apos;,46,&apos;M&apos;,5,NULL),(7,&apos;Xi Ren&apos;,19,&apos;F&apos;,3,NULL),(8,&apos;Lin Daiyu&apos;,17,&apos;F&apos;,7,NULL),(9,&apos;Ren Yingying&apos;,20,&apos;F&apos;,6,NULL),(10,&apos;Yue Lingshan&apos;,19,&apos;F&apos;,3,NULL),(11,&apos;Yuan Chengzhi&apos;,23,&apos;M&apos;,6,NULL),(12,&apos;Wen Qingqing&apos;,19,&apos;F&apos;,1,NULL),(13,&apos;Tian Boguang&apos;,33,&apos;M&apos;,2,NULL),(14,&apos;Lu Wushuang&apos;,17,&apos;F&apos;,3,NULL),(15,&apos;Duan Yu&apos;,19,&apos;M&apos;,4,NULL),(16,&apos;Xu Zhu&apos;,21,&apos;M&apos;,1,NULL),(17,&apos;Lin Chong&apos;,25,&apos;M&apos;,4,NULL),(18,&apos;Hua Rong&apos;,23,&apos;M&apos;,7,NULL),(19,&apos;Xue Baochai&apos;,18,&apos;F&apos;,6,NULL),(20,&apos;Diao Chan&apos;,19,&apos;F&apos;,7,NULL),(21,&apos;Huang Yueying&apos;,22,&apos;F&apos;,6,NULL),(22,&apos;Xiao Qiao&apos;,20,&apos;F&apos;,1,NULL),(23,&apos;Ma Chao&apos;,23,&apos;M&apos;,4,NULL),(24,&apos;Xu Xian&apos;,27,&apos;M&apos;,NULL,NULL),(25,&apos;Sun Dasheng&apos;,100,&apos;M&apos;,NULL,NULL);
+/*!40000 ALTER TABLE `students` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `teachers`
+--
+
+DROP TABLE IF EXISTS `teachers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `teachers` (
+  `TID` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `Name` varchar(100) NOT NULL,
+  `Age` tinyint(3) unsigned NOT NULL,
+  `Gender` enum(&apos;F&apos;,&apos;M&apos;) DEFAULT NULL,
+  PRIMARY KEY (`TID`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `teachers`
+--
+
+LOCK TABLES `teachers` WRITE;
+/*!40000 ALTER TABLE `teachers` DISABLE KEYS */;
+INSERT INTO `teachers` VALUES (1,&apos;Song Jiang&apos;,45,&apos;M&apos;),(2,&apos;Zhang Sanfeng&apos;,94,&apos;M&apos;),(3,&apos;Miejue Shitai&apos;,77,&apos;F&apos;),(4,&apos;Lin Chaoying&apos;,93,&apos;F&apos;);
+/*!40000 ALTER TABLE `teachers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `toc`
+--
+
+DROP TABLE IF EXISTS `toc`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `toc` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `CourseID` smallint(5) unsigned DEFAULT NULL,
+  `TID` smallint(5) unsigned DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `toc`
+--
+
+LOCK TABLES `toc` WRITE;
+/*!40000 ALTER TABLE `toc` DISABLE KEYS */;
+/*!40000 ALTER TABLE `toc` ENABLE KEYS */;
+UNLOCK TABLES;
+</code></pre><p><strong>join的方式：</strong><br><strong>1.cross join: 交叉联结。多项式相乘。效率极低，很少用。</strong><br>(a+b)(c+d+e)=ac+ad+ae+bc+bd+be</p>
+<p><strong>2.自然联结：内连接，等值连接。</strong><br>等值连接:</p>
+<pre><code>mysql&gt; SELECT * FROM students, classes WHERE students.ClassID = classes.ClassID;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/39.png" alt=""></p>
+<p><strong>3.外联结：</strong></p>
+<ul>
+<li>左外联结：只保留出现在左外连接运算之前（左边）的关系中的元组(元组就是记录)；<br>left_tb LEFT JOIN right_tb ON 连接条件(通常是一种等值比较)</li>
+<li>右外联结：只保留出现在右外连接运算之后（右边）的关系中的元组；left_tb RIGHT JOIN right_tb ON 连接条件</li>
+<li>全外联结：左右都出现，保留关系中的每一个元组。对应于右外连接来讲，左侧没有的左侧留空；对应于左外链接来讲，右侧没有的右留空。但是mysql是不支持全外联结。</li>
+</ul>
+<p>【示例】：左外连接</p>
+<pre><code>mysql&gt; SELECT s.Name,c.Class FROM students AS s LEFT JOIN classes AS c ON s.ClassID=c.ClassID;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/40.png" alt=""></p>
+<p>【示例】：右外连接</p>
+<pre><code>mysql&gt; SELECT s.Name,c.Class FROM students AS s RIGHT JOIN classes AS c ON s.ClassID=c.ClassID;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/41.png" alt=""></p>
+<p><strong>4.自联结：自己连接自己。</strong></p>
+<pre><code>mysql&gt; SELECT t.Name,s.Name FROM students AS s,students AS t WHERE s.StuID = t.TeacherID;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/42.png" alt=""></p>
+<p><strong>别名：</strong>当表名、字段名太长时，或者为了区分，可以起个别名。使用AS<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/43.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/44.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/45.png" alt=""></p>
+<p><strong>【示例】：</strong><br> 1、显示前5位同学的姓名、课程及成绩；</p>
+<pre><code>mysql&gt; SELECT Name,Course FROM students AS s,courses AS c,coc WHERE s.ClassID = coc.ClassID AND coc.CourseID = c.CourseID AND s.StuID &lt; 5;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/46.png" alt=""></p>
+<pre><code>mysql&gt; SELECT Name,Course,Score FROM students AS s,courses AS c,coc,scores AS ss WHERE s.ClassID = coc.ClassID AND coc.CourseID = c.CourseID AND s.StuID &lt; 5 AND s.StuID=ss.StuID;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/47.png" alt=""><br>但是由于scores表的StuID有重复，导致上面的s.StuID=ss.StuID条件挑选出来有重复，所以还要加一个条件。</p>
+<pre><code>mysql&gt; SELECT Name,Course,Score FROM students AS s,courses AS c,coc,scores AS ss WHERE s.ClassID = coc.ClassID AND coc.CourseID = c.CourseID AND s.StuID &lt; 5 AND s.StuID=ss.StuID AND coc.CourseID=ss.CourseID;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/48.png" alt=""></p>
+<p>2、求前8位同学每位同学自己两门课的平均成绩，并按降序排列；</p>
+<pre><code>mysql&gt; SELECT Name,AVG(Score) FROM students AS s,courses AS c,coc,scores AS ss WHERE s.ClassID = coc.ClassID AND coc.CourseID = c.CourseID AND s.StuID&lt;=8 AND s.StuID=ss.StuID AND coc.CourseID=ss.CourseID GROUP BY Name ORDER BY AVG(Score) DESC;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/49.png" alt=""></p>
+<h2 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h2><p>【思考】：如何显示其年龄大于平均年龄的同学的名字？<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/50.png" alt=""><br>子查询：在查询中嵌套的查询。</p>
+<h3 id="用于WHERE中的子查询"><a href="#用于WHERE中的子查询" class="headerlink" title="用于WHERE中的子查询"></a>用于WHERE中的子查询</h3><p><strong>1、用于比较表达式中的子查询</strong><br>子查询的返回值只能有一个；</p>
+<pre><code>mysql&gt; SELECT Name,Age FROM students WHERE Age &gt; (SELECT AVG(Age) FROM students GROUP BY Gender); 
+ERROR 1242 (21000): Subquery returns more than 1 row
+</code></pre><p><strong>2、用于EXISTS中的子查询</strong><br>判断存在与否</p>
+<p><strong>3、用于IN中的子查询</strong><br>判断存在于指定列表中</p>
+<h3 id="用于FROM中的子查询"><a href="#用于FROM中的子查询" class="headerlink" title="用于FROM中的子查询"></a>用于FROM中的子查询</h3><pre><code>SELECT alias.col,... FROM (SELECT clause) AS alias WHERE condition  
+mysql&gt; SELECT s.Name,s.Age,s.Gender FROM (SELECT * FROM students WHERE Gender=&apos;M&apos;) AS s WHERE s.Age &gt; 25;
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/51.png" alt=""></p>
+<p><strong>【注意】：MySQL不擅长于子查询：应该避免使用子查询。</strong></p>
+<p><strong>【总结】：MySQL的联结查询及子查询</strong></p>
+<ul>
+<li><p>联结</p>
+<ul>
+<li>交叉联结</li>
+<li>内联结</li>
+<li>外联结<ul>
+<li>左外</li>
+<li>右外</li>
+</ul>
+</li>
+<li>自联结</li>
+</ul>
+</li>
+<li><p>子查询</p>
+<ul>
+<li>用于WHERE中的子查询<ul>
+<li>用于条件比较：子查询只能一个值</li>
+<li>用于IN：子查询可以返回多个值</li>
+<li>EXISTS：子查询可以返回多个值</li>
+</ul>
+</li>
+<li>用于FROM子句的子查询</li>
+</ul>
+</li>
+</ul>
+<h2 id="MySQL的联合查询"><a href="#MySQL的联合查询" class="headerlink" title="MySQL的联合查询"></a>MySQL的联合查询</h2><p>把两个或多个查询语句的结果合并成一个结果进行输出。</p>
+<pre><code>SELECT clauase UNION SELECT clause UNION ...
+</code></pre><p>【示例】：</p>
+<pre><code>mysql&gt; SELECT Name,Age FROM teachers UNION SELECT Name,Age FROM students;
+</code></pre><p>所谓索引有用，就是查询条件上面有索引，比如下例，你在姓名上创建索引，根据年龄来查找是没用的。</p>
+<pre><code>mysql&gt; SELECT Name,Age FROM students WHERE Age &gt; 25;
+</code></pre><p>查询表中是否有索引：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/52.png" alt=""></p>
+<p>查看一个查询语句是否用到索引：</p>
+<pre><code>mysql&gt; EXPLAIN SELECT Name,Age FROM students WHERE Age &gt; 25\G
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/53.png" alt=""></p>
+<p>在某个字段上添加一个索引，然后再来查看这个查询是否用到索引：</p>
+<pre><code>mysql&gt; ALTER TABLE students ADD INDEX (Age);
+mysql&gt; SHOW INDEXES FROM students;
+mysql&gt; EXPLAIN SELECT Name,Age FROM students WHERE Age &gt; 25\G
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/54.png" alt=""></p>
+<h2 id="MySQL视图"><a href="#MySQL视图" class="headerlink" title="MySQL视图"></a>MySQL视图</h2><p>视图就是一虚表，MySQL对视图的支持很有限，因为MySQL支持子查询很有限。</p>
+<p>【示例】：</p>
+<pre><code>mysql&gt; GRANT ALL on hellodb.students TO &apos;testuser&apos;@&apos;172.%.%.%&apos; IDENTIFIED BY &apos;testpass&apos;;
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; GRANT ALL on hellodb.students TO &apos;testuser&apos;@&apos;localhost&apos; IDENTIFIED BY &apos;testpass&apos;;          
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.00 sec)
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/55.png" alt=""><br>为什么会出现这样的情况？</p>
+<pre><code>In many default installations, all users have all privileges on tables within any database called test or beginning with test_.
+</code></pre><p>所以我这边重新导入上面的数据，并将数据库名字命名为hellodb。然后删除上面的两个用户，并且重新授权。</p>
+<pre><code>mysql&gt; use mysql
+Database changed
+mysql&gt; DELETE FROM user WHERE user=&apos;testuser&apos;;
+Query OK, 2 rows affected (0.00 sec)
+
+mysql&gt; FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; GRANT ALL on hellodb.students TO &apos;testuser&apos;@&apos;172.%.%.%&apos; IDENTIFIED BY &apos;testpass&apos;;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql&gt; GRANT ALL on hellodb.students TO &apos;testuser&apos;@&apos;localhost&apos; IDENTIFIED BY &apos;testpass&apos;; 
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.00 sec)
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/56.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/57.png" alt=""></p>
+<p>其实授权的时候可以指定只给看表的某几个字段，但是用户用DESC students还是能看到这两个字段的定义。所以如果我们要想让用户意识到这两个用户不存在怎么办？这就是视图的意义了。创建一个虚表。授权视图给用户。</p>
+<p><strong>视图：存储下来的SELECT语句； 说白了就是把SELECT语句当表来用。</strong><br>【注意】:你什么时候用，它什么时候才执行，平时是没有的。因为存下来的是SELECT语句，不是SELECT查询的结果。当然，Oracle支持物化视图，MySQL不支持。</p>
+<pre><code>mysql&gt; HELP CREATE VIEW
+Name: &apos;CREATE VIEW&apos;
+Description:
+Syntax:
+CREATE
+    [OR REPLACE]
+    [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
+    [DEFINER = { user | CURRENT_USER }]
+    [SQL SECURITY { DEFINER | INVOKER }]
+    VIEW view_name [(column_list)]
+    AS select_statement
+    [WITH [CASCADED | LOCAL] CHECK OPTION]
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/58.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/59.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/60.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/61.png" alt=""></p>
+<p>删除视图：</p>
+<pre><code>mysql&gt; DROP VIEW stu;
+Query OK, 0 rows affected (0.00 sec)
+</code></pre>
       
     </div>
 
@@ -598,6 +931,10 @@ HAVING ...
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/02/MySQL-DML/" rel="prev" title="MySQL DML">
+                MySQL DML <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -667,7 +1004,7 @@ HAVING ...
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">65</span>
+              <span class="site-state-item-count">66</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -754,7 +1091,7 @@ HAVING ...
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#查询的执行路径"><span class="nav-number">1.</span> <span class="nav-text">查询的执行路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL的查询操作"><span class="nav-number">2.</span> <span class="nav-text">MySQL的查询操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#WHERE子句"><span class="nav-number">2.1.</span> <span class="nav-text">WHERE子句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#聚合函数"><span class="nav-number">2.2.</span> <span class="nav-text">聚合函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分组"><span class="nav-number">2.3.</span> <span class="nav-text">分组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HAVING子句"><span class="nav-number">2.4.</span> <span class="nav-text">HAVING子句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#排序"><span class="nav-number">2.5.</span> <span class="nav-text">排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LIMIT"><span class="nav-number">2.6.</span> <span class="nav-text">LIMIT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结SELECT几种惯常用法"><span class="nav-number">2.7.</span> <span class="nav-text">总结SELECT几种惯常用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SELECT语句的执行流程"><span class="nav-number">2.8.</span> <span class="nav-text">SELECT语句的执行流程</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#查询的执行路径"><span class="nav-number">1.</span> <span class="nav-text">查询的执行路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL的查询操作"><span class="nav-number">2.</span> <span class="nav-text">MySQL的查询操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#WHERE子句"><span class="nav-number">2.1.</span> <span class="nav-text">WHERE子句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#聚合函数"><span class="nav-number">2.2.</span> <span class="nav-text">聚合函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分组"><span class="nav-number">2.3.</span> <span class="nav-text">分组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HAVING子句"><span class="nav-number">2.4.</span> <span class="nav-text">HAVING子句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#排序"><span class="nav-number">2.5.</span> <span class="nav-text">排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LIMIT"><span class="nav-number">2.6.</span> <span class="nav-text">LIMIT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结SELECT几种惯常用法"><span class="nav-number">2.7.</span> <span class="nav-text">总结SELECT几种惯常用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SELECT语句的执行流程"><span class="nav-number">2.8.</span> <span class="nav-text">SELECT语句的执行流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多表查询"><span class="nav-number">3.</span> <span class="nav-text">多表查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#子查询"><span class="nav-number">4.</span> <span class="nav-text">子查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#用于WHERE中的子查询"><span class="nav-number">4.1.</span> <span class="nav-text">用于WHERE中的子查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用于FROM中的子查询"><span class="nav-number">4.2.</span> <span class="nav-text">用于FROM中的子查询</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL的联合查询"><span class="nav-number">5.</span> <span class="nav-text">MySQL的联合查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL视图"><span class="nav-number">6.</span> <span class="nav-text">MySQL视图</span></a></li></ol></div>
             
           </div>
         </section>
@@ -800,7 +1137,7 @@ HAVING ...
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共170.8k字</span>
+  <span class="post-count">博客全站共173.3k字</span>
 </div>
 
         

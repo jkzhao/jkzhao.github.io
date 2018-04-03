@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-03-29T07:32:17.000Z</updated>
+  <updated>2018-04-02T10:25:25.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,27 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>MySQL DML</title>
+    <link href="http://yoursite.com/2018/04/02/MySQL-DML/"/>
+    <id>http://yoursite.com/2018/04/02/MySQL-DML/</id>
+    <published>2018-04-02T10:25:25.000Z</published>
+    <updated>2018-04-02T10:25:25.000Z</updated>
+    
+    <content type="html"></content>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
     <title>MySQL查询和视图</title>
     <link href="http://yoursite.com/2018/03/29/MySQL%E6%9F%A5%E8%AF%A2%E5%92%8C%E8%A7%86%E5%9B%BE/"/>
     <id>http://yoursite.com/2018/03/29/MySQL查询和视图/</id>
     <published>2018-03-29T01:20:40.000Z</published>
-    <updated>2018-03-29T07:32:17.000Z</updated>
+    <updated>2018-04-03T06:23:16.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;查询的执行路径&quot;&gt;&lt;a href=&quot;#查询的执行路径&quot; class=&quot;headerlink&quot; title=&quot;查询的执行路径&quot;&gt;&lt;/a&gt;查询的执行路径&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;查询执行路径：&lt;/strong&gt;先查缓存，缓存未命中交给解析器。MySQL是允许多个用户连接进来的，因此有多个线程，如果每个线程上的用户都发起查询请求，而mysql真正能够执行查询的查询引擎只有一个，所以要排队，要给一个队列。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;所以就需要有查询执行计划和查询执行引擎。但是查询执行引擎不能直接去硬盘取数据，所以查询引擎是接收查询执行计划传递而来的优化器优化后的查询语句，它负责转换为对应表的存储引擎的API调用。后面的数据获取是由对应的存储引擎负责到磁盘上取数据，并将数据返回给执行引擎，最后在层层返回给客户端，返回客户端之前有可能要判断要不要缓存下来。比如查当前系统时间，这个就没必要缓存下来了。查询的结果缓存与否，用户是可以定义的。当然不是说用户想缓存就一定能缓存。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/25.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h2 id=&quot;MySQL的查询操作&quot;&gt;&lt;a href=&quot;#MySQL的查询操作&quot; class=&quot;headerlink&quot; title=&quot;MySQL的查询操作&quot;&gt;&lt;/a&gt;MySQL的查询操作&lt;/h2&gt;&lt;p&gt;使用SELECT语句查询数据，查询语句的通用语法格式：&lt;/p&gt;
@@ -164,7 +180,317 @@ HAVING ...
 &lt;li&gt;SQL_CACHE：缓存于查询缓存中；&lt;/li&gt;
 &lt;li&gt;SQL_NO_CACHE：不缓存查询结果。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/38.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
 &lt;/ul&gt;
-</content>
+&lt;h2 id=&quot;多表查询&quot;&gt;&lt;a href=&quot;#多表查询&quot; class=&quot;headerlink&quot; title=&quot;多表查询&quot;&gt;&lt;/a&gt;多表查询&lt;/h2&gt;&lt;p&gt;联结查询：事先将两张或多张表join，根据join的结果进行查询。&lt;br&gt;为什么会有多表查询？数据库设计要求降低冗余。如果一个数据我们来回存了n次，就建议拆分成两张表，并且在两张表中都有的字段建立关联关系。&lt;/p&gt;
+&lt;p&gt;下面先初始化数据，导入一个sql脚本，用于举例子。脚本内容如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;CREATE DATABASE /*!32312 IF NOT EXISTS*/ `test` /*!40100 DEFAULT CHARACTER SET utf8 */;
+
+USE `test`;
+
+--
+-- Table structure for table `classes`
+--
+
+DROP TABLE IF EXISTS `classes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `classes` (
+  `ClassID` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
+  `Class` varchar(100) DEFAULT NULL,
+  `NumOfStu` smallint(5) unsigned DEFAULT NULL,
+  PRIMARY KEY (`ClassID`)
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `classes`
+--
+
+LOCK TABLES `classes` WRITE;
+/*!40000 ALTER TABLE `classes` DISABLE KEYS */;
+INSERT INTO `classes` VALUES (1,&amp;apos;Shaolin Pai&amp;apos;,10),(2,&amp;apos;Emei Pai&amp;apos;,7),(3,&amp;apos;QingCheng Pai&amp;apos;,11),(4,&amp;apos;Wudang Pai&amp;apos;,12),(5,&amp;apos;Riyue Shenjiao&amp;apos;,31),(6,&amp;apos;Lianshan Pai&amp;apos;,27),(7,&amp;apos;Ming Jiao&amp;apos;,27),(8,&amp;apos;Xiaoyao Pai&amp;apos;,15);
+/*!40000 ALTER TABLE `classes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `coc`
+--
+
+DROP TABLE IF EXISTS `coc`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `coc` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `ClassID` tinyint(3) unsigned NOT NULL,
+  `CourseID` smallint(5) unsigned DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `coc`
+--
+
+LOCK TABLES `coc` WRITE;
+/*!40000 ALTER TABLE `coc` DISABLE KEYS */;
+INSERT INTO `coc` VALUES (1,1,2),(2,1,5),(3,2,2),(4,2,6),(5,3,1),(6,3,7),(7,4,5),(8,4,2),(9,5,1),(10,5,9),(11,6,3),(12,6,4),(13,7,4),(14,7,3);
+/*!40000 ALTER TABLE `coc` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `courses`
+--
+
+DROP TABLE IF EXISTS `courses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `courses` (
+  `CourseID` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `Course` varchar(100) NOT NULL,
+  PRIMARY KEY (`CourseID`)
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `courses`
+--
+
+LOCK TABLES `courses` WRITE;
+/*!40000 ALTER TABLE `courses` DISABLE KEYS */;
+INSERT INTO `courses` VALUES (1,&amp;apos;Hamo Gong&amp;apos;),(2,&amp;apos;Kuihua Baodian&amp;apos;),(3,&amp;apos;Jinshe Jianfa&amp;apos;),(4,&amp;apos;Taiji Quan&amp;apos;),(5,&amp;apos;Daiyu Zanghua&amp;apos;),(6,&amp;apos;Weituo Zhang&amp;apos;),(7,&amp;apos;Dagou Bangfa&amp;apos;);
+/*!40000 ALTER TABLE `courses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `scores`
+--
+
+DROP TABLE IF EXISTS `scores`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `scores` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `StuID` int(10) unsigned NOT NULL,
+  `CourseID` smallint(5) unsigned NOT NULL,
+  `Score` tinyint(3) unsigned DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `scores`
+--
+
+LOCK TABLES `scores` WRITE;
+/*!40000 ALTER TABLE `scores` DISABLE KEYS */;
+INSERT INTO `scores` VALUES (1,1,2,77),(2,1,6,93),(3,2,2,47),(4,2,5,97),(5,3,2,88),(6,3,6,75),(7,4,5,71),(8,4,2,89),(9,5,1,39),(10,5,7,63),(11,6,1,96),(12,7,1,86),(13,7,7,83),(14,8,4,57),(15,8,3,93);
+/*!40000 ALTER TABLE `scores` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `students`
+--
+
+DROP TABLE IF EXISTS `students`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `students` (
+  `StuID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Name` varchar(50) NOT NULL,
+  `Age` tinyint(3) unsigned NOT NULL,
+  `Gender` enum(&amp;apos;F&amp;apos;,&amp;apos;M&amp;apos;) NOT NULL,
+  `ClassID` tinyint(3) unsigned DEFAULT NULL,
+  `TeacherID` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`StuID`)
+) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `students`
+--
+
+LOCK TABLES `students` WRITE;
+/*!40000 ALTER TABLE `students` DISABLE KEYS */;
+INSERT INTO `students` VALUES (1,&amp;apos;Shi Zhongyu&amp;apos;,22,&amp;apos;M&amp;apos;,2,3),(2,&amp;apos;Shi Potian&amp;apos;,22,&amp;apos;M&amp;apos;,1,7),(3,&amp;apos;Xie Yanke&amp;apos;,53,&amp;apos;M&amp;apos;,2,16),(4,&amp;apos;Ding Dian&amp;apos;,32,&amp;apos;M&amp;apos;,4,4),(5,&amp;apos;Yu Yutong&amp;apos;,26,&amp;apos;M&amp;apos;,3,1),(6,&amp;apos;Shi Qing&amp;apos;,46,&amp;apos;M&amp;apos;,5,NULL),(7,&amp;apos;Xi Ren&amp;apos;,19,&amp;apos;F&amp;apos;,3,NULL),(8,&amp;apos;Lin Daiyu&amp;apos;,17,&amp;apos;F&amp;apos;,7,NULL),(9,&amp;apos;Ren Yingying&amp;apos;,20,&amp;apos;F&amp;apos;,6,NULL),(10,&amp;apos;Yue Lingshan&amp;apos;,19,&amp;apos;F&amp;apos;,3,NULL),(11,&amp;apos;Yuan Chengzhi&amp;apos;,23,&amp;apos;M&amp;apos;,6,NULL),(12,&amp;apos;Wen Qingqing&amp;apos;,19,&amp;apos;F&amp;apos;,1,NULL),(13,&amp;apos;Tian Boguang&amp;apos;,33,&amp;apos;M&amp;apos;,2,NULL),(14,&amp;apos;Lu Wushuang&amp;apos;,17,&amp;apos;F&amp;apos;,3,NULL),(15,&amp;apos;Duan Yu&amp;apos;,19,&amp;apos;M&amp;apos;,4,NULL),(16,&amp;apos;Xu Zhu&amp;apos;,21,&amp;apos;M&amp;apos;,1,NULL),(17,&amp;apos;Lin Chong&amp;apos;,25,&amp;apos;M&amp;apos;,4,NULL),(18,&amp;apos;Hua Rong&amp;apos;,23,&amp;apos;M&amp;apos;,7,NULL),(19,&amp;apos;Xue Baochai&amp;apos;,18,&amp;apos;F&amp;apos;,6,NULL),(20,&amp;apos;Diao Chan&amp;apos;,19,&amp;apos;F&amp;apos;,7,NULL),(21,&amp;apos;Huang Yueying&amp;apos;,22,&amp;apos;F&amp;apos;,6,NULL),(22,&amp;apos;Xiao Qiao&amp;apos;,20,&amp;apos;F&amp;apos;,1,NULL),(23,&amp;apos;Ma Chao&amp;apos;,23,&amp;apos;M&amp;apos;,4,NULL),(24,&amp;apos;Xu Xian&amp;apos;,27,&amp;apos;M&amp;apos;,NULL,NULL),(25,&amp;apos;Sun Dasheng&amp;apos;,100,&amp;apos;M&amp;apos;,NULL,NULL);
+/*!40000 ALTER TABLE `students` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `teachers`
+--
+
+DROP TABLE IF EXISTS `teachers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `teachers` (
+  `TID` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `Name` varchar(100) NOT NULL,
+  `Age` tinyint(3) unsigned NOT NULL,
+  `Gender` enum(&amp;apos;F&amp;apos;,&amp;apos;M&amp;apos;) DEFAULT NULL,
+  PRIMARY KEY (`TID`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `teachers`
+--
+
+LOCK TABLES `teachers` WRITE;
+/*!40000 ALTER TABLE `teachers` DISABLE KEYS */;
+INSERT INTO `teachers` VALUES (1,&amp;apos;Song Jiang&amp;apos;,45,&amp;apos;M&amp;apos;),(2,&amp;apos;Zhang Sanfeng&amp;apos;,94,&amp;apos;M&amp;apos;),(3,&amp;apos;Miejue Shitai&amp;apos;,77,&amp;apos;F&amp;apos;),(4,&amp;apos;Lin Chaoying&amp;apos;,93,&amp;apos;F&amp;apos;);
+/*!40000 ALTER TABLE `teachers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `toc`
+--
+
+DROP TABLE IF EXISTS `toc`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `toc` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `CourseID` smallint(5) unsigned DEFAULT NULL,
+  `TID` smallint(5) unsigned DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `toc`
+--
+
+LOCK TABLES `toc` WRITE;
+/*!40000 ALTER TABLE `toc` DISABLE KEYS */;
+/*!40000 ALTER TABLE `toc` ENABLE KEYS */;
+UNLOCK TABLES;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;join的方式：&lt;/strong&gt;&lt;br&gt;&lt;strong&gt;1.cross join: 交叉联结。多项式相乘。效率极低，很少用。&lt;/strong&gt;&lt;br&gt;(a+b)(c+d+e)=ac+ad+ae+bc+bd+be&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2.自然联结：内连接，等值连接。&lt;/strong&gt;&lt;br&gt;等值连接:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT * FROM students, classes WHERE students.ClassID = classes.ClassID;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/39.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3.外联结：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;左外联结：只保留出现在左外连接运算之前（左边）的关系中的元组(元组就是记录)；&lt;br&gt;left_tb LEFT JOIN right_tb ON 连接条件(通常是一种等值比较)&lt;/li&gt;
+&lt;li&gt;右外联结：只保留出现在右外连接运算之后（右边）的关系中的元组；left_tb RIGHT JOIN right_tb ON 连接条件&lt;/li&gt;
+&lt;li&gt;全外联结：左右都出现，保留关系中的每一个元组。对应于右外连接来讲，左侧没有的左侧留空；对应于左外链接来讲，右侧没有的右留空。但是mysql是不支持全外联结。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;【示例】：左外连接&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT s.Name,c.Class FROM students AS s LEFT JOIN classes AS c ON s.ClassID=c.ClassID;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/40.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;【示例】：右外连接&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT s.Name,c.Class FROM students AS s RIGHT JOIN classes AS c ON s.ClassID=c.ClassID;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/41.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;4.自联结：自己连接自己。&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT t.Name,s.Name FROM students AS s,students AS t WHERE s.StuID = t.TeacherID;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/42.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;别名：&lt;/strong&gt;当表名、字段名太长时，或者为了区分，可以起个别名。使用AS&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/43.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/44.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/45.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;【示例】：&lt;/strong&gt;&lt;br&gt; 1、显示前5位同学的姓名、课程及成绩；&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,Course FROM students AS s,courses AS c,coc WHERE s.ClassID = coc.ClassID AND coc.CourseID = c.CourseID AND s.StuID &amp;lt; 5;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/46.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,Course,Score FROM students AS s,courses AS c,coc,scores AS ss WHERE s.ClassID = coc.ClassID AND coc.CourseID = c.CourseID AND s.StuID &amp;lt; 5 AND s.StuID=ss.StuID;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/47.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;但是由于scores表的StuID有重复，导致上面的s.StuID=ss.StuID条件挑选出来有重复，所以还要加一个条件。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,Course,Score FROM students AS s,courses AS c,coc,scores AS ss WHERE s.ClassID = coc.ClassID AND coc.CourseID = c.CourseID AND s.StuID &amp;lt; 5 AND s.StuID=ss.StuID AND coc.CourseID=ss.CourseID;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/48.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;2、求前8位同学每位同学自己两门课的平均成绩，并按降序排列；&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,AVG(Score) FROM students AS s,courses AS c,coc,scores AS ss WHERE s.ClassID = coc.ClassID AND coc.CourseID = c.CourseID AND s.StuID&amp;lt;=8 AND s.StuID=ss.StuID AND coc.CourseID=ss.CourseID GROUP BY Name ORDER BY AVG(Score) DESC;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/49.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;子查询&quot;&gt;&lt;a href=&quot;#子查询&quot; class=&quot;headerlink&quot; title=&quot;子查询&quot;&gt;&lt;/a&gt;子查询&lt;/h2&gt;&lt;p&gt;【思考】：如何显示其年龄大于平均年龄的同学的名字？&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/50.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;子查询：在查询中嵌套的查询。&lt;/p&gt;
+&lt;h3 id=&quot;用于WHERE中的子查询&quot;&gt;&lt;a href=&quot;#用于WHERE中的子查询&quot; class=&quot;headerlink&quot; title=&quot;用于WHERE中的子查询&quot;&gt;&lt;/a&gt;用于WHERE中的子查询&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1、用于比较表达式中的子查询&lt;/strong&gt;&lt;br&gt;子查询的返回值只能有一个；&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,Age FROM students WHERE Age &amp;gt; (SELECT AVG(Age) FROM students GROUP BY Gender); 
+ERROR 1242 (21000): Subquery returns more than 1 row
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2、用于EXISTS中的子查询&lt;/strong&gt;&lt;br&gt;判断存在与否&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3、用于IN中的子查询&lt;/strong&gt;&lt;br&gt;判断存在于指定列表中&lt;/p&gt;
+&lt;h3 id=&quot;用于FROM中的子查询&quot;&gt;&lt;a href=&quot;#用于FROM中的子查询&quot; class=&quot;headerlink&quot; title=&quot;用于FROM中的子查询&quot;&gt;&lt;/a&gt;用于FROM中的子查询&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;SELECT alias.col,... FROM (SELECT clause) AS alias WHERE condition  
+mysql&amp;gt; SELECT s.Name,s.Age,s.Gender FROM (SELECT * FROM students WHERE Gender=&amp;apos;M&amp;apos;) AS s WHERE s.Age &amp;gt; 25;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/51.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;【注意】：MySQL不擅长于子查询：应该避免使用子查询。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;【总结】：MySQL的联结查询及子查询&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;联结&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;交叉联结&lt;/li&gt;
+&lt;li&gt;内联结&lt;/li&gt;
+&lt;li&gt;外联结&lt;ul&gt;
+&lt;li&gt;左外&lt;/li&gt;
+&lt;li&gt;右外&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;自联结&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;子查询&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;用于WHERE中的子查询&lt;ul&gt;
+&lt;li&gt;用于条件比较：子查询只能一个值&lt;/li&gt;
+&lt;li&gt;用于IN：子查询可以返回多个值&lt;/li&gt;
+&lt;li&gt;EXISTS：子查询可以返回多个值&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;用于FROM子句的子查询&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;MySQL的联合查询&quot;&gt;&lt;a href=&quot;#MySQL的联合查询&quot; class=&quot;headerlink&quot; title=&quot;MySQL的联合查询&quot;&gt;&lt;/a&gt;MySQL的联合查询&lt;/h2&gt;&lt;p&gt;把两个或多个查询语句的结果合并成一个结果进行输出。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;SELECT clauase UNION SELECT clause UNION ...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【示例】：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,Age FROM teachers UNION SELECT Name,Age FROM students;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;所谓索引有用，就是查询条件上面有索引，比如下例，你在姓名上创建索引，根据年龄来查找是没用的。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,Age FROM students WHERE Age &amp;gt; 25;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查询表中是否有索引：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/52.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;查看一个查询语句是否用到索引：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; EXPLAIN SELECT Name,Age FROM students WHERE Age &amp;gt; 25\G
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/53.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;在某个字段上添加一个索引，然后再来查看这个查询是否用到索引：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; ALTER TABLE students ADD INDEX (Age);
+mysql&amp;gt; SHOW INDEXES FROM students;
+mysql&amp;gt; EXPLAIN SELECT Name,Age FROM students WHERE Age &amp;gt; 25\G
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/54.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;MySQL视图&quot;&gt;&lt;a href=&quot;#MySQL视图&quot; class=&quot;headerlink&quot; title=&quot;MySQL视图&quot;&gt;&lt;/a&gt;MySQL视图&lt;/h2&gt;&lt;p&gt;视图就是一虚表，MySQL对视图的支持很有限，因为MySQL支持子查询很有限。&lt;/p&gt;
+&lt;p&gt;【示例】：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; GRANT ALL on hellodb.students TO &amp;apos;testuser&amp;apos;@&amp;apos;172.%.%.%&amp;apos; IDENTIFIED BY &amp;apos;testpass&amp;apos;;
+Query OK, 0 rows affected (0.00 sec)
+mysql&amp;gt; GRANT ALL on hellodb.students TO &amp;apos;testuser&amp;apos;@&amp;apos;localhost&amp;apos; IDENTIFIED BY &amp;apos;testpass&amp;apos;;          
+Query OK, 0 rows affected (0.00 sec)
+mysql&amp;gt; FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/55.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;为什么会出现这样的情况？&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;In many default installations, all users have all privileges on tables within any database called test or beginning with test_.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;所以我这边重新导入上面的数据，并将数据库名字命名为hellodb。然后删除上面的两个用户，并且重新授权。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; use mysql
+Database changed
+mysql&amp;gt; DELETE FROM user WHERE user=&amp;apos;testuser&amp;apos;;
+Query OK, 2 rows affected (0.00 sec)
+
+mysql&amp;gt; FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&amp;gt; GRANT ALL on hellodb.students TO &amp;apos;testuser&amp;apos;@&amp;apos;172.%.%.%&amp;apos; IDENTIFIED BY &amp;apos;testpass&amp;apos;;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql&amp;gt; GRANT ALL on hellodb.students TO &amp;apos;testuser&amp;apos;@&amp;apos;localhost&amp;apos; IDENTIFIED BY &amp;apos;testpass&amp;apos;; 
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&amp;gt; FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/56.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/57.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;其实授权的时候可以指定只给看表的某几个字段，但是用户用DESC students还是能看到这两个字段的定义。所以如果我们要想让用户意识到这两个用户不存在怎么办？这就是视图的意义了。创建一个虚表。授权视图给用户。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;视图：存储下来的SELECT语句； 说白了就是把SELECT语句当表来用。&lt;/strong&gt;&lt;br&gt;【注意】:你什么时候用，它什么时候才执行，平时是没有的。因为存下来的是SELECT语句，不是SELECT查询的结果。当然，Oracle支持物化视图，MySQL不支持。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; HELP CREATE VIEW
+Name: &amp;apos;CREATE VIEW&amp;apos;
+Description:
+Syntax:
+CREATE
+    [OR REPLACE]
+    [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
+    [DEFINER = { user | CURRENT_USER }]
+    [SQL SECURITY { DEFINER | INVOKER }]
+    VIEW view_name [(column_list)]
+    AS select_statement
+    [WITH [CASCADED | LOCAL] CHECK OPTION]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/58.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/59.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/60.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/61.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;删除视图：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; DROP VIEW stu;
+Query OK, 0 rows affected (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;</content>
     
     <summary type="html">
     
@@ -3188,173 +3514,6 @@ elasticsearch.url: &amp;quot;http://172.16.206.16:9200&amp;quot;
     
     
       <category term="ELK" scheme="http://yoursite.com/tags/ELK/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>EFK收集Kubernetes应用日志</title>
-    <link href="http://yoursite.com/2017/10/12/EFK%E6%94%B6%E9%9B%86Kubernetes%E5%BA%94%E7%94%A8%E6%97%A5%E5%BF%97/"/>
-    <id>http://yoursite.com/2017/10/12/EFK收集Kubernetes应用日志/</id>
-    <published>2017-10-12T06:53:08.000Z</published>
-    <updated>2017-12-04T02:36:46.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;EFK介绍&quot;&gt;&lt;a href=&quot;#EFK介绍&quot; class=&quot;headerlink&quot; title=&quot;EFK介绍&quot;&gt;&lt;/a&gt;EFK介绍&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;Logstash(或者Fluentd)负责收集日志 &lt;/li&gt;
-&lt;li&gt;Elasticsearch存储日志并提供搜索 &lt;/li&gt;
-&lt;li&gt;Kibana负责日志查询和展示&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;官方地址：&lt;a href=&quot;https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch&lt;/a&gt;&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;通过在每台node上部署一个以DaemonSet方式运行的fluentd来收集每台node上的日志。Fluentd将docker日志目录/var/lib/docker/containers和/var/log目录挂载到Pod中，然后Pod会在node节点的/var/log/pods目录中创建新的目录，可以区别不同的容器日志输出，该目录下有一个日志文件链接到/var/lib/docker/contianers目录下的容器日志输出。&lt;/p&gt;
-&lt;h2 id=&quot;配置efk-rbac-yaml文件&quot;&gt;&lt;a href=&quot;#配置efk-rbac-yaml文件&quot; class=&quot;headerlink&quot; title=&quot;配置efk-rbac.yaml文件&quot;&gt;&lt;/a&gt;配置efk-rbac.yaml文件&lt;/h2&gt;&lt;p&gt;EFK服务也需要一个efk-rbac.yaml文件，配置serviceaccount为efk。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 opt]# mkdir efk
-[root@node1 opt]# cd efk
-[root@node1 efk]# vim efk-rbac.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: efk
-  namespace: kube-system
-
----
-
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: efk
-subjects:
-  - kind: ServiceAccount
-    name: efk
-    namespace: kube-system
-roleRef:
-  kind: ClusterRole
-  name: cluster-admin
-  apiGroup: rbac.authorization.k8s.io
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;配置-es-controller-yaml&quot;&gt;&lt;a href=&quot;#配置-es-controller-yaml&quot; class=&quot;headerlink&quot; title=&quot;配置 es-controller.yaml&quot;&gt;&lt;/a&gt;配置 es-controller.yaml&lt;/h2&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;32&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;33&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;34&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;35&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;36&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;37&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;38&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;39&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;40&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;41&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;42&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;43&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;44&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;45&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;46&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;47&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;48&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;49&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;50&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;51&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@node1 efk]# vim es-controller.yaml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apiVersion: v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;kind: ReplicationController&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  name: elasticsearch-logging-v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  namespace: kube-system&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  labels:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    k8s-app: elasticsearch-logging&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    version: v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    kubernetes.io/cluster-service: &amp;quot;true&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    addonmanager.kubernetes.io/mode: Reconcile&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  replicas: 2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  selector:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    k8s-app: elasticsearch-logging&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    version: v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  template:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      labels:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        k8s-app: elasticsearch-logging&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        version: v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        kubernetes.io/cluster-service: &amp;quot;true&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      serviceAccountName: efk&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      containers:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      - image: index.tenxcloud.com/jimmy/elasticsearch:v2.4.1-2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        name: elasticsearch-logging&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        resources:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          # need more cpu upon initialization, therefore burstable class&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          limits:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            cpu: 1000m&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          requests:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            cpu: 100m&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        ports:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        - containerPort: 9200&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          name: db&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          protocol: TCP&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        - containerPort: 9300&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          name: transport&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          protocol: TCP&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        volumeMounts:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        - name: es-persistent-storage&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          mountPath: /data&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        env:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        - name: &amp;quot;NAMESPACE&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          valueFrom:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            fieldRef:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;              fieldPath: metadata.namespace&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      volumes:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      - name: es-persistent-storage&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        emptyDir: &amp;#123;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;h2 id=&quot;配置-es-service-yaml&quot;&gt;&lt;a href=&quot;#配置-es-service-yaml&quot; class=&quot;headerlink&quot; title=&quot;配置 es-service.yaml&quot;&gt;&lt;/a&gt;配置 es-service.yaml&lt;/h2&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@node1 efk]# vim es-service.yaml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apiVersion: v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;kind: Service&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  name: elasticsearch-logging&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  namespace: kube-system&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  labels:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    k8s-app: elasticsearch-logging&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    kubernetes.io/cluster-service: &amp;quot;true&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    addonmanager.kubernetes.io/mode: Reconcile&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    kubernetes.io/name: &amp;quot;Elasticsearch&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  ports:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - port: 9200&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    protocol: TCP&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    targetPort: db&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  selector:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    k8s-app: elasticsearch-logging&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;h2 id=&quot;配置-fluentd-es-ds-yaml&quot;&gt;&lt;a href=&quot;#配置-fluentd-es-ds-yaml&quot; class=&quot;headerlink&quot; title=&quot;配置 fluentd-es-ds.yaml&quot;&gt;&lt;/a&gt;配置 fluentd-es-ds.yaml&lt;/h2&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;32&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;33&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;34&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;35&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;36&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;37&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;38&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;39&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;40&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;41&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;42&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;43&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;44&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;45&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;46&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;47&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;48&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;49&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;50&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;51&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;52&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;53&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;54&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;55&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;56&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;apiVersion: extensions/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;kind: DaemonSet&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  name: fluentd-es-v1.22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  namespace: kube-system&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  labels:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    k8s-app: fluentd-es&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    kubernetes.io/cluster-service: &amp;quot;true&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    addonmanager.kubernetes.io/mode: Reconcile&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    version: v1.22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  template:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      labels:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        k8s-app: fluentd-es&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        kubernetes.io/cluster-service: &amp;quot;true&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        version: v1.22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      # This annotation ensures that fluentd does not get evicted if the node&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      # supports critical pod annotation based priority scheme.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      # Note that this does not guarantee admission on the nodes (#40573).&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      annotations:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        scheduler.alpha.kubernetes.io/critical-pod: &amp;apos;&amp;apos;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    spec:  &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      serviceAccountName: efk&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      containers:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      - name: fluentd-es&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        image: index.tenxcloud.com/jimmy/fluentd-elasticsearch:1.22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        command:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          - &amp;apos;/bin/sh&amp;apos;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          - &amp;apos;-c&amp;apos;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          - &amp;apos;/usr/sbin/td-agent 2&amp;gt;&amp;amp;1 &amp;gt;&amp;gt; /var/log/fluentd.log&amp;apos;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        resources:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          limits:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            memory: 200Mi&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          requests:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            cpu: 100m&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            memory: 200Mi&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        volumeMounts:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        - name: varlog&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          mountPath: /var/log&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        - name: varlibdockercontainers&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          mountPath: /var/lib/docker/containers&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          readOnly: true&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      nodeSelector:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        beta.kubernetes.io/fluentd-ds-ready: &amp;quot;true&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      tolerations:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      - key : &amp;quot;node.alpha.kubernetes.io/ismaster&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        effect: &amp;quot;NoSchedule&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      terminationGracePeriodSeconds: 30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      volumes:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      - name: varlog&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        hostPath:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          path: /var/log&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      - name: varlibdockercontainers&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        hostPath:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          path: /var/lib/docker/containers&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;h2 id=&quot;配置-kibana-controller-yaml&quot;&gt;&lt;a href=&quot;#配置-kibana-controller-yaml&quot; class=&quot;headerlink&quot; title=&quot;配置 kibana-controller.yaml&quot;&gt;&lt;/a&gt;配置 kibana-controller.yaml&lt;/h2&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;32&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;33&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;34&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;35&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;36&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;37&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;38&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;apiVersion: extensions/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;kind: Deployment&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  name: kibana-logging&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  namespace: kube-system&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  labels:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    k8s-app: kibana-logging&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    kubernetes.io/cluster-service: &amp;quot;true&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    addonmanager.kubernetes.io/mode: Reconcile&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  replicas: 1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  selector:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    matchLabels:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      k8s-app: kibana-logging&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  template:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      labels:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        k8s-app: kibana-logging&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      serviceAccountName: efk&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      containers:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      - name: kibana-logging&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        image: index.tenxcloud.com/jimmy/kibana:v4.6.1-1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        resources:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          # keep request = limit to keep this container in guaranteed class&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          limits:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            cpu: 100m&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          requests:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            cpu: 100m&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        env:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          - name: &amp;quot;ELASTICSEARCH_URL&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            value: &amp;quot;http://elasticsearch-logging:9200&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          - name: &amp;quot;KIBANA_BASE_URL&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            value: &amp;quot;/api/v1/proxy/namespaces/kube-system/services/kibana-logging&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        ports:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        - containerPort: 5601&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          name: ui&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          protocol: TCP&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;h2 id=&quot;配置-kibana-service-yaml&quot;&gt;&lt;a href=&quot;#配置-kibana-service-yaml&quot; class=&quot;headerlink&quot; title=&quot;配置 kibana-service.yaml&quot;&gt;&lt;/a&gt;配置 kibana-service.yaml&lt;/h2&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;apiVersion: v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;kind: Service&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  name: kibana-logging&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  namespace: kube-system&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  labels:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    k8s-app: kibana-logging&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    kubernetes.io/cluster-service: &amp;quot;true&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    addonmanager.kubernetes.io/mode: Reconcile&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    kubernetes.io/name: &amp;quot;Kibana&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  ports:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - port: 5601&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    protocol: TCP&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    targetPort: ui&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  selector:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    k8s-app: kibana-logging&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 efk]# ls
-efk-rbac.yaml  es-controller.yaml  es-service.yaml  fluentd-es-ds.yaml  kibana-controller.yaml  kibana-service.yaml
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;给-Node-设置标签&quot;&gt;&lt;a href=&quot;#给-Node-设置标签&quot; class=&quot;headerlink&quot; title=&quot;给 Node 设置标签&quot;&gt;&lt;/a&gt;给 Node 设置标签&lt;/h2&gt;&lt;p&gt;定义 DaemonSet fluentd-es-v1.22 时设置了 nodeSelector beta.kubernetes.io/fluentd-ds-ready=true ，所以需要在期望运行 fluentd 的 Node 上设置该标签；&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 efk]# kubectl label nodes 172.16.7.151 beta.kubernetes.io/fluentd-ds-ready=true
-node &amp;quot;172.16.7.151&amp;quot; labeled
-[root@node1 efk]# kubectl label nodes 172.16.7.152 beta.kubernetes.io/fluentd-ds-ready=true
-node &amp;quot;172.16.7.152&amp;quot; labeled
-[root@node1 efk]# kubectl label nodes 172.16.7.153 beta.kubernetes.io/fluentd-ds-ready=true
-node &amp;quot;172.16.7.153&amp;quot; labeled
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;执行定义文件&quot;&gt;&lt;a href=&quot;#执行定义文件&quot; class=&quot;headerlink&quot; title=&quot;执行定义文件&quot;&gt;&lt;/a&gt;执行定义文件&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;[root@node1 efk]# kubectl create -f .
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;检查执行结果&quot;&gt;&lt;a href=&quot;#检查执行结果&quot; class=&quot;headerlink&quot; title=&quot;检查执行结果&quot;&gt;&lt;/a&gt;检查执行结果&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;[root@node1 efk]# kubectl get deployment -n kube-system|grep kibana
-kibana-logging         1         1         1            1           1h
-
-[root@node1 efk]# kubectl get pods -n kube-system|grep -E &amp;apos;elasticsearch|fluentd|kibana&amp;apos;
-elasticsearch-logging-v1-nw3p3          1/1       Running   0          43m
-elasticsearch-logging-v1-pp89h          1/1       Running   0          43m
-fluentd-es-v1.22-cqd1s                  1/1       Running   0          15m
-fluentd-es-v1.22-f5ljr                  0/1       Error     6          15m
-fluentd-es-v1.22-x24jx                  1/1       Running   0          15m
-kibana-logging-4293390753-kg8kx         1/1       Running   0          1h
-
-[root@node1 efk]# kubectl get service  -n kube-system|grep -E &amp;apos;elasticsearch|kibana&amp;apos;
-elasticsearch-logging   10.254.50.63     &amp;lt;none&amp;gt;        9200/TCP                        1h
-kibana-logging          10.254.169.159   &amp;lt;none&amp;gt;        5601/TCP                        1h
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;kibana Pod 第一次启动时会用&lt;strong&gt;较长时间(10-20分钟)&lt;/strong&gt;来优化和 Cache 状态页面，可以 tailf 该 Pod 的日志观察进度。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 efk]# kubectl logs kibana-logging-4293390753-86h5d -n kube-system -f
-ELASTICSEARCH_URL=http://elasticsearch-logging:9200
-server.basePath: /api/v1/proxy/namespaces/kube-system/services/kibana-logging
-{&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T00:51:31Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;info&amp;quot;,&amp;quot;optimize&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;message&amp;quot;:&amp;quot;Optimizing and caching bundles for kibana and statusPage. This may take a few minutes&amp;quot;}
-{&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:36Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;info&amp;quot;,&amp;quot;optimize&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;message&amp;quot;:&amp;quot;Optimization of bundles for kibana and statusPage complete in 1324.64 seconds&amp;quot;}
-{&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:37Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;status&amp;quot;,&amp;quot;plugin:kibana@1.0.0&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;state&amp;quot;:&amp;quot;green&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Status changed from uninitialized to green - Ready&amp;quot;,&amp;quot;prevState&amp;quot;:&amp;quot;uninitialized&amp;quot;,&amp;quot;prevMsg&amp;quot;:&amp;quot;uninitialized&amp;quot;}
-{&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:38Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;status&amp;quot;,&amp;quot;plugin:elasticsearch@1.0.0&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;state&amp;quot;:&amp;quot;yellow&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Status changed from uninitialized to yellow - Waiting for Elasticsearch&amp;quot;,&amp;quot;prevState&amp;quot;:&amp;quot;uninitialized&amp;quot;,&amp;quot;prevMsg&amp;quot;:&amp;quot;uninitialized&amp;quot;}
-{&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:39Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;status&amp;quot;,&amp;quot;plugin:kbn_vislib_vis_types@1.0.0&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;state&amp;quot;:&amp;quot;green&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Status changed from uninitialized to green - Ready&amp;quot;,&amp;quot;prevState&amp;quot;:&amp;quot;uninitialized&amp;quot;,&amp;quot;prevMsg&amp;quot;:&amp;quot;uninitialized&amp;quot;}
-{&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:39Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;status&amp;quot;,&amp;quot;plugin:markdown_vis@1.0.0&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;state&amp;quot;:&amp;quot;green&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Status changed from uninitialized to green - Ready&amp;quot;,&amp;quot;prevState&amp;quot;:&amp;quot;uninitialized&amp;quot;,&amp;quot;prevMsg&amp;quot;:&amp;quot;uninitialized&amp;quot;}
-{&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:39Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;status&amp;quot;,&amp;quot;plugin:metric_vis@1.0.0&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;state&amp;quot;:&amp;quot;green&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Status changed from uninitialized to green - Ready&amp;quot;,&amp;quot;prevState&amp;quot;:&amp;quot;uninitialized&amp;quot;,&amp;quot;prevMsg&amp;quot;:&amp;quot;uninitialized&amp;quot;}
-{&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:39Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;status&amp;quot;,&amp;quot;plugin:spyModes@1.0.0&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;state&amp;quot;:&amp;quot;green&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Status changed from uninitialized to green - Ready&amp;quot;,&amp;quot;prevState&amp;quot;:&amp;quot;uninitialized&amp;quot;,&amp;quot;prevMsg&amp;quot;:&amp;quot;uninitialized&amp;quot;}
-{&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:40Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;status&amp;quot;,&amp;quot;plugin:statusPage@1.0.0&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;state&amp;quot;:&amp;quot;green&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Status changed from uninitialized to green - Ready&amp;quot;,&amp;quot;prevState&amp;quot;:&amp;quot;uninitialized&amp;quot;,&amp;quot;prevMsg&amp;quot;:&amp;quot;uninitialized&amp;quot;}
-{&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:40Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;status&amp;quot;,&amp;quot;plugin:table_vis@1.0.0&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;state&amp;quot;:&amp;quot;green&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Status changed from uninitialized to green - Ready&amp;quot;,&amp;quot;prevState&amp;quot;:&amp;quot;uninitialized&amp;quot;,&amp;quot;prevMsg&amp;quot;:&amp;quot;uninitialized&amp;quot;}
-{&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:40Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;listening&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;message&amp;quot;:&amp;quot;Server running at http://0.0.0.0:5601&amp;quot;}
-{&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:45Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;status&amp;quot;,&amp;quot;plugin:elasticsearch@1.0.0&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;state&amp;quot;:&amp;quot;yellow&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Status changed from yellow to yellow - No existing Kibana index found&amp;quot;,&amp;quot;prevState&amp;quot;:&amp;quot;yellow&amp;quot;,&amp;quot;prevMsg&amp;quot;:&amp;quot;Waiting for Elasticsearch&amp;quot;}
-{&amp;quot;type&amp;quot;:&amp;quot;log&amp;quot;,&amp;quot;@timestamp&amp;quot;:&amp;quot;2017-10-13T01:13:49Z&amp;quot;,&amp;quot;tags&amp;quot;:[&amp;quot;status&amp;quot;,&amp;quot;plugin:elasticsearch@1.0.0&amp;quot;,&amp;quot;info&amp;quot;],&amp;quot;pid&amp;quot;:5,&amp;quot;state&amp;quot;:&amp;quot;green&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Status changed from yellow to green - Kibana index ready&amp;quot;,&amp;quot;prevState&amp;quot;:&amp;quot;yellow&amp;quot;,&amp;quot;prevMsg&amp;quot;:&amp;quot;No existing Kibana index found&amp;quot;}
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;访问-kibana&quot;&gt;&lt;a href=&quot;#访问-kibana&quot; class=&quot;headerlink&quot; title=&quot;访问 kibana&quot;&gt;&lt;/a&gt;访问 kibana&lt;/h2&gt;&lt;h3 id=&quot;通过-kube-apiserver-访问：获取-kibana-服务-URL&quot;&gt;&lt;a href=&quot;#通过-kube-apiserver-访问：获取-kibana-服务-URL&quot; class=&quot;headerlink&quot; title=&quot;通过 kube-apiserver 访问：获取 kibana 服务 URL&quot;&gt;&lt;/a&gt;通过 kube-apiserver 访问：获取 kibana 服务 URL&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 efk]# kubectl cluster-info
-Kubernetes master is running at https://172.16.7.151:6443
-Elasticsearch is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/elasticsearch-logging
-Heapster is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/heapster
-Kibana is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kibana-logging
-KubeDNS is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kube-dns
-kubernetes-dashboard is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard
-monitoring-grafana is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/monitoring-grafana
-monitoring-influxdb is running at https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/monitoring-influxdb
-
-To further debug and diagnose cluster problems, use &amp;apos;kubectl cluster-info dump&amp;apos;.
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;浏览器访问 URL： &lt;a href=&quot;https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kibana-logging/app/kibana&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://172.16.7.151:6443/api/v1/proxy/namespaces/kube-system/services/kibana-logging/app/kibana&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&quot;通过-kubectl-proxy-访问：创建代理&quot;&gt;&lt;a href=&quot;#通过-kubectl-proxy-访问：创建代理&quot; class=&quot;headerlink&quot; title=&quot;通过 kubectl proxy 访问：创建代理&quot;&gt;&lt;/a&gt;通过 kubectl proxy 访问：创建代理&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@node1 efk]# kubectl proxy --address=&amp;apos;172.16.7.151&amp;apos; --port=8086 --accept-hosts=&amp;apos;^*$&amp;apos; &amp;amp;        
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;浏览器访问 URL：&lt;a href=&quot;http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kibana-logging&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kibana-logging&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/16.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;如果你在这里发现Create按钮是灰色的无法点击，且Time-filed name中没有选项，fluentd要读取/var/log/containers/目录下的log日志，这些日志是从/var/lib/docker/containers/${CONTAINER_ID}/${CONTAINER_ID}-json.log链接过来的，查看你的docker配置，—-log-driver需要设置为json-file格式，默认的可能是journald。&lt;/p&gt;
-&lt;p&gt;查看当前的–log-driver:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# docker version
-Client:
- Version:         1.12.6
- API version:     1.24
- Package version: docker-1.12.6-32.git88a4867.el7.centos.x86_64
- Go version:      go1.7.4
- Git commit:      88a4867/1.12.6
- Built:           Mon Jul  3 16:02:02 2017
- OS/Arch:         linux/amd64
-
-Server:
- Version:         1.12.6
- API version:     1.24
- Package version: docker-1.12.6-32.git88a4867.el7.centos.x86_64
- Go version:      go1.7.4
- Git commit:      88a4867/1.12.6
- Built:           Mon Jul  3 16:02:02 2017
- OS/Arch:         linux/amd64   
-[root@node1 efk]# docker info |grep &amp;apos;Logging Driver&amp;apos;
- WARNING: Usage of loopback devices is strongly discouraged for production use. Use `--storage-opt dm.thinpooldev` to specify a custom block storage device.
-WARNING: bridge-nf-call-ip6tables is disabled
-Logging Driver: journald
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;修改当前版本docker的–log-driver:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# vim /etc/sysconfig/docker
-OPTIONS=&amp;apos;--selinux-enabled --log-driver=json-file --signature-verification=false&amp;apos;
-[root@node1 efk]# systemctl restart docker
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】：本来修改这个参数应该在在/etc/docker/daemon.json文件中添加&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;log-driver&amp;quot;: &amp;quot;json-file&amp;quot;,
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;但是在该版本中，–log-driver是在文件/etc/sysconfig/docker中定义的。&lt;br&gt;在docker-ce版本中，默认的–log-driver是json-file。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;遇到的问题：&lt;/strong&gt;&lt;br&gt;由于之前在/etc/docker/daemon.json中配置–log-driver，重启导致docker程序启动失败，等到后来在/etc/sysconfig/docker配置文件中配置好后，启动docker却发现当前node变成NotReady状态，所有的Pod也变为Unknown状态。查看kubelet状态，发现kubelet程序已经挂掉了。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# kubectl get nodes
-NAME           STATUS     AGE       VERSION
-172.16.7.151   NotReady   28d       v1.6.0
-172.16.7.152   Ready      28d       v1.6.0
-172.16.7.153   Ready      28d       v1.6.0
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动kubelet：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@node1 ~]# systemctl start kubelet
-[root@node1 ~]# kubectl get nodes
-NAME           STATUS    AGE       VERSION
-172.16.7.151   Ready     28d       v1.6.0
-172.16.7.152   Ready     28d       v1.6.0
-172.16.7.153   Ready     28d       v1.6.0
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;浏览器再次访问 kibana URL：&lt;a href=&quot;http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kibana-logging&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.151:8086/api/v1/proxy/namespaces/kube-system/services/kibana-logging&lt;/a&gt;&lt;br&gt;此时就会发现有Create按钮了。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/17.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;在 Settings -&amp;gt; Indices 页面创建一个 index（相当于 mysql 中的一个 database），去掉已经勾选的 &lt;strong&gt;Index contains time-based events&lt;/strong&gt;，使用默认的 &lt;strong&gt;logstash-*&lt;/strong&gt; pattern，点击 Create ;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/18.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;创建Index后，可以在 Discover 下看到 ElasticSearch logging 中汇聚的日志。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/19.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;EFK介绍&quot;&gt;&lt;a href=&quot;#EFK介绍&quot; class=&quot;headerlink&quot; title=&quot;EFK介绍&quot;&gt;&lt;/a&gt;EFK介绍&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;Logstash(或者Fluentd)负责收集日志 &lt;/li&gt;
-&lt;li&gt;Elasticsearch存储日志并提供搜索 &lt;/li&gt;
-&lt;li&gt;Kibana负责日志查询和展示&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;官方地址：&lt;a href=&quot;https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch&lt;/a&gt;&lt;br&gt;
-    
-    </summary>
-    
-      <category term="容器编排" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8%E7%BC%96%E6%8E%92/"/>
-    
-    
-      <category term="Kubernetes" scheme="http://yoursite.com/tags/Kubernetes/"/>
     
   </entry>
   
