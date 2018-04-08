@@ -324,6 +324,140 @@
             
               
                 
+                <a class="post-title-link" href="/2017/07/24/Ansible之roles介绍/" itemprop="url">
+                  Ansible之roles介绍
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-07-24T09:09:22+08:00" content="2017-07-24">
+              2017-07-24
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2017-11-07T15:44:59+08:00" content="2017-11-07">
+              2017-11-07
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/运维自动化/" itemprop="url" rel="index">
+                    <span itemprop="name">运维自动化</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/07/24/Ansible之roles介绍/" class="leancloud_visitors" data-flag-title="Ansible之roles介绍">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="什么场景下会用roles？"><a href="#什么场景下会用roles？" class="headerlink" title="什么场景下会用roles？"></a>什么场景下会用roles？</h2><p>假如我们现在有3个被管理主机，第一个要配置成httpd，第二个要配置成php服务器，第三个要配置成MySQL服务器。我们如何来定义playbook？<br>第一个play用到第一个主机上，用来构建httpd，第二个play用到第二个主机上，用来构建php，第三个play用到第三个主机上，用来构建MySQL。这些个play定义在playbook中比较麻烦，将来也不利于模块化调用，不利于多次调。比如说后来又加进来一个主机，这个第4个主机既是httpd服务器，又是php服务器，我们只能写第4个play，上面写上安装httpd和php。这样playbook中的代码就重复了。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/07/24/Ansible之roles介绍/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2017/07/22/Ansible之tags介绍/" itemprop="url">
                   Ansible之tags介绍
                 </a>
@@ -1527,140 +1661,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/06/20/Elasticsearch介绍及安装部署/" itemprop="url">
-                  Elasticsearch介绍及安装部署
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-06-20T11:29:04+08:00" content="2017-06-20">
-              2017-06-20
-            </time>
-            
-              <span class="post-updated">
-              &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-13T15:44:16+08:00" content="2017-11-13">
-              2017-11-13
-              </time>
-              </span>
-            
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/搜索引擎/" itemprop="url" rel="index">
-                    <span itemprop="name">搜索引擎</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-             <span id="/2017/06/20/Elasticsearch介绍及安装部署/" class="leancloud_visitors" data-flag-title="Elasticsearch介绍及安装部署">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="Elasticsearch介绍"><a href="#Elasticsearch介绍" class="headerlink" title="Elasticsearch介绍"></a>Elasticsearch介绍</h2><p>Elasticsearch是一个分布式搜索服务，提供Restful API，底层基于Lucene，采用多shard的方式保证数据安全，并且提供自动resharding的功能，加之github等大型的站点也采用 Elasticsearch作为其搜索服务。<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/06/20/Elasticsearch介绍及安装部署/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1708,7 +1708,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">66</span>
+              <span class="site-state-item-count">67</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1830,7 +1830,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共173.8k字</span>
+  <span class="post-count">博客全站共178.0k字</span>
 </div>
 
         

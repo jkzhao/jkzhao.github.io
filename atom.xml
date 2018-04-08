@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-04-03T07:23:05.000Z</updated>
+  <updated>2018-04-08T08:30:58.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,176 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL事务及隔离级别</title>
+    <link href="http://yoursite.com/2018/04/05/MySQL%E4%BA%8B%E5%8A%A1%E5%8F%8A%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB/"/>
+    <id>http://yoursite.com/2018/04/05/MySQL事务及隔离级别/</id>
+    <published>2018-04-05T01:17:31.000Z</published>
+    <updated>2018-04-08T08:30:58.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;MySQL逻辑架构&quot;&gt;&lt;a href=&quot;#MySQL逻辑架构&quot; class=&quot;headerlink&quot; title=&quot;MySQL逻辑架构&quot;&gt;&lt;/a&gt;MySQL逻辑架构&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/63.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;我们可以把mysql的架构分为3层：&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1.第一层：连接池或称为线程处理工具。处理用户的连接建立。&lt;/strong&gt;&lt;br&gt;        mysql现在对于线程管理是通过线程池来实现的。一个池子中所能够容纳的水量是有限的，所以一个线程池中所能够容纳的线程数也是有限的。所以mysql启动时事先创建好一个线程池，在这个池子内假如创建了100个空闲线程，来一个用户连接，给它一个线程，当用户连接达到100个，新连接就要排队等待，后面维持一个队列。当某个连接上的用户请求退出后，其对应的线程不会销毁，只会清理数据，还原成原来的样子，再去处理新的用户请求。&lt;br&gt;        所以用户的连接线程在线程池的管理模式中是不会被销毁的，一般是能够实现重用的。所以就避免了频繁的线程创建和删除。&lt;br&gt;        mysql客户端和服务器端通信要通过mysql协议进行通信，协议一般来讲有两种格式。http协议是文本的，我们可以通过telnet连进去手动发送命令的，https协议是二进制的。mysql协议这两种格式都支持。哪种协议会比较高效？二进制的会略微高效一点，所以很多支持两种协议的默认都使用二进制格式。无论是二进制还是文本，都是明文的，只不过你编码成了二进制格式而已，我们只需要一个解码工具，就能把二进制转换为原来的样子了。&lt;br&gt;        为了安全，加密。mysql支持将它的协议基于ssl进行发送的。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2.第二层：mysql核心服务层。是MySQL的核心功能层。&lt;/strong&gt;包括查询解析、分析、优化、缓存以及mysql的所有内置函数(BIF)等。&lt;br&gt;        Parser：解析器，也叫分析器。主要功能是分析查询语句的。首先要做词法分析，要把整个sql语句切割成一个一个的片段，还要做语法分析，看看整个sql语句中有没有语法错误，甚至于还要做语义分析。这些都是由分析器完成。当然，mysql并没有自己开发分析器，有很多著名的开源分析器，yacc和lex，一个做词法分析，一个做语法分析的。mysql借用了这分析器做了二次开发并整合进mysql使用了。&lt;br&gt;        Optimizer：优化器。包括重写查询、决定表的读取顺序(多表查询时调整表的读取顺序)、多表查询时选择一个开销最小的索引。但是我们在查询时，如果你作为用户知道哪个索引更好用，你也可以向mysql发送语句时给它提示以影响mysql决策的。对于mysql来讲，优化器并不关心底层那个表真正使用的存储引擎是什么，但是存储引擎根据其特性的不同所提供的性能表现也不同。但是优化器又不考虑存储引擎，但好在优化器会通过向存储引擎的API发起调用请求让存储引擎返回这种存储引擎下所对应的表的统计数据来判断这个表的查询开销有多大，并基于此做出优化决策。一直在说查询，INSERT和UPDATE都要查询的，我们这里讲的查询是广义上的查询，不仅仅是SELECT。不过，如果你真正执行的是SELECT，mysql还有个内部的工具对这种查询可以发挥效用以提升性能的，就是图中的Query Cache。&lt;br&gt;        Query Cache只对SELECT语句有效。只有SELECT才会被缓存下来。所以如果我们执行的是SELECT语句，服务器每次在解析查询操作之前会去查看缓存中是否命中。所以这对SELECT操作是额外的开销，但是如果命中率足够可靠的话，Query Cache还是很有必要的。怎么查看查询缓存的命中率多高？后面讲到mysql优化时，会讲怎么根据缓存的统计数据来分析命中率的。在命中率的基础上决定到底是否开启缓存。你可以把缓存工作在某种特定模式下，默认mysql都不缓存。只有我们手动明确要缓存语句才缓存。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3.第三层：存储引擎。&lt;/strong&gt;存储引擎的主要工作是真正负责数据的存储和提取的。&lt;/p&gt;
+&lt;h2 id=&quot;MySQL锁&quot;&gt;&lt;a href=&quot;#MySQL锁&quot; class=&quot;headerlink&quot; title=&quot;MySQL锁&quot;&gt;&lt;/a&gt;MySQL锁&lt;/h2&gt;&lt;p&gt;MySQL允许多用户同时连接进来，如果多个用户在访问同一张表的时候，会发生什么问题？比如A用户连接进来修改表A，第二个用户B这时想查询表A中数据能否进行查询？不能查询，怎么达到这个目的呢？你得让B用户的查询操作知道表A正在被某一用户施加写操作。这需要MySQL内在的某些机制完成并发访问控制，而并发访问控制通常基于锁来实现。对于读操作来说，多个用户同时读是没问题的，但是对于写操作是不行的。&lt;/p&gt;
+&lt;h3 id=&quot;MySQL锁-1&quot;&gt;&lt;a href=&quot;#MySQL锁-1&quot; class=&quot;headerlink&quot; title=&quot;MySQL锁&quot;&gt;&lt;/a&gt;MySQL锁&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;1.按执行操作时施加的锁模式来分类：两种类型。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;读锁：又称为共享锁，可以同时读，但是不可以写。读为什么要加锁，因为防止其他人去修改我们正在查询的数据的。&lt;/li&gt;
+&lt;li&gt;写锁：独占锁，排它锁。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;2.按锁粒度划分：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;表锁：table lock。锁定了整张表。开销最小。&lt;/li&gt;
+&lt;li&gt;行锁：row lock。锁定了需要的行。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;粒度越小，开销越大，但并发性越好；&lt;br&gt;粒度越大，开销越小，但并发性越差；&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;3.按锁的实现位置划分：&lt;ul&gt;
+&lt;li&gt;MySQL锁：可以使用显式锁。很多时候我们提到MySQL，是指第二层核心服务层。&lt;/li&gt;
+&lt;li&gt;存储引擎锁：自动进行的（隐式锁）。大多数查询操作都会自动由存储引擎施加锁的。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;如何实现显式锁-在服务器级别显式锁只能是表级锁&quot;&gt;&lt;a href=&quot;#如何实现显式锁-在服务器级别显式锁只能是表级锁&quot; class=&quot;headerlink&quot; title=&quot;如何实现显式锁(在服务器级别显式锁只能是表级锁)&quot;&gt;&lt;/a&gt;如何实现显式锁(在服务器级别显式锁只能是表级锁)&lt;/h3&gt;&lt;p&gt;LOCK TABLES&lt;br&gt;UNLOCK TABLES  #只能一次释放所有表的锁，不能指定表和锁类型。见下面的截图语法。&lt;/p&gt;
+&lt;p&gt;LOCK TABLES&lt;br&gt;    tbl_name lock_type&lt;br&gt;    [, tbl_name lock_type] …&lt;/p&gt;
+&lt;p&gt;锁类型：READ|WRITE&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;【示例1】:演示读锁。&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; use hellodb
+Database changed
+mysql&amp;gt; LOCK TABLES classes READ;
+Query OK, 0 rows affected (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动另一个终端，连接进来：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/64.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;在第一个终端上，释放锁：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; UNLOCK TABLES;
+Query OK, 0 rows affected (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后到第二个窗口，会发现数据已经插入成功了。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;InnoDB存储引擎也支持另外一种显式锁(锁定挑选出的部分行，行级锁 )：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;SELECT ... LOCK IN SHARE MODE;   共享锁
+SELECT ... FOR UPDATE;   排它锁
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【示例2】:演示InnoDB行级锁。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/65.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;【注意】:&lt;/strong&gt;&lt;br&gt;1.只是在语句执行过程中添加了锁，语句执行结束了锁就释放了。因此就没有UNLOCK了。&lt;br&gt;2.除了特性情况下，做备份操作时，不建议手动施加锁，因为存储引擎会自动进行锁操作，而且它的锁操作性能比我们自己施加要好的多。做备份操作时，要手动添加读锁。&lt;/p&gt;
+&lt;h2 id=&quot;事务Transaction&quot;&gt;&lt;a href=&quot;#事务Transaction&quot; class=&quot;headerlink&quot; title=&quot;事务Transaction&quot;&gt;&lt;/a&gt;事务Transaction&lt;/h2&gt;&lt;p&gt;基于锁我们实现了一定意义上的并发功能了，但是一般来讲，为了完成更高级别的操作，需要支持事务。&lt;br&gt;事务就是一组原子性的查询语句，也即将多个查询当作一个独立的工作单元。&lt;br&gt;【注意】:MyISAM存储引擎是不支持事务的。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ACID测试：能满足ACID测试就表示其支持事务，或兼容事务。&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A：Atomicity，原子性。&lt;/li&gt;
+&lt;li&gt;C：Consistency, 一致性。我们的数据库总是从一个一致性状态转到另一个一致性状态。比如，Tom从自己的账户(7000)转账3000到Jerry账户(5000)上， 这样Tom就只剩4000，Jerry就有了8000。转账前二者总和是12000，转账后还是12000。&lt;/li&gt;
+&lt;li&gt;I: Isolation, 隔离性, 一个事务的所有修改操作在提交之前所有的修改对其它事务是不可见的。&lt;ul&gt;
+&lt;li&gt;第一步：Tom: 7000-3000。事务没提交之前，有人查询Jerry账户，是不能看到这多3000的。同样查询Tom账户，也不能看到少了3000。因为我们事务还没提交&lt;/li&gt;
+&lt;li&gt;第二步：Jerry: 5000+3000&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;D：Durability, 持久性, 一旦事务得到提交，其所做的修改会永久有效。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;事实上，ACID机制需要背后有强大的机制才能实现的，而且一旦让一个存储引擎或关系型数据库支持事务，那么它在复杂程度上面是成几何倍上升的。并且如果事务做的完全隔离，事务就是串行的了。如果做到完全隔离，只有在两个事务压根不会涉及到同一张表的时候才会同时执行，否则只要涉及到同一个数据集，事务都只能以串行方式进行。数据安全性越高，其并发性就越低。所以就有了隔离级别的概念。&lt;/p&gt;
+&lt;h3 id=&quot;隔离级别&quot;&gt;&lt;a href=&quot;#隔离级别&quot; class=&quot;headerlink&quot; title=&quot;隔离级别&quot;&gt;&lt;/a&gt;隔离级别&lt;/h3&gt;&lt;p&gt;隔离级别(4个)：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;READ UNCOMMITTED (读未提交)&lt;br&gt;读别人还没提交的数据，这属于没什么隔离性的。数据安全性最差，但并发性最好(但从实际上来看，不会比其他级别好太多。又极其缺乏安全性，所以很少用。)&lt;br&gt;会产生脏读，不可重读，幻读(看到的数据和背后的数据不一样)&lt;/li&gt;
+&lt;li&gt;READ COMMITTED (读提交)&lt;br&gt;只有别人提交了，我们才能看到。市面上常见的大多数关系型数据库隔离级别都是读提交，不过mysql不是。mysql是第3个隔离级别，可重读。&lt;br&gt;不可重读，幻读&lt;/li&gt;
+&lt;li&gt;REPEATABLE READ (可重读)&lt;br&gt;解决了脏读问题，而且可重读，但是解决不了幻读问题。&lt;/li&gt;
+&lt;li&gt;SERIALIZABLE (串行化)&lt;br&gt;强制事务的串行执行避免了幻读。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;跟事务相关的命令：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;32&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;33&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;34&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;35&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;36&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;37&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;38&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;39&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;40&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;41&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;42&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;43&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;44&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;45&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;46&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;47&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;48&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;49&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;50&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;51&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;52&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;53&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;54&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;55&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;56&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;57&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;58&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;59&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;60&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;61&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;62&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;63&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;64&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;65&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;66&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;67&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;68&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;69&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;70&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;71&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;72&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;73&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;mysql&amp;gt; HELP CONTENTS;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;You asked for help about help category: &amp;quot;Contents&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;For more information, type &amp;apos;help &amp;lt;item&amp;gt;&amp;apos;, where &amp;lt;item&amp;gt; is one of the following&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;categories:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Account Management&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Administration&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Compound Statements&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Data Definition&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Data Manipulation&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Data Types&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Functions&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Functions and Modifiers for Use with GROUP BY&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Geographic Features&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Help Metadata&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Language Structure&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Plugins&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Procedures&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Storage Engines&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Table Maintenance&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Transactions&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   User-Defined Functions&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   Utility&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;mysql&amp;gt; HELP Transactions;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;You asked for help about help category: &amp;quot;Transactions&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;For more information, type &amp;apos;help &amp;lt;item&amp;gt;&amp;apos;, where &amp;lt;item&amp;gt; is one of the following&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;topics:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   CHANGE MASTER TO&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   DEALLOCATE PREPARE&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   EXECUTE STATEMENT&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   ISOLATION&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   LOCK&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   PREPARE&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   PURGE BINARY LOGS&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   RESET MASTER&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   RESET SLAVE&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   SAVEPOINT&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   SET GLOBAL SQL_SLAVE_SKIP_COUNTER&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   SET SQL_LOG_BIN&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   START SLAVE&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   START TRANSACTION&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   STOP SLAVE&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   XA&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;mysql&amp;gt; HELP COMMIT&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Many help items for your request exist.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;To make a more specific request, please type &amp;apos;help &amp;lt;item&amp;gt;&amp;apos;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;where &amp;lt;item&amp;gt; is one of the following&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;topics:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   START TRANSACTION&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   XA&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;mysql&amp;gt; HELP ROLLBACK&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Many help items for your request exist.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;To make a more specific request, please type &amp;apos;help &amp;lt;item&amp;gt;&amp;apos;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;where &amp;lt;item&amp;gt; is one of the following&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;topics:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   SAVEPOINT&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   START TRANSACTION&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   XA&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;mysql&amp;gt; HELP SAVEPOINT&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Name: &amp;apos;SAVEPOINT&amp;apos;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Description:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Syntax:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;SAVEPOINT identifier&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;ROLLBACK [WORK] TO [SAVEPOINT] identifier&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;RELEASE SAVEPOINT identifier&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;InnoDB supports the SQL statements SAVEPOINT, ROLLBACK TO SAVEPOINT,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;RELEASE SAVEPOINT and the optional WORK keyword for ROLLBACK.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;URL: http://dev.mysql.com/doc/refman/5.6/en/savepoint.html&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;解释下常用的：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; START TRANSACTION  手动显式启动一个事务。在这个事务中执行的所有语句在你执行下一条语句之前都处于未提交状态，未提交的事务都可以进行回滚。
+mysql&amp;gt; COMMIT
+mysql&amp;gt; ROLLBACK   回滚。回滚时有个问题，如果我们的事务非常大，假如有60个语句，我们执行到第40个的时候，发现第38个错了，如果能够回滚到第35个会比回滚到开头好多了，这就需要SAVEPOINT。我们可以在事务中设置多个保存点，给保存点设置个名字。
+
+mysql&amp;gt; SAVEPOINT identifier
+mysql&amp;gt; ROLLBACK [WORK] TO [SAVEPOINT] identifier
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;示例1：演示事务回滚&quot;&gt;&lt;a href=&quot;#示例1：演示事务回滚&quot; class=&quot;headerlink&quot; title=&quot;示例1：演示事务回滚&quot;&gt;&lt;/a&gt;示例1：演示事务回滚&lt;/h3&gt;&lt;p&gt;【注意】:MySQL数据库默认启动了自动提交的功能，也就意味着哪怕你手动不提交，也会自动提交的。但是当我们显式启动事务时，MySQL就不会自动帮我们提交。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/66.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/67.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;示例2：演示SAVEPOINT&quot;&gt;&lt;a href=&quot;#示例2：演示SAVEPOINT&quot; class=&quot;headerlink&quot; title=&quot;示例2：演示SAVEPOINT&quot;&gt;&lt;/a&gt;示例2：演示SAVEPOINT&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/68.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;如果没有显式启动事务，每个语句都会当作一个独立的事务，其执行完成后会被自动提交。自动提交会带来性能上的很大影响，因为每一个语句都自动提交，都会产生一个I/O。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SHOW GLOBAL VARIABLES LIKE &amp;apos;%commit%&amp;apos;;
++--------------------------------+-------+
+| Variable_name                  | Value |
++--------------------------------+-------+
+| autocommit                     | ON    |
+| binlog_order_commits           | ON    |
+| innodb_api_bk_commit_interval  | 5     |
+| innodb_commit_concurrency      | 0     |
+| innodb_flush_log_at_trx_commit | 1     |
++--------------------------------+-------+
+5 rows in set (0.00 sec)
+
+mysql&amp;gt; SELECT @@global.autocommit;
++---------------------+
+| @@global.autocommit |
++---------------------+
+|                   1 |
++---------------------+
+1 row in set (0.00 sec)
+
+mysql&amp;gt; SET GLOBAL autocommit = 0;  注意这么改对当前会话没有影响，因为我改的是全局的。
+如果关闭自动提交，请记得手动启动事务，手动进行提交；
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;事务隔离级别演示&quot;&gt;&lt;a href=&quot;#事务隔离级别演示&quot; class=&quot;headerlink&quot; title=&quot;事务隔离级别演示&quot;&gt;&lt;/a&gt;事务隔离级别演示&lt;/h3&gt;&lt;p&gt;MySQL默认的事务隔离级别是可重复读。查看MySQL的事务隔离级别：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SHOW GLOBAL VARIABLES LIKE &amp;apos;%iso%&amp;apos;;
++---------------+-----------------+
+| Variable_name | Value           |
++---------------+-----------------+
+| tx_isolation  | REPEATABLE-READ |
++---------------+-----------------+
+1 row in set (0.00 sec)
+
+mysql&amp;gt; SHOW GLOBAL VARIABLES LIKE &amp;apos;tx_isolation&amp;apos;;
++---------------+-----------------+
+| Variable_name | Value           |
++---------------+-----------------+
+| tx_isolation  | REPEATABLE-READ |
++---------------+-----------------+
+1 row in set (0.00 sec)
+
+mysql&amp;gt; SELECT @@global.tx_isolation;  
++-----------------------+
+| @@global.tx_isolation |
++-----------------------+
+| REPEATABLE-READ       |
++-----------------------+
+1 row in set (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;示例3-演示”读未提交”&quot;&gt;&lt;a href=&quot;#示例3-演示”读未提交”&quot; class=&quot;headerlink&quot; title=&quot;示例3:演示”读未提交”&quot;&gt;&lt;/a&gt;示例3:演示”读未提交”&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SET GLOBAL tx_isolation=&amp;apos;READ-UNCOMMITTED&amp;apos;;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&amp;gt; SHOW GLOBAL VARIABLES LIKE &amp;apos;%iso%&amp;apos;;
++---------------+------------------+
+| Variable_name | Value            |
++---------------+------------------+
+| tx_isolation  | READ-UNCOMMITTED |
++---------------+------------------+
+1 row in set (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重新打开两个shell，连接进mysql：注意进去后两个shell要各自先启动事务。然后在到第一个会话执行操作。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/69.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;在打开一个shell，连接进mysql：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/70.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;下面第一个会话回滚事务：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; ROLLBACK;
+Query OK, 0 rows affected (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;到第2个会话中，再次查询：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/71.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;第2个会话回滚事务。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; ROLLBACK;
+Query OK, 0 rows affected (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;示例4-演示”读提交”&quot;&gt;&lt;a href=&quot;#示例4-演示”读提交”&quot; class=&quot;headerlink&quot; title=&quot;示例4:演示”读提交”&quot;&gt;&lt;/a&gt;示例4:演示”读提交”&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SET GLOBAL tx_isolation=&amp;apos;READ-COMMITTED&amp;apos;;
+Query OK, 0 rows affected (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重新打开两个shell，连接进mysql：注意进去后两个shell要各自先启动事务。然后在到第一个会话执行操作。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/72.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/73.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;此时如果第一个会话中的事务回滚了，那么第二个会话看到的还是第3个数据是有的，这是很正确的；&lt;br&gt;但是如果第一个会话中的事务提交了，&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/74.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/75.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;同一个事务中多次读取的结果不一样，这就是不可重复读。所以脏读了就一定不可重复读，因为你每一次都能读到别人直接修改的数据。所以”读提交”在同一个事务中多次读取仍然可能是不一样的。&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&quot;示例3-演示”可重读”&quot;&gt;&lt;a href=&quot;#示例3-演示”可重读”&quot; class=&quot;headerlink&quot; title=&quot;示例3:演示”可重读”&quot;&gt;&lt;/a&gt;示例3:演示”可重读”&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SET GLOBAL tx_isolation=&amp;apos;REPEATABLE-READ&amp;apos;;
+Query OK, 0 rows affected (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重新打开两个shell，连接进mysql：注意进去后两个shell要各自先启动事务。然后在到第一个会话执行操作。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/76.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/77.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;但是如果第一个会话中的事务提交了，&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/78.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/79.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;虽然”可重读”解决了不可重读的问题，但是仍然没有解决幻读的问题。&lt;/p&gt;
+&lt;h4 id=&quot;示例4-演示”串行化”&quot;&gt;&lt;a href=&quot;#示例4-演示”串行化”&quot; class=&quot;headerlink&quot; title=&quot;示例4:演示”串行化”&quot;&gt;&lt;/a&gt;示例4:演示”串行化”&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SET GLOBAL tx_isolation=&amp;apos;serializable&amp;apos;;
+Query OK, 0 rows affected (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重新打开两个shell，连接进mysql：注意进去后两个shell要各自先启动事务。然后在到第一个会话执行操作。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/80.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/81.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;只能等对方提交或者回滚，你才能查看结果。串行化解决了幻读的问题，但是性能太差了。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;【建议】：对事务要求不特别严格的场景下，可以使用读提交。要想让配置永久生效，要改配置文件。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;事实上mysql是怎么实现的？为什么别人提交了，对可重读来讲，还不能看到数据。这就是MVCC机制。&lt;br&gt;&lt;strong&gt;MVCC：多版本并发控制&lt;/strong&gt;&lt;br&gt;对于可重读等机制来讲，每个事务启动时，InnoDB为会每个启动的事务提供一个当下时刻的快照，后续的所有操作都是在快照的基础上执行的。因此不管事务执行多长时间，在同一个事务中看到的数据是一致的。&lt;br&gt;为了实现此功能，InnoDB会为每个表提供两隐藏的字段，一个用于保存行的创建时间，一个用于保存行的失效时间(就是哪个事务删除过)。&lt;br&gt;实际上里面存的不是时间，里面存储的是系统版本号；（system version number）。每启动一个事务，InnoDB存储引擎就会给这个事务创建一个当下时刻的快照，并且为对应所读取的数据的快照启动一个新版本号，+1。&lt;/p&gt;
+&lt;p&gt;MVCC只在两个隔离级别下有效：READ COMMITTED和REPEATABLE READ。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;MySQL逻辑架构&quot;&gt;&lt;a href=&quot;#MySQL逻辑架构&quot; class=&quot;headerlink&quot; title=&quot;MySQL逻辑架构&quot;&gt;&lt;/a&gt;MySQL逻辑架构&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/63.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;我们可以把mysql的架构分为3层：
+    
+    </summary>
+    
+      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
+    
+    
+      <category term="MySQL" scheme="http://yoursite.com/tags/MySQL/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL DML</title>
@@ -3282,282 +3452,6 @@ yellow open filebeat-2017.10.23 PQe6qyVfSSG7GHQJUOPWtA 5 1 18 0 92.8kb 92.8kb
 &lt;ul&gt;
 &lt;li&gt;Packetbeat(用于监控网络流量)&lt;/li&gt;
 &lt;li&gt;Filebeat(用于监听日志数据)
-    
-    </summary>
-    
-      <category term="日志" scheme="http://yoursite.com/categories/%E6%97%A5%E5%BF%97/"/>
-    
-    
-      <category term="ELK" scheme="http://yoursite.com/tags/ELK/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>ELK实战</title>
-    <link href="http://yoursite.com/2017/10/20/ELK%E5%AE%9E%E6%88%98/"/>
-    <id>http://yoursite.com/2017/10/20/ELK实战/</id>
-    <published>2017-10-20T01:33:57.000Z</published>
-    <updated>2017-11-13T07:38:32.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;ELK介绍&quot;&gt;&lt;a href=&quot;#ELK介绍&quot; class=&quot;headerlink&quot; title=&quot;ELK介绍&quot;&gt;&lt;/a&gt;ELK介绍&lt;/h2&gt;&lt;p&gt;ELK由Elasticsearch、Logstash和Kibana三部分组件组成。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Elasticsearch是个开源分布式搜索引擎，它的特点有：分布式，零配置，自动发现，索引自动分片，索引副本机制，restful风格接口，多数据源，自动搜索负载等。&lt;/li&gt;
-&lt;li&gt;Logstash是一个完全开源的工具，它可以对你的日志进行收集、分析，并将其存储供以后使用。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;kibana 是一个开源和免费的工具，它可以为 Logstash 和 ElasticSearch 提供的日志分析友好的 Web 界面，可以帮助您汇总、分析和搜索重要数据日志。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;Elasticsearch&quot;&gt;&lt;a href=&quot;#Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;Elasticsearch&quot;&gt;&lt;/a&gt;Elasticsearch&lt;/h3&gt;&lt;p&gt;Elasticsearch是一个基于Lucene实现的开源、分布式、Restful的全文本搜索引擎。（仅支持文本搜索）此外，它还是一个分布式实时文档存储，其中每个文档的每个field均是被索引的数据，且可被搜索；也是一个带实时分析功能的分布式搜索引擎，能够扩展至数以百计的节点实时处理PB级的数据。&lt;br&gt;Elasticsearch借助于Lucene的API，在Lucene之外又重新封装了一层实现构建搜索引擎中的搜索组件。除此之外，Elasticsearch还新增了更强大的功能。比如把自己构建为分布式，分布式地将Lucene所提供的索引组建成shard形式，分布于多个节点之上，从而构建成分布式实时查询的组件。&lt;/p&gt;
-&lt;h3 id=&quot;Logstash&quot;&gt;&lt;a href=&quot;#Logstash&quot; class=&quot;headerlink&quot; title=&quot;Logstash&quot;&gt;&lt;/a&gt;Logstash&lt;/h3&gt;&lt;p&gt;支持多数据获取机制，通过TCP/UDP协议、文件、syslog、windows EventLogs及STDIN等。获取到数据后，它支持对数据执行过滤、修改等操作。&lt;/p&gt;
-&lt;p&gt;logstash配置框架：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;input {
-  ...
-}
-
-filter {
-  ...
-}
-
-output {
-  ...
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Logstash是高度插件化的，支持4种类型的插件(每一类都有数10种具体的实现)：&lt;br&gt;input、filter、codec、output  &lt;/p&gt;
-&lt;h4 id=&quot;input插件&quot;&gt;&lt;a href=&quot;#input插件&quot; class=&quot;headerlink&quot; title=&quot;input插件&quot;&gt;&lt;/a&gt;input插件&lt;/h4&gt;&lt;p&gt;下面介绍input插件几种常见的实现。&lt;br&gt;&lt;strong&gt;1.File：&lt;/strong&gt;&lt;br&gt;从指定的文件中读取事件流；其工作特性类似于tail -1，不断将文件的最后一行读出来；不过第一次读取文件时是从第1行开始的；文件中的每一行都被识别为一个事件。对于Logstash而言，每一个独立的信息就是一个事件，而对于文本文件来讲，每一个事件是用一行来表示的，如果期望将多行识别为一个事件的话，就需要codec插件。logstash使用FileWatch(Ruby Gem库)机制来监听文件的变化，FileWatch是Linux内核中提供的一个功能。可以一下子监听多个文件。文件状态记录在.sincedb数据库中。另外，FIle插件还能够自动识别你的日志滚动操作，日志一般达到某个体积、或者满足多少天后会滚动，File也能识别。它会按照上一次那个日志文件所在的位置读取，自动进行滚动，读到最新的文件。&lt;br&gt;&lt;strong&gt;2.udp插件:&lt;/strong&gt;&lt;br&gt;如果我们安装的某个程序，它能够通过udp的某个端口输出自己相关日志信息或者事件。Logstash通过udp协议从网络连接来读取Message。其必备参数为port，用于指明自己监听的端口，别的主机向这个端口发事件，host则用来指明自己监听的地址。&lt;br&gt;&lt;strong&gt;3.redis插件：&lt;/strong&gt;&lt;br&gt;允许Logstash从redis读数据。支持redis channel和lists两种方式来获取数据。&lt;/p&gt;
-&lt;h4 id=&quot;filter插件&quot;&gt;&lt;a href=&quot;#filter插件&quot; class=&quot;headerlink&quot; title=&quot;filter插件&quot;&gt;&lt;/a&gt;filter插件&lt;/h4&gt;&lt;p&gt;filter插件主要用于将event通过output发出之前，对其实现某些处理功能。&lt;br&gt;&lt;strong&gt;1.grok：&lt;/strong&gt;用于分析并结构化文本数据。把每一个事件字段切好，做成结构化的形式。使得我们后续可以分析。目前能处理syslog、apache、nginx的日志等。目前Logstash提供120种grok模式，因为我们要分析文本，必须提供模式。&lt;br&gt;简单举个例子说明下什么是模式：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;55.3.244.1 GET /index.html 15824 0.043
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;比如对于上面一条日志，我们定义如下的模式：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;%{IP:client} %{WORD:method} %{URIPATHPARAM:request} %{NUMBER:bytes} %{NUMBER:duration}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;那么经过grok过滤后，这个事件后将会加有分析后的字段：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;client =&amp;gt; 55.3.244.1
-method =&amp;gt; GET
-request =&amp;gt; /index.html
-bytes =&amp;gt; 15824
-duration =&amp;gt; 0.043
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Logstash中默认自带了很多pattern，但是如果没有你需要的，就需要自己在文件中定义你需要的模式。&lt;br&gt;&lt;strong&gt;grok语法格式：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;%{SYNTAX:SEMANTIC}
-    SYNTAX表示预定义模式名称。就是Logstash解压后pattern相关文件里已经定义好的模式，如果没有的，可以自己写在上面那个文件里，名字得全大写。具体的文件在下面的实战中会讲到。
-    SEMANTIC表示匹配到的文本的自定义的标识符。比如识别处理的ip可能是clientip也可能是server端的ip，我们可以自定义名字。
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;output插件&quot;&gt;&lt;a href=&quot;#output插件&quot; class=&quot;headerlink&quot; title=&quot;output插件&quot;&gt;&lt;/a&gt;output插件&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;1.stdout：&lt;/strong&gt;标准输出插件。&lt;br&gt;&lt;strong&gt;2.elasticsearch：&lt;/strong&gt;将结果输出到Elasticsearch中。&lt;br&gt;elasticsearch插件常见配置参数：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;index：数据存储在ES中的哪个索引中。默认“logstash-%{+YYYY.MM.dd}”，每天使用一个单独的索引。&lt;/li&gt;
-&lt;li&gt;workers：执行output的线程数。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;3.redis插件：&lt;/strong&gt;将结果输出到redis中。&lt;br&gt;Logstash使用redis作为输入或输出插件时，尤其是输出插件时，它有两种数据类型可以用来保存Logstash输出的数据。一种是list，一种是channel。一般使用list，list比较简单。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;【注意】：Logstash版本不同，每种插件支持的参数也不同，具体看&lt;a href=&quot;https://www.elastic.co/guide/en/logstash/current/index.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;官方文档&lt;/a&gt;。&lt;/strong&gt;&lt;/p&gt;
-&lt;h2 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h2&gt;&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;主机名&lt;/th&gt;
-&lt;th&gt;操作系统版本&lt;/th&gt;
-&lt;th&gt;IP地址&lt;/th&gt;
-&lt;th&gt;安装软件&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;hadoop16&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;172.16.206.16&lt;/td&gt;
-&lt;td&gt;elasticsearch-5.6.3.zip、kibana-5.6.3-linux-x86_64.tar.gz&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;spark32&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;172.16.206.32&lt;/td&gt;
-&lt;td&gt;logstash-5.6.3.tar.gz&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h2 id=&quot;Elasticsearch-1&quot;&gt;&lt;a href=&quot;#Elasticsearch-1&quot; class=&quot;headerlink&quot; title=&quot;Elasticsearch&quot;&gt;&lt;/a&gt;Elasticsearch&lt;/h2&gt;&lt;h3 id=&quot;安装JDK8&quot;&gt;&lt;a href=&quot;#安装JDK8&quot; class=&quot;headerlink&quot; title=&quot;安装JDK8&quot;&gt;&lt;/a&gt;安装JDK8&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
-# vim /etc/profile
-export JAVA_HOME=/usr/java/jdk1.8.0_73
-export PATH=$JAVA_HOME/bin:$PATH
-export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-# source /etc/profile
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;新建用户&quot;&gt;&lt;a href=&quot;#新建用户&quot; class=&quot;headerlink&quot; title=&quot;新建用户&quot;&gt;&lt;/a&gt;新建用户&lt;/h3&gt;&lt;p&gt;【注意】:elasticsearch不能使用root用户去启动。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# groupadd -g 510 es
-# useradd -g 510 -u 510 es
-# echo &amp;quot;wisedu123&amp;quot; | passwd --stdin es &amp;amp;&amp;gt; /dev/null
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装配置Elasticsearch&quot;&gt;&lt;a href=&quot;#安装配置Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;安装配置Elasticsearch&quot;&gt;&lt;/a&gt;安装配置Elasticsearch&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop16 opt]# unzip -oq elasticsearch-5.6.3.zip
-[root@hadoop16 opt]# vim elasticsearch-5.6.3/config/elasticsearch.yml 
-cluster.name: loges
-node.name: hadoop16
-network.host: 172.16.206.16
-bootstrap.memory_lock: true
-[root@hadoop16 opt]# vim /etc/security/limits.conf
-es - memlock -1
-[root@hadoop16 opt]# chown -R es.es elasticsearch-5.6.3
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;配置说明：&lt;br&gt;bootstrap.memory_lock: true&lt;br&gt;这个配置的作用是保护Elasticsearch使用的内存防止其被swapped。&lt;/p&gt;
-&lt;h3 id=&quot;优化Elasticsearch&quot;&gt;&lt;a href=&quot;#优化Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;优化Elasticsearch&quot;&gt;&lt;/a&gt;优化Elasticsearch&lt;/h3&gt;&lt;p&gt;1.配置操作系统文件描述符数&lt;br&gt;输入下面的命令进行查看：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ ulimit -a
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;找到open files那行：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;open files                      (-n) 1024
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;设置需要修改：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# vim /etc/security/limits.conf
-es               -       nofile          65536
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.增大虚拟内存mmap count配置&lt;br&gt;备注：如果你以.deb或.rpm包安装，则默认不需要设置此项，因为已经被自动设置，查看方式为：&lt;br&gt;sysctl vm.max_map_count&lt;br&gt;如果是手动安装，以root身份执行如下命令：&lt;br&gt;sysctl vm.max_map_count=262144&lt;br&gt;并修改文件使设置永久生效：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# vim /etc/sysctl.conf    
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;加一行：vm.max_map_count = 262144&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# sysctl -p
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;改完后，重启elasticsearch。&lt;br&gt;如果需要需改JVM大小，请修改 jvm.options 配置文件。&lt;/p&gt;
-&lt;h3 id=&quot;启动Elasticsearch&quot;&gt;&lt;a href=&quot;#启动Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;启动Elasticsearch&quot;&gt;&lt;/a&gt;启动Elasticsearch&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop16 opt]# su - es
-[es@hadoop16 ~]$ /opt/elasticsearch-5.6.3/bin/elasticsearch -d
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;检验bootstrap.mlockall: true是否生效：&lt;br&gt;curl &lt;a href=&quot;http://172.16.206.16:9200/_nodes/process?pretty&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.16:9200/_nodes/process?pretty&lt;/a&gt;&lt;br&gt;关注这个这个请求返回数据中的mlockall的值，如果为false，则说明锁定内存失败，这可能由于运行elasticsearch的用户不具备这样的权限。解决该问题的方法是：&lt;br&gt;在运行elasticsearch之前，以root身份执行&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;ulimit -l unlimited
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后再次重启elasticsearch。并查看上面的请求中的mlockall的值是否为true。&lt;br&gt;【注意】:这时候需要在root执行ulimit -l unlimited的shell终端上su - es，然后重启elasticsearch。因为这是命令行设置的ulimit -l unlimited，只对当前会话生效。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# ulimit -l unlimited
-# su - es
-$ ps -ef|grep elasticsearch
-$ kill -9 27189
-$ /usr/local/elasticsearch/bin/elasticsearch -d
-$ curl http://172.16.206.16:9200/_nodes/process?pretty
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;要想永久修改锁定内存大小无限制，需修改/etc/security/limits.conf，添加下面的内容，改完不需要重启系统，但是需要重新打开一个shell建立会话。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;es - memlock -1
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中，es代表运行elasticsearch的用户，-表示同时设置了soft和hard，memlock代表设置的是”锁定内存”这个类型，-1(unlimited或者infinity)代表没限制。&lt;br&gt;【补充】: 要使 /etc/security/limits.conf 文件配置生效，必须要确保 pam_limits.so 文件被加入到相关的启动文件中，启动文件位于/etc/pam.d路径下，如该路径下sshd、login、system-auth等，一般是system-auth文件负责加载该so文件。只要加载了pam_limits.so，则配置就会生效，无需重启系统。&lt;/p&gt;
-&lt;h3 id=&quot;安装配置head插件&quot;&gt;&lt;a href=&quot;#安装配置head插件&quot; class=&quot;headerlink&quot; title=&quot;安装配置head插件&quot;&gt;&lt;/a&gt;安装配置head插件&lt;/h3&gt;&lt;p&gt;项目地址：&lt;a href=&quot;https://github.com/mobz/elasticsearch-head&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/mobz/elasticsearch-head&lt;/a&gt;&lt;/p&gt;
-&lt;h4 id=&quot;安装head插件&quot;&gt;&lt;a href=&quot;#安装head插件&quot; class=&quot;headerlink&quot; title=&quot;安装head插件&quot;&gt;&lt;/a&gt;安装head插件&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop16 opt]# git clone git://github.com/mobz/elasticsearch-head.git
-[root@hadoop16 opt]# yum -y install epel-release
-[root@hadoop16 opt]# yum install nodejs -y
-[root@hadoop16 opt]# cd elasticsearch-head/
-[root@hadoop16 elasticsearch-head]# npm install
-npm: relocation error: npm: symbol SSL_set_cert_cb, version libssl.so.10 not defined in file libssl.so.10 with link time reference
-[root@hadoop16 elasticsearch-head]# yum update openssl -y
-[root@hadoop16 elasticsearch-head]# npm install 
-# 如果下载速度太慢，可以如下方式安装
-[root@hadoop16 elasticsearch-head]# npm install -gd express --registry=http://registry.npm.taobao.org
-# 为了避免每次安装都需要--registry参数，可以使用如下命令进行永久设置：
-[root@hadoop16 elasticsearch-head]# npm config set registry http://registry.npm.taobao.org 
-[root@hadoop16 elasticsearch-head]# npm install grunt --save-dev
-[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-clean 
-[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-concat 
-[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-watch 
-[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-connect 
-[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-copy 
-[root@hadoop16 elasticsearch-head]# npm install grunt-contrib-jasmine 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;奇怪的是最后一个没有安装成功，是因为该模块依赖了phantomjs。但是配置之后，依然无法安装。直接启动就可以了：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@hadoop16 elasticsearch-head]# grunt server 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;以上安装head插件的步骤太过复杂，我们可以将下载下来的elasticsearch-head包放入tomcat中，直接启动tomcat就可以访问head插件了。本实验环境下是采用将head插件放入tomcat中运行。&lt;/p&gt;
-&lt;h4 id=&quot;配置&quot;&gt;&lt;a href=&quot;#配置&quot; class=&quot;headerlink&quot; title=&quot;配置&quot;&gt;&lt;/a&gt;配置&lt;/h4&gt;&lt;p&gt;1.修改Elasticsearch的配置文件elasticsearch.yml，增加跨域的配置(需要重启es才能生效)&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;http.cors.enabled: true
-http.cors.allow-origin: &amp;quot;*&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.编辑head/Gruntfile.js，修改服务器监听地址，增加hostname属性，将其值设置为*。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@hadoop16 elasticsearch-head]# pwd
-/opt/apache-tomcat-8.5.23/webapps/elasticsearch-head
-[root@hadoop16 elasticsearch-head]# vim Gruntfile.js
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;以下两种配置都是可以的：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# Type1
-connect: {
-        hostname: &amp;apos;*&amp;apos;,
-        server: {
-                options: {
-                        port: 9100,
-                        base: &amp;apos;.&amp;apos;,
-                        keepalive: true
-                }
-        }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;　　&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# Type 2
-connect: {
-        server: {
-                options: {
-                        hostname: &amp;apos;*&amp;apos;,
-                        port: 9100,
-                        base: &amp;apos;.&amp;apos;,
-                        keepalive: true
-                }
-        }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.编辑head/_site/app.js，修改head连接es的地址，将localhost修改为es的IP地址&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@hadoop16 elasticsearch-head]# pwd
-/opt/apache-tomcat-8.5.23/webapps/elasticsearch-head
-[root@hadoop16 elasticsearch-head]# vim _site/app.js
-# 原配置
-this.base_uri = this.config.base_uri || this.prefs.get(&amp;quot;app-base_uri&amp;quot;) || &amp;quot;http://localhost:9200&amp;quot;;
-# 将localhost修改为ES的IP地址
-this.base_uri = this.config.base_uri || this.prefs.get(&amp;quot;app-base_uri&amp;quot;) || &amp;quot;http://YOUR-ES-IP:9200&amp;quot;;
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;启动&quot;&gt;&lt;a href=&quot;#启动&quot; class=&quot;headerlink&quot; title=&quot;启动&quot;&gt;&lt;/a&gt;启动&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop16 elasticsearch-head]# cd /opt/apache-tomcat-8.5.23/
-[root@hadoop16 apache-tomcat-8.5.23]# bin/startup.sh 
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;Logstash-1&quot;&gt;&lt;a href=&quot;#Logstash-1&quot; class=&quot;headerlink&quot; title=&quot;Logstash&quot;&gt;&lt;/a&gt;Logstash&lt;/h2&gt;&lt;h3 id=&quot;安装JDK8-1&quot;&gt;&lt;a href=&quot;#安装JDK8-1&quot; class=&quot;headerlink&quot; title=&quot;安装JDK8&quot;&gt;&lt;/a&gt;安装JDK8&lt;/h3&gt;&lt;p&gt;Logstash是jruby研发的，需要跑在JVM上，所以需要安装JDK。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# tar zxf jdk-8u73-linux-x64.gz -C /usr/java/
-# vim /etc/profile
-export JAVA_HOME=/usr/java/jdk1.8.0_73
-export PATH=$JAVA_HOME/bin:$PATH
-export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-# source /etc/profile
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装配置Logstash&quot;&gt;&lt;a href=&quot;#安装配置Logstash&quot; class=&quot;headerlink&quot; title=&quot;安装配置Logstash&quot;&gt;&lt;/a&gt;安装配置Logstash&lt;/h3&gt;&lt;p&gt;我这里选择二进制包安装。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 opt]# tar zxf logstash-5.6.3.tar.gz 
-[root@spark32 opt]# cd logstash-5.6.3/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;由于我这里选择是二进制安装，pattern文件位置在：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 logstash-5.6.3]# ls /opt/logstash-5.6.3/vendor/bundle/jruby/1.9/gems/logstash-patterns-core-4.1.2/patterns/grok-patterns
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;收集Nginx-access日志&quot;&gt;&lt;a href=&quot;#收集Nginx-access日志&quot; class=&quot;headerlink&quot; title=&quot;收集Nginx access日志&quot;&gt;&lt;/a&gt;收集Nginx access日志&lt;/h3&gt;&lt;p&gt;Logstash收集Nginx日志，输出到Elasticsearch中。&lt;/p&gt;
-&lt;h4 id=&quot;创建Nginx-pattern&quot;&gt;&lt;a href=&quot;#创建Nginx-pattern&quot; class=&quot;headerlink&quot; title=&quot;创建Nginx pattern&quot;&gt;&lt;/a&gt;创建Nginx pattern&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@spark32 ~]# vim /opt/logstash-5.6.3/vendor/bundle/jruby/1.9/gems/logstash-patterns-core-4.1.2/patterns/grok-patterns
-# Nginx log
-NGUSERNAME [a-zA-Z\.\@\-\+_%]+
-NGUSER %{NGUSERNAME}
-NGINXACCESS %{IPORHOST:clientip} - %{NOTSPACE:remote_user} \[%{HTTPDATE:timestamp}\] \&amp;quot;(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\&amp;quot; %{NUMBER:response} (?:%{NUMBER:bytes}|-) %{QS:referrer} %{QS:agent} %{NOTSPACE:http_x_forwarded_for}
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;创建Logstash配置文件&quot;&gt;&lt;a href=&quot;#创建Logstash配置文件&quot; class=&quot;headerlink&quot; title=&quot;创建Logstash配置文件&quot;&gt;&lt;/a&gt;创建Logstash配置文件&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@spark32 logstash-5.6.3]# cd /opt/logstash-5.6.3
-[root@spark32 logstash-5.6.3]# mkdir conf
-[root@spark32 logstash-5.6.3]# cd conf
-[root@spark32 conf]# vim logstash_nginx.conf
-input {
-  file {
-    path  =&amp;gt;  [&amp;quot;/usr/local/openresty/nginx/logs/host.access.log&amp;quot;]
-    type  =&amp;gt;  &amp;quot;nginxlog&amp;quot;
-    start_position  =&amp;gt;  &amp;quot;beginning&amp;quot;
-  }
-}
-
-filter {
-  grok {
-    match =&amp;gt; { &amp;quot;message&amp;quot; =&amp;gt; &amp;quot;%{NGINXACCESS}&amp;quot; }
-  }
-}
-
-output {
-  elasticsearch {
-    hosts    =&amp;gt;  [&amp;quot;172.16.206.16:9200&amp;quot;]
-    action   =&amp;gt;  &amp;quot;index&amp;quot;
-    index    =&amp;gt;  &amp;quot;logstash-%{+YYYY.MM.dd}&amp;quot;
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&quot;启动Logstash&quot;&gt;&lt;a href=&quot;#启动Logstash&quot; class=&quot;headerlink&quot; title=&quot;启动Logstash&quot;&gt;&lt;/a&gt;启动Logstash&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;[root@spark32 logstash-5.6.3]# bin/logstash -f /opt/logstash-5.6.3/conf/logstash_nginx.conf -t
-Sending Logstash&amp;apos;s logs to /opt/logstash-5.6.3/logs which is now configured via log4j2.properties
-[2017-10-20T17:07:14,793][INFO ][logstash.modules.scaffold] Initializing module {:module_name=&amp;gt;&amp;quot;fb_apache&amp;quot;, :directory=&amp;gt;&amp;quot;/opt/logstash-5.6.3/modules/fb_apache/configuration&amp;quot;}
-[2017-10-20T17:07:14,797][INFO ][logstash.modules.scaffold] Initializing module {:module_name=&amp;gt;&amp;quot;netflow&amp;quot;, :directory=&amp;gt;&amp;quot;/opt/logstash-5.6.3/modules/netflow/configuration&amp;quot;}
-[2017-10-20T17:07:14,803][INFO ][logstash.setting.writabledirectory] Creating directory {:setting=&amp;gt;&amp;quot;path.queue&amp;quot;, :path=&amp;gt;&amp;quot;/opt/logstash-5.6.3/data/queue&amp;quot;}
-[2017-10-20T17:07:14,804][INFO ][logstash.setting.writabledirectory] Creating directory {:setting=&amp;gt;&amp;quot;path.dead_letter_queue&amp;quot;, :path=&amp;gt;&amp;quot;/opt/logstash-5.6.3/data/dead_letter_queue&amp;quot;}
-Configuration OK
-[2017-10-20T17:07:14,999][INFO ][logstash.runner          ] Using config.test_and_exit mode. Config Validation Result: OK. Exiting Logstash
-[root@spark32 logstash-5.6.3]# bin/logstash -f /opt/logstash-5.6.3/conf/logstash_nginx.conf &amp;amp; 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;记录收集到日志的文件位置在:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@spark32 file]# ls -a
-.  ..  .sincedb_650663ba19529187a32a8b9dc99049f8
-[root@spark32 file]# pwd
-/opt/logstash-5.6.3/data/plugins/inputs/file
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看Elasticsearch索引：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[es@hadoop16 elasticsearch-5.6.3]$ curl -XGET &amp;apos;172.16.206.16:9200/_cat/indices&amp;apos;
-yellow open logstash-2017.10.20 DVARGYZ2R9CfT-xyLrhyAQ 5 1 7 0 49.9kb 49.9kb
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;Kibana&quot;&gt;&lt;a href=&quot;#Kibana&quot; class=&quot;headerlink&quot; title=&quot;Kibana&quot;&gt;&lt;/a&gt;Kibana&lt;/h2&gt;&lt;h3 id=&quot;安装配置kibana&quot;&gt;&lt;a href=&quot;#安装配置kibana&quot; class=&quot;headerlink&quot; title=&quot;安装配置kibana&quot;&gt;&lt;/a&gt;安装配置kibana&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop16 opt]# tar zxf kibana-5.6.3-linux-x86_64.tar.gz 
-[root@hadoop16 opt]# ln -sv kibana-5.6.3-linux-x86_64 kibana
-‘kibana’ -&amp;gt; ‘kibana-5.6.3-linux-x86_64’
-[root@hadoop16 opt]# cd kibana
-[root@hadoop16 kibana]# cd config/
-[root@hadoop16 config]# vim kibana.yml 
-server.host: &amp;quot;172.16.206.16&amp;quot;
-elasticsearch.url: &amp;quot;http://172.16.206.16:9200&amp;quot;
-[root@hadoop16 config]# cd ..
-[root@hadoop16 kibana]# bin/kibana &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;访问&quot;&gt;&lt;a href=&quot;#访问&quot; class=&quot;headerlink&quot; title=&quot;访问&quot;&gt;&lt;/a&gt;访问&lt;/h3&gt;&lt;p&gt;浏览器输入：&lt;a href=&quot;http://172.16.206.16:5601/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.16:5601/&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击左侧菜单的Discover：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;比如我用curl访问下nginx，然后去kibana中搜索。要稍微等一下，等日志进到Elasticsearch中。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@hadoop16 kibana]# curl http://172.16.206.32:808
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/5.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;总结：&lt;/strong&gt;&lt;br&gt;1.Logstash 主要的特点就是它的灵活性，因为它有很多插件。然后它清楚的文档已经直白的配置格式让它可以再多种场景下应用。这样的良性循环让我们可以在网上找到很多资源，几乎可以处理任何问题。&lt;br&gt;2.Logstash不支持缓存，当然我们可以使用redis或者kafka作为中心缓冲池，架构如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;3.Logstash是在jvm跑的，资源消耗比较大，太重量级了。后来作者又用golang写了一个功能较少但是资源消耗也小的轻量级的logstash-forwarder。后来这个人加入了elastic公司。因为elastic公司本身还收购了另一个开源项目packetbeat，而这个项目专门就是用golang写的，有整个团队，所以elastic公司干脆把logstash-forwarder的开发工作也合并到同一个golang团队来搞，于是新的项目就叫filebeat了。当然也可以自己写agent，用go、python都可以写。这样我们就可以使用轻量的日志传输工具，将数据从服务器端经由一个或多个 Logstash 中心服务器传输到 Elasticsearch。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/7.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;ELK介绍&quot;&gt;&lt;a href=&quot;#ELK介绍&quot; class=&quot;headerlink&quot; title=&quot;ELK介绍&quot;&gt;&lt;/a&gt;ELK介绍&lt;/h2&gt;&lt;p&gt;ELK由Elasticsearch、Logstash和Kibana三部分组件组成。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Elasticsearch是个开源分布式搜索引擎，它的特点有：分布式，零配置，自动发现，索引自动分片，索引副本机制，restful风格接口，多数据源，自动搜索负载等。&lt;/li&gt;
-&lt;li&gt;Logstash是一个完全开源的工具，它可以对你的日志进行收集、分析，并将其存储供以后使用。
     
     </summary>
     
