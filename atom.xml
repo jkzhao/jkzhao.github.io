@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-04-10T09:07:13.000Z</updated>
+  <updated>2018-04-10T09:12:34.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2018/04/08/MySQL%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E5%AF%B9%E6%AF%94/"/>
     <id>http://yoursite.com/2018/04/08/MySQL存储引擎对比/</id>
     <published>2018-04-08T08:36:31.000Z</published>
-    <updated>2018-04-10T09:07:13.000Z</updated>
+    <updated>2018-04-10T09:12:34.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;MySQL存储引擎&quot;&gt;&lt;a href=&quot;#MySQL存储引擎&quot; class=&quot;headerlink&quot; title=&quot;MySQL存储引擎&quot;&gt;&lt;/a&gt;MySQL存储引擎&lt;/h2&gt;&lt;p&gt;存储引擎也通常称作“表类型”。可以在创建表时指定其存储引擎。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;mysql&amp;gt; SHOW ENGINES;    #查看支持的存储引擎。
@@ -155,7 +155,7 @@ SHOW TABLE STATUS [{FROM | IN} db_name] [LIKE &amp;apos;pattern&amp;apos; | WHER
 &lt;li&gt;聚簇索引&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;辅助索引&lt;/p&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;p&gt;B树索引(B+)&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;B树(B+树)索引&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;R树索引：空间索引&lt;/li&gt;
 &lt;li&gt;hash索引&lt;/li&gt;
