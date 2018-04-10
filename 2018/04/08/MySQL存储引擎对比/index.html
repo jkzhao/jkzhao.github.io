@@ -1,0 +1,1014 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="MySQL," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="MySQL存储引擎存储引擎也通常称作“表类型”。可以在创建表时指定其存储引擎。">
+<meta name="keywords" content="MySQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL存储引擎对比">
+<meta property="og:url" content="http://yoursite.com/2018/04/08/MySQL存储引擎对比/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="MySQL存储引擎存储引擎也通常称作“表类型”。可以在创建表时指定其存储引擎。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/82.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/83.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/84.png">
+<meta property="og:updated_time" content="2018-04-10T09:07:13.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MySQL存储引擎对比">
+<meta name="twitter:description" content="MySQL存储引擎存储引擎也通常称作“表类型”。可以在创建表时指定其存储引擎。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/82.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> MySQL存储引擎对比 | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                MySQL存储引擎对比
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-08T16:36:31+08:00" content="2018-04-08">
+              2018-04-08
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2018-04-10T17:07:13+08:00" content="2018-04-10">
+              2018-04-10
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2018/04/08/MySQL存储引擎对比/" class="leancloud_visitors" data-flag-title="MySQL存储引擎对比">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="MySQL存储引擎"><a href="#MySQL存储引擎" class="headerlink" title="MySQL存储引擎"></a>MySQL存储引擎</h2><p>存储引擎也通常称作“表类型”。可以在创建表时指定其存储引擎。<a id="more"></a></p>
+<pre><code>mysql&gt; SHOW ENGINES;    #查看支持的存储引擎。
+mysql&gt; SHOW TABLES STATUS [LIKE clause] [WHERE clause] #使用WHERE比使用LIKE性能好
+SHOW TABLE STATUS [{FROM | IN} db_name] [LIKE &apos;pattern&apos; | WHERE expr] #如果设定了数据库，就不需要指定[{FROM | IN} db_name] 
+</code></pre><p>【示例】：查看某张表的存储引擎</p>
+<pre><code>mysql&gt; SHOW TABLE STATUS IN hellodb WHERE Name=&apos;classes&apos;\G
+*************************** 1. row ***************************
+               Name: classes
+             Engine: InnoDB
+            Version: 10
+         Row_format: Compact
+               Rows: 8
+     Avg_row_length: 2048
+        Data_length: 16384
+    Max_data_length: 0
+       Index_length: 0
+          Data_free: 9437184
+     Auto_increment: 9
+        Create_time: 2014-04-08 11:14:52
+        Update_time: NULL
+         Check_time: NULL
+          Collation: utf8_general_ci
+           Checksum: NULL
+     Create_options: 
+            Comment: 
+    1 row in set (0.01 sec)   
+</code></pre><ul>
+<li>Name: 表名</li>
+<li>Engine: 存储引擎</li>
+<li>Version: 表的版本</li>
+<li>Row_format: 行格式。这些行格式是MySQL在其内部存储行数据时所采用的格式。每一种不同格式，其存储空间、开销是各部相同的。对于MyISAM表，常用的通常有DYNAMIC、FIXED或者COMPRESSED。而对于InnoDB存储引擎来讲，还可以额外使用REDUNDANT、COMPACT等类型。对于InnoDB来讲，默认是COMPACT。<br>{DEFAULT|DYNAMIC|FIXED|COMPRESSED|REDUNDANT|COMPACT}</li>
+<li>Rows: 表中的行数。【注意】:对于MyISAM表来讲是精确的，但是对于InnoDB来讲未必精确。因为InnoDB基于多版本并发控制，里面有多种版本的快照，所以有些行你删了里面依然可能有。所以InnoDB表里的行数可能是个估计值。</li>
+<li>Avg_row_length: 平均每行所包含的字节数。</li>
+<li>Data_length: 表中数据总体大小，单位是字节。Data_length:=RowsXAvg_row_length。</li>
+<li>Max_data_length: 表能够占用的最大空间，单位为字节。0表示没有上限。</li>
+<li>Index_length: 索引的大小，单位为字节。</li>
+<li>Data_free: 对于MyISAM表，表示已经分配但尚未使用的空间(就是划分给这个表的块的剩余空间)，其中包含此前删除行之后腾出来的空间。对于InnoDB表，就比较复杂了。</li>
+<li>Auto_increment: 下一个AUTO_INCREMENT的值；</li>
+<li>Create_time: 表的创建时间；</li>
+<li>Update_time：表数据的最近一次的修改时间；</li>
+<li>Check_time：mysql的一些工具，比如使用CHECK TABLE或myisamchk最近一次检测表的时间；</li>
+<li>Collation: 排序规则；</li>
+<li>Checksum: 如果启用，则为表的checksum；为空表示没有启用校验功能。但是请注意，每次修改表，这个值也会变动，会产生额外的I/O，性能会有影响，但是对表的一致性和数据完整性提供了额外保证；</li>
+<li>Create_options: 创建表时指定使用的其它选项，比如SQL_Cache等选项；</li>
+<li>Comment: 表的注释信息。</li>
+</ul>
+<h2 id="存储引擎中的数据和数据文件"><a href="#存储引擎中的数据和数据文件" class="headerlink" title="存储引擎中的数据和数据文件"></a>存储引擎中的数据和数据文件</h2><h3 id="InnoDB"><a href="#InnoDB" class="headerlink" title="InnoDB"></a>InnoDB</h3><p>两种格式：<br><strong>1、innodb_file_per_table=OFF，即使用共享表空间。</strong></p>
+<ul>
+<li>每张表有一个独有的格式定义文件: tb_name.frm</li>
+<li>还有一个默认位于数据目录下共享的表空间文件：ibdata#   (一个表空间文件大小到达一定程度后，会启动第二个表空间文件)</li>
+</ul>
+<p><strong>2、innodb_file_per_table=ON，即使用独立表空间。</strong><br>每个表在数据库目录下存储两个文件：</p>
+<ul>
+<li>tb_name.frm</li>
+<li>tb_name.ibd</li>
+</ul>
+<p><strong>表空间：table space，由InnoDB管理的特有格式数据文件，内部可同时存储数据和索引(因此是聚簇索引)。</strong></p>
+<h3 id="MyISAM"><a href="#MyISAM" class="headerlink" title="MyISAM"></a>MyISAM</h3><p>每个表都在数据库目录(data目录)下存储三个文件：</p>
+<ul>
+<li>tb_name.frm  #表结构的定义</li>
+<li>tb_name.MYD  #数据</li>
+<li>tb_name.MYI  #索引</li>
+</ul>
+<p>如何修改默认存储引擎：通过default_storage_engine服务变量实现。要想永久生效，需要写到配置文件中，重启生效。</p>
+<h2 id="各存储引擎的特性"><a href="#各存储引擎的特性" class="headerlink" title="各存储引擎的特性"></a>各存储引擎的特性</h2><p>mysql 5.3.8之后mysql就被oracle收购了，原生自带InnoDB存储引擎了。(以前InnoDB是插件形式工作的，但是自从oracle收购InnoDB后做了很大改进，再到后来收购了sun，InnoDB就自然成为原生的了。)</p>
+<h3 id="InnoDB-1"><a href="#InnoDB-1" class="headerlink" title="InnoDB"></a>InnoDB</h3><ul>
+<li>支持事务：有事务日志。为什么要有事务日志啊？<strong>因为可以它能够把随机I/O改为顺序I/O。</strong>事务日志在数据目录下，至少有两个，而且大小固定，不会增长，而且一定是磁盘上的一段连续存储空间。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/82.png" alt=""></li>
+<li>支持外键约束：MyISAM是不支持的，因为不支持事务就很难使用外键。</li>
+<li>MVCC：多版本并发控制。</li>
+<li>支持聚簇索引：也叫聚集索引。说白了就是数据和索引存储在一起，通过表空间来实现的。也就意味着创建InnoDB表时必须要有主键。这样的话InnoDB表的查询比MyISAM表的查询多了一步，因为所有非聚集索引(又称为辅助索引)不是指向数据的，而是指向聚簇索引的。什么意思呢？(该节视频31分钟左右开始)。<br>聚簇索引之外的其它索引，通常称为辅助索引。聚簇索引只能有一个，辅助索引可以有多个。</li>
+<li>行级锁：行级锁之上它在实现MVCC机制时是基于”间隙锁”实现的。在行和行之间加间隙锁来隔离行。</li>
+<li>支持辅助索引：有些NoSQL只支持一种索引。</li>
+<li>支持自适应hash索引</li>
+<li>支持热备份：因此数据库不用离线就可以实现备份了。</li>
+</ul>
+<p><strong>【补充】:聚簇索引和辅助索引。</strong><br>位于磁盘上的数据，我们需要把所有载入内存才可以查询的，太慢了。于是我们把表中数据按我们经常查询的叫搜索键，通常是一个字段，通常我们用于WHERE子句中比较的字段，把它抽取出来做索引就好了，这样可以提高查询速度的。这个索引文件如果是额外存放的，意味着要把这个字段的值复制一份出来，放在另外一个位置，这就是索引文件。但是这索引信息是要被排序的，它把表中的字段拿出来后重新排了下序。排完序以后，一个字段对应的那个行在哪？也就是我们找到索引后，怎么找到对应的整行数据？索引里面有原数据，只有一部分，只有你所抽取的字段，如果你找的正好是那个字段，那就不用去查原来的表了。比如SELECT Age FROM students WHERE Age &gt; 30，那就意味着索引要建立在Age上才行，假如我们在Age上创建了索引，意味着索引文件中已经都有了Age字段的所有数据，正好我们找的就是Age，但是如果我们找的不是Age这个字段，而是Name，那么就需要先找到符合索引条件(Age &gt; 30)的条目，这个条目有指向其在原数据中的行的位置，接着就找到行所在的磁盘块，把这个磁盘块载入内存，对应表中的那个行的所有字段就找到了，从而Name也就找到了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/83.png" alt=""><br>图中，索引和数据是分开存放的，也就意味着我们找到索引以后，还得做第二次I/O，找到那个真正数据所在磁盘上的位置，然后把数据读进来。<br>        那什么是聚簇索引呢？索引条目和行是挨着存放的，所以你只要能找到索引，就直接能找到这个行了。一个表能有几个聚簇索引呢？索引是排序的，我们按年龄排序和按姓名排序，其结果不一样。由于索引和数据是存放在一起的，那就意味着索引怎么排序，数据就一定是怎么排序的。如果索引按年龄排序存放了，数据也就按年龄排序存放了，很显然不能在拿姓名来排序存放了。所以对于一张表来讲，聚簇索引只能有一个。非聚簇索引可以有多个，因为排序只是索引本身，不是数据。而对于InnoDB表来讲，非聚簇索引的数据指针并不是指向数据的，而是指向聚簇索引。因此查找InnoDB表分两步，先找辅助索引，然后根据辅助索引找到聚簇索引，然后在找到数据。所以选择一个好的聚簇索引能够非常好的提升InnoDB的查询性能的。<br>        因此对于InnoDB表来说必须有一个聚簇索引，而聚簇索引通常用主键来实现，因为主键中的数据是不允许重复的，所以索引中出现重复的可能性就没有了。因此我们通常提供一个主键用于聚簇索引。<br>        当然，无论是聚簇索引还是辅助索引都是B树索引，因为聚簇和辅助只是指明了它的存储位置是否和原数据存储在一块的，但B树指的是索引自己的内部结构，数据结构。你可以把房子盖到市中心，也可以盖到郊区，但房子本身可以是别墅或一室两厅。一个按位置来讲，一个是按数据结构来讲。B树是一种数据结构。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/84.png" alt=""></p>
+<h3 id="MyISAM-1"><a href="#MyISAM-1" class="headerlink" title="MyISAM"></a>MyISAM</h3><ul>
+<li>支持全文索引：InnoDB不支持。但是InnoDB不支持，好在可以借助额外的其他工具来完成对InnoDB表的全文索引。因此这对于InnoDB来说不是一个缺陷。比如编译Mroonga存储引擎，这是一个很独特的存储引擎。</li>
+<li>支持表压缩：用于实现数据仓库，能节约存储空间并提升性能。只不过压缩以后就不能修改了，只能查询。所以在压缩的时候主要是用来做数据仓库的。</li>
+<li>支持空间索引：InnoDB也支持空间索引。要想使用空间索引，得使用空间函数，才能完成里面的很多数据的操作。</li>
+<li>支持表级锁：不支持行级锁，所以锁开销比较小。如果读写比例是9:1或8:2，对MyISAM是非常理想的。如果读写差不多比例，那么使用MyISAM其性能就下降太厉害了。所以读写差不多的话，建议使用InnoDB表。</li>
+<li><p>支持延迟更新索引：很多时候索引是为了提升读操作的，那么对写操作会有延迟。好在MyISAM支持延迟更新索引键。创建表有个选项delay_key_write，延迟键更新。这样每当数据更新时，不必要立即更新索引，使得其I/O压力就降低了。</p>
+</li>
+<li><p>不支持事务、外键和行级锁<br>崩溃后无法安全恢复数据(你可能得使用repairtable这样的命令去修复表，而这个修复过程通常是不可控的。不像InnoDB，如果崩溃了，InnoDB存储引擎会自行根据事务日志进行恢复)</p>
+</li>
+<li><p>适用场景：只读数据、较小的表、能够容忍崩溃后的修改操作时长和数据丢失。</p>
+</li>
+</ul>
+<p>事实上，mysql库中的表都是MyISAM的，因为mysql这个库是数据字典，而数据字典大多数情况下都是一次创建，但是我们对表的读取却是多次的，所以是一种多读少写的场景，而且表也不会特别大。</p>
+<pre><code>mysql&gt; SHOW TABLE STATUS IN mysql\G
+</code></pre><h3 id="ARCHIVE"><a href="#ARCHIVE" class="headerlink" title="ARCHIVE"></a>ARCHIVE</h3><ul>
+<li>仅支持INSERT和SELECT，支持很好压缩功能；</li>
+<li><p>适用于存储日志信息，或其它按时间序列实现的数据采集类的应用；</p>
+</li>
+<li><p>不支持事务，不能很好的支持索引；</p>
+</li>
+</ul>
+<h3 id="CSV"><a href="#CSV" class="headerlink" title="CSV"></a>CSV</h3><ul>
+<li>将数据存储为CSV格式；不支持索引；仅适用于数据交换场景；<br>你可以将excel中表中数据存储为csv格式的，然后在把它导入到mysql中</li>
+</ul>
+<h3 id="BLACKHOLE"><a href="#BLACKHOLE" class="headerlink" title="BLACKHOLE"></a>BLACKHOLE</h3><p>没有存储机制，任何发往此引擎的数据都会丢弃；其会记录二进制日志，因此，常用于多级复制架构中作中转服务器；</p>
+<h3 id="MEMORY"><a href="#MEMORY" class="headerlink" title="MEMORY"></a>MEMORY</h3><ul>
+<li>保存数据在内存中，内存表；常用于保存中间数据，如周期性的聚合数据等；也用于实现临时表</li>
+<li>仅支持hash索引，使用表级锁，不支持BLOB和TEXT数据类型；</li>
+</ul>
+<h3 id="MRG-MYISAM"><a href="#MRG-MYISAM" class="headerlink" title="MRG_MYISAM"></a>MRG_MYISAM</h3><p>是MYISAM的一个变种，能够将多个MyISAM表合并成一个虚表；<br>但是现在很多应用场景中存的数据量非常大，而一张表中存的数据过多，查询的时候性能会很差。所以很多时候需要借助一些机制将一个表切割成多张表，更别说合并表了。所以这个引擎很少用。</p>
+<h3 id="NDB"><a href="#NDB" class="headerlink" title="NDB"></a>NDB</h3><p>是MySQL CLUSTER中专用的存储引擎。是位于内存中完成数据存储和交换的，能够实现分布式、不做任何共享的、容灾的、高可用的mysql集群，但实际上这种集群没人用。<br>其实早期NDB是爱立信的一个数据库，而后2003年mysql AB公司从爱立信收购了NDB，随后把NDB转换为了存储引擎。</p>
+<h2 id="第三方的存储引擎"><a href="#第三方的存储引擎" class="headerlink" title="第三方的存储引擎"></a>第三方的存储引擎</h2><h3 id="OLTP类：在线事务处理"><a href="#OLTP类：在线事务处理" class="headerlink" title="OLTP类：在线事务处理"></a>OLTP类：在线事务处理</h3><ul>
+<li><p>XtraDB: 增强版的InnoDB，由Percona提供。<br>编译安装时，下载XtraDB的源码替换MySQL存储引擎中的InnoDB的源码。然后重命名XtraDB为InnoDB，接着编译安装mysql，就可以取代InnoDB，只不过仍然叫做InnoDB。</p>
+</li>
+<li><p>PBXT: MariaDB自带此存储引擎。<br>支持引擎级别的复制、外键约束，对SSD磁盘提供适当支持；<br>支持事务、MVCC。</p>
+</li>
+<li><p>TokuDB: 使用Fractal Trees(分形树)索引(这个索引很新，性能很好)，适用存储大数据，拥有很高的压缩比；已经被引入MariaDB。事实上，在mysql被oracle收购后，Apple就立即抛弃了mysql，转向了pgSQL。Apple的领导人很有远见的，迟早有一天要抛弃，还不如早点抛弃。现在Google、Facebook都在纷纷抛弃mysql，转向MariaDB。而Redhat7不在提供mysql，而默认提供MariaDB。可以预见，CentOS、Fedora以后都会转向MariaDB。</p>
+</li>
+</ul>
+<h3 id="列式存储引擎-NoSQL用的多"><a href="#列式存储引擎-NoSQL用的多" class="headerlink" title="列式存储引擎(NoSQL用的多)"></a>列式存储引擎(NoSQL用的多)</h3><p>Mysql数据是这么存的，所有数据在存储时首先划分成逻辑块的，在每一个逻辑块中存的是数据行，一行一行存，不够存的话，再找一个数据块存。而列式存储是按列存的，先存一个字段。这对于按列查询会很有效，比如找所有用户，找到Name那个字段就可以了。web应用常用的反而是列式查询。</p>
+<ul>
+<li>Infobright: 目前较有名的列式存储引擎，适用于海量数据存储场景，如PB级别，专为数据分析和数据仓库设计，有商业版和社区版。但是要想使用Infobright存储引擎，需要对mysql做定制。</li>
+<li>InfiniDB</li>
+<li>MonetDB</li>
+<li>LucidDB</li>
+</ul>
+<h3 id="开源社区提供的存储引擎"><a href="#开源社区提供的存储引擎" class="headerlink" title="开源社区提供的存储引擎"></a>开源社区提供的存储引擎</h3><ul>
+<li>Aria：前身为Maria，可理解为增强版的MyISAM(支持崩溃后安全恢复，支持数据缓存。MyISAM只支持索引缓存，不支持数据缓存)</li>
+<li>Groona：全文索引引擎，Mroonga是基于Groona的二次开发版。</li>
+<li>OQGraph: 由Open Query研发，支持图结构的存储引擎。<br>图是最难处理的数据结构。常用的数据结构有4种：顺序结构(线性结构)、链式结构、树型结构和图。</li>
+<li>SphinxSE: 为Sphinx全文搜索服务器提供了SQL接口。这个已经被整合进了MariaDB了。</li>
+<li>Spider: 能将表中的物理数据切分成不同分片，比较高效透明地实现了分片(shared)，还可以存于不同的服务器上，并支持在分片上支持并行查询。就像很多NoSQL的分片。</li>
+</ul>
+<h2 id="索引类型"><a href="#索引类型" class="headerlink" title="索引类型"></a>索引类型</h2><ul>
+<li>聚簇索引</li>
+<li><p>辅助索引</p>
+</li>
+<li><p>B树索引(B+)</p>
+</li>
+<li>R树索引：空间索引</li>
+<li>hash索引</li>
+<li>全文索引：全文搜索，比如在某帖子里搜索内容。</li>
+<li>位图索引：oracle支持，mysql不支持。</li>
+</ul>
+<h2 id="如何选择？"><a href="#如何选择？" class="headerlink" title="如何选择？"></a>如何选择？</h2><ol>
+<li>是否需要事务</li>
+<li>备份的类型的支持</li>
+<li>崩溃后的恢复</li>
+<li>特有的特性</li>
+</ol>
+<p>一般我们建议默认采用InnoDB，除非你是建立数据仓库时，我们建议使用MyISAM。MySQL5.5.8之前默认的存储引擎是MyISAM，而后其他版本默认是是InnoDB。<br>如果多个存储引擎满足你的需求，做测试，做性能剖析。</p>
+<p>优化没有任何放之四海而皆准的办法，你需要建立对对方良好的精确理解的基础上，并根据自己的需求去做选择。所以不要从网上搜一些文章朝自己的服务器咣当设置，就以为对服务器做优化了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"><i class="fa fa-tag"></i>MySQL</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/05/MySQL事务及隔离级别/" rel="next" title="MySQL事务及隔离级别">
+                <i class="fa fa-chevron-left"></i> MySQL事务及隔离级别
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">68</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL存储引擎"><span class="nav-number">1.</span> <span class="nav-text">MySQL存储引擎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储引擎中的数据和数据文件"><span class="nav-number">2.</span> <span class="nav-text">存储引擎中的数据和数据文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#InnoDB"><span class="nav-number">2.1.</span> <span class="nav-text">InnoDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MyISAM"><span class="nav-number">2.2.</span> <span class="nav-text">MyISAM</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#各存储引擎的特性"><span class="nav-number">3.</span> <span class="nav-text">各存储引擎的特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#InnoDB-1"><span class="nav-number">3.1.</span> <span class="nav-text">InnoDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MyISAM-1"><span class="nav-number">3.2.</span> <span class="nav-text">MyISAM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ARCHIVE"><span class="nav-number">3.3.</span> <span class="nav-text">ARCHIVE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CSV"><span class="nav-number">3.4.</span> <span class="nav-text">CSV</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BLACKHOLE"><span class="nav-number">3.5.</span> <span class="nav-text">BLACKHOLE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MEMORY"><span class="nav-number">3.6.</span> <span class="nav-text">MEMORY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MRG-MYISAM"><span class="nav-number">3.7.</span> <span class="nav-text">MRG_MYISAM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NDB"><span class="nav-number">3.8.</span> <span class="nav-text">NDB</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第三方的存储引擎"><span class="nav-number">4.</span> <span class="nav-text">第三方的存储引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OLTP类：在线事务处理"><span class="nav-number">4.1.</span> <span class="nav-text">OLTP类：在线事务处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#列式存储引擎-NoSQL用的多"><span class="nav-number">4.2.</span> <span class="nav-text">列式存储引擎(NoSQL用的多)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开源社区提供的存储引擎"><span class="nav-number">4.3.</span> <span class="nav-text">开源社区提供的存储引擎</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引类型"><span class="nav-number">5.</span> <span class="nav-text">索引类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何选择？"><span class="nav-number">6.</span> <span class="nav-text">如何选择？</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共182.1k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>

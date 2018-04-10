@@ -131,7 +131,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/79.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/80.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/81.png">
-<meta property="og:updated_time" content="2018-04-08T08:30:58.000Z">
+<meta property="og:updated_time" content="2018-04-08T08:35:32.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL事务及隔离级别">
 <meta name="twitter:description" content="MySQL逻辑架构我们可以把mysql的架构分为3层：">
@@ -364,7 +364,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-04-08T16:30:58+08:00" content="2018-04-08">
+              <time itemprop="dateUpdated" datetime="2018-04-08T16:35:32+08:00" content="2018-04-08">
               2018-04-08
               </time>
               </span>
@@ -451,9 +451,13 @@
 </ul>
 </li>
 </ul>
-<h3 id="如何实现显式锁-在服务器级别显式锁只能是表级锁"><a href="#如何实现显式锁-在服务器级别显式锁只能是表级锁" class="headerlink" title="如何实现显式锁(在服务器级别显式锁只能是表级锁)"></a>如何实现显式锁(在服务器级别显式锁只能是表级锁)</h3><p>LOCK TABLES<br>UNLOCK TABLES  #只能一次释放所有表的锁，不能指定表和锁类型。见下面的截图语法。</p>
-<p>LOCK TABLES<br>    tbl_name lock_type<br>    [, tbl_name lock_type] …</p>
-<p>锁类型：READ|WRITE</p>
+<h3 id="如何实现显式锁-在服务器级别显式锁只能是表级锁"><a href="#如何实现显式锁-在服务器级别显式锁只能是表级锁" class="headerlink" title="如何实现显式锁(在服务器级别显式锁只能是表级锁)"></a>如何实现显式锁(在服务器级别显式锁只能是表级锁)</h3><pre><code>LOCK TABLES
+UNLOCK TABLES  #只能一次释放所有表的锁，不能指定表和锁类型。见下面的截图语法。
+
+LOCK TABLES
+    tbl_name lock_type
+    [, tbl_name lock_type] ...
+</code></pre><p>锁类型：READ|WRITE</p>
 <p><strong>【示例1】:演示读锁。</strong></p>
 <pre><code>mysql&gt; use hellodb
 Database changed
@@ -610,6 +614,10 @@ Query OK, 0 rows affected (0.00 sec)
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2018/04/08/MySQL存储引擎对比/" rel="prev" title="MySQL存储引擎对比">
+                MySQL存储引擎对比 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -678,7 +686,7 @@ Query OK, 0 rows affected (0.00 sec)
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">67</span>
+              <span class="site-state-item-count">68</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -811,7 +819,7 @@ Query OK, 0 rows affected (0.00 sec)
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共178.0k字</span>
+  <span class="post-count">博客全站共182.1k字</span>
 </div>
 
         

@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-04-08T08:30:58.000Z</updated>
+  <updated>2018-04-10T09:07:13.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,181 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>MySQL存储引擎对比</title>
+    <link href="http://yoursite.com/2018/04/08/MySQL%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E5%AF%B9%E6%AF%94/"/>
+    <id>http://yoursite.com/2018/04/08/MySQL存储引擎对比/</id>
+    <published>2018-04-08T08:36:31.000Z</published>
+    <updated>2018-04-10T09:07:13.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;MySQL存储引擎&quot;&gt;&lt;a href=&quot;#MySQL存储引擎&quot; class=&quot;headerlink&quot; title=&quot;MySQL存储引擎&quot;&gt;&lt;/a&gt;MySQL存储引擎&lt;/h2&gt;&lt;p&gt;存储引擎也通常称作“表类型”。可以在创建表时指定其存储引擎。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SHOW ENGINES;    #查看支持的存储引擎。
+mysql&amp;gt; SHOW TABLES STATUS [LIKE clause] [WHERE clause] #使用WHERE比使用LIKE性能好
+SHOW TABLE STATUS [{FROM | IN} db_name] [LIKE &amp;apos;pattern&amp;apos; | WHERE expr] #如果设定了数据库，就不需要指定[{FROM | IN} db_name] 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【示例】：查看某张表的存储引擎&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SHOW TABLE STATUS IN hellodb WHERE Name=&amp;apos;classes&amp;apos;\G
+*************************** 1. row ***************************
+               Name: classes
+             Engine: InnoDB
+            Version: 10
+         Row_format: Compact
+               Rows: 8
+     Avg_row_length: 2048
+        Data_length: 16384
+    Max_data_length: 0
+       Index_length: 0
+          Data_free: 9437184
+     Auto_increment: 9
+        Create_time: 2014-04-08 11:14:52
+        Update_time: NULL
+         Check_time: NULL
+          Collation: utf8_general_ci
+           Checksum: NULL
+     Create_options: 
+            Comment: 
+    1 row in set (0.01 sec)   
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;Name: 表名&lt;/li&gt;
+&lt;li&gt;Engine: 存储引擎&lt;/li&gt;
+&lt;li&gt;Version: 表的版本&lt;/li&gt;
+&lt;li&gt;Row_format: 行格式。这些行格式是MySQL在其内部存储行数据时所采用的格式。每一种不同格式，其存储空间、开销是各部相同的。对于MyISAM表，常用的通常有DYNAMIC、FIXED或者COMPRESSED。而对于InnoDB存储引擎来讲，还可以额外使用REDUNDANT、COMPACT等类型。对于InnoDB来讲，默认是COMPACT。&lt;br&gt;{DEFAULT|DYNAMIC|FIXED|COMPRESSED|REDUNDANT|COMPACT}&lt;/li&gt;
+&lt;li&gt;Rows: 表中的行数。【注意】:对于MyISAM表来讲是精确的，但是对于InnoDB来讲未必精确。因为InnoDB基于多版本并发控制，里面有多种版本的快照，所以有些行你删了里面依然可能有。所以InnoDB表里的行数可能是个估计值。&lt;/li&gt;
+&lt;li&gt;Avg_row_length: 平均每行所包含的字节数。&lt;/li&gt;
+&lt;li&gt;Data_length: 表中数据总体大小，单位是字节。Data_length:=RowsXAvg_row_length。&lt;/li&gt;
+&lt;li&gt;Max_data_length: 表能够占用的最大空间，单位为字节。0表示没有上限。&lt;/li&gt;
+&lt;li&gt;Index_length: 索引的大小，单位为字节。&lt;/li&gt;
+&lt;li&gt;Data_free: 对于MyISAM表，表示已经分配但尚未使用的空间(就是划分给这个表的块的剩余空间)，其中包含此前删除行之后腾出来的空间。对于InnoDB表，就比较复杂了。&lt;/li&gt;
+&lt;li&gt;Auto_increment: 下一个AUTO_INCREMENT的值；&lt;/li&gt;
+&lt;li&gt;Create_time: 表的创建时间；&lt;/li&gt;
+&lt;li&gt;Update_time：表数据的最近一次的修改时间；&lt;/li&gt;
+&lt;li&gt;Check_time：mysql的一些工具，比如使用CHECK TABLE或myisamchk最近一次检测表的时间；&lt;/li&gt;
+&lt;li&gt;Collation: 排序规则；&lt;/li&gt;
+&lt;li&gt;Checksum: 如果启用，则为表的checksum；为空表示没有启用校验功能。但是请注意，每次修改表，这个值也会变动，会产生额外的I/O，性能会有影响，但是对表的一致性和数据完整性提供了额外保证；&lt;/li&gt;
+&lt;li&gt;Create_options: 创建表时指定使用的其它选项，比如SQL_Cache等选项；&lt;/li&gt;
+&lt;li&gt;Comment: 表的注释信息。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;存储引擎中的数据和数据文件&quot;&gt;&lt;a href=&quot;#存储引擎中的数据和数据文件&quot; class=&quot;headerlink&quot; title=&quot;存储引擎中的数据和数据文件&quot;&gt;&lt;/a&gt;存储引擎中的数据和数据文件&lt;/h2&gt;&lt;h3 id=&quot;InnoDB&quot;&gt;&lt;a href=&quot;#InnoDB&quot; class=&quot;headerlink&quot; title=&quot;InnoDB&quot;&gt;&lt;/a&gt;InnoDB&lt;/h3&gt;&lt;p&gt;两种格式：&lt;br&gt;&lt;strong&gt;1、innodb_file_per_table=OFF，即使用共享表空间。&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;每张表有一个独有的格式定义文件: tb_name.frm&lt;/li&gt;
+&lt;li&gt;还有一个默认位于数据目录下共享的表空间文件：ibdata#   (一个表空间文件大小到达一定程度后，会启动第二个表空间文件)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;2、innodb_file_per_table=ON，即使用独立表空间。&lt;/strong&gt;&lt;br&gt;每个表在数据库目录下存储两个文件：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;tb_name.frm&lt;/li&gt;
+&lt;li&gt;tb_name.ibd&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;表空间：table space，由InnoDB管理的特有格式数据文件，内部可同时存储数据和索引(因此是聚簇索引)。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&quot;MyISAM&quot;&gt;&lt;a href=&quot;#MyISAM&quot; class=&quot;headerlink&quot; title=&quot;MyISAM&quot;&gt;&lt;/a&gt;MyISAM&lt;/h3&gt;&lt;p&gt;每个表都在数据库目录(data目录)下存储三个文件：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;tb_name.frm  #表结构的定义&lt;/li&gt;
+&lt;li&gt;tb_name.MYD  #数据&lt;/li&gt;
+&lt;li&gt;tb_name.MYI  #索引&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如何修改默认存储引擎：通过default_storage_engine服务变量实现。要想永久生效，需要写到配置文件中，重启生效。&lt;/p&gt;
+&lt;h2 id=&quot;各存储引擎的特性&quot;&gt;&lt;a href=&quot;#各存储引擎的特性&quot; class=&quot;headerlink&quot; title=&quot;各存储引擎的特性&quot;&gt;&lt;/a&gt;各存储引擎的特性&lt;/h2&gt;&lt;p&gt;mysql 5.3.8之后mysql就被oracle收购了，原生自带InnoDB存储引擎了。(以前InnoDB是插件形式工作的，但是自从oracle收购InnoDB后做了很大改进，再到后来收购了sun，InnoDB就自然成为原生的了。)&lt;/p&gt;
+&lt;h3 id=&quot;InnoDB-1&quot;&gt;&lt;a href=&quot;#InnoDB-1&quot; class=&quot;headerlink&quot; title=&quot;InnoDB&quot;&gt;&lt;/a&gt;InnoDB&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;支持事务：有事务日志。为什么要有事务日志啊？&lt;strong&gt;因为可以它能够把随机I/O改为顺序I/O。&lt;/strong&gt;事务日志在数据目录下，至少有两个，而且大小固定，不会增长，而且一定是磁盘上的一段连续存储空间。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/82.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
+&lt;li&gt;支持外键约束：MyISAM是不支持的，因为不支持事务就很难使用外键。&lt;/li&gt;
+&lt;li&gt;MVCC：多版本并发控制。&lt;/li&gt;
+&lt;li&gt;支持聚簇索引：也叫聚集索引。说白了就是数据和索引存储在一起，通过表空间来实现的。也就意味着创建InnoDB表时必须要有主键。这样的话InnoDB表的查询比MyISAM表的查询多了一步，因为所有非聚集索引(又称为辅助索引)不是指向数据的，而是指向聚簇索引的。什么意思呢？(该节视频31分钟左右开始)。&lt;br&gt;聚簇索引之外的其它索引，通常称为辅助索引。聚簇索引只能有一个，辅助索引可以有多个。&lt;/li&gt;
+&lt;li&gt;行级锁：行级锁之上它在实现MVCC机制时是基于”间隙锁”实现的。在行和行之间加间隙锁来隔离行。&lt;/li&gt;
+&lt;li&gt;支持辅助索引：有些NoSQL只支持一种索引。&lt;/li&gt;
+&lt;li&gt;支持自适应hash索引&lt;/li&gt;
+&lt;li&gt;支持热备份：因此数据库不用离线就可以实现备份了。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;【补充】:聚簇索引和辅助索引。&lt;/strong&gt;&lt;br&gt;位于磁盘上的数据，我们需要把所有载入内存才可以查询的，太慢了。于是我们把表中数据按我们经常查询的叫搜索键，通常是一个字段，通常我们用于WHERE子句中比较的字段，把它抽取出来做索引就好了，这样可以提高查询速度的。这个索引文件如果是额外存放的，意味着要把这个字段的值复制一份出来，放在另外一个位置，这就是索引文件。但是这索引信息是要被排序的，它把表中的字段拿出来后重新排了下序。排完序以后，一个字段对应的那个行在哪？也就是我们找到索引后，怎么找到对应的整行数据？索引里面有原数据，只有一部分，只有你所抽取的字段，如果你找的正好是那个字段，那就不用去查原来的表了。比如SELECT Age FROM students WHERE Age &amp;gt; 30，那就意味着索引要建立在Age上才行，假如我们在Age上创建了索引，意味着索引文件中已经都有了Age字段的所有数据，正好我们找的就是Age，但是如果我们找的不是Age这个字段，而是Name，那么就需要先找到符合索引条件(Age &amp;gt; 30)的条目，这个条目有指向其在原数据中的行的位置，接着就找到行所在的磁盘块，把这个磁盘块载入内存，对应表中的那个行的所有字段就找到了，从而Name也就找到了。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/83.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;图中，索引和数据是分开存放的，也就意味着我们找到索引以后，还得做第二次I/O，找到那个真正数据所在磁盘上的位置，然后把数据读进来。&lt;br&gt;        那什么是聚簇索引呢？索引条目和行是挨着存放的，所以你只要能找到索引，就直接能找到这个行了。一个表能有几个聚簇索引呢？索引是排序的，我们按年龄排序和按姓名排序，其结果不一样。由于索引和数据是存放在一起的，那就意味着索引怎么排序，数据就一定是怎么排序的。如果索引按年龄排序存放了，数据也就按年龄排序存放了，很显然不能在拿姓名来排序存放了。所以对于一张表来讲，聚簇索引只能有一个。非聚簇索引可以有多个，因为排序只是索引本身，不是数据。而对于InnoDB表来讲，非聚簇索引的数据指针并不是指向数据的，而是指向聚簇索引。因此查找InnoDB表分两步，先找辅助索引，然后根据辅助索引找到聚簇索引，然后在找到数据。所以选择一个好的聚簇索引能够非常好的提升InnoDB的查询性能的。&lt;br&gt;        因此对于InnoDB表来说必须有一个聚簇索引，而聚簇索引通常用主键来实现，因为主键中的数据是不允许重复的，所以索引中出现重复的可能性就没有了。因此我们通常提供一个主键用于聚簇索引。&lt;br&gt;        当然，无论是聚簇索引还是辅助索引都是B树索引，因为聚簇和辅助只是指明了它的存储位置是否和原数据存储在一块的，但B树指的是索引自己的内部结构，数据结构。你可以把房子盖到市中心，也可以盖到郊区，但房子本身可以是别墅或一室两厅。一个按位置来讲，一个是按数据结构来讲。B树是一种数据结构。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/84.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;MyISAM-1&quot;&gt;&lt;a href=&quot;#MyISAM-1&quot; class=&quot;headerlink&quot; title=&quot;MyISAM&quot;&gt;&lt;/a&gt;MyISAM&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;支持全文索引：InnoDB不支持。但是InnoDB不支持，好在可以借助额外的其他工具来完成对InnoDB表的全文索引。因此这对于InnoDB来说不是一个缺陷。比如编译Mroonga存储引擎，这是一个很独特的存储引擎。&lt;/li&gt;
+&lt;li&gt;支持表压缩：用于实现数据仓库，能节约存储空间并提升性能。只不过压缩以后就不能修改了，只能查询。所以在压缩的时候主要是用来做数据仓库的。&lt;/li&gt;
+&lt;li&gt;支持空间索引：InnoDB也支持空间索引。要想使用空间索引，得使用空间函数，才能完成里面的很多数据的操作。&lt;/li&gt;
+&lt;li&gt;支持表级锁：不支持行级锁，所以锁开销比较小。如果读写比例是9:1或8:2，对MyISAM是非常理想的。如果读写差不多比例，那么使用MyISAM其性能就下降太厉害了。所以读写差不多的话，建议使用InnoDB表。&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;支持延迟更新索引：很多时候索引是为了提升读操作的，那么对写操作会有延迟。好在MyISAM支持延迟更新索引键。创建表有个选项delay_key_write，延迟键更新。这样每当数据更新时，不必要立即更新索引，使得其I/O压力就降低了。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;不支持事务、外键和行级锁&lt;br&gt;崩溃后无法安全恢复数据(你可能得使用repairtable这样的命令去修复表，而这个修复过程通常是不可控的。不像InnoDB，如果崩溃了，InnoDB存储引擎会自行根据事务日志进行恢复)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;适用场景：只读数据、较小的表、能够容忍崩溃后的修改操作时长和数据丢失。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;事实上，mysql库中的表都是MyISAM的，因为mysql这个库是数据字典，而数据字典大多数情况下都是一次创建，但是我们对表的读取却是多次的，所以是一种多读少写的场景，而且表也不会特别大。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SHOW TABLE STATUS IN mysql\G
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;ARCHIVE&quot;&gt;&lt;a href=&quot;#ARCHIVE&quot; class=&quot;headerlink&quot; title=&quot;ARCHIVE&quot;&gt;&lt;/a&gt;ARCHIVE&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;仅支持INSERT和SELECT，支持很好压缩功能；&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;适用于存储日志信息，或其它按时间序列实现的数据采集类的应用；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;不支持事务，不能很好的支持索引；&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;CSV&quot;&gt;&lt;a href=&quot;#CSV&quot; class=&quot;headerlink&quot; title=&quot;CSV&quot;&gt;&lt;/a&gt;CSV&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;将数据存储为CSV格式；不支持索引；仅适用于数据交换场景；&lt;br&gt;你可以将excel中表中数据存储为csv格式的，然后在把它导入到mysql中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;BLACKHOLE&quot;&gt;&lt;a href=&quot;#BLACKHOLE&quot; class=&quot;headerlink&quot; title=&quot;BLACKHOLE&quot;&gt;&lt;/a&gt;BLACKHOLE&lt;/h3&gt;&lt;p&gt;没有存储机制，任何发往此引擎的数据都会丢弃；其会记录二进制日志，因此，常用于多级复制架构中作中转服务器；&lt;/p&gt;
+&lt;h3 id=&quot;MEMORY&quot;&gt;&lt;a href=&quot;#MEMORY&quot; class=&quot;headerlink&quot; title=&quot;MEMORY&quot;&gt;&lt;/a&gt;MEMORY&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;保存数据在内存中，内存表；常用于保存中间数据，如周期性的聚合数据等；也用于实现临时表&lt;/li&gt;
+&lt;li&gt;仅支持hash索引，使用表级锁，不支持BLOB和TEXT数据类型；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;MRG-MYISAM&quot;&gt;&lt;a href=&quot;#MRG-MYISAM&quot; class=&quot;headerlink&quot; title=&quot;MRG_MYISAM&quot;&gt;&lt;/a&gt;MRG_MYISAM&lt;/h3&gt;&lt;p&gt;是MYISAM的一个变种，能够将多个MyISAM表合并成一个虚表；&lt;br&gt;但是现在很多应用场景中存的数据量非常大，而一张表中存的数据过多，查询的时候性能会很差。所以很多时候需要借助一些机制将一个表切割成多张表，更别说合并表了。所以这个引擎很少用。&lt;/p&gt;
+&lt;h3 id=&quot;NDB&quot;&gt;&lt;a href=&quot;#NDB&quot; class=&quot;headerlink&quot; title=&quot;NDB&quot;&gt;&lt;/a&gt;NDB&lt;/h3&gt;&lt;p&gt;是MySQL CLUSTER中专用的存储引擎。是位于内存中完成数据存储和交换的，能够实现分布式、不做任何共享的、容灾的、高可用的mysql集群，但实际上这种集群没人用。&lt;br&gt;其实早期NDB是爱立信的一个数据库，而后2003年mysql AB公司从爱立信收购了NDB，随后把NDB转换为了存储引擎。&lt;/p&gt;
+&lt;h2 id=&quot;第三方的存储引擎&quot;&gt;&lt;a href=&quot;#第三方的存储引擎&quot; class=&quot;headerlink&quot; title=&quot;第三方的存储引擎&quot;&gt;&lt;/a&gt;第三方的存储引擎&lt;/h2&gt;&lt;h3 id=&quot;OLTP类：在线事务处理&quot;&gt;&lt;a href=&quot;#OLTP类：在线事务处理&quot; class=&quot;headerlink&quot; title=&quot;OLTP类：在线事务处理&quot;&gt;&lt;/a&gt;OLTP类：在线事务处理&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;XtraDB: 增强版的InnoDB，由Percona提供。&lt;br&gt;编译安装时，下载XtraDB的源码替换MySQL存储引擎中的InnoDB的源码。然后重命名XtraDB为InnoDB，接着编译安装mysql，就可以取代InnoDB，只不过仍然叫做InnoDB。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;PBXT: MariaDB自带此存储引擎。&lt;br&gt;支持引擎级别的复制、外键约束，对SSD磁盘提供适当支持；&lt;br&gt;支持事务、MVCC。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;TokuDB: 使用Fractal Trees(分形树)索引(这个索引很新，性能很好)，适用存储大数据，拥有很高的压缩比；已经被引入MariaDB。事实上，在mysql被oracle收购后，Apple就立即抛弃了mysql，转向了pgSQL。Apple的领导人很有远见的，迟早有一天要抛弃，还不如早点抛弃。现在Google、Facebook都在纷纷抛弃mysql，转向MariaDB。而Redhat7不在提供mysql，而默认提供MariaDB。可以预见，CentOS、Fedora以后都会转向MariaDB。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;列式存储引擎-NoSQL用的多&quot;&gt;&lt;a href=&quot;#列式存储引擎-NoSQL用的多&quot; class=&quot;headerlink&quot; title=&quot;列式存储引擎(NoSQL用的多)&quot;&gt;&lt;/a&gt;列式存储引擎(NoSQL用的多)&lt;/h3&gt;&lt;p&gt;Mysql数据是这么存的，所有数据在存储时首先划分成逻辑块的，在每一个逻辑块中存的是数据行，一行一行存，不够存的话，再找一个数据块存。而列式存储是按列存的，先存一个字段。这对于按列查询会很有效，比如找所有用户，找到Name那个字段就可以了。web应用常用的反而是列式查询。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Infobright: 目前较有名的列式存储引擎，适用于海量数据存储场景，如PB级别，专为数据分析和数据仓库设计，有商业版和社区版。但是要想使用Infobright存储引擎，需要对mysql做定制。&lt;/li&gt;
+&lt;li&gt;InfiniDB&lt;/li&gt;
+&lt;li&gt;MonetDB&lt;/li&gt;
+&lt;li&gt;LucidDB&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;开源社区提供的存储引擎&quot;&gt;&lt;a href=&quot;#开源社区提供的存储引擎&quot; class=&quot;headerlink&quot; title=&quot;开源社区提供的存储引擎&quot;&gt;&lt;/a&gt;开源社区提供的存储引擎&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Aria：前身为Maria，可理解为增强版的MyISAM(支持崩溃后安全恢复，支持数据缓存。MyISAM只支持索引缓存，不支持数据缓存)&lt;/li&gt;
+&lt;li&gt;Groona：全文索引引擎，Mroonga是基于Groona的二次开发版。&lt;/li&gt;
+&lt;li&gt;OQGraph: 由Open Query研发，支持图结构的存储引擎。&lt;br&gt;图是最难处理的数据结构。常用的数据结构有4种：顺序结构(线性结构)、链式结构、树型结构和图。&lt;/li&gt;
+&lt;li&gt;SphinxSE: 为Sphinx全文搜索服务器提供了SQL接口。这个已经被整合进了MariaDB了。&lt;/li&gt;
+&lt;li&gt;Spider: 能将表中的物理数据切分成不同分片，比较高效透明地实现了分片(shared)，还可以存于不同的服务器上，并支持在分片上支持并行查询。就像很多NoSQL的分片。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;索引类型&quot;&gt;&lt;a href=&quot;#索引类型&quot; class=&quot;headerlink&quot; title=&quot;索引类型&quot;&gt;&lt;/a&gt;索引类型&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;聚簇索引&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;辅助索引&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;B树索引(B+)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;R树索引：空间索引&lt;/li&gt;
+&lt;li&gt;hash索引&lt;/li&gt;
+&lt;li&gt;全文索引：全文搜索，比如在某帖子里搜索内容。&lt;/li&gt;
+&lt;li&gt;位图索引：oracle支持，mysql不支持。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;如何选择？&quot;&gt;&lt;a href=&quot;#如何选择？&quot; class=&quot;headerlink&quot; title=&quot;如何选择？&quot;&gt;&lt;/a&gt;如何选择？&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;是否需要事务&lt;/li&gt;
+&lt;li&gt;备份的类型的支持&lt;/li&gt;
+&lt;li&gt;崩溃后的恢复&lt;/li&gt;
+&lt;li&gt;特有的特性&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;一般我们建议默认采用InnoDB，除非你是建立数据仓库时，我们建议使用MyISAM。MySQL5.5.8之前默认的存储引擎是MyISAM，而后其他版本默认是是InnoDB。&lt;br&gt;如果多个存储引擎满足你的需求，做测试，做性能剖析。&lt;/p&gt;
+&lt;p&gt;优化没有任何放之四海而皆准的办法，你需要建立对对方良好的精确理解的基础上，并根据自己的需求去做选择。所以不要从网上搜一些文章朝自己的服务器咣当设置，就以为对服务器做优化了。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;MySQL存储引擎&quot;&gt;&lt;a href=&quot;#MySQL存储引擎&quot; class=&quot;headerlink&quot; title=&quot;MySQL存储引擎&quot;&gt;&lt;/a&gt;MySQL存储引擎&lt;/h2&gt;&lt;p&gt;存储引擎也通常称作“表类型”。可以在创建表时指定其存储引擎。
+    
+    </summary>
+    
+      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
+    
+    
+      <category term="MySQL" scheme="http://yoursite.com/tags/MySQL/"/>
+    
+  </entry>
+  
+  <entry>
     <title>MySQL事务及隔离级别</title>
     <link href="http://yoursite.com/2018/04/05/MySQL%E4%BA%8B%E5%8A%A1%E5%8F%8A%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB/"/>
     <id>http://yoursite.com/2018/04/05/MySQL事务及隔离级别/</id>
     <published>2018-04-05T01:17:31.000Z</published>
-    <updated>2018-04-08T08:30:58.000Z</updated>
+    <updated>2018-04-08T08:35:32.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;MySQL逻辑架构&quot;&gt;&lt;a href=&quot;#MySQL逻辑架构&quot; class=&quot;headerlink&quot; title=&quot;MySQL逻辑架构&quot;&gt;&lt;/a&gt;MySQL逻辑架构&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/63.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;我们可以把mysql的架构分为3层：&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;1.第一层：连接池或称为线程处理工具。处理用户的连接建立。&lt;/strong&gt;&lt;br&gt;        mysql现在对于线程管理是通过线程池来实现的。一个池子中所能够容纳的水量是有限的，所以一个线程池中所能够容纳的线程数也是有限的。所以mysql启动时事先创建好一个线程池，在这个池子内假如创建了100个空闲线程，来一个用户连接，给它一个线程，当用户连接达到100个，新连接就要排队等待，后面维持一个队列。当某个连接上的用户请求退出后，其对应的线程不会销毁，只会清理数据，还原成原来的样子，再去处理新的用户请求。&lt;br&gt;        所以用户的连接线程在线程池的管理模式中是不会被销毁的，一般是能够实现重用的。所以就避免了频繁的线程创建和删除。&lt;br&gt;        mysql客户端和服务器端通信要通过mysql协议进行通信，协议一般来讲有两种格式。http协议是文本的，我们可以通过telnet连进去手动发送命令的，https协议是二进制的。mysql协议这两种格式都支持。哪种协议会比较高效？二进制的会略微高效一点，所以很多支持两种协议的默认都使用二进制格式。无论是二进制还是文本，都是明文的，只不过你编码成了二进制格式而已，我们只需要一个解码工具，就能把二进制转换为原来的样子了。&lt;br&gt;        为了安全，加密。mysql支持将它的协议基于ssl进行发送的。&lt;/p&gt;
@@ -49,9 +219,13 @@
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;h3 id=&quot;如何实现显式锁-在服务器级别显式锁只能是表级锁&quot;&gt;&lt;a href=&quot;#如何实现显式锁-在服务器级别显式锁只能是表级锁&quot; class=&quot;headerlink&quot; title=&quot;如何实现显式锁(在服务器级别显式锁只能是表级锁)&quot;&gt;&lt;/a&gt;如何实现显式锁(在服务器级别显式锁只能是表级锁)&lt;/h3&gt;&lt;p&gt;LOCK TABLES&lt;br&gt;UNLOCK TABLES  #只能一次释放所有表的锁，不能指定表和锁类型。见下面的截图语法。&lt;/p&gt;
-&lt;p&gt;LOCK TABLES&lt;br&gt;    tbl_name lock_type&lt;br&gt;    [, tbl_name lock_type] …&lt;/p&gt;
-&lt;p&gt;锁类型：READ|WRITE&lt;/p&gt;
+&lt;h3 id=&quot;如何实现显式锁-在服务器级别显式锁只能是表级锁&quot;&gt;&lt;a href=&quot;#如何实现显式锁-在服务器级别显式锁只能是表级锁&quot; class=&quot;headerlink&quot; title=&quot;如何实现显式锁(在服务器级别显式锁只能是表级锁)&quot;&gt;&lt;/a&gt;如何实现显式锁(在服务器级别显式锁只能是表级锁)&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;LOCK TABLES
+UNLOCK TABLES  #只能一次释放所有表的锁，不能指定表和锁类型。见下面的截图语法。
+
+LOCK TABLES
+    tbl_name lock_type
+    [, tbl_name lock_type] ...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;锁类型：READ|WRITE&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;【示例1】:演示读锁。&lt;/strong&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;mysql&amp;gt; use hellodb
 Database changed
@@ -3306,159 +3480,6 @@ export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
     
     
       <category term="nexus" scheme="http://yoursite.com/tags/nexus/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Filebeat日志收集器</title>
-    <link href="http://yoursite.com/2017/10/24/Filebeat%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86%E5%99%A8/"/>
-    <id>http://yoursite.com/2017/10/24/Filebeat日志收集器/</id>
-    <published>2017-10-24T02:26:16.000Z</published>
-    <updated>2017-11-13T07:38:39.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;Beats工具&quot;&gt;&lt;a href=&quot;#Beats工具&quot; class=&quot;headerlink&quot; title=&quot;Beats工具&quot;&gt;&lt;/a&gt;Beats工具&lt;/h2&gt;&lt;p&gt;Beats是elastic公司的一款轻量级数据采集产品，它是从packetbeat发展出来的数据收集器系统，它包含了几个子产品：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Packetbeat(用于监控网络流量)&lt;/li&gt;
-&lt;li&gt;Filebeat(用于监听日志数据)&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Metricbeat(用于搜集CPU、内存、磁盘的信息以及Nginx、Redis等服务的数据)&lt;/li&gt;
-&lt;li&gt;Winlogbeat(用于搜集windows事件日志)&lt;/li&gt;
-&lt;li&gt;Heartbeat(用于监控服务的可用性)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Beats可以直接把数据发送给Elasticsearch或者发送给Logstash，然后Logstash发送给Elasticsearch，然后进行后续的数据分析活动。&lt;br&gt;由于他们都是基于libbeat写出来的，提供了统一的数据发送方法，输入配置解析，日志记录框架等功能。所有的beat工具，在配置上基本相同，只是input输入的地方各有差异。&lt;br&gt;如果有其他特殊需求，可以使用Go语言借助libbeat库方便地开发自己的Beat工具，社区中有很多工具可以参考。&lt;/p&gt;
-&lt;h2 id=&quot;Logstash和Filebeat&quot;&gt;&lt;a href=&quot;#Logstash和Filebeat&quot; class=&quot;headerlink&quot; title=&quot;Logstash和Filebeat&quot;&gt;&lt;/a&gt;Logstash和Filebeat&lt;/h2&gt;&lt;p&gt;上一篇文章中介绍过，Logstash是跑在JVM上的，需要消耗较多的系统资源，而Filebeat则是一个轻量级的日志采集工具，占用资源更少。我们完全可以在每台机器上安装启动个Filebeat，由Filebeat来采集日志，将数据传输给Redis或者Kafka，然后logstash去获取，利用filter功能过滤分析，然后存储到elasticsearch中。架构图如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/8.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h2&gt;&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;主机名&lt;/th&gt;
-&lt;th&gt;操作系统版本&lt;/th&gt;
-&lt;th&gt;IP地址&lt;/th&gt;
-&lt;th&gt;安装软件&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;hadoop16&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;172.16.206.16&lt;/td&gt;
-&lt;td&gt;elasticsearch-5.6.3.zip、kibana-5.6.3-linux-x86_64.tar.gz&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;spark32&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;172.16.206.32&lt;/td&gt;
-&lt;td&gt;logstash-5.6.3.tar.gz、filebeat-5.6.3-linux-x86_64.tar.gz、Nginx&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;osb30&lt;/td&gt;
-&lt;td&gt;Redhat 6.5&lt;/td&gt;
-&lt;td&gt;172.16.206.30&lt;/td&gt;
-&lt;td&gt;redis-3.2.2.tar.gz&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h2 id=&quot;安装配置Redis&quot;&gt;&lt;a href=&quot;#安装配置Redis&quot; class=&quot;headerlink&quot; title=&quot;安装配置Redis&quot;&gt;&lt;/a&gt;安装配置Redis&lt;/h2&gt;&lt;h3 id=&quot;安装Redis&quot;&gt;&lt;a href=&quot;#安装Redis&quot; class=&quot;headerlink&quot; title=&quot;安装Redis&quot;&gt;&lt;/a&gt;安装Redis&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# yum install readline-devel pcre-devel openssl-devel -y
-# cd /usr/local/
-# tar zxf redis-3.2.2.tar.gz 
-# cd redis-3.2.2/
-# make
-# make install
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置Redis&quot;&gt;&lt;a href=&quot;#配置Redis&quot; class=&quot;headerlink&quot; title=&quot;配置Redis&quot;&gt;&lt;/a&gt;配置Redis&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# cd /usr/local/redis-3.2.2/
-# cp redis.conf /etc/
-# vim /etc/redis.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;1.打开/etc/redis.conf，将daemonize处修改为yes。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/9.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;2.配置Redis持久化策略&lt;br&gt;使用RDB和AOF双持久化策略：其中默认开启了RDB持久化，我们只需要开启AOF持久化。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/10.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;3.配置redis日志文件&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/11.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;4.配置数据文件存放路径，在/目录下面创建/RedisData目录&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# mkdir /RedisData
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;5.修改Redis监听地址&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/13.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;6.修改Redis监听端口&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/14.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;7.在redis3.2之后，redis增加了protected-mode，在这个模式下，即使注释掉了bind 127.0.0.1，再访问redis的时候还是报错，所以要如下设置&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/15.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;启动-停止Redis&quot;&gt;&lt;a href=&quot;#启动-停止Redis&quot; class=&quot;headerlink&quot; title=&quot;启动/停止Redis&quot;&gt;&lt;/a&gt;启动/停止Redis&lt;/h3&gt;&lt;p&gt;启动：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# /usr/local/bin/redis-server /etc/redis.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;停止：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# /usr/local/redis-3.2.2/src/redis-cli -p 6400 shutdown
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装配置Filebeat&quot;&gt;&lt;a href=&quot;#安装配置Filebeat&quot; class=&quot;headerlink&quot; title=&quot;安装配置Filebeat&quot;&gt;&lt;/a&gt;安装配置Filebeat&lt;/h2&gt;&lt;p&gt;filebeat的工作流程：当开启filebeat程序的时候，它会启动一个或多个探测器（prospectors）去检测指定的日志目录或文件，对于探测器找出的每一个日志文件，filebeat启动收割进程（harvester），每一个收割进程读取一个日志文件的新内容，并发送这些新的日志数据到处理程序（spooler），处理程序会集合这些事件，最后filebeat会发送集合的数据到你指定的地点（Elasticsearch、Logstash、Kafka或者Redis）。&lt;/p&gt;
-&lt;h3 id=&quot;安装Filebeat&quot;&gt;&lt;a href=&quot;#安装Filebeat&quot; class=&quot;headerlink&quot; title=&quot;安装Filebeat&quot;&gt;&lt;/a&gt;安装Filebeat&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@spark32 opt]# wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-5.6.3-linux-x86_64.tar.gz
-[root@spark32 opt]# ln -sv filebeat-5.6.3-linux-x86_64 filebeat
-‘filebeat’ -&amp;gt; ‘filebeat-5.6.3-linux-x86_64’
-[root@spark32 opt]# cd filebeat
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;配置Filebeat&quot;&gt;&lt;a href=&quot;#配置Filebeat&quot; class=&quot;headerlink&quot; title=&quot;配置Filebeat&quot;&gt;&lt;/a&gt;配置Filebeat&lt;/h3&gt;&lt;p&gt;1.定义你的日志文件的路径（一个或多个）&lt;br&gt;对于大多数的基本filebeat配置，可以定义一个单一探测器针对一个单一的路径，例如：&lt;br&gt;filebeat.prospectors:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;- input_type: log
-  paths:
-    - /usr/local/openresty/nginx/logs/host.access.log
-  #json.keys_under_root: true 若收取日志格式为json的log，请开启此配置
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.定义输出日志，我这里输出到redis中&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;output.redis:
-  hosts: [&amp;quot;172.16.206.30:6400&amp;quot;]
-  #password: &amp;quot;my_password&amp;quot;
-  key: &amp;quot;filebeat&amp;quot;
-  db: 0
-  timeout: 5
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;启动Filebeat&quot;&gt;&lt;a href=&quot;#启动Filebeat&quot; class=&quot;headerlink&quot; title=&quot;启动Filebeat&quot;&gt;&lt;/a&gt;启动Filebeat&lt;/h3&gt;&lt;p&gt;测试配置文件语法：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /opt/filebeat/
-# ./filebeat -configtest -e
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;启动：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# ./filebeat &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看数据是否进入redis：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@osb30 src]# ./redis-cli -p 6400 
-127.0.0.1:6400&amp;gt; help @LIST
-127.0.0.1:6400&amp;gt; LLEN filebeat
-(integer) 15
-127.0.0.1:6400&amp;gt; LINDEX filebeat 1
-&amp;quot;{\&amp;quot;@timestamp\&amp;quot;:\&amp;quot;2017-10-23T07:13:37.551Z\&amp;quot;,\&amp;quot;beat\&amp;quot;:{\&amp;quot;hostname\&amp;quot;:\&amp;quot;spark32\&amp;quot;,\&amp;quot;name\&amp;quot;:\&amp;quot;spark32\&amp;quot;,\&amp;quot;version\&amp;quot;:\&amp;quot;5.6.3\&amp;quot;},\&amp;quot;input_type\&amp;quot;:\&amp;quot;log\&amp;quot;,\&amp;quot;message\&amp;quot;:\&amp;quot;172.16.4.81 - - [19/Oct/2017:09:47:17 +0800] \\\&amp;quot;GET /favicon.ico HTTP/1.1\\\&amp;quot; 404 576 \\\&amp;quot;http://172.16.206.32:808/\\\&amp;quot; \\\&amp;quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36\\\&amp;quot; \\\&amp;quot;-\\\&amp;quot;\&amp;quot;,\&amp;quot;offset\&amp;quot;:439,\&amp;quot;source\&amp;quot;:\&amp;quot;/usr/local/openresty/nginx/logs/host.access.log\&amp;quot;,\&amp;quot;type\&amp;quot;:\&amp;quot;log\&amp;quot;}&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;浏览器访问下nginx，再次查看redis数据：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;127.0.0.1:6400&amp;gt; LLEN filebeat
-(integer) 16
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装配置Elasticsearch&quot;&gt;&lt;a href=&quot;#安装配置Elasticsearch&quot; class=&quot;headerlink&quot; title=&quot;安装配置Elasticsearch&quot;&gt;&lt;/a&gt;安装配置Elasticsearch&lt;/h2&gt;&lt;p&gt;关于Elasticsearch的安装部署详见上一篇博客&lt;a href=&quot;http://jkzhao.github.io/2017/10/20/ELK%E5%AE%9E%E6%88%98/#more&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;《ELK实战》&lt;/a&gt;。&lt;/p&gt;
-&lt;h2 id=&quot;安装配置Logstash&quot;&gt;&lt;a href=&quot;#安装配置Logstash&quot; class=&quot;headerlink&quot; title=&quot;安装配置Logstash&quot;&gt;&lt;/a&gt;安装配置Logstash&lt;/h2&gt;&lt;p&gt;Logstash从redis中取数据，输出结果到Elasticsearch中。关于Logstash的安装部署详见上一篇博客&lt;a href=&quot;http://jkzhao.github.io/2017/10/20/ELK%E5%AE%9E%E6%88%98/#more&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;《ELK实战》&lt;/a&gt;。&lt;/p&gt;
-&lt;h3 id=&quot;配置Logstash&quot;&gt;&lt;a href=&quot;#配置Logstash&quot; class=&quot;headerlink&quot; title=&quot;配置Logstash&quot;&gt;&lt;/a&gt;配置Logstash&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# cd /opt/logstash-5.6.3/conf
-# vim logstash_redis.conf
-input {
-  redis {
-    host  =&amp;gt;  &amp;quot;172.16.206.30&amp;quot;
-    port  =&amp;gt;  &amp;quot;6400&amp;quot;
-    data_type  =&amp;gt;  &amp;quot;list&amp;quot;
-    key  =&amp;gt;  &amp;quot;filebeat&amp;quot;
-  }
-}
-
-filter {
-  grok {
-    match =&amp;gt; { &amp;quot;message&amp;quot; =&amp;gt; &amp;quot;%{NGINXACCESS}&amp;quot; }
-  }
-}
-
-output {
-  elasticsearch {
-    hosts    =&amp;gt;  [&amp;quot;172.16.206.16:9200&amp;quot;]
-    action   =&amp;gt;  &amp;quot;index&amp;quot;
-    index    =&amp;gt;  &amp;quot;filebeat-%{+YYYY.MM.dd}&amp;quot;
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;启动Logstash&quot;&gt;&lt;a href=&quot;#启动Logstash&quot; class=&quot;headerlink&quot; title=&quot;启动Logstash&quot;&gt;&lt;/a&gt;启动Logstash&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@spark32 logstash-5.6.3]# bin/logstash -f /opt/logstash-5.6.3/conf/logstash_redis.conf &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看redis中的数据，发现已经全部被消费了：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;127.0.0.1:6400&amp;gt; LLEN filebeat
-(integer) 0
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看Elasticsearch中的索引：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# curl -XGET &amp;apos;172.16.206.16:9200/_cat/indices&amp;apos;
-yellow open filebeat-2017.10.23 PQe6qyVfSSG7GHQJUOPWtA 5 1 18 0 92.8kb 92.8kb
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;安装配置Kibana&quot;&gt;&lt;a href=&quot;#安装配置Kibana&quot; class=&quot;headerlink&quot; title=&quot;安装配置Kibana&quot;&gt;&lt;/a&gt;安装配置Kibana&lt;/h2&gt;&lt;p&gt;关于Kibana的安装部署详见上一篇博客&lt;a href=&quot;http://jkzhao.github.io/2017/10/20/ELK%E5%AE%9E%E6%88%98/#more&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;《ELK实战》&lt;/a&gt;。&lt;br&gt;浏览器访问：&lt;a href=&quot;http://172.16.206.16:5601/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.16:5601/&lt;/a&gt;&lt;br&gt;1.左侧菜单点击“Management”，点击“Index Patterns”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/16.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;2.点击“Create Index Pattern”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/17.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;3.输入索引名字，点击“Create”&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/18.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;4.点击Discover，选择上一步创建的索引。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/ELK/19.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Beats工具&quot;&gt;&lt;a href=&quot;#Beats工具&quot; class=&quot;headerlink&quot; title=&quot;Beats工具&quot;&gt;&lt;/a&gt;Beats工具&lt;/h2&gt;&lt;p&gt;Beats是elastic公司的一款轻量级数据采集产品，它是从packetbeat发展出来的数据收集器系统，它包含了几个子产品：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Packetbeat(用于监控网络流量)&lt;/li&gt;
-&lt;li&gt;Filebeat(用于监听日志数据)
-    
-    </summary>
-    
-      <category term="日志" scheme="http://yoursite.com/categories/%E6%97%A5%E5%BF%97/"/>
-    
-    
-      <category term="ELK" scheme="http://yoursite.com/tags/ELK/"/>
     
   </entry>
   
