@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-04-10T09:12:34.000Z</updated>
+  <updated>2018-04-12T12:22:46.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,58 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL用户管理及查询缓存详解</title>
+    <link href="http://yoursite.com/2018/04/12/MySQL%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86%E5%8F%8A%E6%9F%A5%E8%AF%A2%E7%BC%93%E5%AD%98%E8%AF%A6%E8%A7%A3/"/>
+    <id>http://yoursite.com/2018/04/12/MySQL用户管理及查询缓存详解/</id>
+    <published>2018-04-12T06:46:07.000Z</published>
+    <updated>2018-04-12T12:22:46.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;MySQL用户管理&quot;&gt;&lt;a href=&quot;#MySQL用户管理&quot; class=&quot;headerlink&quot; title=&quot;MySQL用户管理&quot;&gt;&lt;/a&gt;MySQL用户管理&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;用户帐号：username@hostname, password       
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;表示这个账号允许通过hostname主机连入mysql服务器。hostname可以是单个ip，也可以是一个网络，也可以是通配符。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/85.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;MySQL对用户帐号的管理是分两步的：创建和授权。&lt;/p&gt;
+&lt;h3 id=&quot;用户账号管理&quot;&gt;&lt;a href=&quot;#用户账号管理&quot; class=&quot;headerlink&quot; title=&quot;用户账号管理&quot;&gt;&lt;/a&gt;用户账号管理&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;CREATE USER   #使用这种方式创建完用户后，他仅能够连入mysql服务器，并能够执行有限的查看类命令，想创建数据库、创建表、插入数据等没有权限。&lt;/li&gt;
+&lt;li&gt;DROP UESER&lt;/li&gt;
+&lt;li&gt;RENAME USER&lt;/li&gt;
+&lt;li&gt;SET PASSWORD&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;CREATE-USER&quot;&gt;&lt;a href=&quot;#CREATE-USER&quot; class=&quot;headerlink&quot; title=&quot;CREATE USER&quot;&gt;&lt;/a&gt;CREATE USER&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;CREATE USER username@hostname
+   [
+       IDENTIFIED BY [PASSWORD] &amp;apos;password&amp;apos;
+   ]            
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】:如果不给密码就是空密码。&lt;/p&gt;
+&lt;p&gt;主机也可使用通配符：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;%：匹配任何字符
+_: 匹配单个字符
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【示例】：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;testuser@&amp;apos;172.16.100.1__&amp;apos; 代表 172.16.100.100-172.16.100.199
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;权限管理&quot;&gt;&lt;a href=&quot;#权限管理&quot; class=&quot;headerlink&quot; title=&quot;权限管理&quot;&gt;&lt;/a&gt;权限管理&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;GRANT    #GRANT命令在用户事先不存在的前提下，它可以自动创建用户。&lt;/li&gt;
+&lt;li&gt;REVOKE&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;权限管理分类&quot;&gt;&lt;a href=&quot;#权限管理分类&quot; class=&quot;headerlink&quot; title=&quot;权限管理分类&quot;&gt;&lt;/a&gt;权限管理分类&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;库级别&lt;/li&gt;
+&lt;li&gt;表级别&lt;/li&gt;
+&lt;li&gt;字段级别&lt;/li&gt;
+&lt;li&gt;管理类：比如能否把自己的权限转赠给其他用户、能否创建用户、能否执行复制等。&lt;/li&gt;
+&lt;li&gt;程序类：比如存储过程、存储函数、触发器。   (这两类是我们自己定义的)&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;MySQL用户管理&quot;&gt;&lt;a href=&quot;#MySQL用户管理&quot; class=&quot;headerlink&quot; title=&quot;MySQL用户管理&quot;&gt;&lt;/a&gt;MySQL用户管理&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;用户帐号：username@hostname, password       
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;表示这个账号允许通过hostname主机连入mysql服务器。hostname可以是单个ip，也可以是一个网络，也可以是通配符。
+    
+    </summary>
+    
+      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
+    
+    
+      <category term="MySQL" scheme="http://yoursite.com/tags/MySQL/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL存储引擎对比</title>
@@ -3403,83 +3455,6 @@ autogen 0s       168h0m0s           1        true
     
     
       <category term="InfluxDB" scheme="http://yoursite.com/tags/InfluxDB/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>nexus搭建maven私服</title>
-    <link href="http://yoursite.com/2017/11/19/nexus%E6%90%AD%E5%BB%BAmaven%E7%A7%81%E6%9C%8D/"/>
-    <id>http://yoursite.com/2017/11/19/nexus搭建maven私服/</id>
-    <published>2017-11-19T06:49:41.000Z</published>
-    <updated>2017-11-19T08:06:13.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;为什么要搭建私服&quot;&gt;&lt;a href=&quot;#为什么要搭建私服&quot; class=&quot;headerlink&quot; title=&quot;为什么要搭建私服&quot;&gt;&lt;/a&gt;为什么要搭建私服&lt;/h2&gt;&lt;p&gt;私服不是Maven的核心概念，它仅仅是一种衍生出来的特殊的Maven仓库。通过建立自己的私服，就可以降低中央仓库负荷、节省外网带宽、加速Maven构建、自己部署构建等，从而高效地使用Maven。Nexus也是当前最流行的Maven仓库管理软件。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;下载Nexus&quot;&gt;&lt;a href=&quot;#下载Nexus&quot; class=&quot;headerlink&quot; title=&quot;下载Nexus&quot;&gt;&lt;/a&gt;下载Nexus&lt;/h2&gt;&lt;p&gt;最新nexus下载地址：&lt;a href=&quot;http://www.sonatype.org/nexus/go&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://www.sonatype.org/nexus/go&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;Nexus是典型的Java Web应用，它有两种安装包，一种是包含Jetty容器的Bundle包，另一种是不包含Web容器的war包。&lt;/p&gt;
-&lt;h2 id=&quot;安装Nexus&quot;&gt;&lt;a href=&quot;#安装Nexus&quot; class=&quot;headerlink&quot; title=&quot;安装Nexus&quot;&gt;&lt;/a&gt;安装Nexus&lt;/h2&gt;&lt;h3 id=&quot;安装JDK1-8&quot;&gt;&lt;a href=&quot;#安装JDK1-8&quot; class=&quot;headerlink&quot; title=&quot;安装JDK1.8&quot;&gt;&lt;/a&gt;安装JDK1.8&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;# mkdir /usr/java
-# tar zxf /usr/local/jdk-8u73-linux-x64.gz -C /usr/java/
-# vim /etc/profile
-export JAVA_HOME=/usr/java/jdk1.8.0_73
-export PATH=$JAVA_HOME/bin:$PATH
-export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-# source /etc/profile
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;安装Nexus-1&quot;&gt;&lt;a href=&quot;#安装Nexus-1&quot; class=&quot;headerlink&quot; title=&quot;安装Nexus&quot;&gt;&lt;/a&gt;安装Nexus&lt;/h3&gt;&lt;p&gt;上传Nexus安装包到/opt目录下。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@hadoop33 opt]# mkdir nexus
-[root@hadoop33 opt]# tar zxf nexus-2.14.0-01-bundle.tar.gz -C /opt/nexus
-[root@hadoop33 opt]# cd nexus/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;nexus-2.6.2-01: 该目录包含了Nexus运行所需要的文件，如启动脚本、依赖jar包等。&lt;br&gt;sonatype-work：该目录包含Nenus生成的配置文件、日志文件、仓库文件等。&lt;br&gt;其中第一个目录是运行Nexus必须的，而第二个不是必须的，Nexus会在运行的时候动态创建该目录。&lt;/p&gt;
-&lt;h3 id=&quot;启动Nexus&quot;&gt;&lt;a href=&quot;#启动Nexus&quot; class=&quot;headerlink&quot; title=&quot;启动Nexus&quot;&gt;&lt;/a&gt;启动Nexus&lt;/h3&gt;&lt;p&gt;默认端口为8081，如需修改请查看配置文件 conf/nexus.properties&lt;br&gt;它本身不建议在root用户下使用，如果我们需要在root用户下启动服务，要先配置 bin/nexus 文件中的 RUN_AS_USER=root&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/3.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@hadoop33 nexus]# cd nexus-2.14.0-01/bin/
-[root@hadoop33 bin]# ./nexus start
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/4.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;停止-Nexus&quot;&gt;&lt;a href=&quot;#停止-Nexus&quot; class=&quot;headerlink&quot; title=&quot;停止 Nexus&quot;&gt;&lt;/a&gt;停止 Nexus&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;[root@hadoop33 bin]# ./nexus stop
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;访问&quot;&gt;&lt;a href=&quot;#访问&quot; class=&quot;headerlink&quot; title=&quot;访问&quot;&gt;&lt;/a&gt;访问&lt;/h2&gt;&lt;p&gt;启动后访问首页： &lt;a href=&quot;http://172.16.206.33:8081/nexus/index.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.33:8081/nexus/index.html&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;点击右上角的Login in&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;登录默认账号/密码 admin/admin123。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;如何修改 nexus 账号密码：&lt;/strong&gt;先停止 nexus，打开 %NEXUS_HOME%/sonatype-work/nexus/conf/security.xml，修改即可。&lt;br&gt;nexus 的密码采用 SHA1 加密算法 ( 在线加密工具 )，将加密后的 SHA1 串（小写）拷贝覆盖原来的。重启 nexus：./nexus restart。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/7.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;配置Nexus&quot;&gt;&lt;a href=&quot;#配置Nexus&quot; class=&quot;headerlink&quot; title=&quot;配置Nexus&quot;&gt;&lt;/a&gt;配置Nexus&lt;/h2&gt;&lt;p&gt;Nexus常用功能就是：指定私服的中央地址、将自己的Maven项目指定到私服地址、从私服下载中央库的项目索引、从私服仓库下载依赖组件、将第三方项目jar上传到私服供其他项目组使用。&lt;br&gt;登录&lt;a href=&quot;http://172.16.206.33:8081/nexus/index.html，点击左侧菜单栏的“Repositories”。&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.206.33:8081/nexus/index.html，点击左侧菜单栏的“Repositories”。&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/8.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;一般用到的仓库种类是hosted、proxy。Hosted代表宿主仓库，用来发布一些第三方不允许的组件，比如oracle驱动、比如商业软件jar包。Proxy代表代理远程的仓库，最典型的就是Maven官方中央仓库、JBoss仓库等等。如果构建的Maven项目本地仓库没有依赖包，那么就会去这个代理站点去下载，那么如果代理站点也没有此依赖包，就回去远程中央仓库下载依赖，这些中央仓库就是proxy。代理站点下载成功后再下载至本机。一般情况下Maven这个自带的默认仓库一般情况下已经够大多数项目使用了。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;hosted   类型的仓库，内部项目的发布仓库&lt;/li&gt;
-&lt;li&gt;releases 内部的模块中release模块的发布仓库&lt;/li&gt;
-&lt;li&gt;snapshots 发布内部的SNAPSHOT模块的仓库&lt;/li&gt;
-&lt;li&gt;3rd party 第三方依赖的仓库，这个数据通常是由内部人员自行下载之后发布上去&lt;/li&gt;
-&lt;li&gt;proxy   类型的仓库，从远程中央仓库中寻找数据的仓库&lt;/li&gt;
-&lt;li&gt;group   类型的仓库，组仓库用来方便我们开发人员进行设置的仓库&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;maven项目索引&quot;&gt;&lt;a href=&quot;#maven项目索引&quot; class=&quot;headerlink&quot; title=&quot;maven项目索引&quot;&gt;&lt;/a&gt;maven项目索引&lt;/h3&gt;&lt;p&gt;下载Maven项目索引，项目索引是为了使用者能够在私服站点查找依赖使用的功能。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/9.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;保存后后台会运行一个任务，点击菜单栏的Scheduled Tasks选项即可看到有个任务在RUNNING。 下载完成后，Maven索引就可以使用了，在搜索栏输入要搜索的项，就可以查到相关的信息。例如spring-core&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/10.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;就可以检索出它的相关信息，包括怎么配置依赖信息。我们要想使用这个私服仓库，先在项目pom中配置相关私服信息。&lt;/p&gt;
-&lt;h2 id=&quot;Maven项目配置&quot;&gt;&lt;a href=&quot;#Maven项目配置&quot; class=&quot;headerlink&quot; title=&quot;Maven项目配置&quot;&gt;&lt;/a&gt;Maven项目配置&lt;/h2&gt;&lt;p&gt;在pom.xml文件中指定仓库：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;lt;repositories&amp;gt;
-    &amp;lt;repository&amp;gt;
-        &amp;lt;id&amp;gt;nexus&amp;lt;/id&amp;gt;
-        &amp;lt;url&amp;gt;http://172.16.206.33:8081/nexus/content/groups/public/&amp;lt;/url&amp;gt;
-        &amp;lt;snapshots&amp;gt;&amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;&amp;lt;/snapshots&amp;gt;
-        &amp;lt;releases&amp;gt;&amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;&amp;lt;/releases&amp;gt;
-    &amp;lt;/repository&amp;gt;
-&amp;lt;/repositories&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在pom.xml文件中指定插件仓库：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;lt;pluginRepositories&amp;gt;
-    &amp;lt;pluginRepository&amp;gt;
-        &amp;lt;id&amp;gt;nexus&amp;lt;/id&amp;gt;
-        &amp;lt;url&amp;gt;http://172.16.206.33:8081/nexus/content/groups/public/&amp;lt;/url&amp;gt;
-        &amp;lt;snapshots&amp;gt;&amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;&amp;lt;/snapshots&amp;gt;
-        &amp;lt;releases&amp;gt;&amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;&amp;lt;/releases&amp;gt;
-    &amp;lt;/pluginRepository&amp;gt;
-&amp;lt;/pluginRepositories&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;以上的配置使得只有本项目才在私服下载组件。这个Maven项目构建的时候会从私服下载相关依赖。&lt;br&gt;上面的配置仅仅是在此项目中生效，对于其他项目还是不起作用。如果相对Maven的其他项目也生效的话。需要修改全局的settings.xml文件。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Maven/11.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;追加激活profile：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;lt;activeProfiles&amp;gt;  
-     &amp;lt;activeProfile&amp;gt;central&amp;lt;/activeProfile&amp;gt;  
-&amp;lt;/activeProfiles
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;之后所有本机的Maven项目就在私服下载组件。&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;为什么要搭建私服&quot;&gt;&lt;a href=&quot;#为什么要搭建私服&quot; class=&quot;headerlink&quot; title=&quot;为什么要搭建私服&quot;&gt;&lt;/a&gt;为什么要搭建私服&lt;/h2&gt;&lt;p&gt;私服不是Maven的核心概念，它仅仅是一种衍生出来的特殊的Maven仓库。通过建立自己的私服，就可以降低中央仓库负荷、节省外网带宽、加速Maven构建、自己部署构建等，从而高效地使用Maven。Nexus也是当前最流行的Maven仓库管理软件。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="maven" scheme="http://yoursite.com/categories/maven/"/>
-    
-    
-      <category term="nexus" scheme="http://yoursite.com/tags/nexus/"/>
     
   </entry>
   
