@@ -113,7 +113,10 @@
 <meta property="og:description" content="MySQL用户管理用户帐号：username@hostname, password        表示这个账号允许通过hostname主机连入mysql服务器。hostname可以是单个ip，也可以是一个网络，也可以是通配符。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/85.png">
-<meta property="og:updated_time" content="2018-04-12T12:22:46.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/86.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/87.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/88.png">
+<meta property="og:updated_time" content="2018-04-13T02:25:44.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL用户管理及查询缓存详解">
 <meta name="twitter:description" content="MySQL用户管理用户帐号：username@hostname, password        表示这个账号允许通过hostname主机连入mysql服务器。hostname可以是单个ip，也可以是一个网络，也可以是通配符。">
@@ -346,8 +349,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-04-12T20:22:46+08:00" content="2018-04-12">
-              2018-04-12
+              <time itemprop="dateUpdated" datetime="2018-04-13T10:25:44+08:00" content="2018-04-13">
+              2018-04-13
               </time>
               </span>
             
@@ -424,7 +427,30 @@
 _: 匹配单个字符
 </code></pre><p>【示例】：</p>
 <pre><code>testuser@&apos;172.16.100.1__&apos; 代表 172.16.100.100-172.16.100.199
-</code></pre><h3 id="权限管理"><a href="#权限管理" class="headerlink" title="权限管理"></a>权限管理</h3><ul>
+
+
+mysql&gt; CREATE USER testuser@&apos;172.16.%.%&apos; IDENTIFIED BY &apos;testpass&apos;;
+Query OK, 0 rows affected (0.13 sec)
+</code></pre><p>对于CREATE USER、GRANT来说，FLUSH不是必须的。然后我们使用这个刚创建的用户账户连接mysql，</p>
+<pre><code>[root@res ~]# mysql -h172.16.206.30  -utestuser -p
+Enter password: 
+mysql&gt; CREATE DATABASE mydb;
+ERROR 1044 (42000): Access denied for user &apos;testuser&apos;@&apos;172.16.%.%&apos; to database &apos;mydb&apos;
+mysql&gt; SHOW GRANTS FOR &apos;testuser&apos;@&apos;172.16.%.%&apos;;
++-------------------------------------------------------------------------------+
+| Grants for testuser@172.16.%.%                                                |
++-------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO &apos;testuser&apos;@&apos;172.16.%.%&apos; IDENTIFIED BY PASSWORD &lt;secret&gt; |
++-------------------------------------------------------------------------------+
+1 row in set (0.04 sec)
+</code></pre><p>【说明】：USAGE：只是一个简单的连入mysql服务器的权限。这是默认获取的授权。</p>
+<p>查看用户能够使用的权限：</p>
+<pre><code>SHOW GRANTS FOR username@&apos;hostname&apos;
+</code></pre><p>重命名用户账号：</p>
+<pre><code>mysql&gt; RENAME USER &apos;testuser&apos;@&apos;172.16.%.%&apos; TO &apos;tuser&apos;@&apos;172.16.%.%&apos;;
+Query OK, 0 rows affected (0.01 sec)
+</code></pre><h3 id="权限管理"><a href="#权限管理" class="headerlink" title="权限管理"></a>权限管理</h3><p>权限管理命令：</p>
+<ul>
 <li>GRANT    #GRANT命令在用户事先不存在的前提下，它可以自动创建用户。</li>
 <li>REVOKE</li>
 </ul>
@@ -435,6 +461,141 @@ _: 匹配单个字符
 <li>管理类：比如能否把自己的权限转赠给其他用户、能否创建用户、能否执行复制等。</li>
 <li>程序类：比如存储过程、存储函数、触发器。   (这两类是我们自己定义的)</li>
 </ul>
+<p><strong>1.管理类权限</strong></p>
+<ul>
+<li>CREATE TEMPORARY TABLES</li>
+<li>CREATE USER</li>
+<li>FILE：在服务器上能够读取或写入文件的。比如我们通过客户端连入mysql服务器，如果想把mysql的查询结果保存到文件中，这个文件很显然就是在服务器上的。这个权限很危险，不能让用户随意使用。</li>
+<li>SUPER：杂项管理类命令。</li>
+<li>SHOW DATABASES</li>
+<li>RELOAD</li>
+<li>SHUTDOWN</li>
+<li>REPLICATION SLAVE</li>
+<li>REPLICATION CLIENT</li>
+<li>LOCK TABLES：显式施加表锁。</li>
+<li><p>PROCESS：查看当前服务器上执行的所有进程，可以理解为线程。相当于下面的：</p>
+<p>  mysql&gt; SHOW PROCESSLIST;<br>  +———+—————-+———————-+————+———+——+——-+——————+<br>  | Id      | User           | Host                 | db         | Command | Time | State | Info             |<br>  +———+—————-+———————-+————+———+——+——-+——————+<br>  | 7793848 | root           | localhost            | NULL       | Query   |    0 | init  | SHOW PROCESSLIST |<br>  | 7793872 | sonar          | localhost:57831      | sonar      | Sleep   |   41 |       | NULL             |<br>  | 7794027 | testuser       | res.wisedu.com:39982 | NULL       | Sleep   |  241 |       | NULL             |<br>  …<br><strong>【注意】: 这个命令是我们将来非常常用的命令，用于查看当前mysql上内部所执行的众多跟用户相关的线程的。</strong>   </p>
+</li>
+</ul>
+<p><strong>2.库级别和表级别</strong></p>
+<ul>
+<li>ALTER</li>
+<li>ALTER ROUTINE：修改存储例程，包括存储过程和存储函数。</li>
+<li>CREATE </li>
+<li>CREATE ROUTINE</li>
+<li>CREATE VIEW</li>
+<li>DROP</li>
+<li>EXECUTE：是否能够执行存储过程或存储函数。</li>
+<li>GRNAT OPTION：把自己获得的权限转赠给别人。</li>
+<li>INDEX</li>
+<li>SHOW VIEW：查看一个视图是怎么被创建的。</li>
+</ul>
+<p><strong>3.数据操作(表级别)</strong></p>
+<ul>
+<li>SELECT</li>
+<li>INSERT</li>
+<li>UPDATE</li>
+<li>DELETE</li>
+</ul>
+<p><strong>4.数据操作(字段级别)</strong></p>
+<ul>
+<li>SELECT(col1,…)</li>
+<li>UPDATE(col1,…)</li>
+<li>INSERT(col1,…)</li>
+</ul>
+<p><strong>5.所有权限</strong></p>
+<ul>
+<li>ALL [PRIVILEGES]</li>
+</ul>
+<h4 id="权限管理命令之GRANT"><a href="#权限管理命令之GRANT" class="headerlink" title="权限管理命令之GRANT"></a>权限管理命令之GRANT</h4><p>两种使用格式：</p>
+<pre><code>GRANT ALL ON [FUNCTION] *.*      
+第一个*表示库，如果第一个*前面没有修饰，那默认第2个*表示表，否则比如加个FUNCTION，第二个*表示的就是某个库的存储函数。修饰有3个，[TABLE|FUNCTION|PROCEDURE]。
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">mysql&gt; HELP GRANT</div><div class="line">Name: &apos;GRANT&apos;</div><div class="line">Description:</div><div class="line">Syntax:</div><div class="line">GRANT</div><div class="line">    priv_type [(column_list)]</div><div class="line">      [, priv_type [(column_list)]] ...</div><div class="line">    ON [object_type] priv_level</div><div class="line">    TO user_specification [, user_specification] ...</div><div class="line">    [REQUIRE &#123;NONE | ssl_option [[AND] ssl_option] ...&#125;]</div><div class="line">    [WITH &#123;GRANT OPTION | resource_option&#125; ...]</div><div class="line"></div><div class="line">GRANT PROXY ON user_specification</div><div class="line">    TO user_specification [, user_specification] ...</div><div class="line">    [WITH GRANT OPTION]</div><div class="line"></div><div class="line">object_type: &#123;</div><div class="line">    TABLE</div><div class="line">  | FUNCTION</div><div class="line">  | PROCEDURE</div><div class="line">&#125;</div><div class="line"></div><div class="line">priv_level: &#123;</div><div class="line">    *</div><div class="line">  | *.*</div><div class="line">  | db_name.*</div><div class="line">  | db_name.tbl_name</div><div class="line">  | tbl_name</div><div class="line">  | db_name.routine_name</div><div class="line">&#125;</div><div class="line"></div><div class="line">user_specification:</div><div class="line">    user [ auth_option ]</div><div class="line"></div><div class="line">auth_option: &#123;</div><div class="line">    IDENTIFIED BY &apos;auth_string&apos;</div><div class="line">  | IDENTIFIED BY PASSWORD &apos;hash_string&apos;</div><div class="line">  | IDENTIFIED WITH auth_plugin</div><div class="line">  | IDENTIFIED WITH auth_plugin AS &apos;hash_string&apos;</div><div class="line">&#125;</div><div class="line"></div><div class="line">ssl_option: &#123;</div><div class="line">    SSL</div><div class="line">  | X509</div><div class="line">  | CIPHER &apos;cipher&apos;</div><div class="line">  | ISSUER &apos;issuer&apos;</div><div class="line">  | SUBJECT &apos;subject&apos;</div><div class="line">&#125;</div><div class="line"></div><div class="line">GRANT OPTION # 允许把自己的权限转赠给其他用户</div><div class="line"></div><div class="line">resource_option: &#123;</div><div class="line">  | MAX_QUERIES_PER_HOUR count #每小时所能执行的最多查询请求的次数，这是做资源限定的</div><div class="line">  | MAX_UPDATES_PER_HOUR count # 每小时所能执行的最多更新的次数</div><div class="line">  | MAX_CONNECTIONS_PER_HOUR count</div><div class="line">  | MAX_USER_CONNECTIONS count # 指定某个用户帐号最多同时连接几次</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在上面那个例子中，我们使用普通用户 tuser@’172.16.%.%’ 连接上去是不能创建数据库的，接下来我们使用root账户登录上去授权这个普通用户一些权限，看看效果：</p>
+<pre><code>mysql&gt; GRANT CREATE ON mydb.tb1 TO &apos;tuser&apos;@&apos;172.16.%.%&apos;;
+Query OK, 0 rows affected (0.02 sec)
+</code></pre><p>【注意】:这个权限只能创建tb1这个表，不能创建库mydb，见下面。管理员授权后，普通用户连接上mysql，可以查看自己的权限：</p>
+<pre><code>mysql&gt; SHOW GRANTS FOR &apos;tuser&apos;@&apos;172.16.%.%&apos;;   
++----------------------------------------------------------------------------+
+| Grants for tuser@172.16.%.%                                                |
++----------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO &apos;tuser&apos;@&apos;172.16.%.%&apos; IDENTIFIED BY PASSWORD &lt;secret&gt; |
+| GRANT CREATE ON `mydb`.`tb1` TO &apos;tuser&apos;@&apos;172.16.%.%&apos;                       |
++----------------------------------------------------------------------------+
+2 rows in set (0.00 sec)
+
+mysql&gt; CREATE DATABASE mydb;
+ERROR 1044 (42000): Access denied for user &apos;tuser&apos;@&apos;172.16.%.%&apos; to database &apos;mydb&apos;
+</code></pre><p>此时确实不能创建数据库。使用root账号授权如下：</p>
+<pre><code>mysql&gt; GRANT CREATE ON mydb.* TO &apos;tuser&apos;@&apos;172.16.%.%&apos;;   
+Query OK, 0 rows affected (0.03 sec)
+</code></pre><p>普通用户再次查看自己的权限，然后在创建数据库就可以了：</p>
+<pre><code>mysql&gt; SHOW GRANTS FOR &apos;tuser&apos;@&apos;172.16.%.%&apos;;
++----------------------------------------------------------------------------+
+| Grants for tuser@172.16.%.%                                                |
++----------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO &apos;tuser&apos;@&apos;172.16.%.%&apos; IDENTIFIED BY PASSWORD &lt;secret&gt; |
+| GRANT CREATE ON `mydb`.* TO &apos;tuser&apos;@&apos;172.16.%.%&apos;                           |
+| GRANT CREATE ON `mydb`.`tb1` TO &apos;tuser&apos;@&apos;172.16.%.%&apos;                       |
++----------------------------------------------------------------------------+
+3 rows in set (0.00 sec)
+
+mysql&gt; CREATE DATABASE mydb;
+Query OK, 1 row affected (0.00 sec)
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/86.png" alt=""><br>在赋予删除表的权限：</p>
+<pre><code>mysql&gt; GRANT DROP ON mydb.* TO &apos;tuser&apos;@&apos;172.16.%.%&apos;;      
+Query OK, 0 rows affected (0.00 sec)
+</code></pre><p>普通用户查看权限和删除表、库：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/87.png" alt=""><br>所以为了让那些在线用户能够立即获取权限，就要在授权后FLUSH。</p>
+<h4 id="权限管理命令之REVOKE"><a href="#权限管理命令之REVOKE" class="headerlink" title="权限管理命令之REVOKE"></a>权限管理命令之REVOKE</h4><p>两种使用格式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">REVOKE</div><div class="line">  priv_type [(column_list)]</div><div class="line">    [, priv_type [(column_list)]] ...</div><div class="line">  ON [object_type] priv_level</div><div class="line">  FROM user [, user] ...</div><div class="line"></div><div class="line">REVOKE ALL PRIVILEGES, GRANT OPTION</div><div class="line">  FROM user [, user] ...</div></pre></td></tr></table></figure></p>
+<p>所有给用户授权的这些权限都会保存在跟用户相关的授权表当中，几个跟用户授权相关的表(都在mysql库中)：</p>
+<ul>
+<li>db: 库级别权限。</li>
+<li>host: 主机级别权限，已废弃。</li>
+<li>tables_priv: 表级别权限。</li>
+<li>colomns_priv：列级别的权限。</li>
+<li>procs_priv：存储过程和存储函数相关的权限。</li>
+<li>proxies_priv：代理用户权限。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/88.png" alt=""></p>
+<p>对MySQL来讲，检查用户授权分两个阶段，mysql用户刚刚执行连入数据库时需要认证，检查用户名密码并且检查用户是否有连进来的权限；连接进来以后，用户每次执行SELECT操作也要检验权限。所以MySQL在执行权限检查时，几乎每一次操作都涉及到，这也是为什么mysql为什么将授权表载入内存中的原因，不然它的速度会有多慢。<br>    如果用户在登录mysql时输错了命令，连续输错了好多次，会被mysql锁定的。再次登录，mysql会直接拒绝了，不会检查授权表。mysql认为这是尝试攻击。如果遇到这种情况，我们需要FLUSH hosts，让系统清空一下hosts相关的缓存，这样用户就可以再次连接。</p>
+<p>之前的文章中提到过MySQL作者在MySQL被Oracle收购后，又带着团队重新开发了MariaDB。在MariaDB中，有两款支持事务的，FEDERATED和InnoDB。只不过FEDERATED不支持XA(分布式事务)。<br>Aria是增强版的MyISAM。<br>MySQL和MariaDB除了这些存储引擎上的区别，他们两个区别并不大。但是要注意MariaDB的服务器变量非常多，有400多个。</p>
+<h2 id="MySQL查询缓存"><a href="#MySQL查询缓存" class="headerlink" title="MySQL查询缓存"></a>MySQL查询缓存</h2><p>每个查询语句要做词法分析，语法分析、语义分析，然后执行解析树，从中选择一个最优路径，并且通过优化器重写查询，并选择合适的索引完成查询操作。而如果这个查询计划被缓存下来，多个用户使用同一个SELECT语句时，语句如果避免二次解析，它就能够加速查询操作。<br>    用于保存MySQL查询语句返回的完整结果。被命中时，MySQL会立即返回结果，省去解析、优化和执行等阶段。<br>    但是查询缓存带来的未必都是好事。为什么呢？现在运行数据库数据的服务器硬件越来越强大，内存动辄几十个g，32g、64g都很常见，而且CPU动辄就是好几颗，每一颗都有好多核，而多个用户同时连进来时，每个用户都有一个连接线程，这些线程会被分配到多颗CPU上执行的。由于MySQL的内生性限制，单独的一条查询最多只能在一颗CPU上执行，如果我们使用了查询缓存，多个用户都执行查询操作，每个查询操作都要查缓存，也就意味着缓存会成为多个能够并发在多颗CPU上执行的查询请求的热点所在，会不会争用。第一个线程发起了查询语句，去查了缓存，假设2颗CPU，每颗32核，现在连进来了64个用户，大家都发起了查询操作，都去查询缓存，所以缓存就成为资源争用的热点所在了。在某一时刻，这段内存空间只能为其中一颗CPU所访问。所以在这种场景下，缓存所带来的未必有我们想象中的好。因为你不能只用单颗CPU的方式去思考mysql服务器。并发查询量非常大，而且CPU核心数又非常多时，缓存是否有效就是个值得思考的问题。</p>
+<p>一个mysql查询操作会经过类似的步骤：<br>   一个查询请求来了，首先检查缓存是否命中，命中则直接返回结果。没命中，解析、优化、执行，执行后的结果先看看能否进行缓存，如果能，缓存到缓存中，然后在把结果返回给用户。</p>
+<h3 id="什么样的语句不会被缓存？"><a href="#什么样的语句不会被缓存？" class="headerlink" title="什么样的语句不会被缓存？"></a>什么样的语句不会被缓存？</h3><p>查询语句中有一些不确定数据时，不会缓存：例如NOW(), CURRENT_TIME()；一般来说，如果查询中包含用户自定义函数、存储函数、用户变量、临时表、mysql库中系统表、或者任何包含权限的表，一般都不会缓存；</p>
+<h3 id="缓存会带来额外开销"><a href="#缓存会带来额外开销" class="headerlink" title="缓存会带来额外开销"></a>缓存会带来额外开销</h3><p>所以只有当这种开销小于缓存给我们带来的益处时才有必要启用缓存</p>
+<ol>
+<li>每个查询都得先检查是否命中；</li>
+<li><p>查询结果要先缓存；</p>
+<p> mysql&gt; SHOW GLOBAL VARIABLES LIKE ‘query_cache%’;<br> +——————————+———+<br> | Variable_name                | Value   |<br> +——————————+———+<br> | query_cache_limit            | 1048576 |<br> | query_cache_min_res_unit     | 4096    |<br> | query_cache_size             | 1048576 |<br> | query_cache_type             | OFF     |<br> | query_cache_wlock_invalidate | OFF     |<br> +——————————+———+<br> 5 rows in set (0.00 sec)</p>
+</li>
+</ol>
+<ul>
+<li><p>query_cache_type: 查询缓存类型；就是指是否开启缓存功能，其开启方式有三种{ON|OFF|DEMAND}；</p>
+<ul>
+<li>DEMAND：意味着SELECT语句明确使用 SQL_CACHE 选项时才会缓存；</li>
+<li>一般而言除非我们明确知道哪些语句缓存下来才有意义的时候才会使用DEMAND，否则我们如果要想使用缓存机制，设置为ON。</li>
+</ul>
+</li>
+<li><p>query_cache_size: 总空间，单位为字节，大小必须是1024的整数倍。16777216是16M，比较小。如果内存够用，可以调大点，但是也不要太大，看你命中率。如果调大能提高命中率，就应该调大些。但是查询命中率，要先”预热”，刚开机你就去查缓存命中率，那没意义。MySQL启动时，会一次性分配并立即初始化这里指定大小的内存空间；这意味着，如果修改此大小，会清空缓存并重新初始化的。不建议经常改，最好事先设置好。</p>
+</li>
+<li><p>query_cache_min_res_unit: 存储缓存的最小内存块；(query_cache_size-Qcache_free_memory)/Qcache_queries_in_cache能够获得一个理想的值。缓存必须要划分成内存块进行缓存的，比如一个划分的内存块一个为1k，某一个查询结果只有30bytes，缓存在一个内存块里，剩余的空间就浪费了。所以这个内存块太大了会导致浪费，太小了我缓存一个大结果，得申请很多个内存块才能存下来。最好你能够观测一下大多数查询，很多结果都是满足正太分布的，找那些分布率比较集中的地方的缓存大小。当然也可以用上面的公式去计算，得到的值是比较理想的。</p>
+</li>
+<li><p>query_cache_limit: 单个缓存对象的最大值，超出时则不予缓存；可以在SELECT语句中手动使用SQL_NO_CACHE可以人为地避免尝试缓存返回结果超出此参数限定值的语句。</p>
+</li>
+<li><p>query_cache_wlock_invalidate: 如果某个表被其它用户的连接(查询)锁住了，是否仍然从缓存中返回结果。OFF表示返回。<br>因为其他用户锁住了表，他可能会改表中的数据，也可能不改，这个时候是返回还是不返回呢？</p>
+</li>
+</ul>
+<h3 id="如何检查缓存？"><a href="#如何检查缓存？" class="headerlink" title="如何检查缓存？"></a>如何检查缓存？</h3><p>MySQL保存结果于缓存中：</p>
+<ul>
+<li>把SELECT语句本身做hash计算，计算的结果作为key，查询结果作为value。</li>
+<li>所以缓存由两个字段组成，一个是key，一个是value。</li>
+</ul>
+<p>缓存到底有没有效不能简单的根据有多少SELECT语句来判定，我们要去判定缓存命中率。但是这个缓存命中率的高和低不能简单的根据查询的命中次数来判定，一般来讲，要根据它的开销来判断命中率到底有多高。命中率有两种，次数命中率和字节命中率(命中后所省去的传输数据量)。</p>
+<h3 id="如何判断命中率？"><a href="#如何判断命中率？" class="headerlink" title="如何判断命中率？"></a>如何判断命中率？</h3><p>查看次数命中率，而不是字节命中率。衡量时最好都衡量<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">mysql&gt; SHOW GLOBAL STATUS LIKE &apos;Qcache%&apos;;     </div><div class="line">+-------------------------+----------+</div><div class="line">| Variable_name           | Value    |</div><div class="line">+-------------------------+----------+</div><div class="line">| Qcache_free_blocks      | 1        | 空闲的块数</div><div class="line">| Qcache_free_memory      | 16757008 | 空闲空间</div><div class="line">| Qcache_hits             | 4        | 命中次数</div><div class="line">| Qcache_inserts          | 2        | 向缓存空间中缓存数据的次数</div><div class="line">| Qcache_lowmem_prunes    | 0        | 因为内存太少而腾出内存的次数</div><div class="line">| Qcache_not_cached       | 18       | 没被缓存的语句的次数</div><div class="line">| Qcache_queries_in_cache | 2        | 在缓存中缓存的查询的个数。和Qcache_inserts不一定一样大。</div><div class="line">| Qcache_total_blocks     | 6        | 缓存总块数</div><div class="line">+-------------------------+----------+</div></pre></td></tr></table></figure></p>
+<p>【注意】:总空间-空闲空间=已用空间。但并非已用空间都缓存了数据，这些已用块数表示已划分好格式了，可以随时等待数据缓存进来。<br>如果内存中的确有碎片了，比如说空闲空间还很多，但是内存总是被修剪(腾出)，这可能是有大量碎片导致大结果无法被缓存。这就需要清理碎片了。只是把碎片挪出去，做成连续空间。<br>碎片整理：FLUSH QUERY_CACHE<br>清空缓存：RESET QUERY_CACHE</p>
+<p>计算次数命中率：(节命中率很难估算)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">mysql&gt; SHOW GLOBAL STATUS WHERE Variable_name=&apos;Qcache_hits&apos; OR Variable_name=&apos;Com_select&apos;;</div><div class="line">+---------------+-------+</div><div class="line">| Variable_name | Value |</div><div class="line">+---------------+-------+</div><div class="line">| Com_select    | 24    |  一共查询了这么多次</div><div class="line">| Qcache_hits   | 4     |  命中的查询的次数，注意命中了缓存，上面那个查询次数是不会加1的。</div><div class="line">+---------------+-------+</div><div class="line"></div><div class="line">Qcache_hits/(Com_select+Qcache_hits)</div></pre></td></tr></table></figure></p>
+<p>也应该参考另外一个指标：命中和写入的比率，即Qcache_hits/Qcache_inserts的值，此比值如果能大于3:1，则表明缓存也是有效的。能达到10:1，为比较理想的情况。</p>
+<h3 id="缓存优化使用思路"><a href="#缓存优化使用思路" class="headerlink" title="缓存优化使用思路"></a>缓存优化使用思路</h3><p>1、批量写入而非多次单个写入；<br>2、缓存空间不宜过大，因为大量缓存同时失效时会导致服务器假死；<br>3、必要时，使用SQL_CACHE和SQL_N0_CACHE手动控制缓存；<br>4、对写密集型的应用场景来说，禁用缓存反而能提高性能。读写比例一样大的时候最好也关了。</p>
 
       
     </div>
@@ -628,7 +789,7 @@ _: 匹配单个字符
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL用户管理"><span class="nav-number">1.</span> <span class="nav-text">MySQL用户管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#用户账号管理"><span class="nav-number">1.1.</span> <span class="nav-text">用户账号管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CREATE-USER"><span class="nav-number">1.1.1.</span> <span class="nav-text">CREATE USER</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#权限管理"><span class="nav-number">1.2.</span> <span class="nav-text">权限管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#权限管理分类"><span class="nav-number">1.2.1.</span> <span class="nav-text">权限管理分类</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL用户管理"><span class="nav-number">1.</span> <span class="nav-text">MySQL用户管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#用户账号管理"><span class="nav-number">1.1.</span> <span class="nav-text">用户账号管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CREATE-USER"><span class="nav-number">1.1.1.</span> <span class="nav-text">CREATE USER</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#权限管理"><span class="nav-number">1.2.</span> <span class="nav-text">权限管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#权限管理分类"><span class="nav-number">1.2.1.</span> <span class="nav-text">权限管理分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#权限管理命令之GRANT"><span class="nav-number">1.2.2.</span> <span class="nav-text">权限管理命令之GRANT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#权限管理命令之REVOKE"><span class="nav-number">1.2.3.</span> <span class="nav-text">权限管理命令之REVOKE</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL查询缓存"><span class="nav-number">2.</span> <span class="nav-text">MySQL查询缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么样的语句不会被缓存？"><span class="nav-number">2.1.</span> <span class="nav-text">什么样的语句不会被缓存？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存会带来额外开销"><span class="nav-number">2.2.</span> <span class="nav-text">缓存会带来额外开销</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何检查缓存？"><span class="nav-number">2.3.</span> <span class="nav-text">如何检查缓存？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何判断命中率？"><span class="nav-number">2.4.</span> <span class="nav-text">如何判断命中率？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存优化使用思路"><span class="nav-number">2.5.</span> <span class="nav-text">缓存优化使用思路</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
@@ -674,7 +835,7 @@ _: 匹配单个字符
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共182.4k字</span>
+  <span class="post-count">博客全站共186.0k字</span>
 </div>
 
         
