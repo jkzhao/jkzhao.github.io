@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-04-13T02:25:44.000Z</updated>
+  <updated>2018-04-13T02:31:16.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2018/04/12/MySQL%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86%E5%8F%8A%E6%9F%A5%E8%AF%A2%E7%BC%93%E5%AD%98%E8%AF%A6%E8%A7%A3/"/>
     <id>http://yoursite.com/2018/04/12/MySQL用户管理及查询缓存详解/</id>
     <published>2018-04-12T06:46:07.000Z</published>
-    <updated>2018-04-13T02:25:44.000Z</updated>
+    <updated>2018-04-13T02:31:16.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;MySQL用户管理&quot;&gt;&lt;a href=&quot;#MySQL用户管理&quot; class=&quot;headerlink&quot; title=&quot;MySQL用户管理&quot;&gt;&lt;/a&gt;MySQL用户管理&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;用户帐号：username@hostname, password       
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;表示这个账号允许通过hostname主机连入mysql服务器。hostname可以是单个ip，也可以是一个网络，也可以是通配符。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/85.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;MySQL对用户帐号的管理是分两步的：创建和授权。&lt;/p&gt;
@@ -86,10 +86,18 @@ Query OK, 0 rows affected (0.01 sec)
 &lt;li&gt;REPLICATION SLAVE&lt;/li&gt;
 &lt;li&gt;REPLICATION CLIENT&lt;/li&gt;
 &lt;li&gt;LOCK TABLES：显式施加表锁。&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;PROCESS：查看当前服务器上执行的所有进程，可以理解为线程。相当于下面的：&lt;/p&gt;
-&lt;p&gt;  mysql&amp;gt; SHOW PROCESSLIST;&lt;br&gt;  +———+—————-+———————-+————+———+——+——-+——————+&lt;br&gt;  | Id      | User           | Host                 | db         | Command | Time | State | Info             |&lt;br&gt;  +———+—————-+———————-+————+———+——+——-+——————+&lt;br&gt;  | 7793848 | root           | localhost            | NULL       | Query   |    0 | init  | SHOW PROCESSLIST |&lt;br&gt;  | 7793872 | sonar          | localhost:57831      | sonar      | Sleep   |   41 |       | NULL             |&lt;br&gt;  | 7794027 | testuser       | res.wisedu.com:39982 | NULL       | Sleep   |  241 |       | NULL             |&lt;br&gt;  …&lt;br&gt;&lt;strong&gt;【注意】: 这个命令是我们将来非常常用的命令，用于查看当前mysql上内部所执行的众多跟用户相关的线程的。&lt;/strong&gt;   &lt;/p&gt;
-&lt;/li&gt;
+&lt;li&gt;PROCESS：查看当前服务器上执行的所有进程，可以理解为线程。&lt;/li&gt;
 &lt;/ul&gt;
+&lt;p&gt;查看当前MySQL服务器上的执行的所有线程：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SHOW PROCESSLIST;
++---------+----------------+----------------------+------------+---------+------+-------+------------------+
+| Id      | User           | Host                 | db         | Command | Time | State | Info             |
++---------+----------------+----------------------+------------+---------+------+-------+------------------+
+| 7793848 | root           | localhost            | NULL       | Query   |    0 | init  | SHOW PROCESSLIST |
+| 7793872 | sonar          | localhost:57831      | sonar      | Sleep   |   41 |       | NULL             |
+| 7794027 | testuser       | res.wisedu.com:39982 | NULL       | Sleep   |  241 |       | NULL             |
+...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;【注意】: 这个命令是我们将来非常常用的命令，用于查看当前mysql上内部所执行的众多跟用户相关的线程的。&lt;/strong&gt;   &lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;2.库级别和表级别&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;ALTER&lt;/li&gt;
@@ -175,14 +183,24 @@ Query OK, 0 rows affected (0.00 sec)
 &lt;h2 id=&quot;MySQL查询缓存&quot;&gt;&lt;a href=&quot;#MySQL查询缓存&quot; class=&quot;headerlink&quot; title=&quot;MySQL查询缓存&quot;&gt;&lt;/a&gt;MySQL查询缓存&lt;/h2&gt;&lt;p&gt;每个查询语句要做词法分析，语法分析、语义分析，然后执行解析树，从中选择一个最优路径，并且通过优化器重写查询，并选择合适的索引完成查询操作。而如果这个查询计划被缓存下来，多个用户使用同一个SELECT语句时，语句如果避免二次解析，它就能够加速查询操作。&lt;br&gt;    用于保存MySQL查询语句返回的完整结果。被命中时，MySQL会立即返回结果，省去解析、优化和执行等阶段。&lt;br&gt;    但是查询缓存带来的未必都是好事。为什么呢？现在运行数据库数据的服务器硬件越来越强大，内存动辄几十个g，32g、64g都很常见，而且CPU动辄就是好几颗，每一颗都有好多核，而多个用户同时连进来时，每个用户都有一个连接线程，这些线程会被分配到多颗CPU上执行的。由于MySQL的内生性限制，单独的一条查询最多只能在一颗CPU上执行，如果我们使用了查询缓存，多个用户都执行查询操作，每个查询操作都要查缓存，也就意味着缓存会成为多个能够并发在多颗CPU上执行的查询请求的热点所在，会不会争用。第一个线程发起了查询语句，去查了缓存，假设2颗CPU，每颗32核，现在连进来了64个用户，大家都发起了查询操作，都去查询缓存，所以缓存就成为资源争用的热点所在了。在某一时刻，这段内存空间只能为其中一颗CPU所访问。所以在这种场景下，缓存所带来的未必有我们想象中的好。因为你不能只用单颗CPU的方式去思考mysql服务器。并发查询量非常大，而且CPU核心数又非常多时，缓存是否有效就是个值得思考的问题。&lt;/p&gt;
 &lt;p&gt;一个mysql查询操作会经过类似的步骤：&lt;br&gt;   一个查询请求来了，首先检查缓存是否命中，命中则直接返回结果。没命中，解析、优化、执行，执行后的结果先看看能否进行缓存，如果能，缓存到缓存中，然后在把结果返回给用户。&lt;/p&gt;
 &lt;h3 id=&quot;什么样的语句不会被缓存？&quot;&gt;&lt;a href=&quot;#什么样的语句不会被缓存？&quot; class=&quot;headerlink&quot; title=&quot;什么样的语句不会被缓存？&quot;&gt;&lt;/a&gt;什么样的语句不会被缓存？&lt;/h3&gt;&lt;p&gt;查询语句中有一些不确定数据时，不会缓存：例如NOW(), CURRENT_TIME()；一般来说，如果查询中包含用户自定义函数、存储函数、用户变量、临时表、mysql库中系统表、或者任何包含权限的表，一般都不会缓存；&lt;/p&gt;
-&lt;h3 id=&quot;缓存会带来额外开销&quot;&gt;&lt;a href=&quot;#缓存会带来额外开销&quot; class=&quot;headerlink&quot; title=&quot;缓存会带来额外开销&quot;&gt;&lt;/a&gt;缓存会带来额外开销&lt;/h3&gt;&lt;p&gt;所以只有当这种开销小于缓存给我们带来的益处时才有必要启用缓存&lt;/p&gt;
+&lt;h3 id=&quot;缓存会带来额外开销&quot;&gt;&lt;a href=&quot;#缓存会带来额外开销&quot; class=&quot;headerlink&quot; title=&quot;缓存会带来额外开销&quot;&gt;&lt;/a&gt;缓存会带来额外开销&lt;/h3&gt;&lt;p&gt;缓存会带来如下的开销，只有当这种开销小于缓存给我们带来的益处时才有必要启用缓存&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;每个查询都得先检查是否命中；&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;查询结果要先缓存；&lt;/p&gt;
-&lt;p&gt; mysql&amp;gt; SHOW GLOBAL VARIABLES LIKE ‘query_cache%’;&lt;br&gt; +——————————+———+&lt;br&gt; | Variable_name                | Value   |&lt;br&gt; +——————————+———+&lt;br&gt; | query_cache_limit            | 1048576 |&lt;br&gt; | query_cache_min_res_unit     | 4096    |&lt;br&gt; | query_cache_size             | 1048576 |&lt;br&gt; | query_cache_type             | OFF     |&lt;br&gt; | query_cache_wlock_invalidate | OFF     |&lt;br&gt; +——————————+———+&lt;br&gt; 5 rows in set (0.00 sec)&lt;/p&gt;
-&lt;/li&gt;
+&lt;li&gt;查询结果要先缓存；&lt;/li&gt;
 &lt;/ol&gt;
-&lt;ul&gt;
+&lt;p&gt;查看当前MySQL上缓存的配置：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SHOW GLOBAL VARIABLES LIKE &amp;apos;query_cache%&amp;apos;;
++------------------------------+---------+
+| Variable_name                | Value   |
++------------------------------+---------+
+| query_cache_limit            | 1048576 |
+| query_cache_min_res_unit     | 4096    |
+| query_cache_size             | 1048576 |
+| query_cache_type             | OFF     |
+| query_cache_wlock_invalidate | OFF     |
++------------------------------+---------+
+5 rows in set (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
 &lt;li&gt;&lt;p&gt;query_cache_type: 查询缓存类型；就是指是否开启缓存功能，其开启方式有三种{ON|OFF|DEMAND}；&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;DEMAND：意味着SELECT语句明确使用 SQL_CACHE 选项时才会缓存；&lt;/li&gt;

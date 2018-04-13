@@ -116,7 +116,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/86.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/87.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/88.png">
-<meta property="og:updated_time" content="2018-04-13T02:25:44.000Z">
+<meta property="og:updated_time" content="2018-04-13T02:31:16.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL用户管理及查询缓存详解">
 <meta name="twitter:description" content="MySQL用户管理用户帐号：username@hostname, password        表示这个账号允许通过hostname主机连入mysql服务器。hostname可以是单个ip，也可以是一个网络，也可以是通配符。">
@@ -349,7 +349,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-04-13T10:25:44+08:00" content="2018-04-13">
+              <time itemprop="dateUpdated" datetime="2018-04-13T10:31:16+08:00" content="2018-04-13">
               2018-04-13
               </time>
               </span>
@@ -473,10 +473,18 @@ Query OK, 0 rows affected (0.01 sec)
 <li>REPLICATION SLAVE</li>
 <li>REPLICATION CLIENT</li>
 <li>LOCK TABLES：显式施加表锁。</li>
-<li><p>PROCESS：查看当前服务器上执行的所有进程，可以理解为线程。相当于下面的：</p>
-<p>  mysql&gt; SHOW PROCESSLIST;<br>  +———+—————-+———————-+————+———+——+——-+——————+<br>  | Id      | User           | Host                 | db         | Command | Time | State | Info             |<br>  +———+—————-+———————-+————+———+——+——-+——————+<br>  | 7793848 | root           | localhost            | NULL       | Query   |    0 | init  | SHOW PROCESSLIST |<br>  | 7793872 | sonar          | localhost:57831      | sonar      | Sleep   |   41 |       | NULL             |<br>  | 7794027 | testuser       | res.wisedu.com:39982 | NULL       | Sleep   |  241 |       | NULL             |<br>  …<br><strong>【注意】: 这个命令是我们将来非常常用的命令，用于查看当前mysql上内部所执行的众多跟用户相关的线程的。</strong>   </p>
-</li>
+<li>PROCESS：查看当前服务器上执行的所有进程，可以理解为线程。</li>
 </ul>
+<p>查看当前MySQL服务器上的执行的所有线程：</p>
+<pre><code>mysql&gt; SHOW PROCESSLIST;
++---------+----------------+----------------------+------------+---------+------+-------+------------------+
+| Id      | User           | Host                 | db         | Command | Time | State | Info             |
++---------+----------------+----------------------+------------+---------+------+-------+------------------+
+| 7793848 | root           | localhost            | NULL       | Query   |    0 | init  | SHOW PROCESSLIST |
+| 7793872 | sonar          | localhost:57831      | sonar      | Sleep   |   41 |       | NULL             |
+| 7794027 | testuser       | res.wisedu.com:39982 | NULL       | Sleep   |  241 |       | NULL             |
+...
+</code></pre><p><strong>【注意】: 这个命令是我们将来非常常用的命令，用于查看当前mysql上内部所执行的众多跟用户相关的线程的。</strong>   </p>
 <p><strong>2.库级别和表级别</strong></p>
 <ul>
 <li>ALTER</li>
@@ -562,14 +570,24 @@ Query OK, 0 rows affected (0.00 sec)
 <h2 id="MySQL查询缓存"><a href="#MySQL查询缓存" class="headerlink" title="MySQL查询缓存"></a>MySQL查询缓存</h2><p>每个查询语句要做词法分析，语法分析、语义分析，然后执行解析树，从中选择一个最优路径，并且通过优化器重写查询，并选择合适的索引完成查询操作。而如果这个查询计划被缓存下来，多个用户使用同一个SELECT语句时，语句如果避免二次解析，它就能够加速查询操作。<br>    用于保存MySQL查询语句返回的完整结果。被命中时，MySQL会立即返回结果，省去解析、优化和执行等阶段。<br>    但是查询缓存带来的未必都是好事。为什么呢？现在运行数据库数据的服务器硬件越来越强大，内存动辄几十个g，32g、64g都很常见，而且CPU动辄就是好几颗，每一颗都有好多核，而多个用户同时连进来时，每个用户都有一个连接线程，这些线程会被分配到多颗CPU上执行的。由于MySQL的内生性限制，单独的一条查询最多只能在一颗CPU上执行，如果我们使用了查询缓存，多个用户都执行查询操作，每个查询操作都要查缓存，也就意味着缓存会成为多个能够并发在多颗CPU上执行的查询请求的热点所在，会不会争用。第一个线程发起了查询语句，去查了缓存，假设2颗CPU，每颗32核，现在连进来了64个用户，大家都发起了查询操作，都去查询缓存，所以缓存就成为资源争用的热点所在了。在某一时刻，这段内存空间只能为其中一颗CPU所访问。所以在这种场景下，缓存所带来的未必有我们想象中的好。因为你不能只用单颗CPU的方式去思考mysql服务器。并发查询量非常大，而且CPU核心数又非常多时，缓存是否有效就是个值得思考的问题。</p>
 <p>一个mysql查询操作会经过类似的步骤：<br>   一个查询请求来了，首先检查缓存是否命中，命中则直接返回结果。没命中，解析、优化、执行，执行后的结果先看看能否进行缓存，如果能，缓存到缓存中，然后在把结果返回给用户。</p>
 <h3 id="什么样的语句不会被缓存？"><a href="#什么样的语句不会被缓存？" class="headerlink" title="什么样的语句不会被缓存？"></a>什么样的语句不会被缓存？</h3><p>查询语句中有一些不确定数据时，不会缓存：例如NOW(), CURRENT_TIME()；一般来说，如果查询中包含用户自定义函数、存储函数、用户变量、临时表、mysql库中系统表、或者任何包含权限的表，一般都不会缓存；</p>
-<h3 id="缓存会带来额外开销"><a href="#缓存会带来额外开销" class="headerlink" title="缓存会带来额外开销"></a>缓存会带来额外开销</h3><p>所以只有当这种开销小于缓存给我们带来的益处时才有必要启用缓存</p>
+<h3 id="缓存会带来额外开销"><a href="#缓存会带来额外开销" class="headerlink" title="缓存会带来额外开销"></a>缓存会带来额外开销</h3><p>缓存会带来如下的开销，只有当这种开销小于缓存给我们带来的益处时才有必要启用缓存</p>
 <ol>
 <li>每个查询都得先检查是否命中；</li>
-<li><p>查询结果要先缓存；</p>
-<p> mysql&gt; SHOW GLOBAL VARIABLES LIKE ‘query_cache%’;<br> +——————————+———+<br> | Variable_name                | Value   |<br> +——————————+———+<br> | query_cache_limit            | 1048576 |<br> | query_cache_min_res_unit     | 4096    |<br> | query_cache_size             | 1048576 |<br> | query_cache_type             | OFF     |<br> | query_cache_wlock_invalidate | OFF     |<br> +——————————+———+<br> 5 rows in set (0.00 sec)</p>
-</li>
+<li>查询结果要先缓存；</li>
 </ol>
-<ul>
+<p>查看当前MySQL上缓存的配置：</p>
+<pre><code>mysql&gt; SHOW GLOBAL VARIABLES LIKE &apos;query_cache%&apos;;
++------------------------------+---------+
+| Variable_name                | Value   |
++------------------------------+---------+
+| query_cache_limit            | 1048576 |
+| query_cache_min_res_unit     | 4096    |
+| query_cache_size             | 1048576 |
+| query_cache_type             | OFF     |
+| query_cache_wlock_invalidate | OFF     |
++------------------------------+---------+
+5 rows in set (0.00 sec)
+</code></pre><ul>
 <li><p>query_cache_type: 查询缓存类型；就是指是否开启缓存功能，其开启方式有三种{ON|OFF|DEMAND}；</p>
 <ul>
 <li>DEMAND：意味着SELECT语句明确使用 SQL_CACHE 选项时才会缓存；</li>
