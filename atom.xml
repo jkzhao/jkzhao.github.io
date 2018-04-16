@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-04-13T02:31:16.000Z</updated>
+  <updated>2018-04-16T01:07:11.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,81 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL日志功能详解</title>
+    <link href="http://yoursite.com/2018/04/16/MySQL%E6%97%A5%E5%BF%97%E5%8A%9F%E8%83%BD%E8%AF%A6%E8%A7%A3/"/>
+    <id>http://yoursite.com/2018/04/16/MySQL日志功能详解/</id>
+    <published>2018-04-16T00:40:02.000Z</published>
+    <updated>2018-04-16T01:07:11.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;MySQL日志&quot;&gt;&lt;a href=&quot;#MySQL日志&quot; class=&quot;headerlink&quot; title=&quot;MySQL日志&quot;&gt;&lt;/a&gt;MySQL日志&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;查询日志&lt;br&gt;这是最不应该记录的日志。因为一个非常繁忙的数据库服务器，其查询会有很多，每一次都记录日志会导致系统性能下降。而且还会有额外的空间开销。MySQL默认没有开启这个日志。注意不仅仅是SELECT。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;慢查询日志&lt;br&gt;查询执行时长超过指定时长的查询，即为慢查询。这里的慢不一定是语句自身执行慢，如果一个操作锁定了某张表，尤其是独占锁锁定了这张表，那么其他人对于这张表的查询就阻塞掉了。但不管怎么讲，慢查询日志是我们通常拿来定位系统上查询操作执行速度过慢时常用到的一个评估工具。所以在生产环境中有时是很有必要启用慢查日志的。percona公司在提供的工具perconatools中有专门工具用来分析慢查日志中哪些查询执行时长过长，以及产生的原因有哪些。这是一个应该启用的日志，但是默认没启用。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;错误日志&lt;br&gt;通常情况下记录的不光是错误信息，也包括mysql启动和关闭过程中的信息，以及启动复制线程时的信息。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;中继日志&lt;br&gt;在从服务器上的日志。就是说复制的时候，主服务器任何能够产生数据修改的操作，在写入数据文件的同时，还会把这个语句(也可能是行)记录到二进制日志文件中一份。从服务器就是使用一个用户帐号不断的去连接主服务器，并尝试去读取主服务器上二进制日志中的每一个条目，从服务器将这些挨个的读到从服务器上，在执行之前，先要将这些读到的保存在本地的日志文件中，而后从本地日志文件中读一条执行一条。这个日志文件就叫做中继日志。很显然，中继日志内容应该和二进制日志内容是一样的，为了完成复制，二进制日志不能随便删除，中继日志可以删除，用完后清了。如果发现清错了，可以找个二进制日志复制下就可以了。再想一个问题，从服务器也有二进制日志，每次执行都是从中继日志中读，然后执行，同时还要写入二进制日志，如果要记录二进制日志的话，应该是和主服务器的二进制日志一样的。这种记录是额外的开销，如果其他服务器不把这个从服务器当做主来用，这个二进制日志就没有用了，所以应该关闭掉，以提升性能。另外，从服务器是不能执行额外的任何写操作的，只能从中继日志中读一条写一条。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;事务日志&lt;br&gt;先暂存事务提交的数据，然后在同步到数据文件中。&lt;br&gt;随机I/O转换为顺序I/O。但是即便是顺序I/O，其速度依然有限。把事务日志放在RAID10上，或放在固态硬盘上，或放在PCI-E固态硬盘上，那就体会几乎内存的性能了。&lt;br&gt;如果是支持事务的存储引擎，要满足事务的要求，就必须满足ACID测试，其中有一点很重要就是持久性。事务还要能够回滚。考虑一种场景，我们的事务隔离级别是”读未提交”，两个连接进来了，都在做事务，第一个事务执行的语句，它的事务在提交之前有可能是保存在内存中，有可能是被同步到事务日志中，内存中可能放不下，就放到事务日志中去了。当第二个事务查询时，它的查询应该是来自磁盘上的数据文件，但问题是第一个事务执行的操作还没有同步到磁盘上，那它怎么查到呢？所以要支持事务，背后的工作逻辑是很复杂的，不但要从数据文件中找，还要去找那些有可能潜在修改这个数据文件的数据集，比如内存缓冲区，这个缓冲区我们称为innodb_buffer，还有可能要去查询事务日志。所以事务日志还要支撑读操作。只有完全把buffer和事务日志中的数据全部同步到磁盘的数据文件中去了，从磁盘上读到的数据才是最新的。所以buffer和事务日志中所保存的数据接近于表中所存储的格式的。&lt;br&gt;再考虑一种场景如果我们启动了一个非常大的事务，那么buffer实在缓存不下了，就要先写到事务日志中去了，日志文件至少需要两个，以实现轮替的，两个组成一个日志文件组。第一个日志文件写满了，就去写第二个。日志文件一个5M，可以调整的，但是大多数场景是够用的。第一个日志文件不够用了，写第二个日志文件，然后第一个日志文件中的数据开始往磁盘数据文件同步。即便如此，这个事务只执行了一半或者2/3，过一会，回滚。该怎么回滚？那些写到磁盘数据文件的数据也得删掉。所以回滚也是一个非常复杂的操作。如果说这个回滚的所有数据最多只到事务日志中和最多走到数据文件中，哪种回滚的开销比较小？只是走到事务日志中开销比较小，甚至于还没走到事务日志中，仍然还在innodb_buffer中，回滚的开销会更小，所以我们应该使用小事务。&lt;br&gt;为了保证提交的事务不丢失，其一部分写操作可能在内存中，我们一commit，所有位于内存中的数据有可能会因为断电或系统崩溃而丢失，为了避免这种情况，要立即写到持久存储中去。写到事务日志中。假如一个事务提交了，刚从内存中同步到事务日志中，还没同步到数据文件中，系统崩溃了。下次启动时，这个事务能恢复回来，因为事务日志中有。所以下一次mysql启动时，它必须保证把那些提交的事务从事务文件中同步到数据文件中。而未提交的事务，比如有些事务正在操作，但并未提交，系统崩溃了，这种情况怎么办？因为没有完成，所以之前这个事务的操作全部回滚，这个过程就叫做系统崩溃恢复的过程。把那些提交的事务同步到数据文件中，没提交的事务回滚。而事务性存储引擎的崩溃恢复能力是天生的。&lt;br&gt;如果MySQL崩溃是因为事务日志的磁盘坏了，这种情况下，就不能崩溃恢复了。只能用备份恢复了。所以我们应该让事务日志所在的硬盘足够可靠，RAID10或者RAID1。假如说是因为数据文件崩溃了，一样的场景。你有事务日志，但你数据文件坏了，怎么去写啊。有事务日志并不能恢复数据，&lt;strong&gt;事务日志不是用来恢复数据的，事务日志仅仅是崩溃时能够保证已提交事务不丢失，未提交事务能回滚。&lt;/strong&gt;&lt;br&gt;从性能上来讲，将事务日志和数据文件放在一块是不合理的。从内存到硬盘，I/O，从事务日志到数据文件也要I/O，所有的I/O都压在一块硬盘上去了，导致性能下降。因此，把数据文件放在一个RAID设备上，把事务日志放在一个RAID设备上。考虑独特的场景，我们实在没有RAID设备放事务日志了，那就给事务日志做镜像。如果你实在是没钱，那就找个其他磁盘空间，跟事务日志文件不在同一个磁盘上就行，做一个mirror，任何往第一组事务日志中写的数据会被自动同步到第二组中去的。&lt;br&gt;日志文件组：至少应该有两个日志文件；&lt;br&gt;【注意】：尽可能使用小事务以提升事务引擎的性能；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;二进制日志&lt;br&gt;主要用于MySQL时间点恢复和复制。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&quot;查询日志&quot;&gt;&lt;a href=&quot;#查询日志&quot; class=&quot;headerlink&quot; title=&quot;查询日志&quot;&gt;&lt;/a&gt;查询日志&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;log={ON|OFF}:是否记录所有语句的日志信息于一般查询日志文件(general_log)。MySQL5.6已经弃用此项变量了，都使用general_log。&lt;/li&gt;
+&lt;li&gt;log_output={TABLE|FILE|NONE}&lt;ul&gt;
+&lt;li&gt;TABLE：记录于表中。MySQL库中会自动生成一个表记录。&lt;/li&gt;
+&lt;li&gt;FILE：记录于general_log_file。&lt;/li&gt;
+&lt;li&gt;NONE：不记录。&lt;/li&gt;
+&lt;li&gt;TABLE和FILE可以同时出现，用逗号分隔即可。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;general_log：是否启用查询日志。由于历史的原因，和log是个冲突的概念。&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;general_log_file：定义一般查询日志保存的文件。文件名为：主机名.log，保存路径没说的话保存在数据目录中。所有的相对路径通常都是相对于数据目录而言的。&lt;/p&gt;
+&lt;p&gt;  mysql&amp;gt; SHOW GLOBAL VARIABLES LIKE “%log%”;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/89.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;如果开启查询日志，包括SHOW、SET操作也会被记录，这些操作过程中也需要查询。如果要记录查询日志，记录到数据库中，会比记录到文件中快一点。但是一般是不启用记录查询日志的，除非特殊情况。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;慢查询日志&quot;&gt;&lt;a href=&quot;#慢查询日志&quot; class=&quot;headerlink&quot; title=&quot;慢查询日志&quot;&gt;&lt;/a&gt;慢查询日志&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;long_query_time： 10.000000&lt;br&gt;执行多长时间的查询算是慢查询&lt;/li&gt;
+&lt;li&gt;slow_query_log={ON|OFF}  或者是1 | 0&lt;br&gt;设定是否启用慢查询日志；它的输出位置也取决log_output={TABLE|FILE|NONE}；&lt;/li&gt;
+&lt;li&gt;slow_query_log_file=www-slow.log&lt;br&gt;定义日志文件路径及名称；&lt;/li&gt;
+&lt;li&gt;log_slow_queries=ON    &lt;/li&gt;
+&lt;li&gt;与上面slow_query_log={ON|OFF}好像是重复的，上面那个是全局的，下面这个是用户自己会话的。                                &lt;/li&gt;
+&lt;li&gt;log_slow_rate_limit=1     记录慢查询日志的速率。                  &lt;/li&gt;
+&lt;li&gt;&lt;p&gt;log_slow_verbosity     是否记录详细的慢查询的详细信息。&lt;/p&gt;
+&lt;p&gt;  mysql&amp;gt; SHOW GLOBAL VARIABLES LIKE “long%”;&lt;br&gt;  +—————–+———–+&lt;br&gt;  | Variable_name   | Value     |&lt;br&gt;  +—————–+———–+&lt;br&gt;  | long_query_time | 10.000000 |&lt;br&gt;  +—————–+———–+&lt;br&gt;  1 row in set (0.00 sec)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;错误日志&quot;&gt;&lt;a href=&quot;#错误日志&quot; class=&quot;headerlink&quot; title=&quot;错误日志&quot;&gt;&lt;/a&gt;错误日志&lt;/h2&gt;&lt;p&gt;错误日志： 通常是开启的。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;服务器启动和关闭过程中的信息；&lt;/li&gt;
+&lt;li&gt;服务器运行过程中的错误信息；&lt;/li&gt;
+&lt;li&gt;事件调度器运行一个事件时产生的信息；&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;在复制架构中的从服务器上启动从服务器线程时产生的信息。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;log_error = /path/to/error_log_file&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;log_warnings = {1|0}&lt;br&gt;是否记录警告信息于错误日志中。&lt;/p&gt;
+&lt;p&gt;  mysql&amp;gt; SHOW GLOBAL VARIABLES LIKE “%log%”;&lt;br&gt;  …&lt;br&gt;  | log_error                               | /data/mydata/db.err           |&lt;br&gt;  …&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;二进制日志&quot;&gt;&lt;a href=&quot;#二进制日志&quot; class=&quot;headerlink&quot; title=&quot;二进制日志&quot;&gt;&lt;/a&gt;二进制日志&lt;/h2&gt;</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;MySQL日志&quot;&gt;&lt;a href=&quot;#MySQL日志&quot; class=&quot;headerlink&quot; title=&quot;MySQL日志&quot;&gt;&lt;/a&gt;MySQL日志&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;查询日志&lt;br&gt;这是最不应该记录的日志。因为一个非常繁忙的数据库服务器，其查询会有
+    
+    </summary>
+    
+      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
+    
+    
+      <category term="MySQL" scheme="http://yoursite.com/tags/MySQL/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL用户管理及查询缓存详解</title>
@@ -3328,302 +3403,6 @@ if __name__ == &amp;apos;__main__&amp;apos;:
     <summary type="html">
     
       &lt;h2 id=&quot;InfluxDB-API-Client-Libraries&quot;&gt;&lt;a href=&quot;#InfluxDB-API-Client-Libraries&quot; class=&quot;headerlink&quot; title=&quot;InfluxDB API Client Libraries&quot;&gt;&lt;/a&gt;InfluxDB API Client Libraries&lt;/h2&gt;&lt;p&gt;上一篇文章介绍了安装部署InfluxDB和它的一些基本概念，接着就得来处理Nginx access.log，并将处理结果存储在InfluxDB中。&lt;br&gt;InfluxDB支持多种语言使用其客户端库来进行交互，具体参见官方文档：&lt;br&gt;&lt;a href=&quot;https://docs.influxdata.com/influxdb/v1.4/tools/api_client_libraries/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.influxdata.com/influxdb/v1.4/tools/api_client_libraries/&lt;/a&gt;&lt;br&gt;
-    
-    </summary>
-    
-      <category term="时序数据库" scheme="http://yoursite.com/categories/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
-    
-    
-      <category term="InfluxDB" scheme="http://yoursite.com/tags/InfluxDB/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>时序数据库InfluxDB</title>
-    <link href="http://yoursite.com/2017/12/15/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93InfluxDB/"/>
-    <id>http://yoursite.com/2017/12/15/时序数据库InfluxDB/</id>
-    <published>2017-12-15T14:00:36.000Z</published>
-    <updated>2018-01-10T07:55:24.000Z</updated>
-    
-    <content type="html">&lt;blockquote&gt;
-&lt;p&gt;最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学习过程，同时也希望能够帮助到其他学习的同学。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h2 id=&quot;InfluxDB介绍&quot;&gt;&lt;a href=&quot;#InfluxDB介绍&quot; class=&quot;headerlink&quot; title=&quot;InfluxDB介绍&quot;&gt;&lt;/a&gt;InfluxDB介绍&lt;/h2&gt;&lt;p&gt;什么是时间序列数据？最简单的定义就是数据格式里包含timestamp字段的数据。比如股票市场的价格，环境中的温度，主机的CPU使用率等。但是又有什么数据是不包含timestamp的呢？几乎所有的数据都可以打上一个timestamp字段。时间序列数据更重要的一个属性是如何去查询它。在查询的时候，对于时间序列我们总是会带上一个时间范围去过滤数据。同时查询的结果里也总是会包含timestamp字段。&lt;br&gt;InfluxDB 是一个开源分布式时序、事件和指标数据库。使用 Go 语言编写，无需外部依赖。其设计目标是实现分布式和水平伸缩扩展。&lt;br&gt;它有三大特性：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Time Series （时间序列）：你可以使用与时间有关的相关函数（如最大，最小，求和等）&lt;/li&gt;
-&lt;li&gt;Metrics（度量）：你可以实时对大量数据进行计算&lt;/li&gt;
-&lt;li&gt;Eevents（事件）：它支持任意的事件数据&lt;br&gt;特点：&lt;/li&gt;
-&lt;/ol&gt;
-&lt;ul&gt;
-&lt;li&gt;schemaless(无结构)，可以是任意数量的列&lt;/li&gt;
-&lt;li&gt;min, max, sum, count, mean, median 一系列函数，方便统计&lt;/li&gt;
-&lt;li&gt;Native HTTP API, 内置http支持，使用http读写&lt;/li&gt;
-&lt;li&gt;Powerful Query Language 类似sql&lt;/li&gt;
-&lt;li&gt;Built-in Explorer 自带web管理界面。（从1.4版本开始去除了自带的web管理界面）&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;安装部署InfluxDB&quot;&gt;&lt;a href=&quot;#安装部署InfluxDB&quot; class=&quot;headerlink&quot; title=&quot;安装部署InfluxDB&quot;&gt;&lt;/a&gt;安装部署InfluxDB&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;influxdb下载地址：&lt;/strong&gt;&lt;br&gt;&lt;a href=&quot;https://portal.influxdata.com/downloads&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://portal.influxdata.com/downloads&lt;/a&gt;&lt;br&gt;&lt;strong&gt;influxdb文档：&lt;/strong&gt;&lt;br&gt;&lt;a href=&quot;http://docs.influxdata.com/influxdb/v1.4/introduction/getting_started/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://docs.influxdata.com/influxdb/v1.4/introduction/getting_started/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;1.下载安装&lt;/strong&gt;&lt;br&gt;对于在不同操作系统上安装，官网都有说明，我这里使用的是CentOS 7。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/2.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@docdesginer local]# wget https://dl.influxdata.com/influxdb/releases/influxdb-1.4.2.x86_64.rpm
-[root@docdesginer local]# yum localinstall influxdb-1.4.2.x86_64.rpm
-[root@docdesginer local]# rpm -ql influxdb
-/etc/influxdb/influxdb.conf
-/etc/logrotate.d/influxdb
-/usr/bin/influx
-/usr/bin/influx_inspect
-/usr/bin/influx_stress
-/usr/bin/influx_tsm
-/usr/bin/influxd
-/usr/lib/influxdb/scripts/influxdb.service
-/usr/lib/influxdb/scripts/init.sh
-/usr/share/man/man1/influx.1.gz
-/usr/share/man/man1/influx_inspect.1.gz
-/usr/share/man/man1/influx_stress.1.gz
-/usr/share/man/man1/influx_tsm.1.gz
-/usr/share/man/man1/influxd-backup.1.gz
-/usr/share/man/man1/influxd-config.1.gz
-/usr/share/man/man1/influxd-restore.1.gz
-/usr/share/man/man1/influxd-run.1.gz
-/usr/share/man/man1/influxd-version.1.gz
-/usr/share/man/man1/influxd.1.gz
-/var/lib/influxdb
-/var/log/influxdb
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.启动&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@docdesginer local]# systemctl start influxdb 
-[root@docdesginer local]# systemctl status influxdb
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.登录&lt;/strong&gt;&lt;br&gt;客户端工具：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@docdesginer local]# /usr/bin/influx
-Connected to http://localhost:8086 version 1.4.2
-InfluxDB shell version: 1.4.2
-&amp;gt; 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看数据库：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt; SHOW DATABASES
-name: databases
-name
-----
-_internal
-&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;HTTP API访问：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@docdesginer ~]# curl -G http://localhost:8086/query --data-urlencode &amp;quot;q=SHOW DATABASES&amp;quot;
-{&amp;quot;results&amp;quot;:[{&amp;quot;statement_id&amp;quot;:0,&amp;quot;series&amp;quot;:[{&amp;quot;name&amp;quot;:&amp;quot;databases&amp;quot;,&amp;quot;columns&amp;quot;:[&amp;quot;name&amp;quot;],&amp;quot;values&amp;quot;:[[&amp;quot;_internal&amp;quot;]]}]}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;此时数据库中还有没有用户，还没开启认证。&lt;/p&gt;
-&lt;h2 id=&quot;开启认证&quot;&gt;&lt;a href=&quot;#开启认证&quot; class=&quot;headerlink&quot; title=&quot;开启认证&quot;&gt;&lt;/a&gt;开启认证&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.创建管理员&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@docdesginer local]# /usr/bin/influx
-Connected to http://localhost:8086 version 1.4.2
-InfluxDB shell version: 1.4.2
-&amp;gt; CREATE USER root WITH PASSWORD &amp;apos;wisedu123&amp;apos; WITH ALL PRIVILEGES
-&amp;gt; quit
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.修改配置文件，开启认证&lt;/strong&gt;&lt;br&gt;By default, authentication is disabled in the configuration file. Enable authentication by setting the auth-enabled option to true in the [http] section of the configuration file:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[http]  
-  enabled = true  
-  bind-address = &amp;quot;:8086&amp;quot;  
-  auth-enabled = true 
-  log-enabled = true  
-  write-tracing = false  
-  pprof-enabled = false  
-  https-enabled = false  
-  https-certificate = &amp;quot;/etc/ssl/influxdb.pem&amp;quot; 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重启InfluxDB：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@docdesginer ~]# systemctl restart influxdb 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.再次登录&lt;/strong&gt;&lt;br&gt;客户端工具连接数据库：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@docdesginer ~]# influx
-Connected to http://localhost:8086 version 1.4.2
-InfluxDB shell version: 1.4.2
-&amp;gt; show databases;
-ERR: unable to parse authentication credentials
-Warning: It is possible this error is due to not setting a database.
-Please set a database with the command &amp;quot;use &amp;lt;database&amp;gt;&amp;quot;.
-&amp;gt;
-
-[root@docdesginer ~]# /usr/bin/influx
-Connected to http://localhost:8086 version 1.4.2
-InfluxDB shell version: 1.4.2
-&amp;gt; auth
-username: root
-password: 
-&amp;gt; show databases;
-name: databases
-name
-----
-_internal
-&amp;gt; 
-或者
-[root@docdesginer ~]# /usr/bin/influx -username root -password wisedu123 -precision rfc3339 
-Connected to http://localhost:8086 version 1.4.2
-InfluxDB shell version: 1.4.2
-&amp;gt; show databases;
-name: databases
-name
-----
-_internal
-&amp;gt; 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;HTTP API：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@docdesginer ~]# curl -G http://localhost:8086/query --data-urlencode &amp;quot;q=SHOW DATABASES&amp;quot;                  
-{&amp;quot;error&amp;quot;:&amp;quot;unable to parse authentication credentials&amp;quot;}
-[root@docdesginer ~]# curl -G http://localhost:8086/query -u root:wisedu123 --data-urlencode &amp;quot;q=SHOW DATABASES&amp;quot;
-{&amp;quot;results&amp;quot;:[{&amp;quot;statement_id&amp;quot;:0,&amp;quot;series&amp;quot;:[{&amp;quot;name&amp;quot;:&amp;quot;databases&amp;quot;,&amp;quot;columns&amp;quot;:[&amp;quot;name&amp;quot;],&amp;quot;values&amp;quot;:[[&amp;quot;_internal&amp;quot;]]}]}
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;InfluxDB概念&quot;&gt;&lt;a href=&quot;#InfluxDB概念&quot; class=&quot;headerlink&quot; title=&quot;InfluxDB概念&quot;&gt;&lt;/a&gt;InfluxDB概念&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.influxdb相关名词（可类比关系型数据库）&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;database：数据库。&lt;/li&gt;
-&lt;li&gt;measurement：数据库中的表。它就是tag，field，time的容器；对于influxDB的measurement来说，field是必须的，并且不能根据field来排序；Tag是可选的，tag可以用来做索引，tag是以字符串的形式存放的。&lt;/li&gt;
-&lt;li&gt;points：表里面的一行数据。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;2.influxDB中独有的概念&lt;/strong&gt;&lt;br&gt;（1）Point由时间戳（time）、数据（field）和标签（tags）组成。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;time：每条数据记录的时间，也是数据库自动生成的主索引；&lt;/li&gt;
-&lt;li&gt;fields：各种记录的值；&lt;/li&gt;
-&lt;li&gt;tags：各种有索引的属性。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;InfluxDb不需要做schema定义，这意味着你可以随意的添加measurements, tags, and fields at any time。&lt;/p&gt;
-&lt;p&gt;（2）series&lt;br&gt;a series is the collection of data that share a retention policy, measurement, and tag set&lt;br&gt;所有在数据库中的数据，都需要通过图表来展示，而这个series表示这个表里面的数据，可以在图表上画成几条线：通过tags排列组合算出来。&lt;br&gt;其实一个series就是一个测点，或者说一条曲线，那么retention policy, measurement, tagset就共同组成了一个定位测点序列的唯一标识。&lt;br&gt;point，就是某个series的同一个时刻的多个field的value，就组成了一个point；其实就是一条曲线上的一个点。&lt;/p&gt;
-&lt;p&gt;（3）retention policy&lt;br&gt;保留策略，用于决定要保留多久的数据，保存几个备份，以及集群的策略等。&lt;/p&gt;
-&lt;h2 id=&quot;InfluxDB基本操作&quot;&gt;&lt;a href=&quot;#InfluxDB基本操作&quot; class=&quot;headerlink&quot; title=&quot;InfluxDB基本操作&quot;&gt;&lt;/a&gt;InfluxDB基本操作&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;连接数据库：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@docdesginer ~]# /usr/bin/influx -username root -password wisedu123 -precision rfc3339   
-Connected to http://localhost:8086 version 1.4.2
-InfluxDB shell version: 1.4.2
-&amp;gt; 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这里的-precision参数指定了时间戳的格式为rfc3339，也可以不使用该参数。&lt;br&gt;&lt;strong&gt;查看数据库：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt; SHOW DATABASES
-name: databases
-name
-----
-_internal
-&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;创建数据库：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt; CREATE DATABASE mydb
-&amp;gt; SHOW DATABASES
-name: databases
-name
-----
-_internal
-mydb
-&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;进入数据库：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt; USE mydb
-Using database mydb
-&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;插入数据：&lt;/strong&gt;&lt;br&gt;influxDB存储数据采用的是Line Protocol格式。&lt;br&gt;Line Protocol格式：写入数据库的Point的固定格式。格式如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;lt;measurement&amp;gt;[,&amp;lt;tag-key&amp;gt;=&amp;lt;tag-value&amp;gt;...] &amp;lt;field-key&amp;gt;=&amp;lt;field-value&amp;gt;[,&amp;lt;field2-key&amp;gt;=&amp;lt;field2-value&amp;gt;...] [unix-nano-timestamp]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;比如：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;weather,location=us-midwest temperature=82 1465839830100400200
-  |    -------------------- --------------  |
-  |             |             |             |
-  |             |             |             |
-+-----------+--------+-+---------+-+---------+
-|measurement|,tag_set| |field_set| |timestamp|
-+-----------+--------+-+---------+-+---------+
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】：最后的timestamp是 unix时间戳*1000000000 的值，或者使用 %Y-%m-%dT%H:%M:%SZ 这种格式。使用其他格式在插入时会报错。&lt;/p&gt;
-&lt;p&gt;示例：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt; INSERT cpu,host=serverA,region=us_west value=0.64
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;cpu是表名&lt;/li&gt;
-&lt;li&gt;host=serverA,region=us_west 是tag&lt;/li&gt;
-&lt;li&gt;value=0.64是field&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;想对此格式有详细的了解参见&lt;a href=&quot;https://docs.influxdata.com/influxdb/v1.4/write_protocols/line_protocol_tutorial/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;官方文档&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;查询数据：&lt;/strong&gt;&lt;br&gt;influxDB是支持类sql语句的，具体的查询语法都差不多。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt; select * from cpu
-name: cpu
-time                           host    region  value
-----                           ----    ------  -----
-2017-12-15T13:17:09.660446488Z serverA us_west 0.64
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】：InfluxDB集群功能已经不再开源。要想使用集群服务需要购买企业版。开源版和企业版的主要区别就是企业版的InfluxDB支持集群，而开源版不支持，此外企业版提供了先进的备份/恢复功能，而开源版本没有。但InfluxDB单机版性能也足够支撑中小公司的业务了。&lt;/p&gt;
-&lt;h2 id=&quot;InfluxDB数据保存策略（Retention-Policies）&quot;&gt;&lt;a href=&quot;#InfluxDB数据保存策略（Retention-Policies）&quot; class=&quot;headerlink&quot; title=&quot;InfluxDB数据保存策略（Retention Policies）&quot;&gt;&lt;/a&gt;InfluxDB数据保存策略（Retention Policies）&lt;/h2&gt;&lt;p&gt;InfluxDB每秒可以处理成千上万条数据，要将这些数据全部保存下来会占用大量的存储空间，有时我们可能并不需要将所有历史数据进行存储，因此，InfluxDB推出了数据保留策略（Retention Policies），用来让我们自定义数据的保留时间。&lt;br&gt;InfluxDB的数据保留策略（RP） 用来定义数据在InfluxDB中存放的时间，或者定义保存某个期间的数据。&lt;br&gt;一个数据库可以有多个保留策略，但每个策略必须是独一无二的。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;1.查询策略&lt;/strong&gt;&lt;br&gt;可以通过如下语句查看数据库的现有策略：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt; SHOW RETENTION POLICIES ON mydb
-name    duration shardGroupDuration replicaN default
-----    -------- ------------------ -------- -------
-autogen 0s       168h0m0s           1        true
-&amp;gt; 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【说明】：数据库mydb只有一个策略，各字段的含义如下：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;name：名称，此示例名称为 autogen。当你创建一个数据库的时候，InfluxDB会自动为数据库创建一个名叫 autogen 的策略，这个策略会永久保存数据。你可以重命名这个策略，并且在InfluxDB的配置文件中禁止掉自动创建策略。&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;duration：数据保存时间，0代表无限制&lt;/li&gt;
-&lt;li&gt;shardGroupDuration：shardGroup的存储时间，shardGroup是InfluxDB的一个基本储存结构。&lt;/li&gt;
-&lt;li&gt;replicaN：全称是REPLICATION，副本个数&lt;/li&gt;
-&lt;li&gt;default：是否是默认策略。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;这里有两个概念：&lt;br&gt;&lt;strong&gt;shard：&lt;/strong&gt;&lt;br&gt;    shard 在 InfluxDB 中是一个比较重要的概念，它和 retention policy 相关联。每一个存储策略下会存在许多 shard，每一个 shard 存储一个指定时间段内的数据，并且不重复，例如 7点-8点 的数据落入 shard0 中，8点-9点的数据则落入 shard1 中。每一个 shard 都对应一个底层的 tsm 存储引擎，有独立的 cache、wal、tsm file。&lt;br&gt;创建数据库时会自动创建一个默认存储策略，永久保存数据，对应的在此存储策略下的 shard 所保存的数据的时间段为 7 天，也就是上面查询时看到的168h。计算的函数如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;func shardGroupDuration(d time.Duration) time.Duration {
-    if d &amp;gt;= 180*24*time.Hour || d == 0 { // 6 months or 0
-        return 7 * 24 * time.Hour
-    } else if d &amp;gt;= 2*24*time.Hour { // 2 days
-        return 1 * 24 * time.Hour
-    }
-    return 1 * time.Hour
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果创建一个新的 retention policy 设置数据的保留时间为 1 天，则单个 shard 所存储数据的时间间隔为 1 小时，超过1个小时的数据会被存放到下一个 shard 中。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;shard group：&lt;/strong&gt;&lt;br&gt;    shard group是shards的逻辑容器。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;2.创建策略&lt;/strong&gt;&lt;br&gt;语法：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;CREATE RETENTION POLICY &amp;lt;retention_policy_name&amp;gt; ON &amp;lt;database_name&amp;gt; DURATION &amp;lt;duration&amp;gt; REPLICATION &amp;lt;n&amp;gt; [SHARD DURATION &amp;lt;duration&amp;gt;] [DEFAULT]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中：SHARD DURATION子句决定了每个shard group存储的时间间隔，在永久存储的策略里这个子句是无效的。这个子句是可选的。shard group duration默认由策略的 duration 决定。&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Retention Policy’s DURATION&lt;/th&gt;
-&lt;th&gt;Shard Group Duration&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;&amp;lt; 2 days&lt;/td&gt;
-&lt;td&gt;1 hour&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&amp;gt;= 2 days and &amp;lt;= 6 months&lt;/td&gt;
-&lt;td&gt;1 day&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&amp;gt; 6 months&lt;/td&gt;
-&lt;td&gt;7 days&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;示例1：为数据库mydb创建一个策略&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;CREATE RETENTION POLICY &amp;quot;one_day_only&amp;quot; ON &amp;quot;mydb&amp;quot; DURATION 1d REPLICATION 1
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;示例2：为数据库mydb创建一个默认策略。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;CREATE RETENTION POLICY &amp;quot;one_day_only&amp;quot; ON &amp;quot;mydb&amp;quot; DURATION 23h60m REPLICATION 1 DEFAULT
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.修改策略&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;ALTER RETENTION POLICY &amp;lt;retention_policy_name&amp;gt; ON &amp;lt;database_name&amp;gt; DURATION &amp;lt;duration&amp;gt; REPLICATION &amp;lt;n&amp;gt; SHARD DURATION &amp;lt;duration&amp;gt; DEFAULT
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;4.删除策略&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;DROP RETENTION POLICY &amp;lt;retention_policy_name&amp;gt; ON &amp;lt;database_name&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】：策略这个关键词“POLICY”在使用是应该大写，小写应该会出错。&lt;br&gt;当一个表使用的策略不是默认策略时，在进行操作时一定要显式的指定策略名称，否则会出现错误。&lt;/p&gt;
-&lt;h2 id=&quot;Chronograf介绍&quot;&gt;&lt;a href=&quot;#Chronograf介绍&quot; class=&quot;headerlink&quot; title=&quot;Chronograf介绍&quot;&gt;&lt;/a&gt;Chronograf介绍&lt;/h2&gt;&lt;p&gt;Influxdb在1.3以后版本已经关闭了内置的8086的web管理功能，需要单独的工具来管理。而这个工具就是Chronograf。&lt;br&gt;其实Chronograf是TICK技术栈的一个组成部分。TICK是InfluxdDB公司推出的监控套件，承包指标采集、分析、画图等时序数据库上下游的工作，有点模仿日志分析系统ELK套件的意思。TICK包含：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;T = Telegraf is a plugin-driven server agent for collecting and reporting metrics.&lt;/li&gt;
-&lt;li&gt;I = InfluxDB is a time series database built from the ground up to handle high write and query loads.&lt;/li&gt;
-&lt;li&gt;C = Chronograf is a graphing and visualization application for performing ad hoc exploration of data.&lt;/li&gt;
-&lt;li&gt;K = Kapacitor is a data processing framework proving alerting, anomaly detection and action frameworks.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;也就是说：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Telegraf：数据采集&lt;/li&gt;
-&lt;li&gt;InfluxDB：数据接收和存储&lt;/li&gt;
-&lt;li&gt;Chronograf：数据汇总展示，报警等。&lt;/li&gt;
-&lt;li&gt;Kapacitor：数据处理，比如监控策略等&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;安装Chronograf&quot;&gt;&lt;a href=&quot;#安装Chronograf&quot; class=&quot;headerlink&quot; title=&quot;安装Chronograf&quot;&gt;&lt;/a&gt;安装Chronograf&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.安装部署&lt;/strong&gt;&lt;br&gt;下载地址：&lt;a href=&quot;https://portal.influxdata.com/downloads&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://portal.influxdata.com/downloads&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/3.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@docdesginer local]# wget https://dl.influxdata.com/chronograf/releases/chronograf-1.3.10.0.x86_64.rpm
-[root@docdesginer local]# yum localinstall chronograf-1.3.10.0.x86_64.rpm
-[root@docdesginer local]# rpm -ql chronograf
-/etc/logrotate.d/chronograf
-/usr/bin/chronograf
-/usr/lib/chronograf/scripts/chronograf.service
-/usr/lib/chronograf/scripts/init.sh
-/usr/share/chronograf/canned/apache.json
-/usr/share/chronograf/canned/consul.json
-/usr/share/chronograf/canned/consul_agent.json
-...
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.启动&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@docdesginer local]# systemctl start chronograf
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.访问Chronograf&lt;/strong&gt;&lt;br&gt;浏览器输入&lt;a href=&quot;http://IP:8888&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://IP:8888&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/4.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;查询：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/TimeSeriesDatabases/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;在查询时，最好数据库名和表名都加上引号。&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;最近帮助公司前端小伙伴处理他们的nginx访问日志，log的数据是半结构化的数据，同时也是典型的时序数据，每一条数据都带有时间戳。于是考虑使用时间序列数据库存储，而不会去使用mysql或是mongodb(zabbix用的是mysql，它在IO上面遇到了瓶颈)。现在时间序列的数据库是有很多的，比如graphite、opentsdb以及新生的influxdb。这次我使用了InfluxDB，在此记录下学习过程，同时也希望能够帮助到其他学习的同学。&lt;br&gt;
     
     </summary>
     
