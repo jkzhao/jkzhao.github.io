@@ -113,7 +113,10 @@
 <meta property="og:description" content="MySQL日志 查询日志这是最不应该记录的日志。因为一个非常繁忙的数据库服务器，其查询会有很多，每一次都记录日志会导致系统性能下降。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/89.png">
-<meta property="og:updated_time" content="2018-04-16T01:14:01.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/90.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/91.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/92.png">
+<meta property="og:updated_time" content="2018-04-18T06:03:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL日志功能详解">
 <meta name="twitter:description" content="MySQL日志 查询日志这是最不应该记录的日志。因为一个非常繁忙的数据库服务器，其查询会有很多，每一次都记录日志会导致系统性能下降。">
@@ -346,8 +349,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-04-16T09:14:01+08:00" content="2018-04-16">
-              2018-04-16
+              <time itemprop="dateUpdated" datetime="2018-04-18T14:03:54+08:00" content="2018-04-18">
+              2018-04-18
               </time>
               </span>
             
@@ -456,7 +459,165 @@
 <li>log_warnings = {1|0}<br>是否记录警告信息于错误日志中。</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">mysql&gt; SHOW GLOBAL VARIABLES LIKE &quot;%log%&quot;;</div><div class="line">...</div><div class="line">| log_error                               | /data/mydata/db.err           |</div><div class="line">...</div></pre></td></tr></table></figure>
-<h2 id="二进制日志"><a href="#二进制日志" class="headerlink" title="二进制日志"></a>二进制日志</h2>
+<h2 id="二进制日志"><a href="#二进制日志" class="headerlink" title="二进制日志"></a>二进制日志</h2><h3 id="二进制日志介绍"><a href="#二进制日志介绍" class="headerlink" title="二进制日志介绍"></a>二进制日志介绍</h3><p>二进制日志：也称为复制日志，记录的是”修改”类信息，记录的是一个个事件。<br>格式也应该是二进制的，不能使用cat命令查看，有专门的工具mysqlbinlog可以查看。<br>二进制日志能够基于过去某个数据集的基础上，把后续的所有操作重新跑一遍，能得到和此前第一次跑时所得到的是一样的结果。日志文件名字以及存放路径都是可以定义的。比如我在安装mysql时将数据文件和二进制日志文件就定义在了不同的目录：</p>
+<pre><code>[root@db ~]# cd /data/binlog/
+[root@db binlog]# ls
+master-bin.000001  master-bin.000003  master-bin.000005  master-bin.000007  master-bin.index
+master-bin.000002  master-bin.000004  master-bin.000006  master-bin.000008
+[root@db binlog]# file master-bin.000001
+master-bin.000001: MySQL replication log
+</code></pre><p>可以使用工具mysqlbinlog查看二进制日志文件内容：</p>
+<pre><code>[root@db binlog]# mysqlbinlog master-bin.000001
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/90.png" alt=""><br>这个事件从66773开始到66846结束，66846-66773=中间的信息的偏移量。</p>
+<ul>
+<li>position：位置，空间记录法。空间记录法就是相对于当前日志文件而言它的偏移位置。</li>
+<li>time: 时间点，时间记录法。</li>
+</ul>
+<p>二进制日志文件内容格式：</p>
+<ul>
+<li>事件发生的日期和时间</li>
+<li>服务器ID</li>
+<li>事件的结束位置</li>
+<li>事件的类型</li>
+<li>原服务器生成此事件时的线程ID</li>
+<li>语句的时间戳和写入二进制日志文件的时间差。exec_time=0，由于单位是s，所以很多时候是0。</li>
+<li>错误代码；</li>
+<li>事件内容：也就是语句本身。</li>
+<li>事件位置，相当于下一事件的开始位置</li>
+</ul>
+<p>考虑一种场景：如果说我们有多个进程同时进行，比如处理两个请求的两个线程分别在两颗CPU上跑着，而且修改不是同一张表，这个时候都需要写入二进制日志，但是某个时刻只会往一个二进制日志文件中写，具体哪个见下面的命令。显然，这个文件不能有两个进程同时写，如果交替着写，事件就混到一块了。由于二进制日志成为了资源争用点，有可能会导致性能下降，如果你去设计的话，如何去避免性能下降？缓存，于是每一个线程在写数据时不是直接写文件，而是写在缓冲区中，专业点的说法是，写通常是叫做缓冲。过一段时间，由MySQL服务器后台线程找空闲时间自行往二进制日志文件中同步。但这会带来一个问题，如果说事件写在缓冲区中了，忽然间系统断电了，这些缓冲区的数据还没写到二进制文件中去呢，那么拿来二进制日志执行，数据也不对。虽然没有写到二进制日志文件中去，但是却已经写到本地数据文件中去了。只不过这个有可能产生数据修改的操作还得写到记录到二进制日志中去。将来把这个二进制日志信息复制到从服务器上，重新跑一遍，得到的数据不一样。因此这是不安全的做法。通常效率和安全性通常是两个背离的方向。所以我们要求应该在事务提交时无论如何也应该把二进制日志缓冲区中的信息同步到二进制日志文件中去。</p>
+<p>滚动： 二进制日志文件需要不停的进行滚动，防止文件大小过大。<br>1、大小<br>2、时间</p>
+<p>二进制日志的功用：</p>
+<ol>
+<li>即时点恢复：我们想恢复到哪个位置，可以通过二进制日志文件手动调整进行的。</li>
+<li>复制。</li>
+</ol>
+<h3 id="二进制日志常用命令"><a href="#二进制日志常用命令" class="headerlink" title="二进制日志常用命令"></a>二进制日志常用命令</h3><p>1.查看当前服务器所正在使用的二进制日志文件，以及下一个事件要开始时记录的位置</p>
+<pre><code>mysql&gt; SHOW MASTER STATUS;
++-------------------+----------+--------------+------------------+-------------------+
+| File              | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++-------------------+----------+--------------+------------------+-------------------+
+| master-bin.000008 |  5525554 |              |                  |                   |
++-------------------+----------+--------------+------------------+-------------------+
+1 row in set (0.00 sec)
+</code></pre><p>2.每一次重启MySQL服务器或者FLUSH LOGS，日志文件都会滚动。FLUSH LOGS，对错误日志等没有意义，它主要是用来滚动二进制日志和中继日志的。二进制日志不像事务日志ib_logfile0、ib_logfile1，反复被用到。</p>
+<pre><code>mysql&gt; FLUSH LOGS;       
+</code></pre><p>3.查看有多少二进制日志文件及其大小</p>
+<pre><code>mysql&gt; SHOW BINARY LOGS; 
++-------------------+-----------+
+| Log_name          | File_size |
++-------------------+-----------+
+| master-bin.000001 |     67251 |
+| master-bin.000002 |   1361538 |
+| master-bin.000003 |  73892389 |
+| master-bin.000004 |       120 |
+| master-bin.000005 |   5076873 |
+| master-bin.000006 |   8200661 |
+| master-bin.000007 |  30885330 |
+| master-bin.000008 |   5525554 |
++-------------------+-----------+
+8 rows in set (0.00 sec)
+</code></pre><p>我们可以通过删除文件的方式清除二进制日志，注意不到万不得已，千万不要手动删除。而且手动删除也不是通过删除文件删除的，而是通过PURGE命令删除的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">mysql&gt; HELP PURGE</div><div class="line">Name: &apos;PURGE BINARY LOGS&apos;</div><div class="line">Description:</div><div class="line">Syntax:</div><div class="line">PURGE &#123; BINARY | MASTER &#125; LOGS</div><div class="line">    &#123; TO &apos;log_name&apos; | BEFORE datetime_expr &#125;</div><div class="line"></div><div class="line">The binary log is a set of files that contain information about data</div><div class="line">modifications made by the MySQL server. The log consists of a set of</div><div class="line">binary log files, plus an index file (see</div><div class="line">http://dev.mysql.com/doc/refman/5.6/en/binary-log.html).</div><div class="line"></div><div class="line">The PURGE BINARY LOGS statement deletes all the binary log files listed</div><div class="line">in the log index file prior to the specified log file name or date.</div><div class="line">BINARY and MASTER are synonyms. Deleted log files also are removed from</div><div class="line">the list recorded in the index file, so that the given log file becomes</div><div class="line">the first in the list.</div><div class="line"></div><div class="line">This statement has no effect if the server was not started with the</div><div class="line">--log-bin option to enable binary logging.</div><div class="line"></div><div class="line">URL: http://dev.mysql.com/doc/refman/5.6/en/purge-binary-logs.html</div><div class="line"></div><div class="line">Examples:</div><div class="line">PURGE BINARY LOGS TO &apos;mysql-bin.010&apos;;</div><div class="line">PURGE BINARY LOGS BEFORE &apos;2008-04-02 22:46:26&apos;;</div></pre></td></tr></table></figure></p>
+<p>4.查看事件信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">mysql&gt; HELP SHOW BINLOG EVENTS</div><div class="line">Name: &apos;SHOW BINLOG EVENTS&apos;</div><div class="line">Description:</div><div class="line">Syntax:</div><div class="line">SHOW BINLOG EVENTS</div><div class="line">   [IN &apos;log_name&apos;] [FROM pos] [LIMIT [offset,] row_count]</div><div class="line"></div><div class="line">Shows the events in the binary log. If you do not specify &apos;log_name&apos;,</div><div class="line">the first binary log is displayed.</div><div class="line"></div><div class="line">URL: http://dev.mysql.com/doc/refman/5.6/en/show-binlog-events.html</div></pre></td></tr></table></figure></p>
+<pre><code>mysql&gt; SHOW BINLOG EVENTS IN &apos;master-bin.000001&apos;\G
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/91.png" alt=""></p>
+<ul>
+<li>server-id: 服务器身份标识。MySQL的复制模型可以做的很复杂，服务器之间可以互为主从，也就是说各自是对方的主，又各自是对方的从。也就意味着左边的服务器也会复制右边的服务器的二进制日志，右边的机器是从左边的二进制日志中读取信息到中继日志中，并执行，同时写入自己的二进制日志，那左边从右边的二进制日志拿回来在执行一次，也就重复了。为了避免重复，server-id。左边读回来的信息发现是自己的server-id，就不会执行了。</li>
+</ul>
+<p>或者可以使用mysqlbinlog工具查看事件信息：</p>
+<pre><code># mysqlbinlog      
+    --start-time
+    --stop-time
+    --start-position
+    --stop-position
+</code></pre><p>考虑一种场景：我们当前执行了INSERT INTO t1 VALUE (CURRENT_DATE())，记录到了二进制日志，但是以后拿这个日志跑一遍，很显然这个函数在那个时刻获得值肯定和现在不一样的。<br>MySQL记录二进制日志的格式的三种方式：</p>
+<ul>
+<li>基于语句：statement。像上面那个插入语句，就不能基于语句做了，就得把那个时间记录下来，叫基于行记录。</li>
+<li>基于行：row。但是基于行，每个行都得记录，比如我执行了一条语句UPDATE tb1 SET salary=salary+1000; ，如果公司有2万人，基于行记录得产生很大的数据量，但是基于语句，只需要记录这个语句就行。</li>
+<li>混合模式：mixed。由MySQL自动判断基于哪种方式记录。</li>
+</ul>
+<h3 id="二进制日志相关配置"><a href="#二进制日志相关配置" class="headerlink" title="二进制日志相关配置"></a>二进制日志相关配置</h3><p>跟二进制日志相关的服务器参数：<br><strong>1.log_bin = {ON|OFF},</strong> 是否开启二进制日志。还可以是个文件路径。同样二进制日志文件也不要和数据文件放在一起。建议在安装好MySQL就配置好二进制日志文件存放路径和没给你做。</p>
+<pre><code>[root@db ~]# vim /etc/my.cnf
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/92.png" alt=""></p>
+<p><strong>2.log_bin_trust_function_creators：</strong>用于控制创建存储函数时如果会导致不完全事件的记录。一般是OFF。</p>
+<p><strong>3.sql_log_bin = {ON|OFF} </strong> sql_log_bin 是一个动态变量，修改该变量时，可以只对当前会话生效（Session），也可以是全局的（Global），当全局修改这个变量时，只会对新的会话生效（这意味当对当前会话也不会生效），因此一般全局修改了这个变量后，都要把原来的所有连接 kill 掉。在 mysql 启动时，通过命令行或配置文件决定是否开启 binlog，而 log_bin 这个变量仅仅是报告当前 binlog 系统的状态（打开与否）。若你想要关闭 binlog，你可以通过修改 sql_log_bin 并把原来的连接 kill 掉，也可以修改 log_bin，然后重启 mysql，后者更彻底，缺点就是需要重启。</p>
+<p><strong>4.sync_binlog：</strong>设定多久同步一次。就是定义多久将缓冲区中的二进制日志信息同步到二进制日志文件中。时间间隔越长，性能就越好，但数据安全性就越差。默认为0，表示不同步，也就是不靠时间来控制。如果你给的是正值，就表示每隔多长时间会同步。事实上如果你的auto_commit=0，意味着每一次事务提交时才会自动同步。虽然这里是二进制日志，和事务没关系，但为了保证事务安全，每一次事务提交时都会同步二进制日志。因此如果auto_commit=1，每个语句执行完都会同步，这是相当的性能低下。sync_binlog和MySQL的性能密切相关，虽然说不至于和事务日志、事务日志的刷写方式影响那么严重，这也是应该引起我们重视的一个服务器参数。=0反而是性能表现比较好的方式。默认情况下auto_commint=1，见下图。建议关闭。</p>
+<p><strong>5.binlog_format = {statement|row|mixed}</strong></p>
+<p><strong>6.max_binlog_cache_size = </strong><br>二进制日志缓冲空间大小，从MySQL5.5.9以后仅用于缓冲事务类的语句。一般不需要调整。如果是非事务类的，比如Aria存储引擎，max_binlog_stmt_cache_size。</p>
+<p><strong>7.max_binlog_stmt_cache_size =</strong><br>非事务类的和事务类的共用的空间大小。一般不需要调整。</p>
+<p><strong>8.max_binlog_size = </strong><br>二进制日志文件上限。一旦超过这个大小，就自动滚动了。默认单位是bytes。</p>
+<p>建议：切勿将二进制日志与数据文件放在一同设备。MySQL的很多默认设定并不适合生产环境，我们需要调整。</p>
+<p>中继日志：对于非从服务器，其中继日志默认是不启用的。</p>
+<pre><code>relay_log_purge={ON|OFF} 是否自动清理 不再需要的中继日志。
+</code></pre><h2 id="总结日志相关的服务器参数"><a href="#总结日志相关的服务器参数" class="headerlink" title="总结日志相关的服务器参数"></a>总结日志相关的服务器参数</h2><ol>
+<li><p>expire_logs_days={0..99}<br>设定二进制日志的过期天数，超出此天数的二进制日志文件将被自动删除。默认为0，表示不启用过期自动删除功能。如果启用此功能，自动删除工作通常发生在MySQL启动时或FLUSH日志时。作用范围为全局，可用于配置文件，属动态变量。</p>
+</li>
+<li><p>general_log={ON|OFF}<br>设定是否启用查询日志，默认值为取决于在启动mysqld时是否使用了–general_log选项。如若启用此项，其输出位置则由–log_output选项进行定义，如果log_output的值设定为NONE，即使用启用查询日志，其也不会记录任何日志信息。作用范围为全局，可用于配置文件，属动态变量。</p>
+</li>
+<li><p>general_log_file=FILE_NAME<br>查询日志的日志文件名称，默认为“hostname.log”。作用范围为全局，可用于配置文件，属动态变量。</p>
+</li>
+</ol>
+<ol>
+<li><p>binlog-format={ROW|STATEMENT|MIXED}<br>指定二进制日志的类型，默认为STATEMENT。如果设定了二进制日志的格式，却没有启用二进制日志，则MySQL启动时会产生警告日志信息并记录于错误日志中。作用范围为全局或会话，可用于配置文件，且属于动态变量。</p>
+</li>
+<li><p>log={YES|NO}<br>是否启用记录所有语句的日志信息于一般查询日志(general query log)中，默认通常为OFF。MySQL 5.6已经弃用此选项。</p>
+</li>
+<li><p>log-bin={YES|NO}<br>是否启用二进制日志，如果为mysqld设定了–log-bin选项，则其值为ON，否则则为OFF。其仅用于显示是否启用了二进制日志，并不反应log-bin的设定值。作用范围为全局级别，属非动态变量。</p>
+</li>
+<li><p>log_bin_trust_function_creators={TRUE|FALSE}<br>此参数仅在启用二进制日志时有效，用于控制创建存储函数时如果会导致不安全的事件记录二进制日志条件下是否禁止创建存储函数。默认值为0，表示除非用户除了CREATE ROUTING或ALTER ROUTINE权限外还有SUPER权限，否则将禁止创建或修改存储函数，同时，还要求在创建函数时必需为之使用DETERMINISTIC属性，再不然就是附带READS SQL DATA或NO SQL属性。设置其值为1时则不启用这些限制。作用范围为全局级别，可用于配置文件，属动态变量。</p>
+</li>
+<li><p>log_error=/PATH/TO/ERROR_LOG_FILENAME<br>定义错误日志文件。作用范围为全局或会话级别，可用于配置文件，属非动态变量。</p>
+</li>
+<li><p>log_output={TABLE|FILE|NONE}<br>定义一般查询日志和慢查询日志的保存方式，可以是TABLE、FILE、NONE，也可以是TABLE及FILE的组合(用逗号隔开)，默认为TABLE。如果组合中出现了NONE，那么其它设定都将失效，同时，无论是否启用日志功能，也不会记录任何相关的日志信息。作用范围为全局级别，可用于配置文件，属动态变量。</p>
+</li>
+<li><p>log_query_not_using_indexes={ON|OFF}<br>设定是否将没有使用索引的查询操作记录到慢查询日志。作用范围为全局级别，可用于配置文件，属动态变量。</p>
+</li>
+<li><p>log_slave_updates<br>用于设定复制场景中的从服务器是否将从主服务器收到的更新操作记录进本机的二进制日志中。本参数设定的生效需要在从服务器上启用二进制日志功能。</p>
+</li>
+<li><p>log_slow_queries={YES|NO}<br>是否记录慢查询日志。慢查询是指查询的执行时间超出long_query_time参数所设定时长的事件。MySQL 5.6将此参数修改为了slow_query_log。作用范围为全局级别，可用于配置文件，属动态变量。</p>
+</li>
+<li><p>log_warnings=#<br>设定是否将警告信息记录进错误日志。默认设定为1，表示启用；可以将其设置为0以禁用；而其值为大于1的数值时表示将新发起连接时产生的“失败的连接”和“拒绝访问”类的错误信息也记录进错误日志。</p>
+</li>
+<li><p>long_query_time=#<br>设定区别慢查询与一般查询的语句执行时间长度。这里的语句执行时长为实际的执行时间，而非在CPU上的执行时长，因此，负载较重的服务器上更容易产生慢查询。其最小值为0，默认值为10，单位是秒钟。它也支持毫秒级的解析度。作用范围为全局或会话级别，可用于配置文件，属动态变量。</p>
+</li>
+<li><p>max_binlog_cache_size{4096 .. 18446744073709547520}<br>二进定日志缓存空间大小，5.5.9及以后的版本仅应用于事务缓存，其上限由max_binlog_stmt_cache_size决定。作用范围为全局级别，可用于配置文件，属动态变量。</p>
+</li>
+<li><p>max_binlog_size={4096 .. 1073741824}<br>设定二进制日志文件上限，单位为字节，最小值为4K，最大值为1G，默认为1G。某事务所产生的日志信息只能写入一个二进制日志文件，因此，实际上的二进制日志文件可能大于这个指定的上限。作用范围为全局级别，可用于配置文件，属动态变量。</p>
+</li>
+</ol>
+<ol>
+<li><p>max_relay_log_size={4096..1073741824}<br>设定从服务器上中继日志的体积上限，到达此限度时其会自动进行中继日志滚动。此参数值为0时，mysqld将使用max_binlog_size参数同时为二进制日志和中继日志设定日志文件体积上限。作用范围为全局级别，可用于配置文件，属动态变量。</p>
+</li>
+<li><p>innodb_log_buffer_size={262144 .. 4294967295}<br>设定InnoDB用于辅助完成日志文件写操作的日志缓冲区大小，单位是字节，默认为8MB。较大的事务可以借助于更大的日志缓冲区来避免在事务完成之前将日志缓冲区的数据写入日志文件，以减少I/O操作进而提升系统性能。因此，在有着较大事务的应用场景中，建议为此变量设定一个更大的值。作用范围为全局级别，可用于选项文件，属非动态变量。</p>
+</li>
+<li><p>innodb_log_file_size={108576 .. 4294967295}<br>设定日志组中每个日志文件的大小，单位是字节，默认值是5MB。较为明智的取值范围是从1MB到缓存池体积的1/n，其中n表示日志组中日志文件的个数。日志文件越大，在缓存池中需要执行的检查点刷写操作就越少，这意味着所需的I/O操作也就越少，然而这也会导致较慢的故障恢复速度。作用范围为全局级别，可用于选项文件，属非动态变量。</p>
+</li>
+<li><p>innodb_log_files_in_group={2 .. 100}<br>设定日志组中日志文件的个数。InnoDB以循环的方式使用这些日志文件。默认值为2。作用范围为全局级别，可用于选项文件，属非动态变量。</p>
+</li>
+<li><p>innodb_log_group_home_dir=/PATH/TO/DIR<br>设定InnoDB重做日志文件的存储目录。在缺省使用InnoDB日志相关的所有变量时，其默认会在数据目录中创建两个大小为5MB的名为ib_logfile0和ib_logfile1的日志文件。作用范围为全局级别，可用于选项文件，属非动态变量。</p>
+</li>
+<li><p>relay_log=file_name<br>设定中继日志的文件名称，默认为host_name-relay-bin。也可以使用绝对路径，以指定非数据目录来存储中继日志。作用范围为全局级别，可用于选项文件，属非动态变量。</p>
+</li>
+<li><p>relay_log_index=file_name<br>设定中继日志的索引文件名，默认为为数据目录中的host_name-relay-bin.index。作用范围为全局级别，可用于选项文件，属非动态变量。</p>
+</li>
+<li><p>relay-log-info-file=file_name<br>设定中继服务用于记录中继信息的文件，默认为数据目录中的relay-log.info。作用范围为全局级别，可用于选项文件，属非动态变量。</p>
+</li>
+<li><p>relay_log_purge={ON|OFF}<br>设定对不再需要的中继日志是否自动进行清理。默认值为ON。作用范围为全局级别，可用于选项文件，属动态变量。</p>
+</li>
+<li><p>relay_log_space_limit=#<br>设定用于存储所有中继日志文件的可用空间大小。默认为0，表示不限定。最大值取决于系统平台位数。作用范围为全局级别，可用于选项文件，属非动态变量。</p>
+</li>
+<li><p>slow_query_log={ON|OFF}<br>设定是否启用慢查询日志。0或OFF表示禁用，1或ON表示启用。日志信息的输出位置取决于log_output变量的定义，如果其值为NONE，则即便slow_query_log为ON，也不会记录任何慢查询信息。作用范围为全局级别，可用于选项文件，属动态变量。</p>
+</li>
+<li><p>slow_query_log_file=/PATH/TO/SOMEFILE<br>设定慢查询日志文件的名称。默认为hostname-slow.log，但可以通过–slow_query_log_file选项修改。作用范围为全局级别，可用于选项文件，属动态变量。</p>
+</li>
+<li><p>sql_log_bin={ON|OFF}<br>用于控制二进制日志信息是否记录进日志文件。默认为ON，表示启用记录功能。用户可以在会话级别修改此变量的值，但其必须具有SUPER权限。作用范围为全局和会话级别，属动态变量。</p>
+</li>
+<li><p>sql_log_off={ON|OFF}<br>用于控制是否禁止将一般查询日志类信息记录进查询日志文件。默认为OFF，表示不禁止记录功能。用户可以在会话级别修改此变量的值，但其必须具有SUPER权限。作用范围为全局和会话级别，属动态变量。</p>
+</li>
+<li><p>sync_binlog=#<br>设定多久同步一次二进制日志至磁盘文件中，0表示不同步，任何正数值都表示对二进制每多少次写操作之后同步一次。当autocommit的值为1时，每条语句的执行都会引起二进制日志同步，否则，每个事务的提交会引起二进制日志同步。</p>
+</li>
+</ol>
+
       
     </div>
 
@@ -649,7 +810,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL日志"><span class="nav-number">1.</span> <span class="nav-text">MySQL日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询日志"><span class="nav-number">2.</span> <span class="nav-text">查询日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#慢查询日志"><span class="nav-number">3.</span> <span class="nav-text">慢查询日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#错误日志"><span class="nav-number">4.</span> <span class="nav-text">错误日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二进制日志"><span class="nav-number">5.</span> <span class="nav-text">二进制日志</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL日志"><span class="nav-number">1.</span> <span class="nav-text">MySQL日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询日志"><span class="nav-number">2.</span> <span class="nav-text">查询日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#慢查询日志"><span class="nav-number">3.</span> <span class="nav-text">慢查询日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#错误日志"><span class="nav-number">4.</span> <span class="nav-text">错误日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二进制日志"><span class="nav-number">5.</span> <span class="nav-text">二进制日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#二进制日志介绍"><span class="nav-number">5.1.</span> <span class="nav-text">二进制日志介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二进制日志常用命令"><span class="nav-number">5.2.</span> <span class="nav-text">二进制日志常用命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二进制日志相关配置"><span class="nav-number">5.3.</span> <span class="nav-text">二进制日志相关配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结日志相关的服务器参数"><span class="nav-number">6.</span> <span class="nav-text">总结日志相关的服务器参数</span></a></li></ol></div>
             
           </div>
         </section>
@@ -695,7 +856,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共188.8k字</span>
+  <span class="post-count">博客全站共194.0k字</span>
 </div>
 
         
