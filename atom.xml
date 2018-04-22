@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-04-21T07:58:55.000Z</updated>
+  <updated>2018-04-22T13:14:03.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2018/04/21/%E5%9F%BA%E4%BA%8Emysqldump%E5%8F%8Alvmsnapshot%E5%81%9A%E5%A4%87%E4%BB%BD%E6%81%A2%E5%A4%8D/"/>
     <id>http://yoursite.com/2018/04/21/基于mysqldump及lvmsnapshot做备份恢复/</id>
     <published>2018-04-21T00:17:27.000Z</published>
-    <updated>2018-04-21T07:58:55.000Z</updated>
+    <updated>2018-04-22T13:14:03.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;备份和恢复概念&quot;&gt;&lt;a href=&quot;#备份和恢复概念&quot; class=&quot;headerlink&quot; title=&quot;备份和恢复概念&quot;&gt;&lt;/a&gt;备份和恢复概念&lt;/h2&gt;&lt;h3 id=&quot;备份和恢复的意义&quot;&gt;&lt;a href=&quot;#备份和恢复的意义&quot; class=&quot;headerlink&quot; title=&quot;备份和恢复的意义&quot;&gt;&lt;/a&gt;备份和恢复的意义&lt;/h3&gt;&lt;ul&gt;
 &lt;li&gt;灾难恢复：比如机房被淹。&lt;/li&gt;
@@ -102,6 +102,61 @@ LOAD DATA INFILE &amp;apos;/path/from/somefile&amp;apos;   #恢复时得使用�
 &lt;li&gt;物理备份，速度快；&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;mysqldump备份&quot;&gt;&lt;a href=&quot;#mysqldump备份&quot; class=&quot;headerlink&quot; title=&quot;mysqldump备份&quot;&gt;&lt;/a&gt;mysqldump备份&lt;/h2&gt;&lt;p&gt;【注意】：数据量在10G以下。&lt;br&gt;相当于一个MySQL客户端工具，你的服务器在远程，mysqldump在本地，没有任何问题，也就意味着二者可以在不同的主机上。可实现完全备份和部分备份，但是还原一个库时，这个库得事先存在，就是说在还原前，先得CREATE DATABASE。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;man mysqldump
+mysqldump [options] [db_name [tbl_name ...]]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;备份单个库：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysqldump [options] db_name
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;恢复时：如果目标库不存在，需要事先手动创建。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;【示例1】：备份和恢复。&lt;/strong&gt;&lt;br&gt;1.先备份库&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@db ~]# mysqldump -uroot -hlocalhost -p hellodb &amp;gt;/tmp/hdb.sql
+Enter password: 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.连接上mysql数据库，删除库hellodb&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; DROP DATABASE hellodb;
+Query OK, 7 rows affected (0.01 sec)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.恢复，得事先创建库&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[root@db ~]# mysql -uroot -hlocalhost -p &amp;lt;/tmp/hdb.sql 
+Enter password: 
+ERROR 1046 (3D000) at line 22: No database selected
+
+mysql&amp;gt; CREATE DATABASE hellodb DEFAULT CHARSET &amp;apos;utf8&amp;apos;;
+Query OK, 1 row affected (0.00 sec)
+
+[root@db ~]# mysql -uroot -hlocalhost -p hellodb &amp;lt;/tmp/hdb.sql     
+Enter password: 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;所以说指定数据库进行备份的这种方式，它只是备份这个库里的东西，它以为这个库是事先存在的，所以恢复时是不会自动创建库的。也可以备份某个表。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;--all-databases:　备份所有库。恢复时不需要事先创建库名。
+--databases db1 db2 ...: 备份指定的多个库。多个库名间用空格隔开，事先不需要创建库名。
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;【示例2】：备份前加锁。（这才是真正的备份，要锁表）&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;–lock-all-tables：请求锁定所有表之后再备份，对MyISAM、InnoDB、Aria做温备。&lt;/li&gt;
+&lt;li&gt;–lock-tables：备份哪张表，就锁定哪张表。这种并不理想，不建议使用，使用上面的那个。&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;–single-transaction: 能够对InnoDB存储引擎实现热备；&lt;/p&gt;
+&lt;p&gt;  [root@db ~]# mysqldump -uroot -hlocalhost -p hellodb –lock-all-tables &amp;gt;/root/hellodb.sql&lt;br&gt;  Enter password:&lt;br&gt;  [root@db ~]# mysqldump -uroot -hlocalhost -p –databases hellodb –lock-all-tables &amp;gt;/root/hellodb2.sql&lt;br&gt;  Enter password: &lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;【注意】:上面两句，第二句在备份单个表时也加了–databases参数，这样备份后的文件里是有CREATE DATABASE语句的。但是–lock-all-tables这种方式也不是很理想，其他的请求会被阻塞，如果你能确保你要备份的数据库的表的底层存储引擎都是InnoDB的话，可以使用另外一种备份方式，–single-transaction，基于多版本并发控制完成对InnoDB存储的热备，和–lock-all-tables不要同时使用。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;备份代码：mysqldump只备份数据，不备份代码。&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;–events: 备份事件调度器代码&lt;/li&gt;
+&lt;li&gt;–routines: 备份存储过程和存储函数&lt;/li&gt;
+&lt;li&gt;–triggers：备份触发器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;备份时滚动日志：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;--flush-logs: 备份前、请求到锁之后滚动日志。
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;为什么要滚动日志呢？恢复是要采用完全备份+增量备份或差异备份，最后是恢复不到数据损坏的那一刻的，比如你周日做的完全备份，周三中午崩掉了，你可以采用完全备份+周一、周二的增量备份，或者完全备份+差异备份，但是你周三凌晨到周三中午的数据怎么恢复？依靠二进制日志。滚动之后，恢复时你就知道从哪个文件向后是要用到的。因此用mysqldump做完全备份时都应该做–flush-logs。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;复制时的同步位置标记：&lt;/strong&gt;&lt;br&gt;主从复制架构中的主服务器数据，说白了它就是在你没有flush-logs时怎么知道下一次恢复时用这个文件怎么恢复到时间点。–master-data帮我们备份那一刻二进制日志的文件名及事件所处的位置。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;--master-data=[0|1|2]
+  0: 不记录
+  1：记录为CHANGE MASTER语句
+  2：记录为注释的CHANGE MASTER语句
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;【总结】:使用mysqldump备份需要使用的参数：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;请求锁：–lock-all-tables或使用–singe-transaction进行innodb热备；&lt;/li&gt;
+&lt;li&gt;滚动日志：–flush-logs&lt;/li&gt;
+&lt;li&gt;选定要备份的库：–databases&lt;/li&gt;
+&lt;li&gt;记录二进制日志文件及位置：–master-data=&lt;/li&gt;
 &lt;/ul&gt;
 </content>
     
