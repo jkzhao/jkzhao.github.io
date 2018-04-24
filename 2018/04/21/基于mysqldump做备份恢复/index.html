@@ -123,7 +123,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/101.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/102.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/103.png">
-<meta property="og:updated_time" content="2018-04-24T03:15:40.000Z">
+<meta property="og:updated_time" content="2018-04-24T03:27:19.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于mysqldump做备份恢复">
 <meta name="twitter:description" content="备份和恢复概念备份和恢复的意义 灾难恢复：比如机房被淹。 审计：比如想知道某一数据在某一时刻是什么样的。 测试">
@@ -356,7 +356,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-04-24T11:15:40+08:00" content="2018-04-24">
+              <time itemprop="dateUpdated" datetime="2018-04-24T11:27:19+08:00" content="2018-04-24">
               2018-04-24
               </time>
               </span>
@@ -526,10 +526,9 @@ Enter password:
 <ul>
 <li>–lock-all-tables：请求锁定所有表之后再备份，对MyISAM、InnoDB、Aria做温备。</li>
 <li>–lock-tables：备份哪张表，就锁定哪张表。这种并不理想，不建议使用，使用上面的那个。</li>
-<li><p>–single-transaction: 能够对InnoDB存储引擎实现热备；</p>
-<p>  [root@db ~]# mysqldump -uroot -hlocalhost -p hellodb –lock-all-tables &gt;/root/hellodb.sql<br>  Enter password:<br>  [root@db ~]# mysqldump -uroot -hlocalhost -p –databases hellodb –lock-all-tables &gt;/root/hellodb2.sql<br>  Enter password: </p>
-</li>
+<li>–single-transaction: 能够对InnoDB存储引擎实现热备；</li>
 </ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@db ~]# mysqldump -uroot -hlocalhost -p hellodb --lock-all-tables &gt;/root/hellodb.sql </div><div class="line">Enter password: </div><div class="line">[root@db ~]# mysqldump -uroot -hlocalhost -p --databases hellodb --lock-all-tables &gt;/root/hellodb2.sql  </div><div class="line">Enter password:</div></pre></td></tr></table></figure>
 <p>【注意】:上面两句，第二句在备份单个表时也加了–databases参数，这样备份后的文件里是有CREATE DATABASE语句的。但是–lock-all-tables这种方式也不是很理想，其他的请求会被阻塞，如果你能确保你要备份的数据库的表的底层存储引擎都是InnoDB的话，可以使用另外一种备份方式，–single-transaction，基于多版本并发控制完成对InnoDB存储的热备，和–lock-all-tables不要同时使用。</p>
 <p><strong>备份代码：mysqldump只备份数据，不备份代码。</strong></p>
 <ul>
