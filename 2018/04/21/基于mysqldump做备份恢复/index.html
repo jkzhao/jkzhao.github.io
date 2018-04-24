@@ -107,15 +107,25 @@
 <meta name="description" content="备份和恢复概念备份和恢复的意义 灾难恢复：比如机房被淹。 审计：比如想知道某一数据在某一时刻是什么样的。 测试">
 <meta name="keywords" content="MySQL">
 <meta property="og:type" content="article">
-<meta property="og:title" content="基于mysqldump及lvmsnapshot做备份恢复">
-<meta property="og:url" content="http://yoursite.com/2018/04/21/基于mysqldump及lvmsnapshot做备份恢复/index.html">
+<meta property="og:title" content="基于mysqldump做备份恢复">
+<meta property="og:url" content="http://yoursite.com/2018/04/21/基于mysqldump做备份恢复/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
 <meta property="og:description" content="备份和恢复概念备份和恢复的意义 灾难恢复：比如机房被淹。 审计：比如想知道某一数据在某一时刻是什么样的。 测试">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/93.png">
-<meta property="og:updated_time" content="2018-04-22T13:14:03.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/94.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/95.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/96.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/97.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/98.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/99.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/100.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/101.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/102.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/103.png">
+<meta property="og:updated_time" content="2018-04-24T03:15:40.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="基于mysqldump及lvmsnapshot做备份恢复">
+<meta name="twitter:title" content="基于mysqldump做备份恢复">
 <meta name="twitter:description" content="备份和恢复概念备份和恢复的意义 灾难恢复：比如机房被淹。 审计：比如想知道某一数据在某一时刻是什么样的。 测试">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/93.png">
 
@@ -135,7 +145,7 @@
   };
 </script>
 
-  <title> 基于mysqldump及lvmsnapshot做备份恢复 | jkzhao's blog </title>
+  <title> 基于mysqldump做备份恢复 | jkzhao's blog </title>
 </head>
 <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 
@@ -328,7 +338,7 @@
             
             
               
-                基于mysqldump及lvmsnapshot做备份恢复
+                基于mysqldump做备份恢复
               
             
           </h1>
@@ -346,8 +356,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-04-22T21:14:03+08:00" content="2018-04-22">
-              2018-04-22
+              <time itemprop="dateUpdated" datetime="2018-04-24T11:15:40+08:00" content="2018-04-24">
+              2018-04-24
               </time>
               </span>
             
@@ -382,7 +392,7 @@
 
           
           
-             <span id="/2018/04/21/基于mysqldump及lvmsnapshot做备份恢复/" class="leancloud_visitors" data-flag-title="基于mysqldump及lvmsnapshot做备份恢复">
+             <span id="/2018/04/21/基于mysqldump做备份恢复/" class="leancloud_visitors" data-flag-title="基于mysqldump做备份恢复">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -487,7 +497,7 @@ LOAD DATA INFILE &apos;/path/from/somefile&apos;   #恢复时得使用这个命�
 </ul>
 </li>
 </ul>
-<h2 id="mysqldump备份"><a href="#mysqldump备份" class="headerlink" title="mysqldump备份"></a>mysqldump备份</h2><p>【注意】：数据量在10G以下。<br>相当于一个MySQL客户端工具，你的服务器在远程，mysqldump在本地，没有任何问题，也就意味着二者可以在不同的主机上。可实现完全备份和部分备份，但是还原一个库时，这个库得事先存在，就是说在还原前，先得CREATE DATABASE。</p>
+<h2 id="mysqldump备份"><a href="#mysqldump备份" class="headerlink" title="mysqldump备份"></a>mysqldump备份</h2><h3 id="mysqldump备份介绍"><a href="#mysqldump备份介绍" class="headerlink" title="mysqldump备份介绍"></a>mysqldump备份介绍</h3><p>【注意】：数据量在10G以下。<br>相当于一个MySQL客户端工具，你的服务器在远程，mysqldump在本地，没有任何问题，也就意味着二者可以在不同的主机上。可实现完全备份和部分备份，但是还原一个库时，这个库得事先存在，就是说在还原前，先得CREATE DATABASE。</p>
 <pre><code>man mysqldump
 mysqldump [options] [db_name [tbl_name ...]]
 </code></pre><p>备份单个库：</p>
@@ -542,6 +552,50 @@ Enter password:
 <li>选定要备份的库：–databases</li>
 <li>记录二进制日志文件及位置：–master-data=</li>
 </ul>
+<h3 id="mysqldump备份示例"><a href="#mysqldump备份示例" class="headerlink" title="mysqldump备份示例"></a>mysqldump备份示例</h3><p><strong>【示例1】:手动施加锁，然后进行备份。</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/94.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/95.png" alt=""><br>【注意】：刷写所有表：把所有表在缓冲区中的内容通通同步到磁盘上。如果你的数据量很大，这句刷写和加锁语句要等很长时间。<br>然后用mysqldump备份就可以了。</p>
+<pre><code>[root@db ~]# mysqldump -uroot -p --databases hellodb &gt;/tmp/hellodb2.sql
+Enter password: 
+</code></pre><p>备份完了记得释放锁：</p>
+<pre><code>mysql&gt; UNLOCK TABLES;
+Query OK, 0 rows affected (0.00 sec)
+</code></pre><p><strong>【示例2】:手动施加锁太麻烦，直接用mysqldump备份。</strong></p>
+<pre><code>[root@db ~]# mysqldump -uroot -p --databases hellodb --lock-all-tables --flush-logs &gt;/tmp/hellodb3.sql
+Enter password: 
+</code></pre><p>如果有代码块，也需要把相应选项加进来。</p>
+<ul>
+<li>–events: 备份事件调度器代码</li>
+<li>–routines: 备份存储过程和存储函数</li>
+<li>–triggers：备份触发器</li>
+</ul>
+<p>热备，你得确定库中所有表的存储引擎都是InnoDB存储引擎</p>
+<pre><code>[root@db ~]# mysqldump -uroot -p --databases hellodb --single-transaction --flush-logs &gt;/tmp/hellodb4.sql                 
+Enter password: 
+</code></pre><p>还应该指定–master-data=[0|1|2]</p>
+<pre><code>[root@db ~]# mysqldump -uroot -p --databases hellodb --lock-all-tables --flush-logs --master-data=2 &gt;/tmp/hellodb5.sql
+Enter password: 
+[root@db ~]# vim /tmp/hellodb5.sql 
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/96.png" alt=""></p>
+<p><strong>恢复:</strong><br>建议：临时性关闭二进制日志，关闭其它用户连接。因为恢复时经常会创建数据库，创建表，插入数据，这部分没必要记录二进制日志。用这个备份恢复时只能恢复到上一次完全备份的位置，要想做时间点还原，还需要二进制日志。</p>
+<p><strong>【示例3】:数据库即时点恢复。</strong></p>
+<pre><code>[root@db ~]# mysqldump -uroot -p --databases hellodb --lock-all-tables --flush-logs --master-data=2 &gt;/tmp/hellodb6.sql
+Enter password: 
+</code></pre><p>备份后，我们在hellodb库中创建了表，插入了一些数据。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">mysql&gt; use hellodb</div><div class="line">Database changed</div><div class="line">mysql&gt; create table newtable(Name CHAR(30));</div><div class="line">Query OK, 0 rows affected (0.04 sec)</div><div class="line"></div><div class="line">mysql&gt; insert into newtable values (&apos;Tom&apos;),(&apos;Jerry&apos;);</div><div class="line">Query OK, 2 rows affected (0.00 sec)</div><div class="line">Records: 2  Duplicates: 0  Warnings: 0</div><div class="line"></div><div class="line">mysql&gt; quit</div><div class="line">Bye</div></pre></td></tr></table></figure></p>
+<p>没注意把数据库hellodb删除了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">mysql&gt; DROP DATABASE hellodb;</div><div class="line">Query OK, 8 rows affected (0.03 sec)</div><div class="line"></div><div class="line">mysql&gt; quit</div><div class="line">Bye</div></pre></td></tr></table></figure></p>
+<p>恢复过程：<br>①让服务器离线，最起码你得保证服务器不能被别人连进来。<br>开启防火墙或者其他。</p>
+<p>②把即时点前的二进制日志导出来。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/97.png" alt=""><br>二进制日志是master-bin.000013的120位置。</p>
+<pre><code>[root@db ~]# vim /tmp/hellodb6.sql 
+[root@db ~]# cd /data/binlog/
+[root@db binlog]# mysqlbinlog --start-position=120 master-bin.000013 #这个日志文件和文件名是在配置文件中定义的
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/98.png" alt=""></p>
+<pre><code>[root@db binlog]# mysqlbinlog --start-position=120 --stop-position=446 master-bin.000013 &gt;/tmp/helldb6.inc.sql
+</code></pre><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/99.png" alt=""></p>
+<p>③连上mysql服务器做恢复，先临时性关闭二进制日志<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/100.png" alt=""><br>千万不要xshell另起一个会话，导入完全备份，因为session sql_log_bin=0只对当前会话生效，另起一会话导入备份，那么同时也会写到二进制日志中，这是我们不期望的。</p>
+<p>④恢复到即时点。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/101.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/102.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/103.png" alt=""><br>但事实上这个开不开没什么影响，只要你自己不在当前session中操作就行。     </p>
+<p>【总结】:备份策略：基于mysqldump<br><strong>1.备份：mysqldump+二进制日志文件</strong><br>    周日做一次完全备份：备份的同时滚动日志<br>    周一至周六：备份二进制日志；(可以每天都FLUSH LOGS，然后把备份之前的那个二进制日志，每天备份每天的二进制日志，直接copy就可以备份二进制日志文件。这里其实是把二进制日志当增量备份)。<br><strong>2.恢复</strong><br>    完全备份+各二进制日志文件中至此刻的事件<br>   日志滚动也可以使用mysqladmin工具：</p>
+<pre><code>[root@db binlog]# mysqladmin -uroot -p flush-logs
+Enter password: 
+</code></pre><p>对MySQL配置文件，以及与MySQL相关的OS配置文件在每次修改后都应该直接进行备份。cp一份放在一个地方就行。</p>
+<p>我们可以写一个备份脚本：<br>1、备份所有数据库；<br>2、在每周日凌晨自动执行；<br>【注意】:crontab的PATH环境变量和系统的PATH环境变量是不一样的，无论你在命令行中使用命令多么顺当，在crontab中未必会执行，所以你写一个脚本的目的不是在命令行中执行，而是在crontab中执行，请使用命令全路径。</p>
 
       
     </div>
@@ -735,7 +789,7 @@ Enter password:
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#备份和恢复概念"><span class="nav-number">1.</span> <span class="nav-text">备份和恢复概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#备份和恢复的意义"><span class="nav-number">1.1.</span> <span class="nav-text">备份和恢复的意义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#备份类型"><span class="nav-number">1.2.</span> <span class="nav-text">备份类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#备份策略"><span class="nav-number">1.3.</span> <span class="nav-text">备份策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#备份对象"><span class="nav-number">1.4.</span> <span class="nav-text">备份对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#备份工具"><span class="nav-number">1.5.</span> <span class="nav-text">备份工具</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysqldump备份"><span class="nav-number">2.</span> <span class="nav-text">mysqldump备份</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#备份和恢复概念"><span class="nav-number">1.</span> <span class="nav-text">备份和恢复概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#备份和恢复的意义"><span class="nav-number">1.1.</span> <span class="nav-text">备份和恢复的意义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#备份类型"><span class="nav-number">1.2.</span> <span class="nav-text">备份类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#备份策略"><span class="nav-number">1.3.</span> <span class="nav-text">备份策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#备份对象"><span class="nav-number">1.4.</span> <span class="nav-text">备份对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#备份工具"><span class="nav-number">1.5.</span> <span class="nav-text">备份工具</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysqldump备份"><span class="nav-number">2.</span> <span class="nav-text">mysqldump备份</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#mysqldump备份介绍"><span class="nav-number">2.1.</span> <span class="nav-text">mysqldump备份介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mysqldump备份示例"><span class="nav-number">2.2.</span> <span class="nav-text">mysqldump备份示例</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
@@ -781,7 +835,7 @@ Enter password:
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共196.4k字</span>
+  <span class="post-count">博客全站共197.5k字</span>
 </div>
 
         
