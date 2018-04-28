@@ -115,7 +115,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/10.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/11.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/12.png">
-<meta property="og:updated_time" content="2018-01-27T13:21:04.000Z">
+<meta property="og:updated_time" content="2018-04-24T10:27:29.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx配置详解及优化">
 <meta name="twitter:description" content="上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。  NginxNginx的代码是由一个核心和一系列的模块组成, 核心主要用于提供Web Server的基本功能，以及Web和Mail反向代理的功能；">
@@ -348,8 +348,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-01-27T21:21:04+08:00" content="2018-01-27">
-              2018-01-27
+              <time itemprop="dateUpdated" datetime="2018-04-24T18:27:29+08:00" content="2018-04-24">
+              2018-04-24
               </time>
               </span>
             
@@ -467,7 +467,10 @@ worker_cpu_affinity 0001 0010 0100 1000;
 </code></pre><p><strong>7.worker_rlimit_nofile</strong><br>设定worker进程所能够打开的文件描述符个数的最大值。语法格式：</p>
 <pre><code>worker_rlimit_nofile number
 </code></pre><h2 id="配置Events段"><a href="#配置Events段" class="headerlink" title="配置Events段"></a>配置Events段</h2><p><strong>1.worker_connections</strong><br>设定每个worker所处理的最大连接数，它与来自main上下文的worker_processes一起决定了maxclients的值。</p>
-<pre><code>max clients = worker_processes * worker_connections
+<pre><code>nginx作为http服务器的时候：
+max_clients = worker_processes * worker_connections
+nginx作为反向代理服务器的时候：
+max_clients = worker_processes * worker_connections/4
 </code></pre><p><strong>2.use</strong><br>在有着多于一个的事件模型IO的应用场景中，可以使用此指令设定nginx所使用的IO机制，默认为./configure脚本选定的各机制中最适用当前OS的版本。语法格式：</p>
 <pre><code>use [ kqueue | rtsig | epoll | /dev/poll | select | poll | eventport ]
 </code></pre><p><strong>一个配置示例</strong></p>

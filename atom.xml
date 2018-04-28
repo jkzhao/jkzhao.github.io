@@ -2798,7 +2798,7 @@ http {
     <link href="http://yoursite.com/2018/01/23/Nginx%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3%E5%8F%8A%E4%BC%98%E5%8C%96/"/>
     <id>http://yoursite.com/2018/01/23/Nginx配置详解及优化/</id>
     <published>2018-01-23T07:06:27.000Z</published>
-    <updated>2018-01-27T13:21:04.000Z</updated>
+    <updated>2018-04-24T10:27:29.000Z</updated>
     
     <content type="html">&lt;blockquote&gt;
 &lt;p&gt;上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。&lt;/p&gt;
@@ -2859,7 +2859,10 @@ worker_cpu_affinity 0001 0010 0100 1000;
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;7.worker_rlimit_nofile&lt;/strong&gt;&lt;br&gt;设定worker进程所能够打开的文件描述符个数的最大值。语法格式：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;worker_rlimit_nofile number
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;配置Events段&quot;&gt;&lt;a href=&quot;#配置Events段&quot; class=&quot;headerlink&quot; title=&quot;配置Events段&quot;&gt;&lt;/a&gt;配置Events段&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.worker_connections&lt;/strong&gt;&lt;br&gt;设定每个worker所处理的最大连接数，它与来自main上下文的worker_processes一起决定了maxclients的值。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;max clients = worker_processes * worker_connections
+&lt;pre&gt;&lt;code&gt;nginx作为http服务器的时候：
+max_clients = worker_processes * worker_connections
+nginx作为反向代理服务器的时候：
+max_clients = worker_processes * worker_connections/4
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.use&lt;/strong&gt;&lt;br&gt;在有着多于一个的事件模型IO的应用场景中，可以使用此指令设定nginx所使用的IO机制，默认为./configure脚本选定的各机制中最适用当前OS的版本。语法格式：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;use [ kqueue | rtsig | epoll | /dev/poll | select | poll | eventport ]
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;一个配置示例&lt;/strong&gt;&lt;/p&gt;
