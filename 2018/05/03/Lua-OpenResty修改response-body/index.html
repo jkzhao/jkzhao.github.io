@@ -1,0 +1,895 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Nginx," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。  OpenResty lua编程相关参考 OpenResty Readme OpenResty最佳实践   其中Readme要看完，是github上对OpenResty的lua-nginx-module比较全面的介绍。 Nginx处理的几个阶段此处">
+<meta name="keywords" content="Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lua + OpenResty修改response body">
+<meta property="og:url" content="http://yoursite.com/2018/05/03/Lua-OpenResty修改response-body/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。  OpenResty lua编程相关参考 OpenResty Readme OpenResty最佳实践   其中Readme要看完，是github上对OpenResty的lua-nginx-module比较全面的介绍。 Nginx处理的几个阶段此处">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/24.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/25.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/26.png">
+<meta property="og:updated_time" content="2018-05-03T07:29:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Lua + OpenResty修改response body">
+<meta name="twitter:description" content="最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。  OpenResty lua编程相关参考 OpenResty Readme OpenResty最佳实践   其中Readme要看完，是github上对OpenResty的lua-nginx-module比较全面的介绍。 Nginx处理的几个阶段此处">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/24.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Lua + OpenResty修改response body | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Lua + OpenResty修改response body
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-05-03T13:18:45+08:00" content="2018-05-03">
+              2018-05-03
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2018-05-03T15:29:27+08:00" content="2018-05-03">
+              2018-05-03
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">Nginx</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2018/05/03/Lua-OpenResty修改response-body/" class="leancloud_visitors" data-flag-title="Lua + OpenResty修改response body">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。</p>
+</blockquote>
+<h2 id="OpenResty-lua编程相关参考"><a href="#OpenResty-lua编程相关参考" class="headerlink" title="OpenResty lua编程相关参考"></a>OpenResty lua编程相关参考</h2><ul>
+<li><a href="https://github.com/openresty/lua-nginx-module#name" target="_blank" rel="external">OpenResty Readme</a></li>
+<li><a href="https://moonbingbing.gitbooks.io/openresty-best-practices/lua/main.html" target="_blank" rel="external">OpenResty最佳实践
+</a></li>
+</ul>
+<p>其中Readme要看完，是github上对OpenResty的lua-nginx-module比较全面的介绍。</p>
+<h2 id="Nginx处理的几个阶段"><a href="#Nginx处理的几个阶段" class="headerlink" title="Nginx处理的几个阶段"></a>Nginx处理的几个阶段</h2><p>此处放上从网上找来的一幅图，<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/24.png" alt=""><br>我这里修改response body显然是需要用到body_filter_by_lua*指令。</p>
+<h2 id="修改Response-Body"><a href="#修改Response-Body" class="headerlink" title="修改Response Body"></a>修改Response Body</h2><p>修改Response Body的方式总体来说有4种，分别是：</p>
+<ul>
+<li>1.使用 body_filter_by_lua<br>指令来实现：<a href="http://wiki.nginx.org/HttpLuaModule#body_filter_by_lua" target="_blank" rel="external">http://wiki.nginx.org/HttpLuaModule#body_filter_by_lua</a> 这个支持流式处理。 </li>
+<li>2.使用 ngx.location.capture 发起子请求，然后对子请求的响应体进行全缓冲式修改</li>
+<li><p>3.可以使用 <a href="https://github.com/agentzh/replace-filter-nginx-module" target="_blank" rel="external">ngx_replace_filter 模块</a>来进行流式正则替换<br>替换成的目标值可以通过 ngx_lua 模块嵌入一小段 Lua 代码来事先计算好，放置在你自己定义的 nginx 变量中，然后在 replace_filter 指令中直接引用之。比如 </p>
+<p>  set_by_lua $my_var ‘… return …’;<br>  replace_filter ‘folderlist=\w+’ ‘folderlist=$my_var’ ‘g’; </p>
+</li>
+<li>4.使用http_sub_module模块</li>
+</ul>
+<p>根据实际的需求，使用第3种，需要先安装sregex library，然后重新编译安装OpenResty，在编译时 ./configure –add-module=/path/to/replace-filter-nginx-module 启用replace-filter-nginx-module模块。<br>如果使用第4种方式都需要重新编译安装OpenResty，在编译时 –with-http_sub_module 启用http_sub_module模块。<br>这两种他们都不接受，因为涉及的客户太多。<br>对于第2种方式，是个比较好的方式，但是使用第二种方式需要增加一个用于子请求的location，相当于大动了配置文件，并且相应的我还得去修改之前写的安装升级脚本，于是最终还是选择了第一种方式。<br>虽然第2种到第4种的方案不适用于此次的需求，但是我还是尝试了使用下第2种和第4种的方案，并会把相关的脚本和配置贴在下面。</p>
+<h3 id="第一种处理办法"><a href="#第一种处理办法" class="headerlink" title="第一种处理办法"></a>第一种处理办法</h3><p>lua脚本代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">-- body_filter_by_lua, body filter模块，ngx.arg[1]代表输入的chunk，ngx.arg[2]代表当前chunk是否为last</div><div class="line">local chunk, eof = ngx.arg[1], ngx.arg[2]</div><div class="line">local buffered = ngx.ctx.buffered</div><div class="line">if not buffered then</div><div class="line">   buffered = &#123;&#125;  -- XXX we can use table.new here </div><div class="line">   ngx.ctx.buffered = buffered</div><div class="line">end</div><div class="line">if chunk ~= &quot;&quot; then</div><div class="line">   buffered[#buffered + 1] = chunk</div><div class="line">   ngx.arg[1] = nil</div><div class="line">end</div><div class="line">if eof then</div><div class="line">   local whole = table.concat(buffered)</div><div class="line">   ngx.ctx.buffered = nil</div><div class="line">   -- try to unzip</div><div class="line">   -- local status, debody = pcall(com.decode, whole) </div><div class="line">   -- if status then whole = debody end</div><div class="line"></div><div class="line">   -- try to add or replace response body</div><div class="line">   -- local js_code = ...</div><div class="line">   -- whole = whole .. js_code</div><div class="line">   whole = string.gsub(whole, &quot;max%-width%:1632px%;&quot;,  &quot;&quot;)</div><div class="line">   ngx.arg[1] = whole</div><div class="line">end</div></pre></td></tr></table></figure></p>
+<p>Nginx相关location配置如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">location  /fe_components/ &#123;</div><div class="line">     location ~ /fe_components/jqwidget/.*/bh-scenes-1.2.min.css &#123;</div><div class="line">            root   /usr/local/nginx/nginx/html/;</div><div class="line">            body_filter_by_lua_file /opt/lua/replace.lua;</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     root   /usr/local/nginx/nginx/html;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>但是重载Nginx后发现，这个css样式的响应时间竟然是1.1min，可怕。。。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/25.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/26.png" alt=""><br>仔细阅读上面贴出来的<a href="https://github.com/openresty/lua-nginx-module#name" target="_blank" rel="external">OpenResty Readme</a>，发现有这么一段话：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">When the Lua code may change the length of the response body, then it is required to always clear out the Content-Length response header (if any) in a header filter to enforce streaming output, as in</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">location /foo &#123;</div><div class="line">    # fastcgi_pass/proxy_pass/...</div><div class="line"></div><div class="line">    header_filter_by_lua_block &#123; ngx.header.content_length = nil &#125;</div><div class="line">    body_filter_by_lua &apos;ngx.arg[1] = string.len(ngx.arg[1]) .. &quot;\\n&quot;&apos;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>于是需要修改配置文件，在body_filter_by_lua_file /opt/lua/replace.lua之前就得把header中的 content_length 置为空。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">location  /fe_components/ &#123;</div><div class="line">     location ~ /fe_components/jqwidget/.*/bh-scenes-1.2.min.css &#123;</div><div class="line">            root   /usr/local/nginx/nginx/html/;</div><div class="line">            header_filter_by_lua &apos;ngx.header.content_length = nil&apos;;</div><div class="line">            body_filter_by_lua_file /opt/lua/replace.lua;</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     root   /usr/local/nginx/nginx/html;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这样重载Nginx，清除缓存重新访问下，发现加载就正常了。<br>仔细了解了下原因，当代码运行到 body_filter_by_lua<em> 时，HTTP 报头（header）已经发送出去了。如果在之前设置了跟响应体相关的报头，而又在 body_filter_by_lua</em> 中修改了响应体，会导致响应报头和实际响应的不一致。举个简就是说这个例子里上游的服务器返回了 Content-Length 报头，而 body_filter_by_lua* 又修改了响应体的实际大小（因为我删除了一些字符串）。客户端收到这个报头后，按其中的 Content-Length 去处理，顺着一头栽进坑里。由于Nginx 的流式响应，发出去的报头就像泼出去的水，要想修改只能提前进行。这是流式处理常常面对的悖论：要在流的开始输出长度，但又不能在那个时间事先知道流的长度。<br>对于处理逻辑简单的场景来说，Lua是十分合适的。 </p>
+<h3 id="第二种处理办法"><a href="#第二种处理办法" class="headerlink" title="第二种处理办法"></a>第二种处理办法</h3><p>lua脚本：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">ngx.req.read_body()</div><div class="line">local data = ngx.req.get_body_data()</div><div class="line">local args = ngx.req.get_uri_args()</div><div class="line">local res = ngx.location.capture(&quot;/bh-scenes-1.2.min.css&quot;, &#123;method = ngx.HTTP_GET, body=data, args=args&#125;)</div><div class="line">res.body = string.gsub(res.body, &quot;max%-width%:1632px%;&quot;, &quot;&quot;)</div><div class="line">ngx.say(res.body)</div></pre></td></tr></table></figure></p>
+<p>Nginx相关配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">location = /bh-scenes-1.2.min.css &#123;</div><div class="line">      root   /usr/local/nginx/nginx/html/fe_components/jqwidget/teal/;</div><div class="line">&#125;</div><div class="line"></div><div class="line">location  /fe_components/ &#123;</div><div class="line">     location ~ /fe_components/jqwidget/.*/bh-scenes-1.2.min.css &#123;</div><div class="line">          content_by_lua_file /opt/lua/replace2.lua;</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     root   /usr/local/nginx/nginx/html;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="第四种处理办法"><a href="#第四种处理办法" class="headerlink" title="第四种处理办法"></a>第四种处理办法</h3><p>需要重新编译安装OpenResty，编译时加入参数 –with-http_sub_module。<br>Nginx相关配置如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">location  /fe_components/ &#123;</div><div class="line">        location ~ /jqwidget/teal/bh-scenes-1.2.min.css &#123;</div><div class="line">           #sub_filter_types *;</div><div class="line">           sub_filter_types text/css;</div><div class="line">           sub_filter &apos;max-width:1632px;&apos;  &apos;&apos;;</div><div class="line">           sub_filter_once off;</div><div class="line">           root   /usr/local/nginx/nginx/html/;</div><div class="line">        &#125;</div><div class="line">        root   /usr/local/nginx/nginx/html;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Nginx/" rel="tag"><i class="fa fa-tag"></i>Nginx</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/21/基于mysqldump做备份恢复/" rel="next" title="基于mysqldump做备份恢复">
+                <i class="fa fa-chevron-left"></i> 基于mysqldump做备份恢复
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">72</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenResty-lua编程相关参考"><span class="nav-number">1.</span> <span class="nav-text">OpenResty lua编程相关参考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx处理的几个阶段"><span class="nav-number">2.</span> <span class="nav-text">Nginx处理的几个阶段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改Response-Body"><span class="nav-number">3.</span> <span class="nav-text">修改Response Body</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一种处理办法"><span class="nav-number">3.1.</span> <span class="nav-text">第一种处理办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二种处理办法"><span class="nav-number">3.2.</span> <span class="nav-text">第二种处理办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第四种处理办法"><span class="nav-number">3.3.</span> <span class="nav-text">第四种处理办法</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共198.8k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>

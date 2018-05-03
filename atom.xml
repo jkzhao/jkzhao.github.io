@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-04-24T03:27:19.000Z</updated>
+  <updated>2018-05-03T07:29:27.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,60 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Lua + OpenResty修改response body</title>
+    <link href="http://yoursite.com/2018/05/03/Lua-OpenResty%E4%BF%AE%E6%94%B9response-body/"/>
+    <id>http://yoursite.com/2018/05/03/Lua-OpenResty修改response-body/</id>
+    <published>2018-05-03T05:18:45.000Z</published>
+    <updated>2018-05-03T07:29:27.000Z</updated>
+    
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;OpenResty-lua编程相关参考&quot;&gt;&lt;a href=&quot;#OpenResty-lua编程相关参考&quot; class=&quot;headerlink&quot; title=&quot;OpenResty lua编程相关参考&quot;&gt;&lt;/a&gt;OpenResty lua编程相关参考&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/openresty/lua-nginx-module#name&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;OpenResty Readme&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://moonbingbing.gitbooks.io/openresty-best-practices/lua/main.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;OpenResty最佳实践
+&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;其中Readme要看完，是github上对OpenResty的lua-nginx-module比较全面的介绍。&lt;/p&gt;
+&lt;h2 id=&quot;Nginx处理的几个阶段&quot;&gt;&lt;a href=&quot;#Nginx处理的几个阶段&quot; class=&quot;headerlink&quot; title=&quot;Nginx处理的几个阶段&quot;&gt;&lt;/a&gt;Nginx处理的几个阶段&lt;/h2&gt;&lt;p&gt;此处放上从网上找来的一幅图，&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/24.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;我这里修改response body显然是需要用到body_filter_by_lua*指令。&lt;/p&gt;
+&lt;h2 id=&quot;修改Response-Body&quot;&gt;&lt;a href=&quot;#修改Response-Body&quot; class=&quot;headerlink&quot; title=&quot;修改Response Body&quot;&gt;&lt;/a&gt;修改Response Body&lt;/h2&gt;&lt;p&gt;修改Response Body的方式总体来说有4种，分别是：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1.使用 body_filter_by_lua&lt;br&gt;指令来实现：&lt;a href=&quot;http://wiki.nginx.org/HttpLuaModule#body_filter_by_lua&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://wiki.nginx.org/HttpLuaModule#body_filter_by_lua&lt;/a&gt; 这个支持流式处理。 &lt;/li&gt;
+&lt;li&gt;2.使用 ngx.location.capture 发起子请求，然后对子请求的响应体进行全缓冲式修改&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;3.可以使用 &lt;a href=&quot;https://github.com/agentzh/replace-filter-nginx-module&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;ngx_replace_filter 模块&lt;/a&gt;来进行流式正则替换&lt;br&gt;替换成的目标值可以通过 ngx_lua 模块嵌入一小段 Lua 代码来事先计算好，放置在你自己定义的 nginx 变量中，然后在 replace_filter 指令中直接引用之。比如 &lt;/p&gt;
+&lt;p&gt;  set_by_lua $my_var ‘… return …’;&lt;br&gt;  replace_filter ‘folderlist=\w+’ ‘folderlist=$my_var’ ‘g’; &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;4.使用http_sub_module模块&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;根据实际的需求，使用第3种，需要先安装sregex library，然后重新编译安装OpenResty，在编译时 ./configure –add-module=/path/to/replace-filter-nginx-module 启用replace-filter-nginx-module模块。&lt;br&gt;如果使用第4种方式都需要重新编译安装OpenResty，在编译时 –with-http_sub_module 启用http_sub_module模块。&lt;br&gt;这两种他们都不接受，因为涉及的客户太多。&lt;br&gt;对于第2种方式，是个比较好的方式，但是使用第二种方式需要增加一个用于子请求的location，相当于大动了配置文件，并且相应的我还得去修改之前写的安装升级脚本，于是最终还是选择了第一种方式。&lt;br&gt;虽然第2种到第4种的方案不适用于此次的需求，但是我还是尝试了使用下第2种和第4种的方案，并会把相关的脚本和配置贴在下面。&lt;/p&gt;
+&lt;h3 id=&quot;第一种处理办法&quot;&gt;&lt;a href=&quot;#第一种处理办法&quot; class=&quot;headerlink&quot; title=&quot;第一种处理办法&quot;&gt;&lt;/a&gt;第一种处理办法&lt;/h3&gt;&lt;p&gt;lua脚本代码如下：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;-- body_filter_by_lua, body filter模块，ngx.arg[1]代表输入的chunk，ngx.arg[2]代表当前chunk是否为last&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;local chunk, eof = ngx.arg[1], ngx.arg[2]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;local buffered = ngx.ctx.buffered&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;if not buffered then&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   buffered = &amp;#123;&amp;#125;  -- XXX we can use table.new here &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   ngx.ctx.buffered = buffered&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;end&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;if chunk ~= &amp;quot;&amp;quot; then&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   buffered[#buffered + 1] = chunk&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   ngx.arg[1] = nil&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;end&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;if eof then&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   local whole = table.concat(buffered)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   ngx.ctx.buffered = nil&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   -- try to unzip&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   -- local status, debody = pcall(com.decode, whole) &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   -- if status then whole = debody end&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   -- try to add or replace response body&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   -- local js_code = ...&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   -- whole = whole .. js_code&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   whole = string.gsub(whole, &amp;quot;max%-width%:1632px%;&amp;quot;,  &amp;quot;&amp;quot;)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;   ngx.arg[1] = whole&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;end&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;Nginx相关location配置如下：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;location  /fe_components/ &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;     location ~ /fe_components/jqwidget/.*/bh-scenes-1.2.min.css &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            root   /usr/local/nginx/nginx/html/;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            body_filter_by_lua_file /opt/lua/replace.lua;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;     &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;     root   /usr/local/nginx/nginx/html;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;但是重载Nginx后发现，这个css样式的响应时间竟然是1.1min，可怕。。。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/25.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/26.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;仔细阅读上面贴出来的&lt;a href=&quot;https://github.com/openresty/lua-nginx-module#name&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;OpenResty Readme&lt;/a&gt;，发现有这么一段话：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;When the Lua code may change the length of the response body, then it is required to always clear out the Content-Length response header (if any) in a header filter to enforce streaming output, as in&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;location /foo &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    # fastcgi_pass/proxy_pass/...&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    header_filter_by_lua_block &amp;#123; ngx.header.content_length = nil &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    body_filter_by_lua &amp;apos;ngx.arg[1] = string.len(ngx.arg[1]) .. &amp;quot;\\n&amp;quot;&amp;apos;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;于是需要修改配置文件，在body_filter_by_lua_file /opt/lua/replace.lua之前就得把header中的 content_length 置为空。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;location  /fe_components/ &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;     location ~ /fe_components/jqwidget/.*/bh-scenes-1.2.min.css &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            root   /usr/local/nginx/nginx/html/;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            header_filter_by_lua &amp;apos;ngx.header.content_length = nil&amp;apos;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            body_filter_by_lua_file /opt/lua/replace.lua;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;     &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;     root   /usr/local/nginx/nginx/html;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;这样重载Nginx，清除缓存重新访问下，发现加载就正常了。&lt;br&gt;仔细了解了下原因，当代码运行到 body_filter_by_lua&lt;em&gt; 时，HTTP 报头（header）已经发送出去了。如果在之前设置了跟响应体相关的报头，而又在 body_filter_by_lua&lt;/em&gt; 中修改了响应体，会导致响应报头和实际响应的不一致。举个简就是说这个例子里上游的服务器返回了 Content-Length 报头，而 body_filter_by_lua* 又修改了响应体的实际大小（因为我删除了一些字符串）。客户端收到这个报头后，按其中的 Content-Length 去处理，顺着一头栽进坑里。由于Nginx 的流式响应，发出去的报头就像泼出去的水，要想修改只能提前进行。这是流式处理常常面对的悖论：要在流的开始输出长度，但又不能在那个时间事先知道流的长度。&lt;br&gt;对于处理逻辑简单的场景来说，Lua是十分合适的。 &lt;/p&gt;
+&lt;h3 id=&quot;第二种处理办法&quot;&gt;&lt;a href=&quot;#第二种处理办法&quot; class=&quot;headerlink&quot; title=&quot;第二种处理办法&quot;&gt;&lt;/a&gt;第二种处理办法&lt;/h3&gt;&lt;p&gt;lua脚本：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;ngx.req.read_body()&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;local data = ngx.req.get_body_data()&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;local args = ngx.req.get_uri_args()&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;local res = ngx.location.capture(&amp;quot;/bh-scenes-1.2.min.css&amp;quot;, &amp;#123;method = ngx.HTTP_GET, body=data, args=args&amp;#125;)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;res.body = string.gsub(res.body, &amp;quot;max%-width%:1632px%;&amp;quot;, &amp;quot;&amp;quot;)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;ngx.say(res.body)&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;Nginx相关配置：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;location = /bh-scenes-1.2.min.css &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      root   /usr/local/nginx/nginx/html/fe_components/jqwidget/teal/;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;location  /fe_components/ &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;     location ~ /fe_components/jqwidget/.*/bh-scenes-1.2.min.css &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;          content_by_lua_file /opt/lua/replace2.lua;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;     &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;     root   /usr/local/nginx/nginx/html;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h3 id=&quot;第四种处理办法&quot;&gt;&lt;a href=&quot;#第四种处理办法&quot; class=&quot;headerlink&quot; title=&quot;第四种处理办法&quot;&gt;&lt;/a&gt;第四种处理办法&lt;/h3&gt;&lt;p&gt;需要重新编译安装OpenResty，编译时加入参数 –with-http_sub_module。&lt;br&gt;Nginx相关配置如下：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;location  /fe_components/ &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        location ~ /jqwidget/teal/bh-scenes-1.2.min.css &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;           #sub_filter_types *;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;           sub_filter_types text/css;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;           sub_filter &amp;apos;max-width:1632px;&amp;apos;  &amp;apos;&amp;apos;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;           sub_filter_once off;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;           root   /usr/local/nginx/nginx/html/;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        root   /usr/local/nginx/nginx/html;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;OpenResty-lua编程相关参考&quot;&gt;&lt;a
+    
+    </summary>
+    
+      <category term="Nginx" scheme="http://yoursite.com/categories/Nginx/"/>
+    
+    
+      <category term="Nginx" scheme="http://yoursite.com/tags/Nginx/"/>
+    
+  </entry>
   
   <entry>
     <title>基于mysqldump做备份恢复</title>
@@ -3599,109 +3653,6 @@ server {
     
     
       <category term="Nginx" scheme="http://yoursite.com/tags/Nginx/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Redis安装部署</title>
-    <link href="http://yoursite.com/2018/01/10/Redis%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
-    <id>http://yoursite.com/2018/01/10/Redis安装部署/</id>
-    <published>2018-01-10T01:12:43.000Z</published>
-    <updated>2018-01-10T03:45:22.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;安装Redis&quot;&gt;&lt;a href=&quot;#安装Redis&quot; class=&quot;headerlink&quot; title=&quot;安装Redis&quot;&gt;&lt;/a&gt;安装Redis&lt;/h2&gt;&lt;p&gt;我这里安装的版本是 3.2.2&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log2 ~]# yum install readline-devel pcre-devel openssl-devel -y
-[root@log2 local]# tar zxf redis-3.2.2.tar.gz 
-[root@log2 local]# cd redis-3.2.2/
-[root@log2 redis-3.2.2]# make
-[root@log2 redis-3.2.2]# make install
-&lt;/code&gt;&lt;/pre&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-&lt;h2 id=&quot;配置Redis&quot;&gt;&lt;a href=&quot;#配置Redis&quot; class=&quot;headerlink&quot; title=&quot;配置Redis&quot;&gt;&lt;/a&gt;配置Redis&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;[root@log2 redis-3.2.2]# cp redis.conf /etc/
-[root@log2 redis-3.2.2]# vim /etc/redis.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;1.配置redis后台启动&lt;/strong&gt;&lt;br&gt;打开/etc/redis.conf，将daemonize处修改为yes。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;################################# GENERAL #####################################
-
-# By default Redis does not run as a daemon. Use &amp;apos;yes&amp;apos; if you need it.
-# Note that Redis will write a pid file in /var/run/redis.pid when daemonized.
-daemonize yes
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.配置Redis持久化策略&lt;/strong&gt;&lt;br&gt;使用RDB和AOF双持久化策略：其中默认开启了RDB持久化，我们只需要开启AOF持久化。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# AOF and RDB persistence can be enabled at the same time without problems.
-# If the AOF is enabled on startup Redis will load the AOF, that is the file
-# with the better durability guarantees.
-#
-# Please check http://redis.io/topics/persistence for more information.
-
-appendonly yes
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.配置redis日志文件&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# Specify the log file name. Also the empty string can be used to force
-# Redis to log on the standard output. Note that if you use standard
-# output for logging but daemonize, logs will be sent to /dev/null
-logfile &amp;quot;/var/log/redis.log&amp;quot;   
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;4.配置数据文件存放路径，在/目录下面创建/RedisData目录&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log2 redis-3.2.2]# mkdir /RedisData
-
- # The working directory.
-#
-# The DB will be written inside this directory, with the filename specified
-# above using the &amp;apos;dbfilename&amp;apos; configuration directive.
-#
-# The Append Only File will also be created inside this directory.
-#
-# Note that you must specify a directory here, not a file name.
-dir /RedisData
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;5.修改Redis监听地址&lt;/strong&gt;&lt;br&gt;注释掉 #bind 127.0.0.1&lt;br&gt;否则redis只会监听在127.0.0.1的某个端口上。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;6.修改Redis监听端口&lt;/strong&gt;&lt;br&gt;为了安全，强烈建议修改redis的监听端口。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# Accept connections on the specified port, default is 6379 (IANA #815344).
-# If port 0 is specified Redis will not listen on a TCP socket.
-port 6400
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;7.在redis3.2之后，redis增加了protected-mode，在这个模式下，即使注释掉了bind 127.0.0.1，再访问redis的时候还是报错，所以要如下设置：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# By default protected mode is enabled. You should disable it only if
-# you are sure you want clients from other hosts to connect to Redis
-# even if no authentication is configured, nor a specific set of interfaces
-# are explicitly listed using the &amp;quot;bind&amp;quot; directive.
-protected-mode no
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;启动-停止&quot;&gt;&lt;a href=&quot;#启动-停止&quot; class=&quot;headerlink&quot; title=&quot;启动/停止&quot;&gt;&lt;/a&gt;启动/停止&lt;/h2&gt;&lt;p&gt;1.启动&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log2 ~]# /usr/local/bin/redis-server /etc/redis.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.停止&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log2 ~]# /usr/local/redis-3.2.2/src/redis-cli -p 6400 shutdown
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;Redis简单使用&quot;&gt;&lt;a href=&quot;#Redis简单使用&quot; class=&quot;headerlink&quot; title=&quot;Redis简单使用&quot;&gt;&lt;/a&gt;Redis简单使用&lt;/h2&gt;&lt;h3 id=&quot;使用客户端连接redis-server&quot;&gt;&lt;a href=&quot;#使用客户端连接redis-server&quot; class=&quot;headerlink&quot; title=&quot;使用客户端连接redis-server&quot;&gt;&lt;/a&gt;使用客户端连接redis-server&lt;/h3&gt;&lt;p&gt;在Redis的安装目录中有redis客户端，即redis-cli（Redis Command Line Interface），它是Redis自带的基于命令行的Redis的客户端。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /usr/local/bin/
-# ./redis-cli -h 172.16.206.30 -p 6400
-172.16.206.30:6400&amp;gt; 
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;向Redis服务器发送命令&quot;&gt;&lt;a href=&quot;#向Redis服务器发送命令&quot; class=&quot;headerlink&quot; title=&quot;向Redis服务器发送命令&quot;&gt;&lt;/a&gt;向Redis服务器发送命令&lt;/h3&gt;&lt;p&gt;redis-cli连上redis服务后，可以在命令行发送命令。&lt;br&gt;&lt;strong&gt;1.ping，测试客户端与redis的连接是否正常，如果正常会收到回复PONG&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# ./redis-cli -h 172.16.206.30 -p 6400
-172.16.206.30:6400&amp;gt; ping
-PONG
-172.16.206.30:6400&amp;gt; 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.set/get，使用set和get可以向redis设置数据、获取数据&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;172.16.206.30:6400&amp;gt; set name wisedu
-OK
-172.16.206.30:6400&amp;gt; get name
-&amp;quot;wisedu&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.del，删除指定key的内容&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;172.16.206.30:6400&amp;gt; del name
-(integer) 1
-172.16.206.30:6400&amp;gt; get name
-(nil)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;4.keys *，查看当前库中所有的key&lt;/strong&gt;&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;安装Redis&quot;&gt;&lt;a href=&quot;#安装Redis&quot; class=&quot;headerlink&quot; title=&quot;安装Redis&quot;&gt;&lt;/a&gt;安装Redis&lt;/h2&gt;&lt;p&gt;我这里安装的版本是 3.2.2&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@log2 ~]# yum install readline-devel pcre-devel openssl-devel -y
-[root@log2 local]# tar zxf redis-3.2.2.tar.gz 
-[root@log2 local]# cd redis-3.2.2/
-[root@log2 redis-3.2.2]# make
-[root@log2 redis-3.2.2]# make install
-&lt;/code&gt;&lt;/pre&gt;
-    
-    </summary>
-    
-      <category term="NoSQL" scheme="http://yoursite.com/categories/NoSQL/"/>
-    
-    
-      <category term="Redis" scheme="http://yoursite.com/tags/Redis/"/>
     
   </entry>
   
