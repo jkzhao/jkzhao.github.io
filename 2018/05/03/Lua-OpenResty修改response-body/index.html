@@ -104,21 +104,21 @@
 
 
 
-<meta name="description" content="最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。  OpenResty lua编程相关参考 OpenResty Readme OpenResty最佳实践   其中Readme要看完，是github上对OpenResty的lua-nginx-module比较全面的介绍。 Nginx处理的几个阶段此处">
+<meta name="description" content="最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。">
 <meta name="keywords" content="Nginx">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Lua + OpenResty修改response body">
 <meta property="og:url" content="http://yoursite.com/2018/05/03/Lua-OpenResty修改response-body/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。  OpenResty lua编程相关参考 OpenResty Readme OpenResty最佳实践   其中Readme要看完，是github上对OpenResty的lua-nginx-module比较全面的介绍。 Nginx处理的几个阶段此处">
+<meta property="og:description" content="最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/24.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/25.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/26.png">
-<meta property="og:updated_time" content="2018-05-03T07:29:27.000Z">
+<meta property="og:updated_time" content="2018-05-03T07:33:50.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Lua + OpenResty修改response body">
-<meta name="twitter:description" content="最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。  OpenResty lua编程相关参考 OpenResty Readme OpenResty最佳实践   其中Readme要看完，是github上对OpenResty的lua-nginx-module比较全面的介绍。 Nginx处理的几个阶段此处">
+<meta name="twitter:description" content="最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/24.png">
 
 
@@ -348,7 +348,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-05-03T15:29:27+08:00" content="2018-05-03">
+              <time itemprop="dateUpdated" datetime="2018-05-03T15:33:50+08:00" content="2018-05-03">
               2018-05-03
               </time>
               </span>
@@ -409,9 +409,9 @@
 
       
         <blockquote>
-<p>最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。</p>
+<p>最近公司前端框架组提了个需求，希望修改response中的一个css文件，去掉一个样式：max-width:1632px;。于是便想到了利用lua。<a id="more"></a></p>
 </blockquote>
-<h2 id="OpenResty-lua编程相关参考"><a href="#OpenResty-lua编程相关参考" class="headerlink" title="OpenResty lua编程相关参考"></a>OpenResty lua编程相关参考</h2><ul>
+<h2 id="OpenResty-lua编程相关资料"><a href="#OpenResty-lua编程相关资料" class="headerlink" title="OpenResty lua编程相关资料"></a>OpenResty lua编程相关资料</h2><ul>
 <li><a href="https://github.com/openresty/lua-nginx-module#name" target="_blank" rel="external">OpenResty Readme</a></li>
 <li><a href="https://moonbingbing.gitbooks.io/openresty-best-practices/lua/main.html" target="_blank" rel="external">OpenResty最佳实践
 </a></li>
@@ -630,7 +630,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenResty-lua编程相关参考"><span class="nav-number">1.</span> <span class="nav-text">OpenResty lua编程相关参考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx处理的几个阶段"><span class="nav-number">2.</span> <span class="nav-text">Nginx处理的几个阶段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改Response-Body"><span class="nav-number">3.</span> <span class="nav-text">修改Response Body</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一种处理办法"><span class="nav-number">3.1.</span> <span class="nav-text">第一种处理办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二种处理办法"><span class="nav-number">3.2.</span> <span class="nav-text">第二种处理办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第四种处理办法"><span class="nav-number">3.3.</span> <span class="nav-text">第四种处理办法</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenResty-lua编程相关资料"><span class="nav-number">1.</span> <span class="nav-text">OpenResty lua编程相关资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx处理的几个阶段"><span class="nav-number">2.</span> <span class="nav-text">Nginx处理的几个阶段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改Response-Body"><span class="nav-number">3.</span> <span class="nav-text">修改Response Body</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一种处理办法"><span class="nav-number">3.1.</span> <span class="nav-text">第一种处理办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二种处理办法"><span class="nav-number">3.2.</span> <span class="nav-text">第二种处理办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第四种处理办法"><span class="nav-number">3.3.</span> <span class="nav-text">第四种处理办法</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
