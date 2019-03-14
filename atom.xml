@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-03-06T07:32:54.000Z</updated>
+  <updated>2019-03-14T06:39:52.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,49 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Nginx缓存功能</title>
+    <link href="http://yoursite.com/2019/03/14/Nginx%E7%BC%93%E5%AD%98%E5%8A%9F%E8%83%BD/"/>
+    <id>http://yoursite.com/2019/03/14/Nginx缓存功能/</id>
+    <published>2019-03-14T05:27:37.000Z</published>
+    <updated>2019-03-14T06:39:52.000Z</updated>
+    
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;业务线在压测性能时，希望将应用一些图标(appIcon.do)利用Nginx缓存功能缓存下来。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;Nginx缓存功能&quot;&gt;&lt;a href=&quot;#Nginx缓存功能&quot; class=&quot;headerlink&quot; title=&quot;Nginx缓存功能&quot;&gt;&lt;/a&gt;Nginx缓存功能&lt;/h2&gt;&lt;p&gt;简单来说，就是Nginx将后端服务器返回来的部分内容缓存到本地磁盘，后面客户端请求中含有这部分内容时，可以从本地磁盘取出这些内容返回给客户端。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;如果Nginx本地没有缓存时，那么响应给客户端的过程是：被代理服务器先得自己磁盘IO一次，将内容取出，然后将内容通过网络IO响应给Nginx，Nginx然后在将该内容响应给客户端。&lt;br&gt;如果Nginx在本地缓存下这部分内容，当用户请求到达时，如果请求的内容中包含这些，Nginx直接从自己本地磁盘取得内容，构建响应报文，响应给客户端。&lt;br&gt;在后端服务器上(被代理服务器上)，磁盘上文件是按树状结构组织的，按照文件名、按照路径去组织的。我们去查找文件时，只能把整个树状结构，就是把document_root所指向的子目录，整体装入内存。将来我们找哪个文件时，才会知道这个文件在哪个路径下，能快速定位到这个文件。&lt;br&gt;Nginx缓存是这么处理的：存储也是树状结构，但是这种树状结构格式很独特，名字是固定等级的，要么是一级路径，要么是两级路径，要么是三级路径。而且每一级路径的文件的名字是hash码的一部分，要么是两个字符，要么是1个字符，因此直接基于用户请求url的字符串，就能知道这个文件在什么地方存放的。因为缓存下来的文件名是用户请求资源的url字符串的hash码，内容是那个请求页面的正常内容。&lt;br&gt;&lt;strong&gt;当用户请求url时，如何判定本地缓存有没有呢？&lt;/strong&gt;像后端服务器就只能遍历，去找树状结构路径下是不是存在。但是对于hash格式来讲，它实际上是基于路由方式来实现。对Nginx而言，通常是这么找的。把这个url编码以后，从右往左截取字符，完成路径路由。因为是16进制的，有1个字符，就有16种变化，有两个字符，就是256种变化，最多不超过3级。如果你的缓存定义分级路径是1:1:2，意味着1级子目录16个，就是说用1个字符来表示， 2级目录16个(指的是1个1级子目录下有16个)，此时一共是256个，3级子目录，每个子目录有256个，每个子目录2个字符。所以从编码后的url截取字符，从右往左，截1个字符表示1级子目录，在截一个字符表示2级子目录，在截两个字符，表示3级子目录。所以Nginx去找文件的时候，直接在url路径上就这个文件在哪个路径下了。当到第三级子目录下，底下的文件肯定不止1个，有一堆，这时候就得遍历去寻找要匹配的文件了。&lt;br&gt;对于Nginx缓存来讲，它的数据存储分为两个部分，第一部分是放在内存中的hash表，以便于一个url请求来的时候，做hash计算后去查表。如果hash表中没有，就不会去缓存在本地文件系统磁盘里找这个文件了。所以有没有命中在内存中就能判断了。第二部分是放在本地磁盘上的目录结构，一旦有，就路由到那个目录下，那个数据就在那。所以这个查找过程速度无与伦比，第一基于内存，第二它是hash值，时间O(1)，恒定，从100个中找1个和在100万中找一个所需要的时间几乎是等同的。 &lt;/p&gt;
+&lt;h2 id=&quot;使用Nginx缓存&quot;&gt;&lt;a href=&quot;#使用Nginx缓存&quot; class=&quot;headerlink&quot; title=&quot;使用Nginx缓存&quot;&gt;&lt;/a&gt;使用Nginx缓存&lt;/h2&gt;&lt;p&gt;缓存空间得先定义，后使用。比如说在内存中用哪段空间来存hash表，用多大内存。磁盘上用哪段文件路径来存放目录树。&lt;br&gt;查缓存也有讲究，http的请求方法有GET、HEAD、POST、PUT、DELETE，后3种方法没必要查缓存。因此对每一种请求过来，我们先判定方法，这个方法如果不支持从缓存里找，就不用看缓存了。一般只对GET和HEAD启用缓存。&lt;br&gt;而且并不是所有GET和HEAD的资源都应该缓存。如果用户GET一个资源的时候， 用户第一次来访问时，服务器setcookie，这个就不应该缓存下来。还有一种场景，用户去请求一些资源时，服务器要求输入用户名和密码，这些内容也不应该缓存。因此不是GET和HEAD的所有资源都要缓存的，对于用户的私有信息，不应该缓存下来。&lt;br&gt;还有一些服务器端在响应时就说了，有些资源不能缓存，告诉代理服务器不能缓存，代理服务器也不应该缓存。服务器在响应时，为了避免代理服务器缓存下来，会告诉代理服务器这些资源是no store，基于cache control来定义。&lt;br&gt;浏览器是可以使用shift+f5强刷的，强制刷新就要求发请求报文时，no cache，意思是不能从缓存中给我响应。&lt;br&gt;再考虑一种场景，第一个用户请求资源时使用的是http 1.1的协议，取得的内容被Nginx缓存下来了。第二个用户使用http 1.0的协议去请求了，它两也不一定能完全兼容。所以还得考虑协议版本。协议版本不一样时，没准也不能使用缓存来响应。&lt;br&gt;缓存空间是有限的，存满了，这就需要cache_manager进程了，根据LRU(最近最少使用算法)将此前没有用的缓存对象清除出去。&lt;/p&gt;
+&lt;h2 id=&quot;缓存指令&quot;&gt;&lt;a href=&quot;#缓存指令&quot; class=&quot;headerlink&quot; title=&quot;缓存指令&quot;&gt;&lt;/a&gt;缓存指令&lt;/h2&gt;&lt;p&gt;Nginx缓存指令说明：&lt;a href=&quot;http://nginx.org/en/docs/http/ngx_http_proxy_module.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://nginx.org/en/docs/http/ngx_http_proxy_module.html&lt;/a&gt;&lt;br&gt;缓存相关的有多个指令，proxy_cache打头的。缓存得先定义，后使用。下面来介绍一些常用的关于缓存方面的指令。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;定义缓存：&lt;/strong&gt;path [levels=levels] 这个目录下分几级子目录，每一级用几个字符来表示。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;Syntax:	proxy_cache_path path [levels=levels] [use_temp_path=on|off] keys_zone=name:size [inactive=time] [max_size=size] [manager_files=number] [manager_sleep=time] [manager_threshold=time] [loader_files=number] [loader_sleep=time] [loader_threshold=time] [purger=on|off] [purger_files=number] [purger_sleep=time] [purger_threshold=time];&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Default:	—&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Context:	http&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;比如：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/29.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;缓存内容，是按需创建目录的。而不是一开始把所有目录都创建出来。现在只是把缓存定义了，还没调用。上面定义的目录/data/nginx/需要事先创建好。&lt;br&gt;&lt;strong&gt;调用缓存指令：&lt;/strong&gt;&lt;br&gt;对于调用缓存来讲，至少需要3个参数。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;首先得声明调用(proxy_cache指令)，使用哪块缓存空间。(实践过了，如果之定义这一条指令，没有任何东西会被缓存下来)&lt;/li&gt;
+&lt;li&gt;缓存时把什么当key，这也是是必须要给的。proxy_cache_key&lt;/li&gt;
+&lt;li&gt;哪些内容能存，存多长时间得自己来定义。哪些东西不能存，哪些方法不检查缓存也得自己定义，虽然你不定义有默认值，但是也得定义出来 proxy_cache_methods、proxy_cache_valid&lt;br&gt;比如：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/30.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;其中最后一项配置解释下：&lt;br&gt;如果我们把内容缓存下来以后，后端服务器找不着了，也就是后端服务器不在线了，此时能不能用缓存内容来响应。也就是指明什么情况下可以使用过期的缓存来响应。比如后端服务器响应error，后端服务器连不上timeout&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;缓存实例&quot;&gt;&lt;a href=&quot;#缓存实例&quot; class=&quot;headerlink&quot; title=&quot;缓存实例&quot;&gt;&lt;/a&gt;缓存实例&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;【实例】：Nginx实现缓存图标&lt;/strong&gt;&lt;br&gt;先创建缓存目录：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mkdir /opt/nginx_cache
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;定义缓存：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/32.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;使用缓存：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/31.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;重载Nginx。此时缓存目录/opt/nginx_cache/first/目录下没有任何内容。&lt;/p&gt;
+&lt;p&gt;浏览器访问，打开F12查看：&lt;br&gt;第一次访问时，都是MISS。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/33.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;此时查看opt/nginx_cache/first/目录下&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/34.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;再次刷新页面，就可以看到是命中了。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/35.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;业务线在压测性能时，希望将应用一些图标(appIcon.do)利用Nginx缓存功能缓存下来。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;Nginx缓存功能&quot;&gt;&lt;a href=&quot;#Nginx缓存功能&quot; class=&quot;headerlink&quot; title=&quot;Nginx缓存功能&quot;&gt;&lt;/a&gt;Nginx缓存功能&lt;/h2&gt;&lt;p&gt;简单来说，就是Nginx将后端服务器返回来的部分内容缓存到本地磁盘，后面客户端请求中含有这部分内容时，可以从本地磁盘取出这些内容返回给客户端。
+    
+    </summary>
+    
+      <category term="Nginx" scheme="http://yoursite.com/categories/Nginx/"/>
+    
+    
+      <category term="Nginx" scheme="http://yoursite.com/tags/Nginx/"/>
+    
+  </entry>
   
   <entry>
     <title>Nginx如何处理一个请求</title>
@@ -2870,110 +2913,6 @@ server {
     <summary type="html">
     
       &lt;h2 id=&quot;HTTPS简介&quot;&gt;&lt;a href=&quot;#HTTPS简介&quot; class=&quot;headerlink&quot; title=&quot;HTTPS简介&quot;&gt;&lt;/a&gt;HTTPS简介&lt;/h2&gt;&lt;p&gt;1.https简介&lt;br&gt;HTTPS其实是有两部分组成：HTTP + SSL / TLS，也就是在HTTP上又加了一层处理加密信息的模块。服务端和客户端的信息传输都会通过TLS进行加密，所以传输的数据都是加密后的数据。
-    
-    </summary>
-    
-      <category term="Nginx" scheme="http://yoursite.com/categories/Nginx/"/>
-    
-    
-      <category term="Nginx" scheme="http://yoursite.com/tags/Nginx/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Nginx实现TCP负载均衡</title>
-    <link href="http://yoursite.com/2018/01/28/Nginx%E5%AE%9E%E7%8E%B0TCP%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/"/>
-    <id>http://yoursite.com/2018/01/28/Nginx实现TCP负载均衡/</id>
-    <published>2018-01-28T01:45:57.000Z</published>
-    <updated>2018-01-28T02:35:15.000Z</updated>
-    
-    <content type="html">&lt;blockquote&gt;
-&lt;p&gt;nginx在版本1.9.0以后支持tcp的负载均衡，具体可以参照官网关于模块&lt;a href=&quot;https://nginx.org/en/docs/stream/ngx_stream_core_module.html#tcp_nodelay&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;ngx_stream_core_module&lt;/a&gt;的说明。一直以来，Nginx 并不支持tcp协议，所以后台的一些基于TCP的业务就只能通过其他高可用负载软件来完成了，比如Haproxy或者LVS。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h2 id=&quot;编译Nginx启用ngx-stream-core-module模块&quot;&gt;&lt;a href=&quot;#编译Nginx启用ngx-stream-core-module模块&quot; class=&quot;headerlink&quot; title=&quot;编译Nginx启用ngx_stream_core_module模块&quot;&gt;&lt;/a&gt;编译Nginx启用ngx_stream_core_module模块&lt;/h2&gt;&lt;p&gt;ngx_stream_core_module 这个模块在1.90版本后将被启用。但是并不会默认安装，需要在编译时通过指定 –with-stream 参数来激活这个模块。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /usr/local/
-# wget https://nginx.org/download/nginx-1.12.2.tar.gz
-# tar zxf nginx-1.12.2.tar.gz
-# cd nginx-1.12.2/
-# ./configure --prefix=/usr/local/nginx --with-stream
-# make &amp;amp;&amp;amp; make install
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;配置Nginx负载均衡MySQL&quot;&gt;&lt;a href=&quot;#配置Nginx负载均衡MySQL&quot; class=&quot;headerlink&quot; title=&quot;配置Nginx负载均衡MySQL&quot;&gt;&lt;/a&gt;配置Nginx负载均衡MySQL&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;# cd /usr/local/nginx/conf/
-# vim nginx.conf
-#user  nobody;
-worker_processes  1;
-
-error_log  logs/error.log debug;
-#error_log  logs/error.log  notice;
-#error_log  logs/error.log  info;
-
-#pid        logs/nginx.pid;
-
-events {
-    worker_connections  1024;
-}
-
-stream {
-    upstream mysql {
-        server 172.16.206.30:3306;
-    }
-    server {
-        listen 3306;
-        proxy_connect_timeout 8s;
-        proxy_timeout 24h;
-        proxy_pass mysql;
-    }
-}
-
-http {
-    include       mime.types;
-    default_type  application/octet-stream;
-
-    log_format  main  &amp;apos;$remote_addr - $remote_user [$time_local] &amp;quot;$request&amp;quot; &amp;apos;
-                  &amp;apos;$status $body_bytes_sent &amp;quot;$http_referer&amp;quot; &amp;apos;
-                  &amp;apos;&amp;quot;$http_user_agent&amp;quot; &amp;quot;$http_x_forwarded_for&amp;quot;&amp;apos;;
-
-    #access_log  logs/access.log  main;
-
-    sendfile        on;
-    #tcp_nopush     on;
-
-    #keepalive_timeout  0;
-    keepalive_timeout  65;
-
-    gzip  on;
-
-    server {
-        listen       80;
-        server_name  localhost;
-
-        #charset koi8-r;
-
-        #access_log  logs/access.log  main;
-
-        location / {
-            root   html;
-            index  index.html index.htm;
-        }
-
-        #error_page  404              /404.html;
-
-        # redirect server error pages to the static page /50x.html
-        #
-        error_page   500 502 503 504  /50x.html;
-        location = /50x.html {
-            root   html;
-        }
-
-    }
-
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;stream与http同级别。&lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;nginx在版本1.9.0以后支持tcp的负载均衡，具体可以参照官网关于模块&lt;a href=&quot;https://nginx.org/en/docs/stream/ngx_stream_core_module.html#tcp_nodelay&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;ngx_stream_core_module&lt;/a&gt;的说明。一直以来，Nginx 并不支持tcp协议，所以后台的一些基于TCP的业务就只能通过其他高可用负载软件来完成了，比如Haproxy或者LVS。
     
     </summary>
     

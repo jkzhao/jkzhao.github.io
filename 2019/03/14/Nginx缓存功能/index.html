@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Docker," />
+  <meta name="keywords" content="Nginx," />
 
 
 
@@ -104,26 +104,26 @@
 
 
 
-<meta name="description" content="Docker的诞生dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。">
-<meta name="keywords" content="Docker">
+<meta name="description" content="业务线在压测性能时，希望将应用一些图标(appIcon.do)利用Nginx缓存功能缓存下来。  Nginx缓存功能简单来说，就是Nginx将后端服务器返回来的部分内容缓存到本地磁盘，后面客户端请求中含有这部分内容时，可以从本地磁盘取出这些内容返回给客户端。">
+<meta name="keywords" content="Nginx">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Docker介绍">
-<meta property="og:url" content="http://yoursite.com/2017/08/14/Docker介绍/index.html">
+<meta property="og:title" content="Nginx缓存功能">
+<meta property="og:url" content="http://yoursite.com/2019/03/14/Nginx缓存功能/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
-<meta property="og:description" content="Docker的诞生dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。">
+<meta property="og:description" content="业务线在压测性能时，希望将应用一些图标(appIcon.do)利用Nginx缓存功能缓存下来。  Nginx缓存功能简单来说，就是Nginx将后端服务器返回来的部分内容缓存到本地磁盘，后面客户端请求中含有这部分内容时，可以从本地磁盘取出这些内容返回给客户端。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/1.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/2.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/3.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/4.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/5.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/6.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/7.png">
-<meta property="og:updated_time" content="2017-11-07T07:46:59.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/29.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/30.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/32.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/31.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/33.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/34.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/35.png">
+<meta property="og:updated_time" content="2019-03-14T06:39:52.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Docker介绍">
-<meta name="twitter:description" content="Docker的诞生dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/1.png">
+<meta name="twitter:title" content="Nginx缓存功能">
+<meta name="twitter:description" content="业务线在压测性能时，希望将应用一些图标(appIcon.do)利用Nginx缓存功能缓存下来。  Nginx缓存功能简单来说，就是Nginx将后端服务器返回来的部分内容缓存到本地磁盘，后面客户端请求中含有这部分内容时，可以从本地磁盘取出这些内容返回给客户端。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/29.png">
 
 
 
@@ -141,7 +141,7 @@
   };
 </script>
 
-  <title> Docker介绍 | jkzhao's blog </title>
+  <title> Nginx缓存功能 | jkzhao's blog </title>
 </head>
 <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 
@@ -334,7 +334,7 @@
             
             
               
-                Docker介绍
+                Nginx缓存功能
               
             
           </h1>
@@ -346,14 +346,14 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-08-14T09:17:58+08:00" content="2017-08-14">
-              2017-08-14
+            <time itemprop="dateCreated" datetime="2019-03-14T13:27:37+08:00" content="2019-03-14">
+              2019-03-14
             </time>
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2017-11-07T15:46:59+08:00" content="2017-11-07">
-              2017-11-07
+              <time itemprop="dateUpdated" datetime="2019-03-14T14:39:52+08:00" content="2019-03-14">
+              2019-03-14
               </time>
               </span>
             
@@ -368,8 +368,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/容器/" itemprop="url" rel="index">
-                    <span itemprop="name">容器</span>
+                  <a href="/categories/Nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">Nginx</span>
                   </a>
                 </span>
 
@@ -388,7 +388,7 @@
 
           
           
-             <span id="/2017/08/14/Docker介绍/" class="leancloud_visitors" data-flag-title="Docker介绍">
+             <span id="/2019/03/14/Nginx缓存功能/" class="leancloud_visitors" data-flag-title="Nginx缓存功能">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -412,38 +412,24 @@
       
 
       
-        <h2 id="Docker的诞生"><a href="#Docker的诞生" class="headerlink" title="Docker的诞生"></a>Docker的诞生</h2><p>dotCloud公司(PaaS)自身业务发展并不如愿，创始人Solomon Hykes决定投向容器技术，并从一开始就在Github上开源，2013年项目命名为Docker，并取得广泛的关注。<br>Docker是基于LXC技术之上构建的Container容器引擎，基于Go语言并遵循Apache 2.0协议开源。<br><a id="more"></a><br>容器技术其实早在2000年早起的UNIX系统上就出现了，直到2007年才加入Linux。容器的行为表现与虚拟机非常类似。现在人们提起容器，基本上指的都是Docker容器了。Docker极大地简化了容器的使用方法，将基于Linux内核隔离机制的容器实现细节统统隐藏在一条简单的命令：docker run之后。另外，Docker提供了一种容器格式，允许将应用和服务打包成一个理论上可以运行在任何安装了Docker Daemon的Linux系统上的容器。</p>
-<h2 id="Hypervisor与Docker"><a href="#Hypervisor与Docker" class="headerlink" title="Hypervisor与Docker"></a>Hypervisor与Docker</h2><h3 id="Hypervisor"><a href="#Hypervisor" class="headerlink" title="Hypervisor"></a>Hypervisor</h3><p>Hypervisor是一种运行在物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享一套基础物理硬件，因此也可以看作是虚拟环境中的“元”操作系统，它可以协调访问服务器上的所有物理设备和虚拟机，也叫虚拟机监视器（Virtual Machine Monitor）。Hypervisor是所有虚拟化技术的核心。<br>Hypervisor是一种运行在基础物理服务器和操作系统之间的中间软件层,可允许多个操作系统和应用共享硬件。也可叫做VMM（ virtual machine monitor ），即虚拟机监视器。 Hypervisors是一种在虚拟环境中的“元”操作系统。他们可以访问服务器上包括磁盘和内存在内的所有物理设备。Hypervisors不但协调着这些硬件资源的访问，也同时在各个虚拟机之间施加防护。当服务器启动并执行Hypervisor时，它会加载所有虚拟机客户端的操作系统同时会分配给每一台虚拟机适量的内存，CPU，网络和磁盘。</p>
-<h3 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h3><p>Docker也是虚拟化的一种，是通过内核虚拟化技术(namespaces和cgroups等)来提供容器的资源隔离与安全保障等。由于Docker通过操作系统层虚拟化实现隔离，所以Docker容器在运行时，不需要类似虚拟机(VM)额外的操作系统开销，提高资源利用率。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/1.png" alt=""></p>
-<h2 id="Docker要解决的问题"><a href="#Docker要解决的问题" class="headerlink" title="Docker要解决的问题"></a>Docker要解决的问题</h2><ul>
-<li>消除环境的不一致</li>
-<li>隔离运行环境</li>
-<li>应用的打包和分发</li>
-<li>简单便捷的操作（统一的API）<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/2.png" alt=""></li>
-</ul>
-<h2 id="Docker配合运维的优势"><a href="#Docker配合运维的优势" class="headerlink" title="Docker配合运维的优势"></a>Docker配合运维的优势</h2><ul>
-<li>环境一致性——减少环境切换带来的问题</li>
-<li>交付标准化——统一的交付件规格便于管理</li>
-<li>自动化运维——提高运维效率，Docker提供了API</li>
-<li>资源利用率——降低基础设施成本</li>
-</ul>
-<h2 id="Docker配合运维的劣势"><a href="#Docker配合运维的劣势" class="headerlink" title="Docker配合运维的劣势"></a>Docker配合运维的劣势</h2><ul>
-<li>操作习惯的变化——ssh/cronjob等变动</li>
-<li>监控方式的变化——系统指标/日志等方面</li>
-<li>网络/存储的变化——学习成本</li>
-<li>周边系统的变化——架构成本</li>
-</ul>
-<h2 id="Docker的架构及工作流"><a href="#Docker的架构及工作流" class="headerlink" title="Docker的架构及工作流"></a>Docker的架构及工作流</h2><p>Docker的基本组成：</p>
+        <blockquote>
+<p>业务线在压测性能时，希望将应用一些图标(appIcon.do)利用Nginx缓存功能缓存下来。</p>
+</blockquote>
+<h2 id="Nginx缓存功能"><a href="#Nginx缓存功能" class="headerlink" title="Nginx缓存功能"></a>Nginx缓存功能</h2><p>简单来说，就是Nginx将后端服务器返回来的部分内容缓存到本地磁盘，后面客户端请求中含有这部分内容时，可以从本地磁盘取出这些内容返回给客户端。<a id="more"></a><br>如果Nginx本地没有缓存时，那么响应给客户端的过程是：被代理服务器先得自己磁盘IO一次，将内容取出，然后将内容通过网络IO响应给Nginx，Nginx然后在将该内容响应给客户端。<br>如果Nginx在本地缓存下这部分内容，当用户请求到达时，如果请求的内容中包含这些，Nginx直接从自己本地磁盘取得内容，构建响应报文，响应给客户端。<br>在后端服务器上(被代理服务器上)，磁盘上文件是按树状结构组织的，按照文件名、按照路径去组织的。我们去查找文件时，只能把整个树状结构，就是把document_root所指向的子目录，整体装入内存。将来我们找哪个文件时，才会知道这个文件在哪个路径下，能快速定位到这个文件。<br>Nginx缓存是这么处理的：存储也是树状结构，但是这种树状结构格式很独特，名字是固定等级的，要么是一级路径，要么是两级路径，要么是三级路径。而且每一级路径的文件的名字是hash码的一部分，要么是两个字符，要么是1个字符，因此直接基于用户请求url的字符串，就能知道这个文件在什么地方存放的。因为缓存下来的文件名是用户请求资源的url字符串的hash码，内容是那个请求页面的正常内容。<br><strong>当用户请求url时，如何判定本地缓存有没有呢？</strong>像后端服务器就只能遍历，去找树状结构路径下是不是存在。但是对于hash格式来讲，它实际上是基于路由方式来实现。对Nginx而言，通常是这么找的。把这个url编码以后，从右往左截取字符，完成路径路由。因为是16进制的，有1个字符，就有16种变化，有两个字符，就是256种变化，最多不超过3级。如果你的缓存定义分级路径是1:1:2，意味着1级子目录16个，就是说用1个字符来表示， 2级目录16个(指的是1个1级子目录下有16个)，此时一共是256个，3级子目录，每个子目录有256个，每个子目录2个字符。所以从编码后的url截取字符，从右往左，截1个字符表示1级子目录，在截一个字符表示2级子目录，在截两个字符，表示3级子目录。所以Nginx去找文件的时候，直接在url路径上就这个文件在哪个路径下了。当到第三级子目录下，底下的文件肯定不止1个，有一堆，这时候就得遍历去寻找要匹配的文件了。<br>对于Nginx缓存来讲，它的数据存储分为两个部分，第一部分是放在内存中的hash表，以便于一个url请求来的时候，做hash计算后去查表。如果hash表中没有，就不会去缓存在本地文件系统磁盘里找这个文件了。所以有没有命中在内存中就能判断了。第二部分是放在本地磁盘上的目录结构，一旦有，就路由到那个目录下，那个数据就在那。所以这个查找过程速度无与伦比，第一基于内存，第二它是hash值，时间O(1)，恒定，从100个中找1个和在100万中找一个所需要的时间几乎是等同的。 </p>
+<h2 id="使用Nginx缓存"><a href="#使用Nginx缓存" class="headerlink" title="使用Nginx缓存"></a>使用Nginx缓存</h2><p>缓存空间得先定义，后使用。比如说在内存中用哪段空间来存hash表，用多大内存。磁盘上用哪段文件路径来存放目录树。<br>查缓存也有讲究，http的请求方法有GET、HEAD、POST、PUT、DELETE，后3种方法没必要查缓存。因此对每一种请求过来，我们先判定方法，这个方法如果不支持从缓存里找，就不用看缓存了。一般只对GET和HEAD启用缓存。<br>而且并不是所有GET和HEAD的资源都应该缓存。如果用户GET一个资源的时候， 用户第一次来访问时，服务器setcookie，这个就不应该缓存下来。还有一种场景，用户去请求一些资源时，服务器要求输入用户名和密码，这些内容也不应该缓存。因此不是GET和HEAD的所有资源都要缓存的，对于用户的私有信息，不应该缓存下来。<br>还有一些服务器端在响应时就说了，有些资源不能缓存，告诉代理服务器不能缓存，代理服务器也不应该缓存。服务器在响应时，为了避免代理服务器缓存下来，会告诉代理服务器这些资源是no store，基于cache control来定义。<br>浏览器是可以使用shift+f5强刷的，强制刷新就要求发请求报文时，no cache，意思是不能从缓存中给我响应。<br>再考虑一种场景，第一个用户请求资源时使用的是http 1.1的协议，取得的内容被Nginx缓存下来了。第二个用户使用http 1.0的协议去请求了，它两也不一定能完全兼容。所以还得考虑协议版本。协议版本不一样时，没准也不能使用缓存来响应。<br>缓存空间是有限的，存满了，这就需要cache_manager进程了，根据LRU(最近最少使用算法)将此前没有用的缓存对象清除出去。</p>
+<h2 id="缓存指令"><a href="#缓存指令" class="headerlink" title="缓存指令"></a>缓存指令</h2><p>Nginx缓存指令说明：<a href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html" target="_blank" rel="external">http://nginx.org/en/docs/http/ngx_http_proxy_module.html</a><br>缓存相关的有多个指令，proxy_cache打头的。缓存得先定义，后使用。下面来介绍一些常用的关于缓存方面的指令。</p>
+<p><strong>定义缓存：</strong>path [levels=levels] 这个目录下分几级子目录，每一级用几个字符来表示。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Syntax:	proxy_cache_path path [levels=levels] [use_temp_path=on|off] keys_zone=name:size [inactive=time] [max_size=size] [manager_files=number] [manager_sleep=time] [manager_threshold=time] [loader_files=number] [loader_sleep=time] [loader_threshold=time] [purger=on|off] [purger_files=number] [purger_sleep=time] [purger_threshold=time];</div><div class="line">Default:	—</div><div class="line">Context:	http</div></pre></td></tr></table></figure></p>
+<p>比如：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/29.png" alt=""><br>缓存内容，是按需创建目录的。而不是一开始把所有目录都创建出来。现在只是把缓存定义了，还没调用。上面定义的目录/data/nginx/需要事先创建好。<br><strong>调用缓存指令：</strong><br>对于调用缓存来讲，至少需要3个参数。</p>
 <ul>
-<li>Docker Client 客户端</li>
-<li>Docker Daemon 守护进程</li>
-<li>Docker Image 镜像</li>
-<li>Docker Container 容器</li>
-<li>Docker Registry 仓库<br>docker是C/S架构的程序。客户端对服务器端的访问既可以是在本地，也可以通过远程来访问。<br>我们通过docker客户端来执行各种命令，docker客户端会将这些命令发送给守护进程，从而操作docker的容器，而容器是通过镜像来创建，而镜像是保存在仓库中。守护进程执行的结果还会传回给客户端。这样我们就可以通过客户端来查看命令运行的结果。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/3.png" alt=""></li>
+<li>首先得声明调用(proxy_cache指令)，使用哪块缓存空间。(实践过了，如果之定义这一条指令，没有任何东西会被缓存下来)</li>
+<li>缓存时把什么当key，这也是是必须要给的。proxy_cache_key</li>
+<li>哪些内容能存，存多长时间得自己来定义。哪些东西不能存，哪些方法不检查缓存也得自己定义，虽然你不定义有默认值，但是也得定义出来 proxy_cache_methods、proxy_cache_valid<br>比如：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/30.png" alt=""><br>其中最后一项配置解释下：<br>如果我们把内容缓存下来以后，后端服务器找不着了，也就是后端服务器不在线了，此时能不能用缓存内容来响应。也就是指明什么情况下可以使用过期的缓存来响应。比如后端服务器响应error，后端服务器连不上timeout</li>
 </ul>
-<h3 id="Docker-Image镜像"><a href="#Docker-Image镜像" class="headerlink" title="Docker Image镜像"></a>Docker Image镜像</h3><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/4.png" alt=""><br>镜像是docker容器的基石，容器基于镜像启动和运行。镜像就好比容器的源代码，保存了用于启动容器的各种条件。<br>深层次的理解镜像：docker的镜像是个层叠的只读文件系统，它的最底端是个引导文件系统，即bootfs。这很像典型的Linux文件系统，docker用户几乎永远不可能和底层引导文件系统有交互。实际上，当一个容器启动后，它将会被移到内存中，而引导文件系统则会被卸载。<br>docker镜像的第二层是root文件系统，即rootfs。root文件系统可以是一种或多种的文件系统，比如Ubuntu或者CentOS等。在传统的linux引导过程中，root文件系统会最先以只读的方式加载，但引导结束并完成了完整性检查后，它才会切换为读写模式。但是在docker里，root文件系统永远只能是只读的。并且docker利用联合加载技术又会在root文件系统之上加载更多的只读文件系统。联合加载：一次加载多个文件系统，但是在外面看起来只能看见一个文件系统。联合加载会将各层文件系统叠加到一起。docker将这样的文件系统称为镜像。一个镜像可以放到另一个镜像的顶部，位于下面的镜像称为父镜像，以此类推，最底部的镜像称为基础镜像。也就是图中的root文件系统。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/5.png" alt=""><br>bootfs (boot file system) 主要包含 bootloader 和 kernel, bootloader主要是引导加载kernel, 当boot成功后 kernel 被加载到内存中后 bootfs就被umount了. rootfs (root file system) 包含的就是典型 Linux 系统中的 /dev, /proc,/bin, /etc 等标准目录和文件。<br>对于不同的linux发行版, bootfs基本是一致的, 但rootfs会有差别, 因此不同的发行版可以公用bootfs 如下图:<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/6.png" alt=""><br>【补充】:BusyBox就是一个工具，使用它可以对linux进行定制，可以制作非常小的系统。BusyBox生成的系统映像可以独立安装在硬盘上。</p>
-<h3 id="Docker-Container容器"><a href="#Docker-Container容器" class="headerlink" title="Docker Container容器"></a>Docker Container容器</h3><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Docker/7.png" alt=""><br>容器通过镜像来启动，docker的容器是docker的执行单元，容器中可以运行客户的一个或多个进程。如果说镜像是docker生命周期中的构建和打包阶段，那么容器则是启动和执行阶段。<br>那么容器是怎样通过镜像来启动的呢？当一个容器启动时，会在该镜像的最顶层加载一个读写文件系统，也就是一个可写的文件层。我们在docker中运行的程序就是在这层中运行的。当docker第一次启动一个容器时，初始的读写层是空的，当文件系统发生变化时，这些变化都会应用到这一层上，比如如果想修改一个文件，这个文件首先会从该读写层下面的只读层复制到该读写层，该文件的只读版本依然存在，但是已经被读写层中的文件副本所隐藏。这就是docker中的一个重要技术，“写时复制”。每个只读镜像层都是只读的，并且以后永远不会变化。<br>当创建一个新容器时，docker会构建一个镜像站，就像右图所示。在站的最顶层添加可写层，这个读写层加上下面的镜像层以及一些配置数据就构成了一个容器。</p>
-<h3 id="Docker-Registry仓库"><a href="#Docker-Registry仓库" class="headerlink" title="Docker Registry仓库"></a>Docker Registry仓库</h3><p>docker用仓库保存用户构建的镜像。仓库分为公有和私有两种。docker公司自己提供了一个公有的仓库，叫Docker Hub。我们可以在docker hub上注册账号，分享并保存自己的镜像。目前docker上已经有了非常丰富的镜像。所以我们也可以通过docker hub来查找我们需要的镜像。当然我们也可以架设自己私有的仓库。</p>
+<h2 id="缓存实例"><a href="#缓存实例" class="headerlink" title="缓存实例"></a>缓存实例</h2><p><strong>【实例】：Nginx实现缓存图标</strong><br>先创建缓存目录：</p>
+<pre><code>mkdir /opt/nginx_cache
+</code></pre><p>定义缓存：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/32.png" alt=""><br>使用缓存：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/31.png" alt=""><br>重载Nginx。此时缓存目录/opt/nginx_cache/first/目录下没有任何内容。</p>
+<p>浏览器访问，打开F12查看：<br>第一次访问时，都是MISS。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/33.png" alt=""><br>此时查看opt/nginx_cache/first/目录下<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/34.png" alt=""></p>
+<p>再次刷新页面，就可以看到是命中了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/35.png" alt=""></p>
 
       
     </div>
@@ -465,7 +451,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Docker/" rel="tag"><i class="fa fa-tag"></i>Docker</a>
+            <a href="/tags/Nginx/" rel="tag"><i class="fa fa-tag"></i>Nginx</a>
           
         </div>
       
@@ -474,17 +460,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/08/11/Spark介绍及安装部署/" rel="next" title="Spark介绍及安装部署">
-                <i class="fa fa-chevron-left"></i> Spark介绍及安装部署
+              <a href="/2019/03/06/Nginx如何处理一个请求/" rel="next" title="Nginx如何处理一个请求">
+                <i class="fa fa-chevron-left"></i> Nginx如何处理一个请求
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/08/16/Docker镜像和容器/" rel="prev" title="Docker镜像和容器">
-                Docker镜像和容器 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -641,7 +623,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker的诞生"><span class="nav-number">1.</span> <span class="nav-text">Docker的诞生</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hypervisor与Docker"><span class="nav-number">2.</span> <span class="nav-text">Hypervisor与Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hypervisor"><span class="nav-number">2.1.</span> <span class="nav-text">Hypervisor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker"><span class="nav-number">2.2.</span> <span class="nav-text">Docker</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker要解决的问题"><span class="nav-number">3.</span> <span class="nav-text">Docker要解决的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker配合运维的优势"><span class="nav-number">4.</span> <span class="nav-text">Docker配合运维的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker配合运维的劣势"><span class="nav-number">5.</span> <span class="nav-text">Docker配合运维的劣势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker的架构及工作流"><span class="nav-number">6.</span> <span class="nav-text">Docker的架构及工作流</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-Image镜像"><span class="nav-number">6.1.</span> <span class="nav-text">Docker Image镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-Container容器"><span class="nav-number">6.2.</span> <span class="nav-text">Docker Container容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-Registry仓库"><span class="nav-number">6.3.</span> <span class="nav-text">Docker Registry仓库</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx缓存功能"><span class="nav-number">1.</span> <span class="nav-text">Nginx缓存功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Nginx缓存"><span class="nav-number">2.</span> <span class="nav-text">使用Nginx缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存指令"><span class="nav-number">3.</span> <span class="nav-text">缓存指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存实例"><span class="nav-number">4.</span> <span class="nav-text">缓存实例</span></a></li></ol></div>
             
           </div>
         </section>
