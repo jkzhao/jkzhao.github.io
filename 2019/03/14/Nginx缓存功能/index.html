@@ -118,8 +118,9 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/31.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/33.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/34.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/36.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/35.png">
-<meta property="og:updated_time" content="2019-03-14T06:39:52.000Z">
+<meta property="og:updated_time" content="2019-03-14T07:38:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx缓存功能">
 <meta name="twitter:description" content="业务线在压测性能时，希望将应用一些图标(appIcon.do)利用Nginx缓存功能缓存下来。  Nginx缓存功能简单来说，就是Nginx将后端服务器返回来的部分内容缓存到本地磁盘，后面客户端请求中含有这部分内容时，可以从本地磁盘取出这些内容返回给客户端。">
@@ -352,7 +353,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2019-03-14T14:39:52+08:00" content="2019-03-14">
+              <time itemprop="dateUpdated" datetime="2019-03-14T15:38:54+08:00" content="2019-03-14">
               2019-03-14
               </time>
               </span>
@@ -428,7 +429,7 @@
 <h2 id="缓存实例"><a href="#缓存实例" class="headerlink" title="缓存实例"></a>缓存实例</h2><p><strong>【实例】：Nginx实现缓存图标</strong><br>先创建缓存目录：</p>
 <pre><code>mkdir /opt/nginx_cache
 </code></pre><p>定义缓存：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/32.png" alt=""><br>使用缓存：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/31.png" alt=""><br>重载Nginx。此时缓存目录/opt/nginx_cache/first/目录下没有任何内容。</p>
-<p>浏览器访问，打开F12查看：<br>第一次访问时，都是MISS。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/33.png" alt=""><br>此时查看opt/nginx_cache/first/目录下<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/34.png" alt=""></p>
+<p>浏览器访问，打开F12查看：<br>第一次访问时，都是MISS。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/33.png" alt=""><br>此时查看opt/nginx_cache/first/目录下<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/34.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/36.png" alt=""></p>
 <p>再次刷新页面，就可以看到是命中了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/35.png" alt=""></p>
 
       
