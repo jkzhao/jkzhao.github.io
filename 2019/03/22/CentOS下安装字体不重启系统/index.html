@@ -113,7 +113,7 @@
 <meta property="og:description" content="代码在实现svg转png时，英文字符能正常显示，但是中文显示为方框。项目在大多数Linux系统上正常，今天在部署一个客户时出现乱码。仔细查看系统字体文件，发现没有中文字体。由于系统是客户那边自己装的，该系统安装时选择的是最小化安装，缺少字体库。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Linux/1.png">
-<meta property="og:updated_time" content="2019-03-22T09:00:23.000Z">
+<meta property="og:updated_time" content="2019-03-22T09:05:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CentOS下安装字体不重启系统">
 <meta name="twitter:description" content="代码在实现svg转png时，英文字符能正常显示，但是中文显示为方框。项目在大多数Linux系统上正常，今天在部署一个客户时出现乱码。仔细查看系统字体文件，发现没有中文字体。由于系统是客户那边自己装的，该系统安装时选择的是最小化安装，缺少字体库。">
@@ -346,7 +346,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2019-03-22T17:00:23+08:00" content="2019-03-22">
+              <time itemprop="dateUpdated" datetime="2019-03-22T17:05:46+08:00" content="2019-03-22">
               2019-03-22
               </time>
               </span>
@@ -415,7 +415,8 @@
 </code></pre><p>在这个目录下，有一个目录cjkuni-uming，这个目录下就有字体uming.ttc，将这个cjkuni-uming复制到缺少字体的系统的/usr/share/fonts/目录下。</p>
 <p>然后在系统上刷新字体缓存，<strong>不需要重启Linux。</strong></p>
 <pre><code># fc-cache -f -v
-</code></pre><p>然后重启下我们的项目，在做转换时，乱码就没了。</p>
+</code></pre><p>如果没有这个命令，需要安装下：yum install -y fontconfig</p>
+<p>刷新缓存后重启下我们的项目，在做转换时，乱码就没了。</p>
 
       
     </div>
