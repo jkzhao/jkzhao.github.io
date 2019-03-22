@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-03-14T07:38:54.000Z</updated>
+  <updated>2019-03-22T09:00:23.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,39 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>CentOS下安装字体不重启系统</title>
+    <link href="http://yoursite.com/2019/03/22/CentOS%E4%B8%8B%E5%AE%89%E8%A3%85%E5%AD%97%E4%BD%93%E4%B8%8D%E9%87%8D%E5%90%AF%E7%B3%BB%E7%BB%9F/"/>
+    <id>http://yoursite.com/2019/03/22/CentOS下安装字体不重启系统/</id>
+    <published>2019-03-22T08:38:07.000Z</published>
+    <updated>2019-03-22T09:00:23.000Z</updated>
+    
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;代码在实现svg转png时，英文字符能正常显示，但是中文显示为方框。项目在大多数Linux系统上正常，今天在部署一个客户时出现乱码。仔细查看系统字体文件，发现没有中文字体。由于系统是客户那边自己装的，该系统安装时选择的是最小化安装，缺少字体库。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;现象&quot;&gt;&lt;a href=&quot;#现象&quot; class=&quot;headerlink&quot; title=&quot;现象&quot;&gt;&lt;/a&gt;现象&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Linux/1.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;安装中文字体uming-ttc&quot;&gt;&lt;a href=&quot;#安装中文字体uming-ttc&quot; class=&quot;headerlink&quot; title=&quot;安装中文字体uming.ttc&quot;&gt;&lt;/a&gt;安装中文字体uming.ttc&lt;/h2&gt;&lt;p&gt;找一个有该字体的操作系统，&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /usr/share/fonts/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在这个目录下，有一个目录cjkuni-uming，这个目录下就有字体uming.ttc，将这个cjkuni-uming复制到缺少字体的系统的/usr/share/fonts/目录下。&lt;/p&gt;
+&lt;p&gt;然后在系统上刷新字体缓存，&lt;strong&gt;不需要重启Linux。&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# fc-cache -f -v
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后重启下我们的项目，在做转换时，乱码就没了。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;代码在实现svg转png时，英文字符能正常显示，但是中文显示为方框。项目在大多数Linux系统上正常，今天在部署一个客户时出现乱码。仔细查看系统字体文件，发现没有中文字体。由于系统是客户那边自己装的，该系统安装时选择的是最小化安装，缺少字体库。
+    
+    </summary>
+    
+      <category term="Linux" scheme="http://yoursite.com/categories/Linux/"/>
+    
+    
+      <category term="乱码" scheme="http://yoursite.com/tags/%E4%B9%B1%E7%A0%81/"/>
+    
+  </entry>
   
   <entry>
     <title>Nginx缓存功能</title>
@@ -2763,156 +2796,6 @@ vrrp_instance VI_1 {
     <summary type="html">
     
       &lt;h2 id=&quot;高可用集群介绍&quot;&gt;&lt;a href=&quot;#高可用集群介绍&quot; class=&quot;headerlink&quot; title=&quot;高可用集群介绍&quot;&gt;&lt;/a&gt;高可用集群介绍&lt;/h2&gt;&lt;p&gt;前面介绍的Nginx可以实现对后端服务的负载均衡，Nginx就是调度器。但是我们还要考虑一个，调度器本身在工作的时候仍然会有一个风险，因为我们把整个站点的请求的依赖性都建立在了调度器上，调度器坏了怎么办？
-    
-    </summary>
-    
-      <category term="Nginx" scheme="http://yoursite.com/categories/Nginx/"/>
-    
-    
-      <category term="Nginx" scheme="http://yoursite.com/tags/Nginx/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Nginx配置HTTPS</title>
-    <link href="http://yoursite.com/2018/01/30/Nginx%E9%85%8D%E7%BD%AEHTTPS/"/>
-    <id>http://yoursite.com/2018/01/30/Nginx配置HTTPS/</id>
-    <published>2018-01-30T04:24:12.000Z</published>
-    <updated>2018-01-31T11:06:19.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;HTTPS简介&quot;&gt;&lt;a href=&quot;#HTTPS简介&quot; class=&quot;headerlink&quot; title=&quot;HTTPS简介&quot;&gt;&lt;/a&gt;HTTPS简介&lt;/h2&gt;&lt;p&gt;1.https简介&lt;br&gt;HTTPS其实是有两部分组成：HTTP + SSL / TLS，也就是在HTTP上又加了一层处理加密信息的模块。服务端和客户端的信息传输都会通过TLS进行加密，所以传输的数据都是加密后的数据。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;2.https协议原理&lt;br&gt;首先，客户端与服务器建立连接，各自生成私钥和公钥，是不同的。服务器返给客户端一个公钥，然后客户端拿着这个公钥把要搜索的东西加密，称之为密文，并连并自己的公钥一起返回给服务器，服务器拿着自己的私钥解密密文，然后把响应到的数据用客户端的公钥加密，返回给客户端，客户端拿着自己的私钥解密密文，把数据呈现出来。&lt;/p&gt;
-&lt;h3 id=&quot;TLS-SSL&quot;&gt;&lt;a href=&quot;#TLS-SSL&quot; class=&quot;headerlink&quot; title=&quot;TLS/SSL&quot;&gt;&lt;/a&gt;TLS/SSL&lt;/h3&gt;&lt;p&gt;TCP/IP的4层模型：最底层物理层、网络层、传输层、应用层。&lt;br&gt;OSI7层模型：物理层、数据链路层、网络层、传输层、会话层、表示层、应用层。&lt;br&gt;以TCP/IP层为例，哪一层可以实现数据的加密和解密？在TCP层和应用层之间引入了半个层，并且称这半个层位为SSL。可以这么理解，把SSL当成一个库，让上层应用层的某种协议如果在传输数据到TCP层之前调用了SSL的功能，那么这个协议就可以实现加密的功能了。比如说，本来http在应用层封装起来，接下来就要交给应用层了，但是加了SSL层，http在传送给TCP层之前经过SSL进行了一次封装，而SSL本身就是实现数据安全通信的，因此，http变成了https。同样，smtp就变成了smtps，ftp就变成了ftps。众多的应用层的协议都可以通过调用SSL库的功能来实现数据的安全传输的。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;SSL(Secure Socket Layer,，安全的套接字层)，目前比较流行的是SSLv2、SSLv3。它只是一个库，因此要想实现SSL的功能，只需要在我们系统中提供SSL相关的库文件，就能够将http封装成https，也就意味着可以支持https协议了。http和https是两个不同的协议。但是SSL到底是某一家公司的协议，虽然也是开放的，国际标准化组织就不干了，他们决定研发一个更为开放的，通用的协议，TLS就出现了。&lt;br&gt;TLS(Transport Layer Security，传输层安全)：TLSv1，相当于SSLv3。&lt;/p&gt;
-&lt;h3 id=&quot;两台主机间TLS-SSL会话的建立：以http为例&quot;&gt;&lt;a href=&quot;#两台主机间TLS-SSL会话的建立：以http为例&quot; class=&quot;headerlink&quot; title=&quot;两台主机间TLS/SSL会话的建立：以http为例&quot;&gt;&lt;/a&gt;两台主机间TLS/SSL会话的建立：以http为例&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;第一步：http是基于TCP的，因此双方在建立会话之前需要3次握手。&lt;br&gt;这是http会话的建立，下面就可以互相通信了。但是有了https后就不是3次握手后直接通信了。&lt;/li&gt;
-&lt;li&gt;第二步：双方协商。客户端向服务器端发起请求，双方协商建立SSL会话，比如选择SSL协议的哪个版本、密钥加密算法等等。&lt;/li&gt;
-&lt;li&gt;第三步：server端将自己的证书发给客户端。(一般而言客户端都是没有证书的) 。客户端拿到证书后要验证拿到的证书是不是自己信任的机构颁发的，再验证证书完整性。&lt;/li&gt;
-&lt;li&gt;第四步：客户端传递加密后的对称密码给服务器端。https的主要作用在于web服务器的数据传递或者称为会话交换通过加密的方式实现的。加密一定要使用对称加密的方式，非对称加密方式速度太慢，既然是对称加密了，就需要对称加密密钥。如何生成这个密码呢？这里不是密钥交换实现的，而是客户端选择生成一个随机的对称密钥。并且将这个密码通过server端的公钥加密后传递给server端。&lt;/li&gt;
-&lt;li&gt;第五步：拿着客户端发来的密码给数据加密，并发送给客户端。&lt;br&gt;【注意】:密钥是客户端自己选择的，加密后发送给客户端的。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;常用的加解密算法简介&quot;&gt;&lt;a href=&quot;#常用的加解密算法简介&quot; class=&quot;headerlink&quot; title=&quot;常用的加解密算法简介&quot;&gt;&lt;/a&gt;常用的加解密算法简介&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1.对称加密：加密和解密使用同样的密码&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;DES：数据加密标准，56位的密钥长度。&lt;/li&gt;
-&lt;li&gt;3DES：3重DES。&lt;/li&gt;
-&lt;li&gt;AES：高级加密标准，Advanced。使用128的密钥。AES192、AES256、AES512。。。&lt;/li&gt;
-&lt;li&gt;Blowfish&lt;/li&gt;
-&lt;li&gt;IDEA&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;2.单向加密&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;MD4&lt;/li&gt;
-&lt;li&gt;MD5:128位。指输出长度，不是密钥长度。&lt;/li&gt;
-&lt;li&gt;SHA1:160位。SHA192、SHA256、SHA384&lt;/li&gt;
-&lt;li&gt;CRC-32：循环冗余校验码。不是加密算法，只是一种校验码机制，提供校验功能。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;3.公钥加密：&lt;/strong&gt;一对密钥，长度也是可以变化的，512、768、1024、2048、4096。。。越长速度越慢。核心：加密/签名。一般不会使用公钥加密来加密数据的。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;身份认证（数字签名）&lt;/li&gt;
-&lt;li&gt;数据加密&lt;/li&gt;
-&lt;li&gt;密钥交换&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;RSA算法：既能实现加密，也能实现签名。有公开有要钱的。&lt;br&gt;DSA算法：只能实现签名。公开的。&lt;br&gt;ElGamal算法：商业算法，要钱的。&lt;/p&gt;
-&lt;p&gt;加密解密需要算法来实现，因此需要一种工具或程序能够在主机上提供算法的实现。在Linux上，不同的加密机制所提供的工具是不同的。比如说，对于能够实现对称加密的工具叫openssl，gpg也可以。&lt;/p&gt;
-&lt;h2 id=&quot;OpenSSL&quot;&gt;&lt;a href=&quot;#OpenSSL&quot; class=&quot;headerlink&quot; title=&quot;OpenSSL&quot;&gt;&lt;/a&gt;OpenSSL&lt;/h2&gt;&lt;p&gt;SSL的开源实现。OpenSSL功能非常强大，几乎实现了市面上主流的所有加密算法。OpenSSL是个软件，由3部分组成。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;libcrpto：通用加密库。提供了各种加密函数。&lt;/li&gt;
-&lt;li&gt;libssl：TLS/SSL协议的实现。就是那半层。基于会话的、实现了身份认证、数据机密性、会话完整性的TLS/SSL库。&lt;/li&gt;
-&lt;li&gt;openssl：多用途命令行工具。能够实现单向加密、对称加密和非对称加密。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;OpenSSL还可实现私有证书颁发机构。为什么要实现私有证书颁发机构？我们很多功能都是建立在证书上，假如说我们买不起证书，我们就想在公司内部实现加密解密，而且我们也不跟外人通信。因此就需要个私有的证书颁发机构。&lt;/p&gt;
-&lt;p&gt;查看系统上有没有安装openssl：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;rpm -q openssl   
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果需要新版本，去 &lt;a href=&quot;http://www.openssl.org/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://www.openssl.org/&lt;/a&gt; 下载编译安装。&lt;br&gt;下面开始建立私有CA，颁发证书，配置Nginx实现HTTPS访问网站。&lt;/p&gt;
-&lt;h2 id=&quot;OpenSSL实现私有CA&quot;&gt;&lt;a href=&quot;#OpenSSL实现私有CA&quot; class=&quot;headerlink&quot; title=&quot;OpenSSL实现私有CA&quot;&gt;&lt;/a&gt;OpenSSL实现私有CA&lt;/h2&gt;&lt;h3 id=&quot;环境信息&quot;&gt;&lt;a href=&quot;#环境信息&quot; class=&quot;headerlink&quot; title=&quot;环境信息&quot;&gt;&lt;/a&gt;环境信息&lt;/h3&gt;&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;主机名&lt;/th&gt;
-&lt;th&gt;操作系统版本&lt;/th&gt;
-&lt;th&gt;IP地址&lt;/th&gt;
-&lt;th&gt;安装软件&lt;/th&gt;
-&lt;th&gt;作用&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;res&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;172.16.7.75&lt;/td&gt;
-&lt;td&gt;openssl&lt;/td&gt;
-&lt;td&gt;私有CA&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;res&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;172.16.7.180&lt;/td&gt;
-&lt;td&gt;openresty&lt;/td&gt;
-&lt;td&gt;Nginx服务器&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;比如在公司内部模拟实现https，就得给web服务器发一个证书，不用去买，自己做一个。在给自己颁发证书之前，自己先建立一个证书颁发机构。Openssl可以帮你去实现私有CA。首先私有CA自己要有证书。&lt;/p&gt;
-&lt;h3 id=&quot;创建私有CA&quot;&gt;&lt;a href=&quot;#创建私有CA&quot; class=&quot;headerlink&quot; title=&quot;创建私有CA&quot;&gt;&lt;/a&gt;创建私有CA&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1.生成一对密钥&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@res ~]# cd /etc/pki/CA/ 
-[root@res CA]# openssl genrsa -out private/cakey.pem 2048
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/14.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;2.生成自签发证书&lt;/strong&gt;&lt;br&gt;CA机构也有自己的证书的&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@res CA]# openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 3655
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/15.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;3.要想把它扮演成私有CA来使用，还要修改openssl.cnf，新建几个需要的文件&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@res CA]# cd /etc/pki/tls/
-[root@res tls]# vim openssl.cnf
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/16.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/17.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;4.生成几个必备的文件和目录&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@res tls]# cd /etc/pki/CA/
-[root@res CA]# mkdir certs crl newcerts
-[root@res CA]# touch index.txt
-[root@res CA]# echo 01 &amp;gt; serial
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;以上是CA的环境准备和密钥生成以及自签证书的过程。别的主机可以到这个CA申请证书。比如说Nginx服务器过来申请证书。&lt;/p&gt;
-&lt;h3 id=&quot;Nginx服务器申请证书&quot;&gt;&lt;a href=&quot;#Nginx服务器申请证书&quot; class=&quot;headerlink&quot; title=&quot;Nginx服务器申请证书&quot;&gt;&lt;/a&gt;Nginx服务器申请证书&lt;/h3&gt;&lt;p&gt;以下操作都是在172.16.7.180机器上操作。&lt;br&gt;任何一个应用要想用到证书，它必须要有私钥，因为必须从私钥中提取出公钥，每一种应用都必须有自己的证书。第一步：生成私钥。【注意】：如果生成的密钥长度不合适，可以重新生成导出到同一个文件中就覆盖了。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;1.生成一对密钥&lt;/strong&gt;&lt;br&gt;这里我在生成时对密钥进行了加密&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@res ~]# mkdir /opt/ssl/
-[root@res ~]# cd /opt/ssl/
-[root@res ssl]# (umask 077; openssl genrsa 2048 &amp;gt; res.key)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/18.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;2.生成证书签署请求&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@res ssl]# openssl req -new -key res.key -out res.csr
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/19.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;Commone Name一定要是你要授予证书的服务器域名或主机名。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;3.把证书签署请求送给CA机构，CA生成证书&lt;/strong&gt;&lt;br&gt;【注意】:这个请求要发给CA才可以，要让CA去签名才有效。当然在一台主机上就不用了，直接签了。如果不在一台主机上，要发给服务器的，远程传过去。可以传到CA机器的/tmp目录下。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;登录上CA机器172.16.7.75：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@res CA]# cd /etc/pki/tls/
-[root@res tls]# openssl ca -in /tmp/res.csr -out /tmp/res.crt -days 3650
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/20.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;4.CA机构将证书返回给申请单位，这里即172.16.7.180机器，我将证书放到/opt/ssl目录下&lt;/strong&gt;&lt;/p&gt;
-&lt;h2 id=&quot;配置Nginx&quot;&gt;&lt;a href=&quot;#配置Nginx&quot; class=&quot;headerlink&quot; title=&quot;配置Nginx&quot;&gt;&lt;/a&gt;配置Nginx&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.配置Nginx支持http和https共存&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/21.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;2.如果只需要https，禁止http，配置如下：&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/22.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;3.配置http强制转https&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;server {
-    listen       80;
-    server_name  static.res.com;
-
-    rewrite ^(.*)$  https://$host$1 permanent;
-
-}
-
-server {
-    listen       443 ssl;
-    server_name  static.res.com;
-
-    ssl on;
-    #证书和私钥
-    ssl_certificate /opt/ssl/res.crt;
-    ssl_certificate_key /opt/ssl/res.key;
-
-
-    access_log  logs/res.access.log  res;
-    ...
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】：我这里这个域名是假的，所以需要在客户端（你用哪个机器访问网站，哪台机器就是客户端）编辑hosts文件，配置如下的解析：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;172.16.7.180 static.res.com
-&lt;/code&gt;&lt;/pre&gt;</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;HTTPS简介&quot;&gt;&lt;a href=&quot;#HTTPS简介&quot; class=&quot;headerlink&quot; title=&quot;HTTPS简介&quot;&gt;&lt;/a&gt;HTTPS简介&lt;/h2&gt;&lt;p&gt;1.https简介&lt;br&gt;HTTPS其实是有两部分组成：HTTP + SSL / TLS，也就是在HTTP上又加了一层处理加密信息的模块。服务端和客户端的信息传输都会通过TLS进行加密，所以传输的数据都是加密后的数据。
     
     </summary>
     
