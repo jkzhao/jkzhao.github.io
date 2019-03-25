@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Nginx," />
 
 
 
@@ -104,13 +104,22 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="jkzhao&#39;s blog">
-<meta property="og:url" content="http://yoursite.com/archives/2017/04/index.html">
+<meta name="description" content="Nginx启用了https，但是测试部门在使用fiddler工具抓包时，发现能抓到用户账号和密码。但是我自己在服务端用tcpdump抓包却抓不到明文账号和密码。">
+<meta name="keywords" content="Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="访问https，抓包是明文的">
+<meta property="og:url" content="http://yoursite.com/2019/03/25/访问https，抓包是明文的/index.html">
 <meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="Nginx启用了https，但是测试部门在使用fiddler工具抓包时，发现能抓到用户账号和密码。但是我自己在服务端用tcpdump抓包却抓不到明文账号和密码。">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/37.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/38.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/39.png">
+<meta property="og:updated_time" content="2019-03-25T03:43:23.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="jkzhao&#39;s blog">
+<meta name="twitter:title" content="访问https，抓包是明文的">
+<meta name="twitter:description" content="Nginx启用了https，但是测试部门在使用fiddler工具抓包时，发现能抓到用户账号和密码。但是我自己在服务端用tcpdump抓包却抓不到明文账号和密码。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/37.png">
 
 
 
@@ -128,7 +137,7 @@
   };
 </script>
 
-  <title> 归档 | jkzhao's blog </title>
+  <title> 访问https，抓包是明文的 | jkzhao's blog </title>
 </head>
 <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 
@@ -160,7 +169,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  page-archive  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
@@ -300,65 +309,165 @@
           <div id="content" class="content">
             
 
-  <section id="posts" class="posts-collapse">
-    <span class="archive-move-on"></span>
-
-    <span class="archive-page-counter">
-      
-      
-       
-        
-      好! 目前共计 79 篇日志。 继续努力。
-    </span>
-
+  <div id="posts" class="posts-expand">
     
 
-      
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                访问https，抓包是明文的
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-03-25T10:29:21+08:00" content="2019-03-25">
+              2019-03-25
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-03-25T11:43:23+08:00" content="2019-03-25">
+              2019-03-25
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">Nginx</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/03/25/访问https，抓包是明文的/" class="leancloud_visitors" data-flag-title="访问https，抓包是明文的">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
       
       
 
       
+        <blockquote>
+<p>Nginx启用了https，但是测试部门在使用fiddler工具抓包时，发现能抓到用户账号和密码。但是我自己在服务端用tcpdump抓包却抓不到明文账号和密码。<a id="more"></a></p>
+</blockquote>
+<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>测试反馈的问题：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/37.png" alt=""></p>
+<h2 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h2><p>测试人员是在本地打开fiddler工具抓包，同时打开本地浏览器，输入应用地址，然后输入用户账号和密码，然后点击登录。在这个操作过程中，其实fiddler把测试人员输入账号和密码也给录制下来了，是客户端上传的明文账号和密码，因此也看到了明文账号和密码。这个看到的账号密码并不是https传输过程中看到的账号名和密码。<br>密文是针对https两端以外其他路径而言，作为https链接的两端，自然可以看到明文。这就好比，你自己打开一个网站，然后输入用户名和密码，你的朋友在你旁边看着你输入账号和密码，他是肯定能看见明文账号和密码的。<br>Https保证的是传输过程中第三方抓包看到的是密文。客户端和服务端，无论如何都可以拿到明文。在自己本地抓包不能说明什么。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>以<a href="https://gitee.com" target="_blank" rel="external">码云</a> 网站为例，不需要抓包工具，打开F12就可以看到明文账号和密码。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/38.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/39.png" alt=""></p>
+<h2 id="更合理办法"><a href="#更合理办法" class="headerlink" title="更合理办法"></a>更合理办法</h2><p>更安全的方式是，在写代码时，先将用户输入的账号和密码加密，然后再发到后台校验。</p>
+
+      
+    </div>
+
+    <div>
+      
         
-        <div class="collection-title">
-          <h2 class="archive-year motion-element" id="archive-year-2017">2017</h2>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Nginx/" rel="tag"><i class="fa fa-tag"></i>Nginx</a>
+          
         </div>
       
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/22/CentOS下安装字体不重启系统/" rel="next" title="CentOS下安装字体不重启系统">
+                <i class="fa fa-chevron-left"></i> CentOS下安装字体不重启系统
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
       
 
       
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2017/04/21/速成RPM包制作/" itemprop="url">
-              
-                <span itemprop="name">速成RPM包制作</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-04-21T14:38:46+08:00"
-              content="2017-04-21" >
-          04-21
-        </time>
-      </div>
-
-    </header>
+      
+    </footer>
   </article>
 
 
 
-    
-
-  </section>
-
-  
-
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -366,6 +475,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
       <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
 
@@ -387,8 +500,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -479,6 +601,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#现象"><span class="nav-number">1.</span> <span class="nav-text">现象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解释"><span class="nav-number">2.</span> <span class="nav-text">解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例"><span class="nav-number">3.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更合理办法"><span class="nav-number">4.</span> <span class="nav-text">更合理办法</span></a></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -594,11 +727,9 @@
 
 
   
-  
-    <script type="text/javascript" id="motion.page.archive">
-      $('.archive-year').velocity('transition.slideLeftIn');
-    </script>
-  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
 
 
   
