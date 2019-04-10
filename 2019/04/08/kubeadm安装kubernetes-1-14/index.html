@@ -1,0 +1,1018 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="之前采用二进制方式部署过Kubernetes，操作较为繁琐，此次采用kubeadm安装Kubernetes，Kubernetes相关组件介绍详见前面的文章。">
+<meta name="keywords" content="Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kubeadm安装kubernetes 1.14">
+<meta property="og:url" content="http://yoursite.com/2019/04/08/kubeadm安装kubernetes-1-14/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="之前采用二进制方式部署过Kubernetes，操作较为繁琐，此次采用kubeadm安装Kubernetes，Kubernetes相关组件介绍详见前面的文章。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/27.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/21.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/20.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/22.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/23.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/24.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/25.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/26.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/28.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/29.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/30.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/31.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/32.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/33.png">
+<meta property="og:updated_time" content="2019-04-10T12:05:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kubeadm安装kubernetes 1.14">
+<meta name="twitter:description" content="之前采用二进制方式部署过Kubernetes，操作较为繁琐，此次采用kubeadm安装Kubernetes，Kubernetes相关组件介绍详见前面的文章。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/27.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> kubeadm安装kubernetes 1.14 | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                kubeadm安装kubernetes 1.14
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-04-08T11:26:45+08:00" content="2019-04-08">
+              2019-04-08
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-04-10T20:05:29+08:00" content="2019-04-10">
+              2019-04-10
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/04/08/kubeadm安装kubernetes-1-14/" class="leancloud_visitors" data-flag-title="kubeadm安装kubernetes 1.14">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>之前采用二进制方式部署过Kubernetes，操作较为繁琐，此次采用kubeadm安装Kubernetes，Kubernetes相关组件介绍详见前面的文章。<a id="more"></a></p>
+</blockquote>
+<h2 id="环境说明"><a href="#环境说明" class="headerlink" title="环境说明"></a>环境说明</h2><h3 id="服务器环境"><a href="#服务器环境" class="headerlink" title="服务器环境"></a>服务器环境</h3><table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>操作系统版本</th>
+<th>IP地址</th>
+<th>角色</th>
+<th>安装软件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>spark32</td>
+<td>CentOS 7.0</td>
+<td>172.16.206.32</td>
+<td>Kubernetes Master、Harbor</td>
+<td>docker-ce 18.09.4、kubelet v1.14.0、kubeadm v1.14.0、etcd 3.3.10、kube-apiserver v1.14.0、kube-scheduler v1.14.0、kube-controller-manager v1.14.0、kube-proxy、flannel v0.11.0、kubectl v1.14.0</td>
+</tr>
+<tr>
+<td>spark17</td>
+<td>CentOS 7.0</td>
+<td>172.16.206.17</td>
+<td>Kubernetes Node</td>
+<td>docker-ce 18.09.4、kubelet v1.14.0、kubeadm v1.14.0、kube-proxy v1.14.0、flannel v0.11.0</td>
+</tr>
+<tr>
+<td>node2</td>
+<td>CentOS 7.0</td>
+<td>172.16.7.152</td>
+<td>Kubernetes Node</td>
+<td>kubelet、kube-proxy、flannel 0.7.1、etcd 3.2.7、docker 1.12.6</td>
+</tr>
+<tr>
+<td>node3</td>
+<td>CentOS 7.0</td>
+<td>172.16.7.153</td>
+<td>Kubernetes Node</td>
+<td>kubelet、kube-proxy、flannel 0.7.1、etcd 3.2.7、docker 1.12.6</td>
+</tr>
+</tbody>
+</table>
+<p><strong>【注意】：如果操作系统选择的是CentOS的，建议操作系统选择CentOS 7.3+的，从7.3+开始，默认安装的xfs文件系统的 ftype=1，这样docker可以使用官方推荐的存储驱动：overlay2</strong><br>如果当前系统小于7.3，并且ftype=0，有几个方法：</p>
+<ul>
+<li>重新创建xfs文件系统</li>
+<li><a href="https://superuser.com/questions/1321926/recreating-an-xfs-file-system-with-ftype-1，没试过这种方法" target="_blank" rel="external">https://superuser.com/questions/1321926/recreating-an-xfs-file-system-with-ftype-1，没试过这种方法</a></li>
+<li>如果你的主机上的卷组还有其他空间，可以重新分配一个逻辑卷，并且在格式化时指定 ftype=1，修改docker的默认存储路径(/var/lib/docker)为新创建的逻辑卷。</li>
+</ul>
+<p>【示例】：如何查看xfs文件系统的ftype的值<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/27.png" alt=""></p>
+<h3 id="安装准备"><a href="#安装准备" class="headerlink" title="安装准备"></a>安装准备</h3><p>1.关闭iptables和firewalld<br>每个节点都需要做<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">systemctl stop firewalld.service</div><div class="line">systemctl disable firewalld.service</div></pre></td></tr></table></figure></p>
+<p>2.集群主机时间同步<br>采用NTP(Network Time Protocol)方式来实现, 选择一台机器, 作为集群的时间同步服务器, 然后分别配置服务端和集群其他机器。<br>参见之前的博客文档<a href="http://jkzhao.github.io/2016/08/07/%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2Apache%20Hadoop%20(%E5%AE%8C%E5%85%A8%E5%88%86%E5%B8%83%E5%BC%8F%E6%A8%A1%E5%BC%8F%E5%B9%B6%E4%B8%94%E5%AE%9E%E7%8E%B0NameNode%20HA%E5%92%8CResourceManager%20HA" target="_blank" rel="external">安装部署Apache Hadoop (完全分布式模式并且实现NameNode HA和ResourceManager HA)</a>/)</p>
+<p>3.禁用SELINUX<br>每个节点都需要做<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">setenforce 0</div><div class="line">vi /etc/selinux/config</div><div class="line">SELINUX=disabled</div></pre></td></tr></table></figure></p>
+<p>4.配置/etc/hosts<br>每个节点都需要配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"># vim /etc/hosts</div><div class="line">172.16.206.32 spark32</div><div class="line">172.16.206.17 spark17</div><div class="line">172.16.206.31 ubuntu31</div></pre></td></tr></table></figure></p>
+<p>5.docker会生成大量的ip规则，有可能对iptables内部的nfcall，需要打开内生的桥接功能<br>每个节点都需要配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# echo &quot;net.bridge.bridge-nf-call-iptables = 1&quot; &gt;&gt; /etc/sysctl.conf </div><div class="line">[root@spark32 ~]# echo &quot;net.bridge.bridge-nf-call-ip6tables = 1&quot; &gt;&gt; /etc/sysctl.conf </div><div class="line">[root@spark32 ~]# sysctl -p /etc/sysctl.conf</div></pre></td></tr></table></figure></p>
+<h2 id="安装配置master节点"><a href="#安装配置master节点" class="headerlink" title="安装配置master节点"></a>安装配置master节点</h2><h3 id="安装docker-ce、kubelet、kubeadm、kubectl"><a href="#安装docker-ce、kubelet、kubeadm、kubectl" class="headerlink" title="安装docker-ce、kubelet、kubeadm、kubectl"></a>安装docker-ce、kubelet、kubeadm、kubectl</h3><p>我们使用阿里云仓库。点击访问<a href="https://opsx.alibaba.com/mirror" target="_blank" rel="external">阿里云仓库</a>，可以找到docker-ce和kubernetes，在右侧有“帮助”，里面会有说明。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/21.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/20.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# cat &lt;&lt;EOF &gt; /etc/yum.repos.d/kubernetes.repo</div><div class="line">&gt; [kubernetes]</div><div class="line">&gt; name=Kubernetes</div><div class="line">&gt; baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/</div><div class="line">&gt; enabled=1</div><div class="line">&gt; gpgcheck=1</div><div class="line">&gt; repo_gpgcheck=1</div><div class="line">&gt; gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg</div><div class="line">&gt; EOF</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# yum install docker-ce kubelet kubeadm kubectl</div></pre></td></tr></table></figure>
+<p>你也可以自己安装时指定固定的版本安装，我这里默认使用最新的稳定版本1.14。以kubeadm为例，查看仓库里有哪些版本可以安装：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# yum list kubeadm.x86_64 --showduplicates | sort -r</div></pre></td></tr></table></figure></p>
+<h3 id="配置启动docker"><a href="#配置启动docker" class="headerlink" title="配置启动docker"></a>配置启动docker</h3><p>接下来需要安装apiserver、controller manager、scheduler、kube-proxy。kubeadm安装Kubernetes集群时，这些组件是跑在静态Pods中的，docker是需要去docker仓库里下载所依赖的每一个镜像文件，这些镜像文件放在google的gcr仓库里，可能下载不了。我这里临时改下docker的配置文件，临时添加个代理，等集群安装完去掉代理。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# vim /usr/lib/systemd/system/docker.service</div><div class="line">Environment=&quot;HTTPS_PROXY=http://www.ik8s.io:10080&quot;</div><div class="line">Environment=&quot;NO_PROXY=127.0.0.0/8,172.16.0.0/16&quot;</div><div class="line">[root@spark32 ~]# systemctl daemon-reload</div><div class="line">[root@spark32 ~]# systemctl start docker</div><div class="line">[root@spark32 ~]# docker info</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/22.png" alt=""><br>如上图所示，有个提示，Storage Driver: overlay，以后会被移除。我这里改为overlay2。具体关于存储方面的可仔细阅读<a href="https://docs.docker.com/storage/storagedriver/" target="_blank" rel="external">docker官方文档相应章节</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# systemctl stop docker</div><div class="line">[root@spark32 ~]# cp -au /var/lib/docker /var/lib/docker.bk</div><div class="line">[root@spark32 ~]# vim /etc/docker/daemon.json</div><div class="line">&#123;</div><div class="line">  &quot;storage-driver&quot;: &quot;overlay2&quot;</div><div class="line">&#125;</div><div class="line">[root@spark32 ~]# systemctl start docker</div><div class="line">[root@spark32 ~]# systemctl enable docker.service</div></pre></td></tr></table></figure>
+<h3 id="配置kubelet"><a href="#配置kubelet" class="headerlink" title="配置kubelet"></a>配置kubelet</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# rpm -ql kubelet</div><div class="line">/etc/kubernetes/manifests</div><div class="line">/etc/sysconfig/kubelet</div><div class="line">/usr/bin/kubelet</div><div class="line">/usr/lib/systemd/system/kubelet.service</div><div class="line">[root@spark32 ~]# cat /etc/sysconfig/kubelet </div><div class="line">KUBELET_EXTRA_ARGS=</div></pre></td></tr></table></figure>
+<p>早期的k8s要求，每一个节点都不能打开swap设备。如果开了，不让你启动。但是我们可以人为的去忽略它，定义的方式就是上面这个参数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# vim /etc/sysconfig/kubelet</div><div class="line">KUBELET_EXTRA_ARGS=&quot;--fail-swap-on=false&quot;</div></pre></td></tr></table></figure></p>
+<p>如果不配置这个，在下面使用kubeadm init初始化master时会报如下错误：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubeadm init --kubernetes-version=v1.14.0 --pod-network-cidr=10.244.0.0/16 --service-cidr=10.96.0.0/12</div><div class="line">[init] Using Kubernetes version: v1.14.0</div><div class="line">[preflight] Running pre-flight checks</div><div class="line">        [WARNING Service-Docker]: docker service is not enabled, please run &apos;systemctl enable docker.service&apos;</div><div class="line">        [WARNING IsDockerSystemdCheck]: detected &quot;cgroupfs&quot; as the Docker cgroup driver. The recommended driver is &quot;systemd&quot;. Please follow the guide at https://kubernetes.io/docs/setup/cri/</div><div class="line">        [WARNING Service-Kubelet]: kubelet service is not enabled, please run &apos;systemctl enable kubelet.service&apos;</div><div class="line">error execution phase preflight: [preflight] Some fatal errors occurred:</div><div class="line">        [ERROR Swap]: running with swap on is not supported. Please disable swap</div><div class="line">[preflight] If you know what you are doing, you can make a check non-fatal with `--ignore-preflight-errors=...`</div></pre></td></tr></table></figure></p>
+<p>此时不能启动kubelet，它的配置文件还没有生成，在初始化master节点的过程中会生成kubelet的配置文件，并且启动kubelet。先设置开机自启动：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# systemctl enable kubelet.service</div></pre></td></tr></table></figure></p>
+<h3 id="初始化master节点"><a href="#初始化master节点" class="headerlink" title="初始化master节点"></a>初始化master节点</h3><p>使用kubeadm安装master节点的各组件。<br>查看初始化参数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubeadm init --help</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/23.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/24.png" alt=""><br>在初始化前，我们可以打印出kubeadm默认的配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]#  kubeadm config print init-defaults</div><div class="line">apiVersion: kubeadm.k8s.io/v1beta1</div><div class="line">bootstrapTokens:</div><div class="line">- groups:</div><div class="line">  - system:bootstrappers:kubeadm:default-node-token</div><div class="line">  token: abcdef.0123456789abcdef</div><div class="line">  ttl: 24h0m0s</div><div class="line">  usages:</div><div class="line">  - signing</div><div class="line">  - authentication</div><div class="line">kind: InitConfiguration</div><div class="line">localAPIEndpoint:</div><div class="line">  advertiseAddress: 1.2.3.4</div><div class="line">  bindPort: 6443</div><div class="line">nodeRegistration:</div><div class="line">  criSocket: /var/run/dockershim.sock</div><div class="line">  name: spark32</div><div class="line">  taints:</div><div class="line">  - effect: NoSchedule</div><div class="line">    key: node-role.kubernetes.io/master</div><div class="line">---</div><div class="line">apiServer:</div><div class="line">  timeoutForControlPlane: 4m0s</div><div class="line">apiVersion: kubeadm.k8s.io/v1beta1</div><div class="line">certificatesDir: /etc/kubernetes/pki</div><div class="line">clusterName: kubernetes</div><div class="line">controlPlaneEndpoint: &quot;&quot;</div><div class="line">controllerManager: &#123;&#125;</div><div class="line">dns:</div><div class="line">  type: CoreDNS</div><div class="line">etcd:</div><div class="line">  local:</div><div class="line">    dataDir: /var/lib/etcd</div><div class="line">imageRepository: k8s.gcr.io</div><div class="line">kind: ClusterConfiguration</div><div class="line">kubernetesVersion: v1.14.0</div><div class="line">networking:</div><div class="line">  dnsDomain: cluster.local</div><div class="line">  podSubnet: &quot;&quot;</div><div class="line">  serviceSubnet: 10.96.0.0/12</div><div class="line">scheduler: &#123;&#125;</div></pre></td></tr></table></figure></p>
+<p>下面开始初始化：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubeadm init --kubernetes-version=v1.14.0 --pod-network-cidr=10.244.0.0/16 --service-cidr=10.96.0.0/12 --ignore-preflight-errors=Swap</div><div class="line">[init] Using Kubernetes version: v1.14.0</div><div class="line">[preflight] Running pre-flight checks</div><div class="line">        [WARNING IsDockerSystemdCheck]: detected &quot;cgroupfs&quot; as the Docker cgroup driver. The recommended driver is &quot;systemd&quot;. Please follow the guide at https://kubernetes.io/docs/setup/cri/</div><div class="line">        [WARNING Swap]: running with swap on is not supported. Please disable swap</div><div class="line">[preflight] Pulling images required for setting up a Kubernetes cluster</div><div class="line">[preflight] This might take a minute or two, depending on the speed of your internet connection</div><div class="line">[preflight] You can also perform this action in beforehand using &apos;kubeadm config images pull&apos;</div><div class="line">error execution phase preflight: [preflight] Some fatal errors occurred:</div><div class="line">        [ERROR ImagePull]: failed to pull image k8s.gcr.io/kube-apiserver:v1.14.0: output: Error response from daemon: Get https://k8s.gcr.io/v2/: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)</div><div class="line">, error: exit status 1</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p>问题：初始化时发现网上找的代理已经失效了，拉取不了gcr仓库的镜像<br>先查看kubeadm初始化master需要哪些镜像：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubeadm config images list</div><div class="line">I0408 15:43:21.372628    4131 version.go:96] could not fetch a Kubernetes version from the internet: unable to get URL &quot;https://dl.k8s.io/release/stable-1.txt&quot;: Get https://dl.k8s.io/release/stable-1.txt: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)</div><div class="line">I0408 15:43:21.372730    4131 version.go:97] falling back to the local client version: v1.14.0</div><div class="line">k8s.gcr.io/kube-apiserver:v1.14.0</div><div class="line">k8s.gcr.io/kube-controller-manager:v1.14.0</div><div class="line">k8s.gcr.io/kube-scheduler:v1.14.0</div><div class="line">k8s.gcr.io/kube-proxy:v1.14.0</div><div class="line">k8s.gcr.io/pause:3.1</div><div class="line">k8s.gcr.io/etcd:3.3.10</div><div class="line">k8s.gcr.io/coredns:1.3.1</div></pre></td></tr></table></figure></p>
+<p>去掉docker配置文件中代理配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# vim /usr/lib/systemd/system/docker.service </div><div class="line"># Environment=&quot;HTTPS_PROXY=http://www.ik8s.io:10080&quot;</div><div class="line"># Environment=&quot;NO_PROXY=127.0.0.0/8,172.16.0.0/16&quot;</div><div class="line">[root@spark32 ~]# systemctl daemon-reload</div><div class="line">[root@spark32 ~]# systemctl restart docker.service</div></pre></td></tr></table></figure></p>
+<p>配置阿里云加速：参照前面博客<a href="http://jkzhao.github.io/2017/08/28/CentOS%E5%AE%89%E8%A3%85Docker-CE/" target="_blank" rel="external">CentOS安装Docker CE</a><br>从阿里云registry拉取镜像<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-apiserver:v1.14.0</div><div class="line">[root@spark32 ~]# docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-controller-manager:v1.14.0</div><div class="line">[root@spark32 ~]# docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-scheduler:v1.14.0</div><div class="line">[root@spark32 ~]# docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v1.14.0</div><div class="line">[root@spark32 ~]# docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1</div><div class="line">[root@spark32 ~]# docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/etcd:3.3.10</div><div class="line">[root@spark32 ~]# docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/coredns:1.3.1</div><div class="line">[root@spark32 ~]# docker images</div><div class="line">REPOSITORY                                                                    TAG                 IMAGE ID            CREATED             SIZE</div><div class="line">registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy                v1.14.0             5cd54e388aba        13 days ago         82.1MB</div><div class="line">registry.cn-hangzhou.aliyuncs.com/google_containers/kube-controller-manager   v1.14.0             b95b1efa0436        13 days ago         158MB</div><div class="line">registry.cn-hangzhou.aliyuncs.com/google_containers/kube-scheduler            v1.14.0             00638a24688b        13 days ago         81.6MB</div><div class="line">registry.cn-hangzhou.aliyuncs.com/google_containers/kube-apiserver            v1.14.0             ecf910f40d6e        13 days ago         210MB</div><div class="line">registry.cn-hangzhou.aliyuncs.com/google_containers/coredns                   1.3.1               eb516548c180        2 months ago        40.3MB</div><div class="line">registry.cn-hangzhou.aliyuncs.com/google_containers/etcd                      3.3.10              2c4adeb21b4f        4 months ago        258MB</div><div class="line">registry.cn-hangzhou.aliyuncs.com/google_containers/pause                     3.1                 da86e6ba6ca1        15 months ago       742kB</div></pre></td></tr></table></figure></p>
+<p>因为kubeadm安装的docker镜像默认是k8s.gcr.io网站的，所以需要改一下标签：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/kube-apiserver:v1.14.0 k8s.gcr.io/kube-apiserver:v1.14.0</div><div class="line">[root@spark32 ~]# docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/kube-scheduler:v1.14.0 k8s.gcr.io/kube-scheduler:v1.14.0     </div><div class="line">[root@spark32 ~]# docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v1.14.0 k8s.gcr.io/kube-proxy:v1.14.0             </div><div class="line">[root@spark32 ~]# docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1 k8s.gcr.io/pause:3.1</div><div class="line">[root@spark32 ~]# docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1 k8s.gcr.io/pause:3.1 </div><div class="line">[root@spark32 ~]# docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/etcd:3.3.10 k8s.gcr.io/etcd:3.3.10 </div><div class="line">[root@spark32 ~]# docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/coredns:1.3.1 k8s.gcr.io/coredns:1.3.1</div></pre></td></tr></table></figure></p>
+<p>下面再次初始化：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubeadm init --kubernetes-version=v1.14.0 --pod-network-cidr=10.244.0.0/16 --service-cidr=10.96.0.0/12 --ignore-preflight-errors=Swap</div><div class="line">[init] Using Kubernetes version: v1.14.0</div><div class="line">[preflight] Running pre-flight checks</div><div class="line">        [WARNING IsDockerSystemdCheck]: detected &quot;cgroupfs&quot; as the Docker cgroup driver. The recommended driver is &quot;systemd&quot;. Please follow the guide at https://kubernetes.io/docs/setup/cri/</div><div class="line">        [WARNING Swap]: running with swap on is not supported. Please disable swap</div><div class="line">[preflight] Pulling images required for setting up a Kubernetes cluster</div><div class="line">[preflight] This might take a minute or two, depending on the speed of your internet connection</div><div class="line">[preflight] You can also perform this action in beforehand using &apos;kubeadm config images pull&apos;</div><div class="line">[kubelet-start] Writing kubelet environment file with flags to file &quot;/var/lib/kubelet/kubeadm-flags.env&quot;</div><div class="line">[kubelet-start] Writing kubelet configuration to file &quot;/var/lib/kubelet/config.yaml&quot;</div><div class="line">[kubelet-start] Activating the kubelet service</div><div class="line">[certs] Using certificateDir folder &quot;/etc/kubernetes/pki&quot;</div><div class="line">[certs] Generating &quot;etcd/ca&quot; certificate and key</div><div class="line">[certs] Generating &quot;etcd/server&quot; certificate and key</div><div class="line">[certs] etcd/server serving cert is signed for DNS names [spark32 localhost] and IPs [172.16.206.32 127.0.0.1 ::1]</div><div class="line">[certs] Generating &quot;apiserver-etcd-client&quot; certificate and key</div><div class="line">[certs] Generating &quot;etcd/peer&quot; certificate and key</div><div class="line">[certs] etcd/peer serving cert is signed for DNS names [spark32 localhost] and IPs [172.16.206.32 127.0.0.1 ::1]</div><div class="line">[certs] Generating &quot;etcd/healthcheck-client&quot; certificate and key</div><div class="line">[certs] Generating &quot;ca&quot; certificate and key</div><div class="line">[certs] Generating &quot;apiserver&quot; certificate and key</div><div class="line">[certs] apiserver serving cert is signed for DNS names [spark32 kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local] and IPs [10.96.0.1 172.16.206.32]</div><div class="line">[certs] Generating &quot;apiserver-kubelet-client&quot; certificate and key</div><div class="line">[certs] Generating &quot;front-proxy-ca&quot; certificate and key</div><div class="line">[certs] Generating &quot;front-proxy-client&quot; certificate and key</div><div class="line">[certs] Generating &quot;sa&quot; key and public key</div><div class="line">[kubeconfig] Using kubeconfig folder &quot;/etc/kubernetes&quot;</div><div class="line">[kubeconfig] Writing &quot;admin.conf&quot; kubeconfig file</div><div class="line">[kubeconfig] Writing &quot;kubelet.conf&quot; kubeconfig file</div><div class="line">[kubeconfig] Writing &quot;controller-manager.conf&quot; kubeconfig file</div><div class="line">[kubeconfig] Writing &quot;scheduler.conf&quot; kubeconfig file</div><div class="line">[control-plane] Using manifest folder &quot;/etc/kubernetes/manifests&quot;</div><div class="line">[control-plane] Creating static Pod manifest for &quot;kube-apiserver&quot;</div><div class="line">[control-plane] Creating static Pod manifest for &quot;kube-controller-manager&quot;</div><div class="line">[control-plane] Creating static Pod manifest for &quot;kube-scheduler&quot;</div><div class="line">[etcd] Creating static Pod manifest for local etcd in &quot;/etc/kubernetes/manifests&quot;</div><div class="line">[wait-control-plane] Waiting for the kubelet to boot up the control plane as static Pods from directory &quot;/etc/kubernetes/manifests&quot;. This can take up to 4m0s</div><div class="line">[apiclient] All control plane components are healthy after 25.563846 seconds</div><div class="line">[upload-config] storing the configuration used in ConfigMap &quot;kubeadm-config&quot; in the &quot;kube-system&quot; Namespace</div><div class="line">[kubelet] Creating a ConfigMap &quot;kubelet-config-1.14&quot; in namespace kube-system with the configuration for the kubelets in the cluster</div><div class="line">[upload-certs] Skipping phase. Please see --experimental-upload-certs</div><div class="line">[mark-control-plane] Marking the node spark32 as control-plane by adding the label &quot;node-role.kubernetes.io/master=&apos;&apos;&quot;</div><div class="line">[mark-control-plane] Marking the node spark32 as control-plane by adding the taints [node-role.kubernetes.io/master:NoSchedule]</div><div class="line">[bootstrap-token] Using token: q8vnmo.3eav1kq9c3zp2xgq</div><div class="line">[bootstrap-token] Configuring bootstrap tokens, cluster-info ConfigMap, RBAC Roles</div><div class="line">[bootstrap-token] configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order for nodes to get long term certificate credentials</div><div class="line">[bootstrap-token] configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token</div><div class="line">[bootstrap-token] configured RBAC rules to allow certificate rotation for all node client certificates in the cluster</div><div class="line">[bootstrap-token] creating the &quot;cluster-info&quot; ConfigMap in the &quot;kube-public&quot; namespace</div><div class="line">[addons] Applied essential addon: CoreDNS</div><div class="line">[addons] Applied essential addon: kube-proxy</div><div class="line"></div><div class="line">Your Kubernetes control-plane has initialized successfully!</div><div class="line"></div><div class="line">To start using your cluster, you need to run the following as a regular user:</div><div class="line"></div><div class="line">  mkdir -p $HOME/.kube</div><div class="line">  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</div><div class="line">  sudo chown $(id -u):$(id -g) $HOME/.kube/config</div><div class="line"></div><div class="line">You should now deploy a pod network to the cluster.</div><div class="line">Run &quot;kubectl apply -f [podnetwork].yaml&quot; with one of the options listed at:</div><div class="line">  https://kubernetes.io/docs/concepts/cluster-administration/addons/</div><div class="line"></div><div class="line">Then you can join any number of worker nodes by running the following on each as root:</div><div class="line"></div><div class="line">kubeadm join 172.16.206.32:6443 --token q8vnmo.3eav1kq9c3zp2xgq \</div><div class="line">    --discovery-token-ca-cert-hash sha256:7fb950b750bc546d9343040b646bae7d8749a63a33124f51c1adb2b4c19aa235</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/25.png" alt=""><br>【说明】：</p>
+<ul>
+<li>dns附件在k8s上已经进化到第三版了。第一版叫skydns，后来被kubedns所取代，而在1.11版开始，才正式被CoreDNS所取代。CoreDNS支持前面两版不支持的高级功能，比如像很多资源的动态配置等。</li>
+<li>kube-proxy是作为附件运行的，也是托管在k8s之上。来帮忙负责生成service资源的相关iptables或ipvs规则。从1.11版本开始，默认开始使用的是ipvs。如果当前系统支不支持，默认安装上不支持的时候自动降级为iptables。1.10版及之前都是iptables，那时候使用ipvs还不成熟。</li>
+<li>这个token是个认证令牌，其实是个域共享密钥，意思是当前这个集群不是谁都能加入进来的，你要想加入进来得拿着这个令牌。这个token是动态生成的，复制保存下来，免得以后找不着了。<strong>注意这个令牌有效期是24小时，过了24小时在拿这个令牌来加入集群就会报认证错误，具体看下面的章节-安装配置Ubuntu 16.04 node节点</strong></li>
+<li>–discovery-token-ca-cert-hash：做发现时TLS BootStrap那个相关证书的或者私钥文件的hash码，hash码不对是不会让加入集群的，复制保存下来。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# mkdir -p $HOME/.kube</div><div class="line">You have mail in /var/spool/mail/root</div><div class="line">[root@spark32 ~]# cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</div></pre></td></tr></table></figure>
+<p>【说明】：admin.conf里面是kubeadm帮我们生成的一个被kubectl可以拿来作为配置文件，指定连接至k8s的apiserver，并完成认证的配置文件。这里面包含了认证信息，认证证书信息。</p>
+<p>查看kubelet状态，此时已经启动起来了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# systemctl status kubelet</div></pre></td></tr></table></figure></p>
+<p>查看集群组件状态：kubectl get cs/componentstatus<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl get cs</div><div class="line">NAME                 STATUS    MESSAGE             ERROR</div><div class="line">scheduler            Healthy   ok                  </div><div class="line">controller-manager   Healthy   ok                  </div><div class="line">etcd-0               Healthy   &#123;&quot;health&quot;:&quot;true&quot;&#125;</div><div class="line">[root@spark32 ~]# kubectl get componentstatus</div><div class="line">NAME                 STATUS    MESSAGE             ERROR</div><div class="line">controller-manager   Healthy   ok                  </div><div class="line">scheduler            Healthy   ok                  </div><div class="line">etcd-0               Healthy   &#123;&quot;health&quot;:&quot;true&quot;&#125;</div></pre></td></tr></table></figure></p>
+<p>这里没有显示apiserver的状态，如果apiserver不健康，我们是得不到这些组件健康状态信息的。</p>
+<p>查看集群节点信息：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl get nodes</div><div class="line">NAME      STATUS     ROLES    AGE   VERSION</div><div class="line">spark32   NotReady   master   29m   v1.14.0</div></pre></td></tr></table></figure></p>
+<p>此时只有主节点一个节点，而且是未就绪状态，因为此时还缺少一个网络附件，此时Pod之间无法通信。</p>
+<p>查看集群Pods状态信息（默认查的是default空间的pods，系统级的pods都是在kube-system空间）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl get pods -n kube-system</div><div class="line">NAME                              READY   STATUS    RESTARTS   AGE</div><div class="line">coredns-fb8b8dccf-8zzkb           0/1     Pending   0          43m</div><div class="line">coredns-fb8b8dccf-t69hm           0/1     Pending   0          43m</div><div class="line">etcd-spark32                      1/1     Running   1          43m</div><div class="line">kube-apiserver-spark32            1/1     Running   1          43m</div><div class="line">kube-controller-manager-spark32   1/1     Running   1          43m</div><div class="line">kube-proxy-9clf7                  1/1     Running   0          43m</div><div class="line">kube-scheduler-spark32            1/1     Running   1          43m</div></pre></td></tr></table></figure></p>
+<p>coredns处于pending状态，未决定的，行将发生的状态，是因为此时网络插件还没有安装。此时/etc/cni/目录也不存在。</p>
+<p><strong>【注意】：原来kubeadm 1.14.0版本初始化master节点时，已经支持从其他仓库下载需要的镜像，选项为：–image-repository string</strong><br>这就意味着我们不需要像上面那样从阿里云registry下载镜像，在打tag了。</p>
+<h3 id="部署网络附件flannel"><a href="#部署网络附件flannel" class="headerlink" title="部署网络附件flannel"></a>部署网络附件flannel</h3><p>官网：<a href="https://github.com/coreos/flannel" target="_blank" rel="external">https://github.com/coreos/flannel</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/26.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</div><div class="line">podsecuritypolicy.extensions/psp.flannel.unprivileged created</div><div class="line">clusterrole.rbac.authorization.k8s.io/flannel created</div><div class="line">clusterrolebinding.rbac.authorization.k8s.io/flannel created</div><div class="line">serviceaccount/flannel created</div><div class="line">configmap/kube-flannel-cfg created</div><div class="line">daemonset.extensions/kube-flannel-ds-amd64 created</div><div class="line">daemonset.extensions/kube-flannel-ds-arm64 created</div><div class="line">daemonset.extensions/kube-flannel-ds-arm created</div><div class="line">daemonset.extensions/kube-flannel-ds-ppc64le created</div><div class="line">daemonset.extensions/kube-flannel-ds-s390x created</div></pre></td></tr></table></figure></p>
+<p>看到这些并不是执行好了，此时正在拉取flannel镜像。下载很慢，耐心等待。可以使用docker images查看是否下载完成。。。<br>可以使用docker images查看当前服务器上下载的镜像，如果一直没有下来，直接运行命令拉取：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# docker pull quay.io/coreos/flannel:v0.11.0-amd64</div></pre></td></tr></table></figure></p>
+<p>拉取下来后，过一会儿，对应的flannel的pod就会启动起来了。</p>
+<p>查看集群Pods状态：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl get pods -n kube-system</div><div class="line">NAME                              READY   STATUS    RESTARTS   AGE</div><div class="line">coredns-fb8b8dccf-8zzkb           1/1     Running   0          79m</div><div class="line">coredns-fb8b8dccf-t69hm           1/1     Running   0          79m</div><div class="line">etcd-spark32                      1/1     Running   1          78m</div><div class="line">kube-apiserver-spark32            1/1     Running   1          78m</div><div class="line">kube-controller-manager-spark32   1/1     Running   1          78m</div><div class="line">kube-flannel-ds-amd64-2hkjh       1/1     Running   0          27m</div><div class="line">kube-proxy-9clf7                  1/1     Running   0          79m</div><div class="line">kube-scheduler-spark32            1/1     Running   1          78m</div></pre></td></tr></table></figure></p>
+<p>此时再次查看master节点状态，已经是就绪状态了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl get nodes</div><div class="line">NAME      STATUS   ROLES    AGE   VERSION</div><div class="line">spark32   Ready    master   86m   v1.14.0</div></pre></td></tr></table></figure></p>
+<h2 id="安装配置CentOS-7-node节点"><a href="#安装配置CentOS-7-node节点" class="headerlink" title="安装配置CentOS 7 node节点"></a>安装配置CentOS 7 node节点</h2><p>我这里以spark17节点为例：</p>
+<h3 id="安装docker-ce、kubelet、kubeadm"><a href="#安装docker-ce、kubelet、kubeadm" class="headerlink" title="安装docker-ce、kubelet、kubeadm"></a>安装docker-ce、kubelet、kubeadm</h3><p>在master节点上远程拷贝 docker-ce.repo、kubernetes.repo 到node3节点。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# scp -p /etc/yum.repos.d/docker-ce.repo root@spark17:/etc/yum.repos.d/</div><div class="line">[root@spark32 ~]# scp -p /etc/yum.repos.d/kubernetes.repo root@spark17:/etc/yum.repos.d/</div></pre></td></tr></table></figure></p>
+<p>安装docker-ce、kubelet、kubeadm<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@node3 ~]# yum install docker-ce kubelet kubeadm -y</div></pre></td></tr></table></figure></p>
+<p>启动docker：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# systemctl start docker</div></pre></td></tr></table></figure></p>
+<h3 id="配置启动docker-1"><a href="#配置启动docker-1" class="headerlink" title="配置启动docker"></a>配置启动docker</h3><p>修改docker的Storage Driver：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# scp -p /etc/docker/daemon.json root@node3:/etc/docker/</div></pre></td></tr></table></figure></p>
+<p>重启docker并设置开机自启动：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# systemctl restart docker </div><div class="line">[root@spark17 ~]# systemctl enable docker</div></pre></td></tr></table></figure></p>
+<h3 id="配置kubelet-1"><a href="#配置kubelet-1" class="headerlink" title="配置kubelet"></a>配置kubelet</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# vim /etc/sysconfig/kubelet</div><div class="line">KUBELET_EXTRA_ARGS=&quot;--fail-swap-on=false&quot;</div><div class="line">[root@spark17 ~]# systemctl enable kubelet</div></pre></td></tr></table></figure>
+<h3 id="加入集群"><a href="#加入集群" class="headerlink" title="加入集群"></a>加入集群</h3><p>我这里由于上面kubeadm init的时候没有使用 –image-repository string 指定从其他registry下载镜像，所以我先下载下来需要的镜像，然后再加入到集群中。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v1.14.0</div><div class="line">[root@spark17 ~]# docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v1.14.0 k8s.gcr.io/kube-proxy:v1.14.0</div><div class="line">[root@spark17 ~]# docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1</div><div class="line">[root@spark17 ~]# docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1 k8s.gcr.io/pause:3.1</div><div class="line">[root@spark17 ~]# docker pull quay.io/coreos/flannel:v0.11.0-amd64</div></pre></td></tr></table></figure></p>
+<p>或者可以在master节点上，把镜像docker save保存为tar，然后到node节点上docker load为镜像。以flannel为例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark31 ~]# docker save -o flannel.tar quay.io/coreos/flannel:v0.11.0-amd64</div><div class="line">[root@spark17 ~]# docker load -i flannel.tar</div></pre></td></tr></table></figure></p>
+<p>加入集群：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">kubeadm join 172.16.206.32:6443 --token q8vnmo.3eav1kq9c3zp2xgq --discovery-token-ca-cert-hash sha256:7fb950b750bc546d9343040b646bae7d8749a63a33124f51c1adb2b4c19aa235 --ignore-preflight-errors=Swap</div><div class="line">[preflight] Running pre-flight checks</div><div class="line">        [WARNING IsDockerSystemdCheck]: detected &quot;cgroupfs&quot; as the Docker cgroup driver. The recommended driver is &quot;systemd&quot;. Please follow the guide at https://kubernetes.io/docs/setup/cri/</div><div class="line">        [WARNING Swap]: running with swap on is not supported. Please disable swap</div><div class="line">[preflight] Reading configuration from the cluster...</div><div class="line">[preflight] FYI: You can look at this config file with &apos;kubectl -n kube-system get cm kubeadm-config -oyaml&apos;</div><div class="line">[kubelet-start] Downloading configuration for the kubelet from the &quot;kubelet-config-1.14&quot; ConfigMap in the kube-system namespace</div><div class="line">[kubelet-start] Writing kubelet configuration to file &quot;/var/lib/kubelet/config.yaml&quot;</div><div class="line">[kubelet-start] Writing kubelet environment file with flags to file &quot;/var/lib/kubelet/kubeadm-flags.env&quot;</div><div class="line">[kubelet-start] Activating the kubelet service</div><div class="line">[kubelet-start] Waiting for the kubelet to perform the TLS Bootstrap...</div><div class="line"></div><div class="line">This node has joined the cluster:</div><div class="line">* Certificate signing request was sent to apiserver and a response was received.</div><div class="line">* The Kubelet was informed of the new secure connection details.</div><div class="line"></div><div class="line">Run &apos;kubectl get nodes&apos; on the control-plane to see this node join the cluster.</div></pre></td></tr></table></figure></p>
+<p>要等待几分钟，node节点会下载kube-proxy和flannel，启动起来，才算真正完成。可以使用 kubectl get nodes 查看节点状态。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl get nodes      </div><div class="line">NAME      STATUS   ROLES    AGE   VERSION</div><div class="line">spark17   Ready    &lt;none&gt;   14h   v1.14.0</div><div class="line">spark32   Ready    master   23h   v1.14.0</div><div class="line">[root@spark32 ~]# kubectl get pods -n kube-system -o wide</div><div class="line">NAME                              READY   STATUS    RESTARTS   AGE   IP              NODE      NOMINATED NODE   READINESS GATES</div><div class="line">coredns-fb8b8dccf-8zzkb           1/1     Running   0          23h   10.244.0.2      spark32   &lt;none&gt;           &lt;none&gt;</div><div class="line">coredns-fb8b8dccf-t69hm           1/1     Running   0          23h   10.244.0.3      spark32   &lt;none&gt;           &lt;none&gt;</div><div class="line">etcd-spark32                      1/1     Running   1          23h   172.16.206.32   spark32   &lt;none&gt;           &lt;none&gt;</div><div class="line">kube-apiserver-spark32            1/1     Running   1          23h   172.16.206.32   spark32   &lt;none&gt;           &lt;none&gt;</div><div class="line">kube-controller-manager-spark32   1/1     Running   1          23h   172.16.206.32   spark32   &lt;none&gt;           &lt;none&gt;</div><div class="line">kube-flannel-ds-amd64-2hkjh       1/1     Running   0          22h   172.16.206.32   spark32   &lt;none&gt;           &lt;none&gt;</div><div class="line">kube-flannel-ds-amd64-f5fhc       1/1     Running   0          14h   172.16.206.17   spark17   &lt;none&gt;           &lt;none&gt;</div><div class="line">kube-proxy-9clf7                  1/1     Running   0          23h   172.16.206.32   spark32   &lt;none&gt;           &lt;none&gt;</div><div class="line">kube-proxy-p5nrg                  1/1     Running   0          14h   172.16.206.17   spark17   &lt;none&gt;           &lt;none&gt;</div><div class="line">kube-scheduler-spark32            1/1     Running   1          23h   172.16.206.32   spark32   &lt;none&gt;           &lt;none&gt;</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/28.png" alt=""></p>
+<h2 id="安装配置Ubuntu-16-04-node节点"><a href="#安装配置Ubuntu-16-04-node节点" class="headerlink" title="安装配置Ubuntu 16.04 node节点"></a>安装配置Ubuntu 16.04 node节点</h2><p>集群中有一台服务器的操作系统是Ubuntu 16.04，作为Node节点。<br>关闭防火墙：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sudo systemctl status ufw.service </div><div class="line">sudo systemctl stop ufw.service</div><div class="line">sudo systemctl disable ufw.service</div></pre></td></tr></table></figure></p>
+<p>查看apparmor（相当于CentOS中的SELinux）状态：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">sudo systemctl status apparmor.service</div><div class="line">● apparmor.service</div><div class="line">   Loaded: not-found (Reason: No such file or directory)</div><div class="line">   Active: inactive (dead)</div></pre></td></tr></table></figure></p>
+<p>检查nf-call：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ cat /proc/sys/net/bridge/bridge-nf-call-iptables </div><div class="line">1</div><div class="line">$ cat /proc/sys/net/bridge/bridge-nf-call-ip6tables </div><div class="line">1</div></pre></td></tr></table></figure></p>
+<h3 id="安装docker-ce、kubelet、kubeadm-1"><a href="#安装docker-ce、kubelet、kubeadm-1" class="headerlink" title="安装docker-ce、kubelet、kubeadm"></a>安装docker-ce、kubelet、kubeadm</h3><p>我们使用阿里云仓库。点击访问<a href="https://opsx.alibaba.com/mirror" target="_blank" rel="external">阿里云仓库</a>，可以找到docker-ce和kubernetes，在右侧有“帮助”，里面会有说明。</p>
+<h4 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h4><p><a href="https://yq.aliyun.com/articles/110806" target="_blank" rel="external">https://yq.aliyun.com/articles/110806</a><br>step 1: 安装必要的一些系统工具<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo apt-get update</div><div class="line">sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common</div></pre></td></tr></table></figure></p>
+<p>step 2: 安装GPG证书<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -</div></pre></td></tr></table></figure></p>
+<p>Step 3: 写入软件源信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo add-apt-repository &quot;deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable&quot;</div></pre></td></tr></table></figure></p>
+<p>Step 4: 更新并安装 Docker-CE<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">sudo apt-get -y update</div><div class="line">sudo apt-get -y install docker-ce</div><div class="line">sudo docker info</div><div class="line">Containers: 1</div><div class="line"> Running: 1</div><div class="line"> Paused: 0</div><div class="line"> Stopped: 0</div><div class="line">Images: 4</div><div class="line">Server Version: 18.09.4</div><div class="line">Storage Driver: overlay2</div><div class="line"> Backing Filesystem: extfs</div><div class="line"> Supports d_type: true</div><div class="line"> Native Overlay Diff: true</div><div class="line">Logging Driver: json-file</div><div class="line">Cgroup Driver: cgroupfs</div><div class="line">...</div><div class="line">	WARNING: No swap limit support</div></pre></td></tr></table></figure></p>
+<p>有个WARNING，根据错误提示，只是cgroups中的swap account没有开启。这个功能应该是用在 <code>docker run -m=1524288 -it ubuntu /bin/bash</code> 类似的命令，用来限制一个docker容器的内存使用上限，所以这里只是WARNING，不影响使用。<br>解决：<br>编辑/etc/default/grub，找到 GRUB_CMDLINE_LINUX=””，在双引号里面输入cgroup_enable=memory swapaccount=1<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/29.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sudo vim /etc/default/grub</div><div class="line">sudo update-grub</div><div class="line">sudo reboot</div></pre></td></tr></table></figure></p>
+<h4 id="安装kubelet、kubeadm"><a href="#安装kubelet、kubeadm" class="headerlink" title="安装kubelet、kubeadm"></a>安装kubelet、kubeadm</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install -y apt-transport-https</div></pre></td></tr></table></figure>
+<p>下面这条命令需要切换到root用户运行，普通用户sudo执行时一直提示要求使用root用户执行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">jkzhao@ubuntu31:~$ su - root</div><div class="line">Password: </div><div class="line">curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - </div><div class="line">cat &lt;&lt;EOF &gt;/etc/apt/sources.list.d/kubernetes.list</div><div class="line">deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main</div><div class="line">EOF</div></pre></td></tr></table></figure></p>
+<p>下面在切回到普通用户执行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install kubelet=1.14.0-00 kubeadm=1.14.0-00 kubectl=1.14.0-00 #这里安装时我发现默认最新的是1.14.1版本，所以我安装的时候指定版本为1.14.0</div></pre></td></tr></table></figure></p>
+<h4 id="配置kubelet-2"><a href="#配置kubelet-2" class="headerlink" title="配置kubelet"></a>配置kubelet</h4><p>Kubernetes 1.8开始要求关闭系统的Swap，如果不关闭，默认配置下kubelet将无法启动。可以通过kubelet的启动参数–fail-swap-on=false更改这个限制。配置忽略swap：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ sudo vim /etc/systemd/system/kubelet.service.d/10-kubeadm.conf </div><div class="line">Environment=&quot;KUBELET_EXTRA_ARGS=--fail-swap-on=false&quot;</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/30.png" alt=""></p>
+<h3 id="加入集群-1"><a href="#加入集群-1" class="headerlink" title="加入集群"></a>加入集群</h3><p>把需要的3个镜像下载下来，分别是kube-proxy、pause、flannel。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$ sudo docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v1.14.0</div><div class="line">$ sudo docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v1.14.0 k8s.gcr.io/kube-proxy:v1.14.0</div><div class="line">$ sudo docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1</div><div class="line">$ sudo docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1 k8s.gcr.io/pause:3.1</div><div class="line">$ sudo docker pull quay.io/coreos/flannel:v0.11.0-amd64</div></pre></td></tr></table></figure></p>
+<p>加入集群：<br>切换到root用户，执行如下命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"># kubeadm join 172.16.206.32:6443 --token q8vnmo.3eav1kq9c3zp2xgq --discovery-token-ca-cert-hash sha256:7fb950b750bc546d9343040b646bae7d8749a63a33124f51c1adb2b4c19aa235 --ignore-preflight-errors=Swap</div><div class="line">[preflight] Running pre-flight checks</div><div class="line">        [WARNING IsDockerSystemdCheck]: detected &quot;cgroupfs&quot; as the Docker cgroup driver. The recommended driver is &quot;systemd&quot;. Please follow the guide at https://kubernetes.io/docs/setup/cri/</div><div class="line">        [WARNING Swap]: running with swap on is not supported. Please disable swap</div><div class="line">[preflight] Reading configuration from the cluster...</div><div class="line">[preflight] FYI: You can look at this config file with &apos;kubectl -n kube-system get cm kubeadm-config -oyaml&apos;</div><div class="line">error execution phase preflight: unable to fetch the kubeadm-config ConfigMap: failed to get config map: Unauthorized</div></pre></td></tr></table></figure></p>
+<p>但是发现报错了：error execution phase preflight: unable to fetch the kubeadm-config ConfigMap: failed to get config map: Unauthorized<br>解决：<a href="https://github.com/kubernetes/kubeadm/issues/1310" target="_blank" rel="external">https://github.com/kubernetes/kubeadm/issues/1310</a><br>TTL for the token should be 24h.我这个是后面几天加的新节点。<br>回到master节点，查看集群token：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubeadm token list</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/31.png" alt=""><br>生成一个新的token：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubeadm token create</div><div class="line">85e3nn.5copkyq2j5leqrpb</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/32.png" alt=""><br>再次回到node节点执行加入集群命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"># kubeadm join 172.16.206.32:6443 --token 85e3nn.5copkyq2j5leqrpb --discovery-token-ca-cert-hash sha256:7fb950b750bc546d9343040b646bae7d8749a63a33124f51c1adb2b4c19aa235 --ignore-preflight-errors=Swap</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/33.png" alt=""></p>
+<p>在Ubuntu上使用kubectl，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ mkdir -p .kube</div></pre></td></tr></table></figure></p>
+<p>把master节点上的 $HOME/.kube/config/admin.conf 拷贝到 这台Ubuntu机器的 $HOME/.kube/，并将admin.conf重命名为config<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">jkzhao@ubuntu31:~$ kubectl get nodes</div><div class="line">NAME       STATUS   ROLES    AGE   VERSION</div><div class="line">spark17    Ready    &lt;none&gt;   21h   v1.14.0</div><div class="line">spark32    Ready    master   30h   v1.14.0</div><div class="line">ubuntu31   Ready    &lt;none&gt;   13m   v1.14.0</div><div class="line">jkzhao@ubuntu31:~$ kubectl get pods -n kube-system</div><div class="line">NAME                              READY   STATUS    RESTARTS   AGE</div><div class="line">coredns-fb8b8dccf-8zzkb           1/1     Running   0          30h</div><div class="line">coredns-fb8b8dccf-t69hm           1/1     Running   0          30h</div><div class="line">etcd-spark32                      1/1     Running   1          30h</div><div class="line">kube-apiserver-spark32            1/1     Running   1          30h</div><div class="line">kube-controller-manager-spark32   1/1     Running   1          30h</div><div class="line">kube-flannel-ds-amd64-2hkjh       1/1     Running   0          29h</div><div class="line">kube-flannel-ds-amd64-f5fhc       1/1     Running   0          21h</div><div class="line">kube-flannel-ds-amd64-j596v       1/1     Running   0          13m</div><div class="line">kube-proxy-9clf7                  1/1     Running   0          30h</div><div class="line">kube-proxy-p5nrg                  1/1     Running   0          21h</div><div class="line">kube-proxy-vbcs4                  1/1     Running   0          13m</div><div class="line">kube-scheduler-spark32            1/1     Running   1          30h</div></pre></td></tr></table></figure></p>
+<h3 id="kubelet报错"><a href="#kubelet报错" class="headerlink" title="kubelet报错"></a>kubelet报错</h3><p>查看kubelet日志，发现kubelet一直在报错：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# journalctl -xeu kubelet</div><div class="line">qos_container_manager_linux.go:139] [ContainerManager] Failed to reserve QoS requests: failed to set supported cgroup subsystems for cgroup [kubepods burburstable]: Failed to find subsystem mount for required subsystem: pids</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# tail -f /var/log/messages</div><div class="line">Apr 10 16:48:48 spark17 kubelet: E0410 16:48:48.871706   11041 qos_container_manager_linux.go:329] [ContainerManager]: Failed to update QoS cgroup configuration</div><div class="line">Apr 10 16:48:48 spark17 kubelet: W0410 16:48:48.871726   11041 qos_container_manager_linux.go:139] [ContainerManager] Failed to reserve QoS requests: failed to set supported cgroup subsystems for cgroup [kubepods burstable]: Failed to find subsystem mount for required subsystem: pids</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# kubectl describe node spark17</div><div class="line">...</div><div class="line">Events:</div><div class="line">  Type     Reason                            Age                     From              Message</div><div class="line">  ----     ------                            ----                    ----              -------</div><div class="line">  Warning  FailedNodeAllocatableEnforcement  5m33s (x1741 over 31h)  kubelet, spark32  Failed to update Node Allocatable Limits [&quot;kubepods&quot;]: failed to set supported cgroup subsystems for cgroup [kubepods]: Failed to find subsystem mount for required subsystem: pids</div></pre></td></tr></table></figure>
+<p>查看当前系统支持哪些subsystem：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# cat /proc/cgroups</div><div class="line">#subsys_name    hierarchy       num_cgroups     enabled</div><div class="line">cpuset  5       11      1</div><div class="line">cpu     4       104     1</div><div class="line">cpuacct 4       104     1</div><div class="line">memory  6       104     1</div><div class="line">devices 3       104     1</div><div class="line">freezer 2       11      1</div><div class="line">net_cls 8       11      1</div><div class="line">blkio   9       104     1</div><div class="line">perf_event      10      11      1</div><div class="line">hugetlb 7       11      1</div></pre></td></tr></table></figure></p>
+<p>发现并不支持pids。</p>
+<p>查看当前系统内核：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# uname -r</div><div class="line">3.10.0-327.el7.x86_64</div><div class="line">[root@spark17 ~]# grep CGROUP_ /boot/config-3.10.0-327.el7.x86_64   </div><div class="line"># CONFIG_CGROUP_DEBUG is not set</div><div class="line">CONFIG_CGROUP_FREEZER=y</div><div class="line">CONFIG_CGROUP_DEVICE=y</div><div class="line">CONFIG_CGROUP_CPUACCT=y</div><div class="line">CONFIG_CGROUP_HUGETLB=y</div><div class="line">CONFIG_CGROUP_PERF=y</div><div class="line">CONFIG_CGROUP_SCHED=y</div></pre></td></tr></table></figure></p>
+<p>升级内核，经过测试，在CentOS 7.4默认的内核为3.10.0-514.26.2.el7.x86_64，默认是开启了pids subsystem，我这边使用yum升级内核为 3.10.0-957.el7.x86_64<br>查看仓库里有哪些版本的内核，并安装：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# yum list kernel.x86_64 --showduplicates | sort -r</div><div class="line"> * updates: ap.stykers.moe</div><div class="line">Loading mirror speeds from cached hostfile</div><div class="line">Loaded plugins: fastestmirror, langpacks</div><div class="line">kernel.x86_64                   3.10.0-957.el7                         base     </div><div class="line">kernel.x86_64                   3.10.0-957.5.1.el7                     updates  </div><div class="line">kernel.x86_64                   3.10.0-957.1.3.el7                     updates  </div><div class="line">kernel.x86_64                   3.10.0-957.10.1.el7                    updates  </div><div class="line">kernel.x86_64                   3.10.0-327.el7                         @anaconda</div><div class="line">Installed Packages</div><div class="line"> * extras: mirrors.huaweicloud.com</div><div class="line"> * epel: mirrors.aliyun.com</div><div class="line"> * elrepo: mirrors.tuna.tsinghua.edu.cn</div><div class="line"> * base: ap.stykers.moe</div><div class="line">Available Packages</div><div class="line">[root@spark17 ~]# yum install kernel-3.10.0-957.el7.x86_64 -y</div></pre></td></tr></table></figure></p>
+<p>由于CentOS 7使用grub2作为引导程序 ，所以和CentOS 6有所不同，并不是修改/etc/grub.conf来修改启动项，需要如下操作：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# cat /boot/grub2/grub.cfg |grep menuentry  ##查看有哪些内核选项</div><div class="line">if [ x&quot;$&#123;feature_menuentry_id&#125;&quot; = xy ]; then</div><div class="line">  menuentry_id_option=&quot;--id&quot;</div><div class="line">  menuentry_id_option=&quot;&quot;</div><div class="line">export menuentry_id_option</div><div class="line">menuentry &apos;CentOS Linux (3.10.0-957.el7.x86_64) 7 (Core)&apos; --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option &apos;gnulinux-3.10.0-327.el7.x86_64-advanced-7787952f-c2d4-4216-ae09-5188e7fd88b8&apos; &#123;</div><div class="line">menuentry &apos;CentOS Linux (3.10.0-327.el7.x86_64) 7 (Core)&apos; --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option &apos;gnulinux-3.10.0-327.el7.x86_64-advanced-7787952f-c2d4-4216-ae09-5188e7fd88b8&apos; &#123;</div><div class="line">menuentry &apos;CentOS Linux (0-rescue-d918a8d2df0e481a820b4e5554fed3b5) 7 (Core)&apos; --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option &apos;gnulinux-0-rescue-d918a8d2df0e481a820b4e5554fed3b5-advanced-7787952f-c2d4-4216-ae09-5188e7fd88b8&apos; &#123;</div><div class="line">[root@spark17 ~]# grub2-editenv list   #查看默认启动内核</div><div class="line">[root@spark17 ~]# shutdown -r now</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# uname -r</div><div class="line">3.10.0-957.el7.x86_64</div><div class="line">[root@spark17 ~]# cat /proc/cgroups</div><div class="line">#subsys_name    hierarchy       num_cgroups     enabled</div><div class="line">cpuset  5       11      1</div><div class="line">cpu     4       110     1</div><div class="line">cpuacct 4       110     1</div><div class="line">memory  3       110     1</div><div class="line">devices 6       110     1</div><div class="line">freezer 7       11      1</div><div class="line">net_cls 2       11      1</div><div class="line">blkio   10      110     1</div><div class="line">perf_event      8       11      1</div><div class="line">hugetlb 9       11      1</div><div class="line">pids    11      110     1</div><div class="line">net_prio        2       11      1</div></pre></td></tr></table></figure>
+<p>此时已经支持了pids subsystem，查看kubelet已经不报错了</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"><i class="fa fa-tag"></i>Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/25/访问https，抓包是明文的/" rel="next" title="访问https，抓包是明文的">
+                <i class="fa fa-chevron-left"></i> 访问https，抓包是明文的
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">80</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#环境说明"><span class="nav-number">1.</span> <span class="nav-text">环境说明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务器环境"><span class="nav-number">1.1.</span> <span class="nav-text">服务器环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装准备"><span class="nav-number">1.2.</span> <span class="nav-text">安装准备</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置master节点"><span class="nav-number">2.</span> <span class="nav-text">安装配置master节点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装docker-ce、kubelet、kubeadm、kubectl"><span class="nav-number">2.1.</span> <span class="nav-text">安装docker-ce、kubelet、kubeadm、kubectl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置启动docker"><span class="nav-number">2.2.</span> <span class="nav-text">配置启动docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置kubelet"><span class="nav-number">2.3.</span> <span class="nav-text">配置kubelet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化master节点"><span class="nav-number">2.4.</span> <span class="nav-text">初始化master节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署网络附件flannel"><span class="nav-number">2.5.</span> <span class="nav-text">部署网络附件flannel</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置CentOS-7-node节点"><span class="nav-number">3.</span> <span class="nav-text">安装配置CentOS 7 node节点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装docker-ce、kubelet、kubeadm"><span class="nav-number">3.1.</span> <span class="nav-text">安装docker-ce、kubelet、kubeadm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置启动docker-1"><span class="nav-number">3.2.</span> <span class="nav-text">配置启动docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置kubelet-1"><span class="nav-number">3.3.</span> <span class="nav-text">配置kubelet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加入集群"><span class="nav-number">3.4.</span> <span class="nav-text">加入集群</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置Ubuntu-16-04-node节点"><span class="nav-number">4.</span> <span class="nav-text">安装配置Ubuntu 16.04 node节点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装docker-ce、kubelet、kubeadm-1"><span class="nav-number">4.1.</span> <span class="nav-text">安装docker-ce、kubelet、kubeadm</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装docker"><span class="nav-number">4.1.1.</span> <span class="nav-text">安装docker</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装kubelet、kubeadm"><span class="nav-number">4.1.2.</span> <span class="nav-text">安装kubelet、kubeadm</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置kubelet-2"><span class="nav-number">4.1.3.</span> <span class="nav-text">配置kubelet</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加入集群-1"><span class="nav-number">4.2.</span> <span class="nav-text">加入集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kubelet报错"><span class="nav-number">4.3.</span> <span class="nav-text">kubelet报错</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共212.6k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>
