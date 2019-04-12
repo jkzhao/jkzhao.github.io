@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-04-12T01:03:32.000Z</updated>
+  <updated>2019-04-12T01:38:36.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>kubeadm安装kubernetes 1.14</title>
-    <link href="http://yoursite.com/2019/04/08/kubeadm%E5%AE%89%E8%A3%85kubernetes-1-14/"/>
-    <id>http://yoursite.com/2019/04/08/kubeadm安装kubernetes-1-14/</id>
+    <title>kubeadm安装kubernetes 1.14.0</title>
+    <link href="http://yoursite.com/2019/04/08/kubeadm%E5%AE%89%E8%A3%85kubernetes-1-14-0/"/>
+    <id>http://yoursite.com/2019/04/08/kubeadm安装kubernetes-1-14-0/</id>
     <published>2019-04-08T03:26:45.000Z</published>
-    <updated>2019-04-12T01:03:32.000Z</updated>
+    <updated>2019-04-12T01:38:36.000Z</updated>
     
     <content type="html">&lt;blockquote&gt;
 &lt;p&gt;之前采用二进制方式部署过Kubernetes，操作较为繁琐，此次采用kubeadm安装Kubernetes，Kubernetes相关组件介绍详见前面的文章。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
@@ -158,7 +158,7 @@
 &lt;p&gt;此时已经支持了pids subsystem，查看kubelet已经不报错了&lt;/p&gt;
 &lt;h3 id=&quot;apiserver疯狂刷日志：OpenAPI-AggregationController-Processing-item-k8s-internal-local-delegation-chain-0000000001&quot;&gt;&lt;a href=&quot;#apiserver疯狂刷日志：OpenAPI-AggregationController-Processing-item-k8s-internal-local-delegation-chain-0000000001&quot; class=&quot;headerlink&quot; title=&quot;apiserver疯狂刷日志：OpenAPI AggregationController: Processing item k8s_internal_local_delegation_chain_0000000001&quot;&gt;&lt;/a&gt;apiserver疯狂刷日志：OpenAPI AggregationController: Processing item k8s_internal_local_delegation_chain_0000000001&lt;/h3&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# kubectl logs -f kube-apiserver-spark32 -n kube-system&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;I0411 12:01:07.724117       1 controller.go:102] OpenAPI AggregationController: Processing item k8s_internal_local_delegation_chain_0000000001&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;I0411 12:01:07.724291       1 controller.go:102] OpenAPI AggregationController: Processing item k8s_internal_local_delegation_chain_0000000002&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;...&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 &lt;p&gt;疯狂的刷这两行日志。。。&lt;br&gt;网上查了在1.14.0版本上确实有人遇到这样的情况，见kubernetes issue：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;https://github.com/kubernetes/kubernetes/issues/75777&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;https://github.com/kubernetes/kubernetes/pull/75781，说会在1.14.1版本里修复。去查了下1.14.1的CHANGELOG，发现确实改了这个bug：&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/kubernetes/kubernetes/pull/75781，说会在1.14.1版本里修复。去查了下1.14.1的CHANGELOG，发现确实改了这个bug：&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/36.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/kubernetes/kubernetes/pull/75781，说会在1.14.1版本里修复。去查了下1.14.1的CHANGELOG，上面写了已经修复了这个bug：&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/kubernetes/kubernetes/pull/75781，说会在1.14.1版本里修复。去查了下1.14.1的CHANGELOG，上面写了已经修复了这个bug：&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/36.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;但如今装的是1.14.0版本，只能尝试着降低apiserver这个组件的日志级别。基本上每个 kubernetes 组件都会有个通用的参数 –v；这个参数用于控制 kubernetes 各个组件的日志级别。官方关于apiserver命令行文档：&lt;a href=&quot;https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/，里面可以看到有个关于日志级别的选项：&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/，里面可以看到有个关于日志级别的选项：&lt;/a&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;-v, --v Level&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    number for the log level verbosity&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
 &lt;p&gt;关于Kubernetes组件输出日志级别说明：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;https://github.com/kubernetes/community/blob/master/contributors/devel/sig-instrumentation/logging.md&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
 &lt;p&gt;kubeadm init在初始化master节点的时候生成了apiserver组件的manifests，在 /etc/kubernetes/manifests/ 目录下。修改文件kube-apiserver.yaml：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 manifests]# vim kube-apiserver.yaml&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
