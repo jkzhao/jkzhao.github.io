@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-04-12T09:13:33.000Z</updated>
+  <updated>2019-04-30T07:29:38.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,49 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Jenkins与sonar集成</title>
+    <link href="http://yoursite.com/2019/04/26/Jenkins%E4%B8%8Esonar%E9%9B%86%E6%88%90/"/>
+    <id>http://yoursite.com/2019/04/26/Jenkins与sonar集成/</id>
+    <published>2019-04-26T12:41:44.000Z</published>
+    <updated>2019-04-30T07:29:38.000Z</updated>
+    
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;部门领导要求扫描代码质量，我们平时是用jenkins来做持续集成和持续发布的，所以就将jenkins和sonar做了集成，在编译完成后sonar自动扫描代码，然后在进行发布。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;sonar简介&quot;&gt;&lt;a href=&quot;#sonar简介&quot; class=&quot;headerlink&quot; title=&quot;sonar简介&quot;&gt;&lt;/a&gt;sonar简介&lt;/h2&gt;&lt;p&gt;SonarQube 是一个开源的代码分析平台, 用来持续分析和评测项目源代码的质量。 通过SonarQube我们可以检测出项目中重复代码，潜在bug，代码风格问题，缺乏单元测试等问题， 并通过一个web ui展示出来。&lt;br&gt;这里摆一张从网上搜到的图：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/11.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;安装配置sonar&quot;&gt;&lt;a href=&quot;#安装配置sonar&quot; class=&quot;headerlink&quot; title=&quot;安装配置sonar&quot;&gt;&lt;/a&gt;安装配置sonar&lt;/h2&gt;&lt;h3 id=&quot;新建普通用户sonar&quot;&gt;&lt;a href=&quot;#新建普通用户sonar&quot; class=&quot;headerlink&quot; title=&quot;新建普通用户sonar&quot;&gt;&lt;/a&gt;新建普通用户sonar&lt;/h3&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# useradd sonar&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# passwd sonar&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;输入两次密码&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;h3 id=&quot;下载sonar&quot;&gt;&lt;a href=&quot;#下载sonar&quot; class=&quot;headerlink&quot; title=&quot;下载sonar&quot;&gt;&lt;/a&gt;下载sonar&lt;/h3&gt;&lt;p&gt;下载地址：&lt;a href=&quot;https://www.sonarqube.org/downloads/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://www.sonarqube.org/downloads/&lt;/a&gt;&lt;br&gt;我这里下载的是长期支持版6.7.7。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# su - sonar&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-6.7.7.zip&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# unzip -oq sonarqube-6.7.7.zip&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h3 id=&quot;MySQL中新建sonar数据库&quot;&gt;&lt;a href=&quot;#MySQL中新建sonar数据库&quot; class=&quot;headerlink&quot; title=&quot;MySQL中新建sonar数据库&quot;&gt;&lt;/a&gt;MySQL中新建sonar数据库&lt;/h3&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# mysql -uroot -p&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;mysql&amp;gt; create database sonar default charset utf8;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;mysql&amp;gt; grant all on sonar.* to sonar@localhost identified by &amp;apos;sonar&amp;apos;;mysql&amp;gt; grant all on sonar.* to zabbix@&amp;apos;%.%.%.%&amp;apos; identified by &amp;apos;sonar&amp;apos;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;mysql&amp;gt; flush privileges;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;h3 id=&quot;修改sonar-properties文件&quot;&gt;&lt;a href=&quot;#修改sonar-properties文件&quot; class=&quot;headerlink&quot; title=&quot;修改sonar.properties文件&quot;&gt;&lt;/a&gt;修改sonar.properties文件&lt;/h3&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[sonar@res ~]$ cd sonarqube-6.7.7/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[sonar@res sonarqube-6.7.7]$ ls&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;bin  conf  COPYING  data  elasticsearch  extensions  lib  logs  temp  web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[sonar@res sonarqube-6.7.7]$ vim conf/sonar.properties&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;启动-停止sonar&quot;&gt;&lt;a href=&quot;#启动-停止sonar&quot; class=&quot;headerlink&quot; title=&quot;启动/停止sonar&quot;&gt;&lt;/a&gt;启动/停止sonar&lt;/h3&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[sonar@res sonarqube-6.7.7]$ bin/linux-x86-64/sonar.sh start&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[sonar@res sonarqube-6.7.7]$ bin/linux-x86-64/sonar.sh stop&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;访问sonar web：&lt;a href=&quot;http://172.16.7.180:9000&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://172.16.7.180:9000&lt;/a&gt;&lt;br&gt;默认账号密码是：admin/admin。登录完成后，建议去修改管理员密码。点击右上角的管理员头像，选择“我的账号”，然后点击“安全”，可以看到修改密码的地方。&lt;/p&gt;
+&lt;h3 id=&quot;sonar配置邮件&quot;&gt;&lt;a href=&quot;#sonar配置邮件&quot; class=&quot;headerlink&quot; title=&quot;sonar配置邮件&quot;&gt;&lt;/a&gt;sonar配置邮件&lt;/h3&gt;&lt;p&gt;使用管理员账号登录sonar web，点击第一行菜单中的“配置”。往下拉，在左侧最下方点击“通用”。在右侧，往下拉会看到可以配置邮件的地方。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/22.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/23.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;sonar添加用户、组&quot;&gt;&lt;a href=&quot;#sonar添加用户、组&quot; class=&quot;headerlink&quot; title=&quot;sonar添加用户、组&quot;&gt;&lt;/a&gt;sonar添加用户、组&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1.添加组&lt;/strong&gt;&lt;br&gt;可以针对一个项目添加一个组，把这些人放到这个组里面，然后再配置相应的权限。&lt;br&gt;使用管理员账号登录sonar web，点击第一行的“配置”，点击“权限”，在下拉菜单中选择“群组”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/24.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;然后点击右上方“创建群组”，输入群组名称即可创建群组。此时还没有添加用户，没有用户可以添加到新创建的群组中。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2.添加用户&lt;/strong&gt;&lt;br&gt;使用管理员账号登录sonar web，点击第一行的“配置”，点击“权限”，在下拉菜单中选择“用户”。然后点击右上方的“创建用户”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/25.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;jenkins安装sonarqube-scaner插件&quot;&gt;&lt;a href=&quot;#jenkins安装sonarqube-scaner插件&quot; class=&quot;headerlink&quot; title=&quot;jenkins安装sonarqube scaner插件&quot;&gt;&lt;/a&gt;jenkins安装sonarqube scaner插件&lt;/h2&gt;&lt;p&gt;浏览器输入jenkins访问地址，以管理员账户登录后，点击左侧菜单的“系统管理”。然后找到“管理插件”，点击“可选插件”，输入sonarqube scanner，即可搜索到。我这边由于jenkins版本比较低，是2.73.3。最新的sonarqube scanner插件需要jenkins 2.89.4以上版本才可以安装，但是这里又不提供低版本的插件直接安装。查看&lt;a href=&quot;https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;sonarqube官方文档&lt;/a&gt;，有jenkins版本和sonarscanner版本对应关系。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;这样就只能先下载好低版本的插件，然后通过“高级”选项卡上传插件进行安装。&lt;br&gt;我这里下载好了2.6.1版本的sonar.hpi。在插件管理里，选择“高级”选项卡。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/14.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;往下拉，找到“上传插件”，点击“选择文件”，然后选择本地的sonar.hpi，点击“上传”。过一会儿就装好了。&lt;/p&gt;
+&lt;h2 id=&quot;jenkins构建过程配置sonar&quot;&gt;&lt;a href=&quot;#jenkins构建过程配置sonar&quot; class=&quot;headerlink&quot; title=&quot;jenkins构建过程配置sonar&quot;&gt;&lt;/a&gt;jenkins构建过程配置sonar&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.配置“SonarQube servers”&lt;/strong&gt;&lt;br&gt;在jenkins页面，点击“系统管理”，点击“系统设置”，找到“SonarQube servers”，点击“Add SonarQube”，输入SonarQube的相关信息。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/15.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;上图中的token，请访问sonar界面，使用管理员账号登录，点击右上角的管理员头像，选择“我的账号”，然后点击“安全”，第一项就是“令牌”。在输入框输入名字，随便定义，然后点击“生成”。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/16.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;【注意】：请复制生成的token并保存下来，因为后来在进去就看不到了。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2.配置在构建过程中增加sonar扫描&lt;/strong&gt;&lt;br&gt;点击某个项目进去，在“构建”处，点击“增加构建步骤”，选择“Execute SonarQube Scanner”，配置如下：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/17.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;上图中在 Analysis properties 项里配置了一个参数，sonar.projectBaseDir=/root/.jenkins/workspace/gemini_dev。之所以配置这个参数，是因为我这个项目里配置有多个svn地址，每个svn地址都是项目的一个模块，这个情况下SonarQube的sonar.ProjectBaseDir参数默认会被设置为第一个项目的路径。这会导致找不到其他模块。详见官方issue：&lt;a href=&quot;https://issues.jenkins-ci.org/browse/JENKINS-24044&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://issues.jenkins-ci.org/browse/JENKINS-24044&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;上图中的 sonar-project.properties 内容大致如下：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;32&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;33&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;34&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;35&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;36&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;37&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;38&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;39&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;40&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;41&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;42&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;43&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;44&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;45&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;46&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;47&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;48&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;49&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;50&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;51&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;52&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;53&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;54&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;55&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;56&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;57&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;58&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;59&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;60&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;61&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;62&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;63&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;64&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;65&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;66&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;67&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;68&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;69&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;70&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;71&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;72&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;73&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;74&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;75&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;76&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;77&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;78&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;79&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;80&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;81&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;82&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;83&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;84&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;85&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;86&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;87&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;88&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;89&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;90&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;91&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;92&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;93&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;94&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;95&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;96&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;97&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;98&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;99&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;100&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;101&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;102&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;103&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;#sonarqube的地址&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;sonar.host.url=http://172.16.7.180:9000&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# SonarQube 中唯一表示，must be unique in a given SonarQube instance&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;sonar.projectKey=gemini #名字随意&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# ui里面显示的项目名称，this is the name displayed in the SonarQube UI&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;sonar.projectName=gemini #名字随意&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#版本号&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;sonar.projectVersion=1.0  #版本随意&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#用户名密码，用token代替&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;sonar.login=26e7ce1f5cc56a2442b7934b721749bd269f2dcc&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#语言&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#sonar.language=java,html,css,js #默认是多语言，但是不支持这么写&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#源码位置&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;sonar.modules=eetablecore,eetablemanage,emapflow,emapfunauth,emapsender,emaptaskcenter,emapturing,flowstatistics,skylobby,temppersonnel,getemapapplist,getybtapplist,emapposition,resourcemonitor,serviceanalyseapp&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;eetablecore.projectBaseDir=/root/.jenkins/workspace/gemini_dev/eetablecore&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;eetablecore.sonar.projectName=eetablecore&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;eetablecore.sonar.sources=src,web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;eetablecore.sonar.java.binaries=/usr/local/gemini/eetablecore/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;eetablecore.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;eetablemanage.projectBaseDir=/root/.jenkins/workspace/gemini_dev/eetablemanage&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;eetablemanage.sonar.projectName=eetablemanage&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;eetablemanage.sonar.sources=src,web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;eetablemanage.sonar.java.binaries=/usr/local/gemini/eetablemanage/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;eetablemanage.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js,web/public/design/plugin/**/*,web/public/design/public/**/*&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapflow.projectBaseDir=/root/.jenkins/workspace/gemini_dev/emapflow&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapflow.sonar.projectName=emapflow&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapflow.sonar.sources=src,web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapflow.sonar.java.binaries=/usr/local/gemini/emapflow/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapflow.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js,src/org/activiti/**/*.java&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapfunauth.projectBaseDir=/root/.jenkins/workspace/gemini_dev/emapfunauth&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapfunauth.sonar.projectName=emapfunauth&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapfunauth.sonar.sources=src,web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapfunauth.sonar.java.binaries=/usr/local/gemini/emapfunauth/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapfunauth.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapsender.projectBaseDir=/root/.jenkins/workspace/gemini_dev/emapsender&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapsender.sonar.projectName=emapsender&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapsender.sonar.sources=src&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapsender.sonar.java.binaries=/usr/local/gemini/emapsender/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emaptaskcenter.projectBaseDir=/root/.jenkins/workspace/gemini_dev/emaptaskcenter&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emaptaskcenter.sonar.projectName=emaptaskcenter&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emaptaskcenter.sonar.sources=src,web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emaptaskcenter.sonar.java.binaries=/usr/local/gemini/emaptaskcenter/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emaptaskcenter.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapturing.projectBaseDir=/root/.jenkins/workspace/gemini_dev/emapturing&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapturing.sonar.projectName=emapturing&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapturing.sonar.sources=src,web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapturing.sonar.java.binaries=/usr/local/gemini/emapturing/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapturing.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;flowstatistics.projectBaseDir=/root/.jenkins/workspace/gemini_dev/flowstatistics&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;flowstatistics.sonar.projectName=flowstatistics&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;flowstatistics.sonar.sources=src,web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;flowstatistics.sonar.java.binaries=/usr/local/gemini/flowstatistics/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;flowstatistics.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;skylobby.projectBaseDir=/root/.jenkins/workspace/gemini_dev/skylobby&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;skylobby.sonar.projectName=skylobby&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;skylobby.sonar.sources=src,web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;skylobby.sonar.java.binaries=/usr/local/gemini/skylobby/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;skylobby.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js,web/manager/components/UE/**/*,web/mobile/dependencies/**/*,web/mobile/static/**/*&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;temppersonnel.projectBaseDir=/root/.jenkins/workspace/gemini_dev/temppersonnel&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;temppersonnel.sonar.projectName=temppersonnel&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;temppersonnel.sonar.sources=src,web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;temppersonnel.sonar.java.binaries=/usr/local/gemini/temppersonnel/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;temppersonnel.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;getemapapplist.projectBaseDir=/root/.jenkins/workspace/gemini_dev/getemapapplist&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;getemapapplist.sonar.projectName=getemapapplist&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;getemapapplist.sonar.sources=src&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;getemapapplist.sonar.java.binaries=/usr/local/gemini/getemapapplist/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;getybtapplist.projectBaseDir=/root/.jenkins/workspace/gemini_dev/getybtapplist&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;getybtapplist.sonar.projectName=getybtapplist&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;getybtapplist.sonar.sources=src&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;getybtapplist.sonar.java.binaries=/usr/local/gemini/getybtapplist/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapposition.projectBaseDir=/root/.jenkins/workspace/gemini_dev/emapposition&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapposition.sonar.projectName=emapposition&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapposition.sonar.sources=src,web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapposition.sonar.java.binaries=/usr/local/gemini/emapposition/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;emapposition.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;resourcemonitor.projectBaseDir=/root/.jenkins/workspace/gemini_dev/resourcemonitor&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;resourcemonitor.sonar.projectName=resourcemonitor&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;resourcemonitor.sonar.sources=src,web&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;resourcemonitor.sonar.java.binaries=/usr/local/gemini/resourcemonitor/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;resourcemonitor.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;serviceanalyseapp.projectBaseDir=/root/.jenkins/workspace/gemini_dev/serviceanalyseapp&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;serviceanalyseapp.sonar.projectName=serviceanalyseapp&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;serviceanalyseapp.sonar.sources=src&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;serviceanalyseapp.sonar.java.binaries=/usr/local/gemini/serviceanalyseapp/classes&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#源码的编码&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;sonar.sourceEncoding=UTF-8&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;【说明】：&lt;/strong&gt;&lt;br&gt;1.以上配置中 src 为java源代码目录，web为前端js目录。&lt;br&gt;2.新版本的SonarQube scanner的配置文件里扫描java源代码需要提供 java.binaries 定义，我这里对应每个模块建了个文件夹作为值。&lt;br&gt;3.配置文件可配参数更详细的介绍：&lt;br&gt;&lt;a href=&quot;https://baiyangcao.github.io/notes/2017/01/11/sonarqube-analyz-parameter.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://baiyangcao.github.io/notes/2017/01/11/sonarqube-analyz-parameter.html&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://docs.sonarqube.org/latest/analysis/analysis-parameters/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.sonarqube.org/latest/analysis/analysis-parameters/&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://docs.sonarqube.org/latest/project-administration/narrowing-the-focus/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.sonarqube.org/latest/project-administration/narrowing-the-focus/&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;构建测试并查看结果&quot;&gt;&lt;a href=&quot;#构建测试并查看结果&quot; class=&quot;headerlink&quot; title=&quot;构建测试并查看结果&quot;&gt;&lt;/a&gt;构建测试并查看结果&lt;/h2&gt;&lt;p&gt;在jenkins相应项目上，点击“立即构建”，然后查看“Console Output”：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/18.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;构建完成后可以登录sonar web界面查看：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/19.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/20.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/21.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;部门领导要求扫描代码质量，我们平时是用jenkins来做持续集成和持续发布的，所以就将jenkins和sonar做了集成，在编译完成后sonar自动扫描代码，然后在进行发布。
+    
+    </summary>
+    
+      <category term="持续集成" scheme="http://yoursite.com/categories/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/"/>
+    
+    
+      <category term="Jenkins" scheme="http://yoursite.com/tags/Jenkins/"/>
+    
+  </entry>
   
   <entry>
     <title>kubeadm安装kubernetes 1.14.0</title>
@@ -2433,271 +2476,6 @@ MySQL [(none)]&amp;gt; quit;
     <summary type="html">
     
       &lt;h2 id=&quot;安装依赖&quot;&gt;&lt;a href=&quot;#安装依赖&quot; class=&quot;headerlink&quot; title=&quot;安装依赖&quot;&gt;&lt;/a&gt;安装依赖&lt;/h2&gt;
-    
-    </summary>
-    
-      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
-    
-    
-      <category term="MySQL" scheme="http://yoursite.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL介绍及安装部署</title>
-    <link href="http://yoursite.com/2018/03/18/MySQL%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"/>
-    <id>http://yoursite.com/2018/03/18/MySQL介绍及安装部署/</id>
-    <published>2018-03-18T04:08:49.000Z</published>
-    <updated>2018-03-23T08:41:38.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;MySQL产品&quot;&gt;&lt;a href=&quot;#MySQL产品&quot; class=&quot;headerlink&quot; title=&quot;MySQL产品&quot;&gt;&lt;/a&gt;MySQL产品&lt;/h2&gt;&lt;p&gt;当年Sun公司买下了MySQL，后来Sun公司被Oracle收购了。也就是MySQL也变成Oracle的了。Oracle向来视MySQL为眼中钉，所以Oracle在收购Sun的时候遭到了欧盟的极力反对，他们担心MySQL。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;Oracle有前科的，对于自己的产品，有竞争对手的，把对方公司收购，在把产品打入冷宫，不卖了。Oracle当前做出承诺，5年内花人力物力研发MySQL。Oracle也的确这么做了，但是MySQL有两个版本：社区版和商业版。在Oracle收购Sun之后，在不到两年的时间，商业版价格翻了4倍。好在Oracle在收购Sun的时候还收购了一个Openoffice的组件，是Linux上的一个办公套件。Oracle收购之后第一件事，就是openoffice不再开源，开始收钱了。很遗憾的是，Oracle毙掉之后，大家不认账，没人买他的。后来，openoffice那个团队又在早期的openoffice基础上做了另外一套office叫Libreoffice，比openoffice还要好，依然开源。没过多久，Oracle把openoffice又开源了，但是没人在用了。所以不知道MySQL会不会面临这个命运。MySQL的原作者当前在Oracle收购Sun时就极力反对，在Sun被收购后，他又组织了当年的开源团队，在早期MySQL的基础上重新创建了另外一套叫做MariaDB。MariaDB开源，并且其在设计上比早期的MySQL更先进。而且其API和MySQL完全兼容，所以Redhat7不再附带MySQL，而是MariaDB。现在MySQL家族的产品主要有：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;MySQL Server（mysqld、mysql）&lt;/li&gt;
-&lt;li&gt;MySQL Cluster&lt;/li&gt;
-&lt;li&gt;MySQL Proxy&lt;/li&gt;
-&lt;li&gt;MySQL Adminitrator&lt;/li&gt;
-&lt;li&gt;MySQL Query Browser&lt;/li&gt;
-&lt;li&gt;MySQL Workbench    &lt;/li&gt;
-&lt;li&gt;MySQL Migration Toolkit&lt;/li&gt;
-&lt;li&gt;MySQL Embedded Server&lt;/li&gt;
-&lt;li&gt;MySQL Drivers and Connectors&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;MySQL Server：&lt;/strong&gt;分为企业级DB和社区版DB。&lt;br&gt;&lt;strong&gt;MySQL Cluster：&lt;/strong&gt;市面上几乎没有使用这种企业级集群。&lt;br&gt;&lt;strong&gt;MySQL Proxy：&lt;/strong&gt;由代理来判断谁能被读，谁能被写。&lt;br&gt;对于我们来说，会用到MySQL Server、MySQL Proxy和MySQL Drivers and Connectors。&lt;/p&gt;
-&lt;h2 id=&quot;MySQL逻辑架构&quot;&gt;&lt;a href=&quot;#MySQL逻辑架构&quot; class=&quot;headerlink&quot; title=&quot;MySQL逻辑架构&quot;&gt;&lt;/a&gt;MySQL逻辑架构&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/2.png&quot; alt=&quot;&quot;&gt;&lt;br&gt; MySQL是个多用户服务器，支持多个连接同时连接进来。可以通过线程池来定义最多可以有多少个用户同时连进来。多余的连接请求放在连接队列中，线程池里出去一个，就从队列里进去线程池一个。据说oracle为mysql的商业版引入了很强大的线程池机制。连接/线程处理是MySQL的重要组成部分。&lt;br&gt;    用户请求接进来以后，如果是个select语句，先查询缓存(mysql缓存是根据查询语句的hash码对比的，select的大小写都会导致hash码不一样)。如果命中，直接返回结果，如果未命中，接下来分析器做语句分析，分析之后缓存中还有可能命中。所以分析器分析后仍然要去查缓存。如果缓存还是未命中，接下来交给优化器，优化以后由执行引擎交给存储引擎做查询操作。&lt;br&gt;    优化器优化之后，真正负责执行语句的是存储引擎。mysql是插件式存储引擎的，所以不同的表可以使用不同的存储引擎。&lt;/p&gt;
-&lt;h2 id=&quot;MySQL逻辑组件&quot;&gt;&lt;a href=&quot;#MySQL逻辑组件&quot; class=&quot;headerlink&quot; title=&quot;MySQL逻辑组件&quot;&gt;&lt;/a&gt;MySQL逻辑组件&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/3.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;Connection Pool：Authentication, Thread Reuse, Connection Limits, Check Memory, Caches。&lt;br&gt;认证，线程重用， 连接限制， 检查内存， 实现连接缓存。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/4.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/5.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;存储引擎将数据转换成存储在文件系统中的文件，文件系统可以是NTFS、ufs、ext2/3、NFS、SAN、NAS。文件系统上的文件表现为文件和日志。文件有数据文件和索引文件。日志有重做、撤销、二进制、错误、查询和慢查询日志，一般不涉及撤销日志，所以这边日志有5种。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/6.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;备份工具、安全工具、恢复工具复制工具、集群工具等。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/7.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;用户请求接进来了，&lt;strong&gt;连接管理器&lt;/strong&gt;负责接收用户请求，接进来后，&lt;strong&gt;线程管理器&lt;/strong&gt;需要生成一个线程响应用户请求(MySQL是单进程多线程模型的)，用户输入了帐号和密码后，需要一个&lt;strong&gt;用户模块&lt;/strong&gt;，用户肯定需要和用户模块打交道的，因为需要认证。只要连接进来，后续的sql语句也是和用户模块打交道，而不会和连接管理器打交道了。&lt;br&gt;    用户认证后，会发出很多SQL命令，由&lt;strong&gt;命令派发器&lt;/strong&gt;来派发给&lt;strong&gt;查询缓存&lt;/strong&gt;，查询缓存如果命中了则直接返回结果，当然完成了就需要&lt;strong&gt;记录日志&lt;/strong&gt;(记录日志是可选步骤)。如果查询缓存没命中，就要交给&lt;strong&gt;分析器&lt;/strong&gt;分析了。用户的语句有DDL、DML，分析结束后，如果是select就交给&lt;strong&gt;优化器&lt;/strong&gt;，如果是update、insert、delete、replace就交给&lt;strong&gt;表修改模块&lt;/strong&gt;，如果是repair就交给&lt;strong&gt;表维护模块&lt;/strong&gt;，如果是replication类操作就交给复制模块，还需要个&lt;strong&gt;状态报告模块&lt;/strong&gt;报告服务器执行状态。&lt;br&gt;    这些组件最终由&lt;strong&gt;访问控制模块&lt;/strong&gt;来控制，你到底有没有权限来操作，这个模块是做访问检查的。前面那个用户模块是做认证检查的，帐号密码没问题不代表可以访问里面的数据。访问控制模块检查没问题后，接下来就真正执行操作了。&lt;strong&gt;表管理器接口&lt;/strong&gt;的真正执行的操作依赖于&lt;strong&gt;存储引擎&lt;/strong&gt;。所以接下来要交给存储引擎的抽象接口。存储引擎抽象接口将用户请求在转发给各存储引擎。&lt;/p&gt;
-&lt;h2 id=&quot;MySQL安装部署&quot;&gt;&lt;a href=&quot;#MySQL安装部署&quot; class=&quot;headerlink&quot; title=&quot;MySQL安装部署&quot;&gt;&lt;/a&gt;MySQL安装部署&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.MySQL的安装方式&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;源码编译&lt;/li&gt;
-&lt;li&gt;rpm包：&lt;ul&gt;
-&lt;li&gt;OS Vendor提供的&lt;/li&gt;
-&lt;li&gt;MySQL官方提供的&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;通用二进制格式&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;2.MySQL版本&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;GA（General Availability）：要选择GA版&lt;/li&gt;
-&lt;li&gt;RC（Release Candidate）：候选版，马上要发布为GA版本&lt;/li&gt;
-&lt;li&gt;beta：公测版&lt;/li&gt;
-&lt;li&gt;alpha：内测版&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;3.MySQL官方提供的rpm包&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;MySQL-devel：开发需要的头文件和额外的库文件。&lt;/li&gt;
-&lt;li&gt;MySQL-embedded：嵌入式环境下专用的。&lt;/li&gt;
-&lt;li&gt;MySQL-ndb-management：MySQL集群管理器。&lt;/li&gt;
-&lt;li&gt;MySQL-shared：被各种应用程序所依赖的贡献库。&lt;/li&gt;
-&lt;li&gt;MySQL-shared-compat：兼容库。有些老的应用程序可能依赖mysql老版本的库。&lt;/li&gt;
-&lt;li&gt;MySQL-test：测试套件。包含一些压测工具等等。&lt;/li&gt;
-&lt;li&gt;MySQL-VERSION.PLATFORM.src.rpm：源代码包。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;对我们而言，需要MySQL-client、MySQL-server、MySQL-shared、MySQL-shared-compat和MySQL-test。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;4.二进制方式部署MySQL 5.6&lt;/strong&gt;&lt;br&gt;下载地址：&lt;a href=&quot;http://mirrors.sohu.com/mysql&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://mirrors.sohu.com/mysql&lt;/a&gt;&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;主机名&lt;/th&gt;
-&lt;th&gt;操作系统版本&lt;/th&gt;
-&lt;th&gt;IP地址&lt;/th&gt;
-&lt;th&gt;安装软件&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;console&lt;/td&gt;
-&lt;td&gt;CentOS 7.0&lt;/td&gt;
-&lt;td&gt;114.55.29.246&lt;/td&gt;
-&lt;td&gt;mysql-5.6.27-linux-glibc2.5-x86_64.tar.gz&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;&lt;strong&gt;（1）安装依赖包&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console local]# yum install libaio* -y
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;（2）解压安装&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console local]# tar zxf mysql-5.6.27-linux-glibc2.5-x86_64.tar.gz 
-[root@console local]# ln -sv mysql-5.6.27-linux-glibc2.5-x86_64 mysql
-‘mysql’ -&amp;gt; ‘mysql-5.6.27-linux-glibc2.5-x86_64’
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;（3）新建用户&lt;/strong&gt;&lt;br&gt;运行mysql最好不要用root去运行，而以普通用户身份。添加用户mysql。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console local]# groupadd -r -g 300 mysql
-[root@console local]# useradd -g mysql -r -s /sbin/nologin -u 300 mysql
-[root@console local]# id mysql
-uid=300(mysql) gid=300(mysql) groups=300(mysql)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;（4）修改mysql文件权限为mysql.mysql&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console local]# cd mysql
-[root@console mysql]# chown -R mysql.mysql ./*
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;（5）执行初始化操作，生成一个系统库叫mysql，它里面保存着有当前所有能够使用mysql服务器的用户帐号、所有数据库的名字、每个库中表的名字、表中字段的名字等等。&lt;/strong&gt;&lt;br&gt;脚本路径：/usr/local/mysql/scripts&lt;br&gt;创建数据文件目录：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console mysql]# mkdir -pv /data/{mydata,binlog}
-[root@console mysql]# scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/data/mydata
-[root@console mysql]# ls /data/mydata
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;（6）修改mysql目录下的文件属主为root，属组为mysql&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console mysql]# chown -R root .
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;（7）修改data目录属主、属组为mysql&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console mysql]# chown -R mysql.mysql /data
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;（8）拷贝修改mysql的配置文件&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;copy写好的my.cnf到/etc/目录下。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;32&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;33&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;34&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;35&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;36&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;37&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;38&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;39&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;40&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;41&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;42&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;43&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;44&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;45&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;46&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;47&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;48&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;49&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;50&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;51&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;52&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;53&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;54&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;55&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;56&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;57&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# The following options will be passed to all MySQL clients&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[client]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#password       = your_password&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;port            = 3306&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;socket          = /tmp/mysql.sock&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# The MySQL server&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[mysqld]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;port            = 3306&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;socket          = /tmp/mysql.sock&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;skip-external-locking&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;key_buffer_size = 256M&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;max_allowed_packet = 1M&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;table_open_cache = 256&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;sort_buffer_size = 1M&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;read_buffer_size = 1M&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;read_rnd_buffer_size = 4M&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;myisam_sort_buffer_size = 64M&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;thread_cache_size = 8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;query_cache_size= 16M&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# Try number of CPU&amp;apos;s*2 for thread_concurrency&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;thread_concurrency = 4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;datadir=/data/mydata&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;character-set-server = utf8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;max_connections = 1000&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# Replication Master Server (default)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# binary logging is required for replication&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;log-bin=/data/binlog/master-bin&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# binary logging format - mixed recommended&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;binlog_format=mixed&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# required unique id between 1 and 2^32 - 1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# defaults to 1 if master-host is not set&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# but will not function as a master if omitted&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;server-id       = 1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[mysqldump]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;quick&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;max_allowed_packet = 16M&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[mysql]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;no-auto-rehash&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[myisamchk]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;key_buffer_size = 128M&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;sort_buffer_size = 128M&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;read_buffer = 2M&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;write_buffer = 2M&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[mysqlhotcopy]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;interactive-timeout&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;（9）拷贝mysql的启动脚本，并加入系统服务&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console mysql]# cp support-files/mysql.server /etc/init.d/mysqld 
-[root@console mysql]# chkconfig --add mysqld
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;（10）启动mysql&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console mysql]# service mysqld start
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;（11）配置环境变量，配置完重新打开一个shell&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console mysql]# vim /etc/profile.d/mysql.sh
-export PATH=/usr/local/mysql/bin:$PATH
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;（12）修改root密码，因为一装完root密码是空的&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console ~]# mysql -uroot mysql 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/8.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; UPDATE user SET Password=PASSWORD(&amp;apos;wisedu123&amp;apos;) where USER=&amp;apos;root&amp;apos;;
-mysql&amp;gt; FLUSH PRIVILEGES;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/9.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;此时再以root登录就需要密码了。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/10.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;（13）删除两个匿名帐号&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; use mysql
-mysql&amp;gt; SELECT host,user,password FROM user;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/11.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; DROP USER &amp;apos;&amp;apos;@localhost;   #注意’’@localhost是两个单引号
-mysql&amp;gt; DROP USER &amp;apos;&amp;apos;@console; 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;MySQL初始化&quot;&gt;&lt;a href=&quot;#MySQL初始化&quot; class=&quot;headerlink&quot; title=&quot;MySQL初始化&quot;&gt;&lt;/a&gt;MySQL初始化&lt;/h2&gt;&lt;p&gt;MySQL是基于TCP的3306端口。虽然如此，但是还支持其他的通信方式，比如socket、memory、pipe。tcp是远程通信时用的，Linux或unix本机是基于socket，windows本机是基于memory或pipe。&lt;br&gt;MySQL服务器无论是通用二进制方式安装还是编译的方式安装，安装完成后要做MySQL的初始化。系统初始化时，默认库是mysql。这个库存储了当前mysql的各种元数据。这些初始化包含以下工作：&lt;/p&gt;
-&lt;h3 id=&quot;提供配置文件&quot;&gt;&lt;a href=&quot;#提供配置文件&quot; class=&quot;headerlink&quot; title=&quot;提供配置文件&quot;&gt;&lt;/a&gt;提供配置文件&lt;/h3&gt;&lt;p&gt;配置文件：.cnf结尾 &lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;集中式的配置:多个应用程序共用的配置文件&lt;ul&gt;
-&lt;li&gt;[mysqld]&lt;/li&gt;
-&lt;li&gt;[mysqld_safe]&lt;/li&gt;
-&lt;li&gt;[client]&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;使用配置文件的方式（安装mysql的方式不同，读取配置文件的顺序可能不同）&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;1.它依次查找每个需要查找的文件，结果是所有文件并集；&lt;/li&gt;
-&lt;li&gt;2.如果某参数在多个文件中出现多次，后读取的最终生效；&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;配置文件顺序：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# /usr/local/mysql/bin/mysqld --help --verbose | head -20
-Default options are read from the following files in the given order:
-/etc/mysql/my.cnf  /etc/my.cnf  ~/.my.cnf
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;删除所有匿名用户（5-7之前的版本）&quot;&gt;&lt;a href=&quot;#删除所有匿名用户（5-7之前的版本）&quot; class=&quot;headerlink&quot; title=&quot;删除所有匿名用户（5.7之前的版本）&quot;&gt;&lt;/a&gt;删除所有匿名用户（5.7之前的版本）&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;mysql&amp;gt; DROP USER &amp;apos;&amp;apos;@&amp;apos;localhost&amp;apos;;
-mysql&amp;gt; DROP USER &amp;apos;&amp;apos;@&amp;apos;www.abc.com&amp;apos;; #www.abc.com为主机名
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;用户帐号由两部分组成：username@host，host指所能够远程访问时使用的客户端主机&lt;br&gt;host还可以使用通配符：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;%: 任意长度的任意字符&lt;/li&gt;
-&lt;li&gt;_: 匹配任意单个字符&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;给所有的root用户设定密码（5-7之前的版本）&quot;&gt;&lt;a href=&quot;#给所有的root用户设定密码（5-7之前的版本）&quot; class=&quot;headerlink&quot; title=&quot;给所有的root用户设定密码（5.7之前的版本）&quot;&gt;&lt;/a&gt;给所有的root用户设定密码（5.7之前的版本）&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1.第一种方式&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SET PASSWORD FOR username@host = PASSWORD(&amp;apos;your_passwrod&amp;apos;);
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.第二种方式&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; UPDATE user SET password = PASSWORD(&amp;apos;your_password&amp;apos;) WHERE user = &amp;apos;root&amp;apos;;   ——这是修改授权表
-mysql&amp;gt; FLUSH PRIVILEGES;   ——通知mysqld重读授权表
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.第三种方式： 命令行mysqladmin工具&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# mysqladmin -uUserName -hHost password &amp;apos;new_password&amp;apos; -p    ——这里的host指mysqld服务器的ip，并不是帐号中的主机地址
-# mysqladmin -uUserName -hHost -p flush-privileges
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;客户端工具&quot;&gt;&lt;a href=&quot;#客户端工具&quot; class=&quot;headerlink&quot; title=&quot;客户端工具&quot;&gt;&lt;/a&gt;客户端工具&lt;/h2&gt;&lt;p&gt;mysql, mysqladmin, mysqldump, mysqlcheck, mysqlimport&lt;br&gt;配置文件中[client]下面的配置是所有mysql客户端共享的配置&lt;br&gt;命令行客户端的通用的选项：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;-u, –user=&lt;/li&gt;
-&lt;li&gt;-h, –host=&lt;/li&gt;
-&lt;li&gt;-p, –password=&lt;/li&gt;
-&lt;li&gt;–protocol={tcp|socket|memory|pipe}&lt;/li&gt;
-&lt;li&gt;–port=&lt;/li&gt;
-&lt;li&gt;–socket=    例如：/tmp/mysql.sock &lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;非客户端类的管理工具：myisamchk, myisampack。 都是在mysql服务器上运行的，不能基于客户端服务器端通信方式进行使用的。myisamchk是检测工具，检测myisam表是不是有不一致的情况。myisampack是打包压缩工具。&lt;/p&gt;
-&lt;h3 id=&quot;mysql客户端&quot;&gt;&lt;a href=&quot;#mysql客户端&quot; class=&quot;headerlink&quot; title=&quot;mysql客户端&quot;&gt;&lt;/a&gt;mysql客户端&lt;/h3&gt;&lt;p&gt;mysql这个命令行客户端工作模式: &lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;交互式模式 mysql&amp;gt; &lt;/li&gt;
-&lt;li&gt;脚本模式(批处理模式) mysql &amp;lt; /path/to/mysql_script.sql&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;1.mysql交互式模式&lt;/strong&gt;&lt;br&gt;（1）客户端命令：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; help  ——获取客户端命令帮助
-mysql&amp;gt; \?    ——获取客户端命令帮助
-       \c
-       \g
-       \G
-       \q
-       \!
-       \s
-       \. /path/to/mysql_script.sql
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;当然，客户端命令里面偶尔可能还会用到其他的，比如”rehash    (#) Rebuild completion hash.”，MySQL其实也支持命令补全的，比如说你有一个库叫mysql，或者叫其他的库，等会我们去use设定某个默认库时，或者只要但凡用到库名的时候，你可以不用写全了，它可以自动给你补全。但是这一功能在mysql启动时默认是关闭的，因为要想能够实现此种功能意义上的补全，需要让mysql服务器启动时读取每一个mysql对象并且给它们生成一个hash表才能补全。这通常会导致mysql启动时被卡住，尤其是非常大的mysql数据库时。启动后如果想用补全，就使用#，重新生成补全的hash表的hash码。&lt;/p&gt;
-&lt;p&gt;（2）服务器端命令：需要把命令写全后一并发送给服务器端执行的，因此需要命令结束符，默认为分号(;)&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;2.mysql的快捷键&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Ctrl + w: 删除光标之前的单词&lt;/li&gt;
-&lt;li&gt;Ctrl + u: 删除光标之前至命令行首的所有内容&lt;/li&gt;
-&lt;li&gt;Ctrl + y: 粘贴使用Ctrl+w或Ctrl+u删除的内容&lt;/li&gt;
-&lt;li&gt;Ctrl + a: 移动光标至行首&lt;/li&gt;
-&lt;li&gt;Ctrl + e: 移动光标至行尾&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;mysqldmin工具&quot;&gt;&lt;a href=&quot;#mysqldmin工具&quot; class=&quot;headerlink&quot; title=&quot;mysqldmin工具&quot;&gt;&lt;/a&gt;mysqldmin工具&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;mysqladmin [options] command [arg] [command [arg]] ...
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;command:&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;create DB_NAME&lt;/li&gt;
-&lt;li&gt;drop DB_NAME&lt;/li&gt;
-&lt;li&gt;debug: 打开调试日志并记录于error log中；如果我们启动mysql总是出错的话，你可以使用mysqladmin debug，它可以限定通知mysql服务器运行过程中的所有信息都送往mysql的error log。&lt;/li&gt;
-&lt;li&gt;status：显示mysql运行的简要状态信息&lt;ul&gt;
-&lt;li&gt;–sleep #: 指定间隔时长刷新状态信息&lt;/li&gt;
-&lt;li&gt;–count #: 显示的批次，显示几次。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;extended-status: 输出mysqld的各状态变量及其值，相当于执行“mysql&amp;gt; SHOW GLOBAL STATUS”&lt;/li&gt;
-&lt;li&gt;variables: 输出mysqld的各服务器变量&lt;/li&gt;
-&lt;li&gt;flush-hosts: 清空主机相关的缓存：DNS解析缓存，此前因为连接错误次数过多而被拒绝访问mysqld的主机列表。如果我们在某台客户端主机上连服务器，mysql默认好像是10次，在有限时间内错误过多可能就被放到黑名单中去了。此后再发连接请求，直接拒绝。一旦出现这种情况，就得去mysql服务器端flush-hosts。&lt;/li&gt;
-&lt;li&gt;flush-logs: 日志滚动，只二进制日志和中继日志。&lt;/li&gt;
-&lt;li&gt;refresh: 相当于同时使用flush-logs和flush-hosts&lt;/li&gt;
-&lt;li&gt;flush-privileges: 通知服务器重读授权表。&lt;/li&gt;
-&lt;li&gt;reload: 功能同flush-privileges。&lt;/li&gt;
-&lt;li&gt;flush-status: 重置服务器状态变量的值。重置extended-status显示的变量值，不是所有变量。&lt;/li&gt;
-&lt;li&gt;flush-tables: 关闭当前打开的表文件句柄。&lt;/li&gt;
-&lt;li&gt;flush-threads：清空线程缓存。&lt;/li&gt;
-&lt;li&gt;kill:　给线程id，杀死指定的线程，可以一次杀死多个线程，以逗号分隔，但不能有多余空格。mysql是单进程多线程的。&lt;/li&gt;
-&lt;li&gt;password: 修改当前用户的密码。&lt;/li&gt;
-&lt;li&gt;ping: 探测服务器是否在线。&lt;/li&gt;
-&lt;li&gt;processlist：显示mysql服务器的线程列表。&lt;/li&gt;
-&lt;li&gt;shutdown: 关闭mysqld进程。所以mysqladmin是个很危险的命令。&lt;/li&gt;
-&lt;li&gt;start-slave&lt;/li&gt;
-&lt;li&gt;stop-slave: 启动/关闭从服务器线程&lt;/li&gt;
-&lt;li&gt;version：显示mysqld的版本。  &lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;【示例】：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@osb30 ~]# mysqladmin -uroot -p create testdb
-Enter password: 
-[root@osb30 ~]# mysqladmin -uroot -p status
-Enter password: 
-Uptime: 15116890  Threads: 23  Questions: 144580431  Slow queries: 12904887  Opens: 380  Flush tables: 1  Open tables: 338  Queries per second avg: 9.564
-[root@osb30 ~]# mysqladmin -uroot -p version
-Enter password: 
-mysqladmin  Ver 8.42 Distrib 5.6.27, for Linux on x86_64
-Copyright (c) 2000, 2015, Oracle and/or its affiliates. All rights reserved.
-
-Oracle is a registered trademark of Oracle Corporation and/or its
-affiliates. Other names may be trademarks of their respective
-owners.
-
-Server version          5.6.27
-Protocol version        10
-...
-[root@osb30 ~]# mysqladmin -uroot -p ping
-Enter password: 
-mysqld is alive
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;GUI客户端工具：&quot;&gt;&lt;a href=&quot;#GUI客户端工具：&quot; class=&quot;headerlink&quot; title=&quot;GUI客户端工具：&quot;&gt;&lt;/a&gt;GUI客户端工具：&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;Navicat for mysql      商业版的&lt;/li&gt;
-&lt;li&gt;Toad for mysql          &lt;/li&gt;
-&lt;li&gt;mysql front            商业版的&lt;/li&gt;
-&lt;li&gt;sqlyog                 商业版的&lt;/li&gt;
-&lt;li&gt;phpMyAdmin             基于php的开源工具&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;mysql忘记root密码怎么办&quot;&gt;&lt;a href=&quot;#mysql忘记root密码怎么办&quot; class=&quot;headerlink&quot; title=&quot;mysql忘记root密码怎么办&quot;&gt;&lt;/a&gt;mysql忘记root密码怎么办&lt;/h2&gt;&lt;p&gt;在my.cnf文件中加入如下配置：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;skip-grant-tables=1
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后用空密码方式使用root用户登录 MySQL：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql -u root
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;修改root用户的密码：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; update mysql.user set password=PASSWORD(&amp;apos;newpassword&amp;apos;) where User=&amp;apos;root&amp;apos;;  
-mysql&amp;gt; flush privileges;  
-mysql&amp;gt; quit 
-&lt;/code&gt;&lt;/pre&gt;</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;MySQL产品&quot;&gt;&lt;a href=&quot;#MySQL产品&quot; class=&quot;headerlink&quot; title=&quot;MySQL产品&quot;&gt;&lt;/a&gt;MySQL产品&lt;/h2&gt;&lt;p&gt;当年Sun公司买下了MySQL，后来Sun公司被Oracle收购了。也就是MySQL也变成Oracle的了。Oracle向来视MySQL为眼中钉，所以Oracle在收购Sun的时候遭到了欧盟的极力反对，他们担心MySQL。
     
     </summary>
     

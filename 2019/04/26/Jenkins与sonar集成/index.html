@@ -1,0 +1,898 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Jenkins," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="部门领导要求扫描代码质量，我们平时是用jenkins来做持续集成和持续发布的，所以就将jenkins和sonar做了集成，在编译完成后sonar自动扫描代码，然后在进行发布。">
+<meta name="keywords" content="Jenkins">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jenkins与sonar集成">
+<meta property="og:url" content="http://yoursite.com/2019/04/26/Jenkins与sonar集成/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="部门领导要求扫描代码质量，我们平时是用jenkins来做持续集成和持续发布的，所以就将jenkins和sonar做了集成，在编译完成后sonar自动扫描代码，然后在进行发布。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/12.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/22.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/23.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/24.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/25.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/13.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/14.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/15.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/16.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/17.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/18.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/19.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/20.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/21.png">
+<meta property="og:updated_time" content="2019-04-30T07:29:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jenkins与sonar集成">
+<meta name="twitter:description" content="部门领导要求扫描代码质量，我们平时是用jenkins来做持续集成和持续发布的，所以就将jenkins和sonar做了集成，在编译完成后sonar自动扫描代码，然后在进行发布。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/11.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Jenkins与sonar集成 | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Jenkins与sonar集成
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-04-26T20:41:44+08:00" content="2019-04-26">
+              2019-04-26
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-04-30T15:29:38+08:00" content="2019-04-30">
+              2019-04-30
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/持续集成/" itemprop="url" rel="index">
+                    <span itemprop="name">持续集成</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/04/26/Jenkins与sonar集成/" class="leancloud_visitors" data-flag-title="Jenkins与sonar集成">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>部门领导要求扫描代码质量，我们平时是用jenkins来做持续集成和持续发布的，所以就将jenkins和sonar做了集成，在编译完成后sonar自动扫描代码，然后在进行发布。<a id="more"></a></p>
+</blockquote>
+<h2 id="sonar简介"><a href="#sonar简介" class="headerlink" title="sonar简介"></a>sonar简介</h2><p>SonarQube 是一个开源的代码分析平台, 用来持续分析和评测项目源代码的质量。 通过SonarQube我们可以检测出项目中重复代码，潜在bug，代码风格问题，缺乏单元测试等问题， 并通过一个web ui展示出来。<br>这里摆一张从网上搜到的图：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/11.png" alt=""></p>
+<h2 id="安装配置sonar"><a href="#安装配置sonar" class="headerlink" title="安装配置sonar"></a>安装配置sonar</h2><h3 id="新建普通用户sonar"><a href="#新建普通用户sonar" class="headerlink" title="新建普通用户sonar"></a>新建普通用户sonar</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"># useradd sonar</div><div class="line"># passwd sonar</div><div class="line">输入两次密码</div></pre></td></tr></table></figure>
+<h3 id="下载sonar"><a href="#下载sonar" class="headerlink" title="下载sonar"></a>下载sonar</h3><p>下载地址：<a href="https://www.sonarqube.org/downloads/" target="_blank" rel="external">https://www.sonarqube.org/downloads/</a><br>我这里下载的是长期支持版6.7.7。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"># su - sonar</div><div class="line"># wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-6.7.7.zip</div><div class="line"># unzip -oq sonarqube-6.7.7.zip</div></pre></td></tr></table></figure></p>
+<h3 id="MySQL中新建sonar数据库"><a href="#MySQL中新建sonar数据库" class="headerlink" title="MySQL中新建sonar数据库"></a>MySQL中新建sonar数据库</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"># mysql -uroot -p</div><div class="line">mysql&gt; create database sonar default charset utf8;</div><div class="line">mysql&gt; grant all on sonar.* to sonar@localhost identified by &apos;sonar&apos;;mysql&gt; grant all on sonar.* to zabbix@&apos;%.%.%.%&apos; identified by &apos;sonar&apos;;</div><div class="line">mysql&gt; flush privileges;</div></pre></td></tr></table></figure>
+<h3 id="修改sonar-properties文件"><a href="#修改sonar-properties文件" class="headerlink" title="修改sonar.properties文件"></a>修改sonar.properties文件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[sonar@res ~]$ cd sonarqube-6.7.7/</div><div class="line">[sonar@res sonarqube-6.7.7]$ ls</div><div class="line">bin  conf  COPYING  data  elasticsearch  extensions  lib  logs  temp  web</div><div class="line">[sonar@res sonarqube-6.7.7]$ vim conf/sonar.properties</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/12.png" alt=""></p>
+<h3 id="启动-停止sonar"><a href="#启动-停止sonar" class="headerlink" title="启动/停止sonar"></a>启动/停止sonar</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[sonar@res sonarqube-6.7.7]$ bin/linux-x86-64/sonar.sh start</div><div class="line">[sonar@res sonarqube-6.7.7]$ bin/linux-x86-64/sonar.sh stop</div></pre></td></tr></table></figure>
+<p>访问sonar web：<a href="http://172.16.7.180:9000" target="_blank" rel="external">http://172.16.7.180:9000</a><br>默认账号密码是：admin/admin。登录完成后，建议去修改管理员密码。点击右上角的管理员头像，选择“我的账号”，然后点击“安全”，可以看到修改密码的地方。</p>
+<h3 id="sonar配置邮件"><a href="#sonar配置邮件" class="headerlink" title="sonar配置邮件"></a>sonar配置邮件</h3><p>使用管理员账号登录sonar web，点击第一行菜单中的“配置”。往下拉，在左侧最下方点击“通用”。在右侧，往下拉会看到可以配置邮件的地方。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/22.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/23.png" alt=""></p>
+<h3 id="sonar添加用户、组"><a href="#sonar添加用户、组" class="headerlink" title="sonar添加用户、组"></a>sonar添加用户、组</h3><p><strong>1.添加组</strong><br>可以针对一个项目添加一个组，把这些人放到这个组里面，然后再配置相应的权限。<br>使用管理员账号登录sonar web，点击第一行的“配置”，点击“权限”，在下拉菜单中选择“群组”。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/24.png" alt=""><br>然后点击右上方“创建群组”，输入群组名称即可创建群组。此时还没有添加用户，没有用户可以添加到新创建的群组中。</p>
+<p><strong>2.添加用户</strong><br>使用管理员账号登录sonar web，点击第一行的“配置”，点击“权限”，在下拉菜单中选择“用户”。然后点击右上方的“创建用户”。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/25.png" alt=""></p>
+<h2 id="jenkins安装sonarqube-scaner插件"><a href="#jenkins安装sonarqube-scaner插件" class="headerlink" title="jenkins安装sonarqube scaner插件"></a>jenkins安装sonarqube scaner插件</h2><p>浏览器输入jenkins访问地址，以管理员账户登录后，点击左侧菜单的“系统管理”。然后找到“管理插件”，点击“可选插件”，输入sonarqube scanner，即可搜索到。我这边由于jenkins版本比较低，是2.73.3。最新的sonarqube scanner插件需要jenkins 2.89.4以上版本才可以安装，但是这里又不提供低版本的插件直接安装。查看<a href="https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner" target="_blank" rel="external">sonarqube官方文档</a>，有jenkins版本和sonarscanner版本对应关系。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/13.png" alt=""><br>这样就只能先下载好低版本的插件，然后通过“高级”选项卡上传插件进行安装。<br>我这里下载好了2.6.1版本的sonar.hpi。在插件管理里，选择“高级”选项卡。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/14.png" alt=""><br>往下拉，找到“上传插件”，点击“选择文件”，然后选择本地的sonar.hpi，点击“上传”。过一会儿就装好了。</p>
+<h2 id="jenkins构建过程配置sonar"><a href="#jenkins构建过程配置sonar" class="headerlink" title="jenkins构建过程配置sonar"></a>jenkins构建过程配置sonar</h2><p><strong>1.配置“SonarQube servers”</strong><br>在jenkins页面，点击“系统管理”，点击“系统设置”，找到“SonarQube servers”，点击“Add SonarQube”，输入SonarQube的相关信息。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/15.png" alt=""><br>上图中的token，请访问sonar界面，使用管理员账号登录，点击右上角的管理员头像，选择“我的账号”，然后点击“安全”，第一项就是“令牌”。在输入框输入名字，随便定义，然后点击“生成”。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/16.png" alt=""><br><strong>【注意】：请复制生成的token并保存下来，因为后来在进去就看不到了。</strong></p>
+<p><strong>2.配置在构建过程中增加sonar扫描</strong><br>点击某个项目进去，在“构建”处，点击“增加构建步骤”，选择“Execute SonarQube Scanner”，配置如下：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/17.png" alt=""><br>上图中在 Analysis properties 项里配置了一个参数，sonar.projectBaseDir=/root/.jenkins/workspace/gemini_dev。之所以配置这个参数，是因为我这个项目里配置有多个svn地址，每个svn地址都是项目的一个模块，这个情况下SonarQube的sonar.ProjectBaseDir参数默认会被设置为第一个项目的路径。这会导致找不到其他模块。详见官方issue：<a href="https://issues.jenkins-ci.org/browse/JENKINS-24044" target="_blank" rel="external">https://issues.jenkins-ci.org/browse/JENKINS-24044</a></p>
+<p>上图中的 sonar-project.properties 内容大致如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div></pre></td><td class="code"><pre><div class="line">#sonarqube的地址</div><div class="line">sonar.host.url=http://172.16.7.180:9000</div><div class="line"># SonarQube 中唯一表示，must be unique in a given SonarQube instance</div><div class="line">sonar.projectKey=gemini #名字随意</div><div class="line"># ui里面显示的项目名称，this is the name displayed in the SonarQube UI</div><div class="line">sonar.projectName=gemini #名字随意</div><div class="line">#版本号</div><div class="line">sonar.projectVersion=1.0  #版本随意</div><div class="line"></div><div class="line">#用户名密码，用token代替</div><div class="line">sonar.login=26e7ce1f5cc56a2442b7934b721749bd269f2dcc</div><div class="line">#语言</div><div class="line">#sonar.language=java,html,css,js #默认是多语言，但是不支持这么写</div><div class="line">#源码位置</div><div class="line">sonar.modules=eetablecore,eetablemanage,emapflow,emapfunauth,emapsender,emaptaskcenter,emapturing,flowstatistics,skylobby,temppersonnel,getemapapplist,getybtapplist,emapposition,resourcemonitor,serviceanalyseapp</div><div class="line">eetablecore.projectBaseDir=/root/.jenkins/workspace/gemini_dev/eetablecore</div><div class="line">eetablecore.sonar.projectName=eetablecore</div><div class="line">eetablecore.sonar.sources=src,web</div><div class="line">eetablecore.sonar.java.binaries=/usr/local/gemini/eetablecore/classes</div><div class="line">eetablecore.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js</div><div class="line"></div><div class="line">eetablemanage.projectBaseDir=/root/.jenkins/workspace/gemini_dev/eetablemanage</div><div class="line">eetablemanage.sonar.projectName=eetablemanage</div><div class="line">eetablemanage.sonar.sources=src,web</div><div class="line">eetablemanage.sonar.java.binaries=/usr/local/gemini/eetablemanage/classes</div><div class="line">eetablemanage.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js,web/public/design/plugin/**/*,web/public/design/public/**/*</div><div class="line"></div><div class="line">emapflow.projectBaseDir=/root/.jenkins/workspace/gemini_dev/emapflow</div><div class="line">emapflow.sonar.projectName=emapflow</div><div class="line">emapflow.sonar.sources=src,web</div><div class="line">emapflow.sonar.java.binaries=/usr/local/gemini/emapflow/classes</div><div class="line">emapflow.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js,src/org/activiti/**/*.java</div><div class="line"></div><div class="line">emapfunauth.projectBaseDir=/root/.jenkins/workspace/gemini_dev/emapfunauth</div><div class="line">emapfunauth.sonar.projectName=emapfunauth</div><div class="line">emapfunauth.sonar.sources=src,web</div><div class="line">emapfunauth.sonar.java.binaries=/usr/local/gemini/emapfunauth/classes</div><div class="line">emapfunauth.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js</div><div class="line"></div><div class="line">emapsender.projectBaseDir=/root/.jenkins/workspace/gemini_dev/emapsender</div><div class="line">emapsender.sonar.projectName=emapsender</div><div class="line">emapsender.sonar.sources=src</div><div class="line">emapsender.sonar.java.binaries=/usr/local/gemini/emapsender/classes</div><div class="line"></div><div class="line">emaptaskcenter.projectBaseDir=/root/.jenkins/workspace/gemini_dev/emaptaskcenter</div><div class="line">emaptaskcenter.sonar.projectName=emaptaskcenter</div><div class="line">emaptaskcenter.sonar.sources=src,web</div><div class="line">emaptaskcenter.sonar.java.binaries=/usr/local/gemini/emaptaskcenter/classes</div><div class="line">emaptaskcenter.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js</div><div class="line"></div><div class="line">emapturing.projectBaseDir=/root/.jenkins/workspace/gemini_dev/emapturing</div><div class="line">emapturing.sonar.projectName=emapturing</div><div class="line">emapturing.sonar.sources=src,web</div><div class="line">emapturing.sonar.java.binaries=/usr/local/gemini/emapturing/classes</div><div class="line">emapturing.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js</div><div class="line"></div><div class="line">flowstatistics.projectBaseDir=/root/.jenkins/workspace/gemini_dev/flowstatistics</div><div class="line">flowstatistics.sonar.projectName=flowstatistics</div><div class="line">flowstatistics.sonar.sources=src,web</div><div class="line">flowstatistics.sonar.java.binaries=/usr/local/gemini/flowstatistics/classes</div><div class="line">flowstatistics.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js</div><div class="line"></div><div class="line">skylobby.projectBaseDir=/root/.jenkins/workspace/gemini_dev/skylobby</div><div class="line">skylobby.sonar.projectName=skylobby</div><div class="line">skylobby.sonar.sources=src,web</div><div class="line">skylobby.sonar.java.binaries=/usr/local/gemini/skylobby/classes</div><div class="line">skylobby.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js,web/manager/components/UE/**/*,web/mobile/dependencies/**/*,web/mobile/static/**/*</div><div class="line"></div><div class="line">temppersonnel.projectBaseDir=/root/.jenkins/workspace/gemini_dev/temppersonnel</div><div class="line">temppersonnel.sonar.projectName=temppersonnel</div><div class="line">temppersonnel.sonar.sources=src,web</div><div class="line">temppersonnel.sonar.java.binaries=/usr/local/gemini/temppersonnel/classes</div><div class="line">temppersonnel.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js</div><div class="line"></div><div class="line">getemapapplist.projectBaseDir=/root/.jenkins/workspace/gemini_dev/getemapapplist</div><div class="line">getemapapplist.sonar.projectName=getemapapplist</div><div class="line">getemapapplist.sonar.sources=src</div><div class="line">getemapapplist.sonar.java.binaries=/usr/local/gemini/getemapapplist/classes</div><div class="line"></div><div class="line">getybtapplist.projectBaseDir=/root/.jenkins/workspace/gemini_dev/getybtapplist</div><div class="line">getybtapplist.sonar.projectName=getybtapplist</div><div class="line">getybtapplist.sonar.sources=src</div><div class="line">getybtapplist.sonar.java.binaries=/usr/local/gemini/getybtapplist/classes</div><div class="line"></div><div class="line">emapposition.projectBaseDir=/root/.jenkins/workspace/gemini_dev/emapposition</div><div class="line">emapposition.sonar.projectName=emapposition</div><div class="line">emapposition.sonar.sources=src,web</div><div class="line">emapposition.sonar.java.binaries=/usr/local/gemini/emapposition/classes</div><div class="line">emapposition.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js</div><div class="line"></div><div class="line">resourcemonitor.projectBaseDir=/root/.jenkins/workspace/gemini_dev/resourcemonitor</div><div class="line">resourcemonitor.sonar.projectName=resourcemonitor</div><div class="line">resourcemonitor.sonar.sources=src,web</div><div class="line">resourcemonitor.sonar.java.binaries=/usr/local/gemini/resourcemonitor/classes</div><div class="line">resourcemonitor.sonar.exclusions=web/**/*.css,web/**/*.less,web/**/*.scss,web/**/*.min.js</div><div class="line"></div><div class="line">serviceanalyseapp.projectBaseDir=/root/.jenkins/workspace/gemini_dev/serviceanalyseapp</div><div class="line">serviceanalyseapp.sonar.projectName=serviceanalyseapp</div><div class="line">serviceanalyseapp.sonar.sources=src</div><div class="line">serviceanalyseapp.sonar.java.binaries=/usr/local/gemini/serviceanalyseapp/classes</div><div class="line"></div><div class="line">#源码的编码</div><div class="line">sonar.sourceEncoding=UTF-8</div></pre></td></tr></table></figure></p>
+<p><strong>【说明】：</strong><br>1.以上配置中 src 为java源代码目录，web为前端js目录。<br>2.新版本的SonarQube scanner的配置文件里扫描java源代码需要提供 java.binaries 定义，我这里对应每个模块建了个文件夹作为值。<br>3.配置文件可配参数更详细的介绍：<br><a href="https://baiyangcao.github.io/notes/2017/01/11/sonarqube-analyz-parameter.html" target="_blank" rel="external">https://baiyangcao.github.io/notes/2017/01/11/sonarqube-analyz-parameter.html</a><br><a href="https://docs.sonarqube.org/latest/analysis/analysis-parameters/" target="_blank" rel="external">https://docs.sonarqube.org/latest/analysis/analysis-parameters/</a><br><a href="https://docs.sonarqube.org/latest/project-administration/narrowing-the-focus/" target="_blank" rel="external">https://docs.sonarqube.org/latest/project-administration/narrowing-the-focus/</a></p>
+<h2 id="构建测试并查看结果"><a href="#构建测试并查看结果" class="headerlink" title="构建测试并查看结果"></a>构建测试并查看结果</h2><p>在jenkins相应项目上，点击“立即构建”，然后查看“Console Output”：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/18.png" alt=""><br>构建完成后可以登录sonar web界面查看：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/19.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/20.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/jenkins/21.png" alt=""></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Jenkins/" rel="tag"><i class="fa fa-tag"></i>Jenkins</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/08/kubeadm安装kubernetes-1-14-0/" rel="next" title="kubeadm安装kubernetes 1.14.0">
+                <i class="fa fa-chevron-left"></i> kubeadm安装kubernetes 1.14.0
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">81</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#sonar简介"><span class="nav-number">1.</span> <span class="nav-text">sonar简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置sonar"><span class="nav-number">2.</span> <span class="nav-text">安装配置sonar</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#新建普通用户sonar"><span class="nav-number">2.1.</span> <span class="nav-text">新建普通用户sonar</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载sonar"><span class="nav-number">2.2.</span> <span class="nav-text">下载sonar</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL中新建sonar数据库"><span class="nav-number">2.3.</span> <span class="nav-text">MySQL中新建sonar数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改sonar-properties文件"><span class="nav-number">2.4.</span> <span class="nav-text">修改sonar.properties文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动-停止sonar"><span class="nav-number">2.5.</span> <span class="nav-text">启动/停止sonar</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sonar配置邮件"><span class="nav-number">2.6.</span> <span class="nav-text">sonar配置邮件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sonar添加用户、组"><span class="nav-number">2.7.</span> <span class="nav-text">sonar添加用户、组</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jenkins安装sonarqube-scaner插件"><span class="nav-number">3.</span> <span class="nav-text">jenkins安装sonarqube scaner插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jenkins构建过程配置sonar"><span class="nav-number">4.</span> <span class="nav-text">jenkins构建过程配置sonar</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构建测试并查看结果"><span class="nav-number">5.</span> <span class="nav-text">构建测试并查看结果</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共215.6k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>
