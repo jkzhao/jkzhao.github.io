@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-04-30T07:29:38.000Z</updated>
+  <updated>2019-05-23T06:15:51.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,64 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Java调用Python脚本</title>
+    <link href="http://yoursite.com/2019/05/23/Java%E8%B0%83%E7%94%A8Python%E8%84%9A%E6%9C%AC/"/>
+    <id>http://yoursite.com/2019/05/23/Java调用Python脚本/</id>
+    <published>2019-05-23T01:44:38.000Z</published>
+    <updated>2019-05-23T06:15:51.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;环境和问题&quot;&gt;&lt;a href=&quot;#环境和问题&quot; class=&quot;headerlink&quot; title=&quot;环境和问题&quot;&gt;&lt;/a&gt;环境和问题&lt;/h2&gt;&lt;p&gt;Maven依赖：&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;!-- https://mvnrepository.com/artifact/org.python/jython-standalone --&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;lt;dependency&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      &amp;lt;groupId&amp;gt;org.python&amp;lt;/groupId&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      &amp;lt;artifactId&amp;gt;jython-standalone&amp;lt;/artifactId&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      &amp;lt;version&amp;gt;2.7.1&amp;lt;/version&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;lt;/dependency&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;Java代码：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;public class InterpreterExample &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    PythonInterpreter interpreter = null;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    public InterpreterExample()&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        PythonInterpreter.initialize(System.getProperties(),&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;                System.getProperties(), new String[0]);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        this.interpreter = new PythonInterpreter();&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    void execfile( final String fileName )&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        this.interpreter.execfile(fileName);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    PyInstance createClass( final String className, final String opts )&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        return (PyInstance) this.interpreter.eval(className + &amp;quot;(&amp;quot; + opts + &amp;quot;)&amp;quot;);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    public static void main(String[] args)&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        //PySystemState sys = Py.getSystemState();&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        //sys.path.add(&amp;quot;/Library/Python/2.7/site-packages&amp;quot;);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        InterpreterExample ie = new InterpreterExample();&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        ie.execfile(&amp;quot;./pythonSrc/environment.py&amp;quot;);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        PyInstance env = ie.createClass(&amp;quot;Environment&amp;quot;, &amp;quot;None&amp;quot;);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        env.invoke(&amp;quot;get_os_version&amp;quot;);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;问题：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Python/1.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;原因：&lt;a href=&quot;https://stackoverflow.com/questions/9100909/using-multiprocessing-2-6-2-1-package-in-jython&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://stackoverflow.com/questions/9100909/using-multiprocessing-2-6-2-1-package-in-jython&lt;/a&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;You can&amp;apos;t use it if multiprocessing requires C extensions i.e., if you can&amp;apos;t disable them and the module was not reimplemented for Jython in Java/pure Python. multiprocessing module is included in the stdlib since Python 2.6. Current Jython supports Python 2.5.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;There is no GIL in Jython so you can use threading in many cases where you would use multiprocessing in CPython.&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;此外Jython还有其他问题：&lt;br&gt;Python执行时的sys.path和Jython的sys.path路径不一致。两者加载类库的路径不一样。&lt;br&gt;代码：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;import org.python.util.PythonInterpreter;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;public class HelloPython &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    public static void main(String[] args) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        PySystemState sys = Py.getSystemState();&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        interpreter.execfile(&amp;quot;./pythonSrc/test_sys.py&amp;quot;);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;test_sys.py代码：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;import sys&lt;br&gt;print(sys.path)&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;```&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;打印出来的是：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;[‘/Users/jkzhao/Documents/work/repository/org/python/jython-standalone/2.7.1/Lib’, ‘/Users/jkzhao/Documents/work/repository/org/python/jython-standalone/2.7.1/jython-standalone-2.7.1.jar/Lib’, ‘&lt;strong&gt;classpath&lt;/strong&gt;‘, ‘&lt;strong&gt;pyclasspath&lt;/strong&gt;/‘]&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;直接执行test_sys.py打印sys.path:&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;[‘/Users/jkzhao/Documents/study/Java/IDEAProjects/call’, ‘/Library/Python/2.7/site-packages/pip-7.1.0-py2.7.egg’, ‘/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python27.zip’, ‘/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7’, ‘/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-darwin’, ‘/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-mac’, ‘/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-mac/lib-scriptpackages’, ‘/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python’, ‘/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-tk’, ‘/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-old’, ‘/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-dynload’, ‘/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/PyObjC’, ‘/Library/Python/2.7/site-packages’]&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;## 常见的java调用python脚本方式&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;1.通过Jython.jar提供的类库实现：上面使用的就是这种方式&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2.通过Runtime.getRuntime()开启进程来执行脚本文件&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;介绍下第2种方式：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;代码：&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;public class Cmd {&lt;br&gt;    public static void main(String[] args) throws IOException, InterruptedException {&lt;br&gt;        try {&lt;br&gt;            // using the Runtime exec method:&lt;br&gt;            String[] arguments = new String[] { “python”, “./pythonSrc/environment.py” };&lt;br&gt;            Process p = Runtime.getRuntime().exec(arguments);&lt;br&gt;            BufferedReader stdInput = new BufferedReader(&lt;br&gt;                    new InputStreamReader(p.getInputStream()));&lt;br&gt;            BufferedReader stdError = new BufferedReader(new&lt;br&gt;                    InputStreamReader(p.getErrorStream()));&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;// read the output from the command
+System.out.println(&amp;quot;Here is the standard output of the command:\n&amp;quot;);
+String line = null;
+while ((line = stdInput.readLine()) != null) {
+    System.out.println(line);
+}
+
+// read any errors from the attempted command
+System.out.println(&amp;quot;\nHere is the standard error of the command (if any):\n&amp;quot;);
+String errline = null;
+while ((errline = stdError.readLine()) != null) {
+    System.out.println(errline);
+}
+
+stdInput.close();
+stdError.close();
+
+int ret = p.waitFor();
+System.out.println(&amp;quot;Process exit code: &amp;quot; + ret);
+
+if (ret != 0) {
+    System.out.println(&amp;quot;do something&amp;quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;//            System.exit(0);&lt;br&gt;        } catch (Exception e) {&lt;br&gt;            System.out.println(“exception happened - here’s what I know: “);&lt;br&gt;            e.printStackTrace();&lt;br&gt;            System.exit(-1);&lt;br&gt;        }&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;    System.out.println(&amp;quot;=============&amp;quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;}&lt;br&gt;```&lt;br&gt;这样就正常执行了。&lt;br&gt;【注意】：&lt;br&gt;Runtime.exec方法将产生一个本地的进程，并返回一个Process子类的实例,该实例可用于控制进程或取得进程的相关信息。由于调用Runtime.exec方法所创建的子进程没有自己的终端或控制台，因此该子进程的标准IO(如stdin,stdou,stderr)都通过 p.getOutputStream(), p.getInputStream(), p.getErrorStream() 方法重定向给它的父进程了。用户需要用这些stream来向子进程输入数据或获取子进程的输出。&lt;br&gt;但是向标准输出流和标准错误流写数据，而JVM却不读取，数据会暂存在linux缓存区，当缓存区存满之后导致该进程无法继续写数据，会僵死，导致java进程会卡死在waitFor()处。我这里采取的办法是：java进程在waitFor()前不断读取标准输出流和标准错误流。&lt;/p&gt;
+&lt;p&gt;参考资料：&lt;br&gt;&lt;a href=&quot;http://alvinalexander.com/java/edu/pj/pj010016&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Running system commands in Java applications&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://www.cnblogs.com/yueshutong/p/9381570.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;用Java执行Python：Jython踩坑笔记&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://yangfangs.github.io/2016/03/16/java-waitfor-block-deadlock/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Java 调用外部命令使用 waitFor() 方法阻塞或锁死&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://blog.csdn.net/caohaicheng/article/details/22928297&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Java执行shell遇到的各种问题&lt;/a&gt;&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;环境和问题&quot;&gt;&lt;a href=&quot;#环境和问题&quot; class=&quot;headerlink&quot; title=&quot;环境和问题&quot;&gt;&lt;/a&gt;环境和问题&lt;/h2&gt;&lt;p&gt;Maven依赖：
+    
+    </summary>
+    
+    
+      <category term="Java" scheme="http://yoursite.com/tags/Java/"/>
+    
+      <category term="Python" scheme="http://yoursite.com/tags/Python/"/>
+    
+  </entry>
   
   <entry>
     <title>Jenkins与sonar集成</title>
@@ -235,7 +293,7 @@
     <link href="http://yoursite.com/2019/03/25/%E8%AE%BF%E9%97%AEhttps%EF%BC%8C%E6%8A%93%E5%8C%85%E6%98%AF%E6%98%8E%E6%96%87%E7%9A%84/"/>
     <id>http://yoursite.com/2019/03/25/访问https，抓包是明文的/</id>
     <published>2019-03-25T02:29:21.000Z</published>
-    <updated>2019-03-25T03:43:23.000Z</updated>
+    <updated>2019-05-15T03:11:51.000Z</updated>
     
     <content type="html">&lt;blockquote&gt;
 &lt;p&gt;Nginx启用了https，但是测试部门在使用fiddler工具抓包时，发现能抓到用户账号和密码。但是我自己在服务端用tcpdump抓包却抓不到明文账号和密码。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
@@ -257,6 +315,8 @@
     
     
       <category term="Nginx" scheme="http://yoursite.com/tags/Nginx/"/>
+    
+      <category term="HTTPS" scheme="http://yoursite.com/tags/HTTPS/"/>
     
   </entry>
   
@@ -2402,80 +2462,6 @@ mysql&amp;gt; SELECT * FROM INFORMATION_SCHEMA.SESSION_VARIABLES WHERE VARIABLE_
     <summary type="html">
     
       &lt;h2 id=&quot;DBA&quot;&gt;&lt;a href=&quot;#DBA&quot; class=&quot;headerlink&quot; title=&quot;DBA&quot;&gt;&lt;/a&gt;DBA&lt;/h2&gt;&lt;h3 id=&quot;开发DBA&quot;&gt;&lt;a href=&quot;#开发DBA&quot; class=&quot;headerlink&quot; title=&quot;开发DBA&quot;&gt;&lt;/a&gt;开发DBA&lt;/h3&gt;&lt;p&gt;数据库设计(E-R关系图)、SQL开发、内置函数、存储例程(存储过程和存储函数，存储过程没有返回值，函数有返回值)、触发器、事件调度器(event scheduler) 。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
-    
-    
-      <category term="MySQL" scheme="http://yoursite.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>CentOS 7安装mysql 5.7.21(二进制版本)</title>
-    <link href="http://yoursite.com/2018/03/20/CentOS-7%E5%AE%89%E8%A3%85mysql-5-7-21-%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%89%88%E6%9C%AC/"/>
-    <id>http://yoursite.com/2018/03/20/CentOS-7安装mysql-5-7-21-二进制版本/</id>
-    <published>2018-03-20T01:45:45.000Z</published>
-    <updated>2018-09-11T07:37:52.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;安装依赖&quot;&gt;&lt;a href=&quot;#安装依赖&quot; class=&quot;headerlink&quot; title=&quot;安装依赖&quot;&gt;&lt;/a&gt;安装依赖&lt;/h2&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-&lt;pre&gt;&lt;code&gt;# yum install libaio* -y
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&quot;下载安装MySQL二进制版本&quot;&gt;&lt;a href=&quot;#下载安装MySQL二进制版本&quot; class=&quot;headerlink&quot; title=&quot;下载安装MySQL二进制版本&quot;&gt;&lt;/a&gt;下载安装MySQL二进制版本&lt;/h2&gt;&lt;p&gt;&lt;a href=&quot;https://dev.mysql.com/downloads/mysql/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;MySQL社区版下载地址&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;1.下载解压&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /usr/local/
-# wget https://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.21-linux-glibc2.12-x86_64.tar.gz
-# tar zxf mysql-5.7.21-linux-glibc2.12-x86_64.tar.gz
-# ln -sv mysql-5.7.21-linux-glibc2.12-x86_64 mysql
-‘mysql’ -&amp;gt; ‘mysql-5.7.21-linux-glibc2.12-x86_64’
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2.新建用户&lt;/strong&gt;&lt;br&gt;运行mysql最好不要用root去运行，而以普通用户身份。添加用户mysql。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# groupadd -r -g 300 mysql
-# useradd -g mysql -r -s /sbin/nologin -u 300 mysql
-# id mysql
-uid=300(mysql) gid=300(mysql) groups=300(mysql)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;3.创建目录并授权&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /usr/local/mysql
-# mkdir data
-# touch db.err
-# chown -R mysql:mysql .
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;4.初始化MySQL&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# bin/mysqld --initialize --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data
-2018-03-20T10:19:23.020203Z 0 [Warning] TIMESTAMP with implicit DEFAULT value is deprecated. Please use --explicit_defaults_for_timestamp server option (see documentation for more details).
-2018-03-20T10:19:24.877676Z 0 [Warning] InnoDB: New log files created, LSN=45790
-2018-03-20T10:19:25.111211Z 0 [Warning] InnoDB: Creating foreign key constraint system tables.
-2018-03-20T10:19:25.181304Z 0 [Warning] No existing UUID has been found, so we assume that this is the first time that this server has been started. Generating a new UUID: 2a1f5e46-2c28-11e8-8a64-00163e13578e.
-2018-03-20T10:19:25.189269Z 0 [Warning] Gtid table is not ready to be used. Table &amp;apos;mysql.gtid_executed&amp;apos; cannot be opened.
-2018-03-20T10:19:25.189787Z 1 [Note] A temporary password is generated for root@localhost: 77a.Fue3IeIg
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;注意mysql临时密码在上面日志的最后一行的末尾：77a.Fue3IeIg，请先记下来。&lt;/strong&gt;&lt;br&gt;查看初始化后data目录生成的文件：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# ls data/
-auto.cnf  ib_buffer_pool  ibdata1  ib_logfile0  ib_logfile1  mysql  performance_schema  sys
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;5.生成RSA私钥，可以跳过此步骤&lt;/strong&gt;&lt;br&gt;mysql_ssl_rsa_setup需要openssl支持，用于启用数据量ssl连接，需要进一步配置。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# bin/mysql_ssl_rsa_setup --datadir=/usr/local/mysql/data
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;6.配置my.cnf&lt;/strong&gt;&lt;br&gt;将修改好的配置文件my.cnf传到/etc/目录下。my.cnf内容如下：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[mysql]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;socket          = /usr/local/mysql/mysql.sock&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;# The MySQL server&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[mysqld]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;port            = 3306&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;socket          = /usr/local/mysql/mysql.sock&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;#skip-grant-tables&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;datadir=/usr/local/mysql/data&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;log-error=/usr/local/mysql/db.err&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;pid-file=/usr/local/mysql/mysqld.pid&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;character-set-server = utf8&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;7.拷贝启动脚本文件&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cp support-files/mysql.server /etc/init.d/mysqld 
-# chkconfig --add mysqld
-# service mysqld start
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;8.设置开机启动&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# chkconfig mysqld on
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;9.配置环境变量，配置完重新打开一个shell&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# vim /etc/profile.d/mysql.sh
-export PATH=/usr/local/mysql/bin:$PATH
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;9.登录mysql，设置密码&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# mysql -uroot -p77a.Fue3IeIg
-密码是上面记录下来的临时密码
-MySQL [(none)]&amp;gt; ALTER USER &amp;apos;root&amp;apos;@&amp;apos;localhost&amp;apos; identified by &amp;apos;test&amp;apos;;
-MySQL [(none)]&amp;gt; flush privileges;
-MySQL [(none)]&amp;gt; quit;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;10.在 Linux 下为了安全，默认是不允许 MySQL 服务器本机以外的机器访问 MySQL 数据库服务的，因此需要重新授权 root 账号。方便其他机器远程访问 MySQL 服务器，MySQL 命令如下：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;MySQL [(none)]&amp;gt; grant all privileges on *.* to root@&amp;apos;%&amp;apos; identified by &amp;apos;Wisedu123@2018&amp;apos;;
-MySQL [(none)]&amp;gt; flush privileges;
-MySQL [(none)]&amp;gt; quit;
-&lt;/code&gt;&lt;/pre&gt;</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;安装依赖&quot;&gt;&lt;a href=&quot;#安装依赖&quot; class=&quot;headerlink&quot; title=&quot;安装依赖&quot;&gt;&lt;/a&gt;安装依赖&lt;/h2&gt;
     
     </summary>
     
