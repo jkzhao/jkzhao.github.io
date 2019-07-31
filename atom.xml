@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-05-23T07:19:56.000Z</updated>
+  <updated>2019-07-31T06:00:16.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,62 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>kubernetes基础概念</title>
+    <link href="http://yoursite.com/2019/07/31/kubernetes%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/"/>
+    <id>http://yoursite.com/2019/07/31/kubernetes基础概念/</id>
+    <published>2019-07-31T03:38:21.000Z</published>
+    <updated>2019-07-31T06:00:16.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;pod分类&quot;&gt;&lt;a href=&quot;#pod分类&quot; class=&quot;headerlink&quot; title=&quot;pod分类&quot;&gt;&lt;/a&gt;pod分类&lt;/h2&gt;&lt;h3 id=&quot;自主式Pod&quot;&gt;&lt;a href=&quot;#自主式Pod&quot; class=&quot;headerlink&quot; title=&quot;自主式Pod&quot;&gt;&lt;/a&gt;自主式Pod&lt;/h3&gt;&lt;p&gt;自我管理。scheduler调度到某台node，pod启动后，如果有容器出现故障，需要重启容器，是由k8s来完成的。但是如果节点故障了，pod就消失了，没法进行全局调度。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;控制器管理端的Pod&quot;&gt;&lt;a href=&quot;#控制器管理端的Pod&quot; class=&quot;headerlink&quot; title=&quot;控制器管理端的Pod&quot;&gt;&lt;/a&gt;控制器管理端的Pod&lt;/h3&gt;&lt;p&gt;Pod控制器，有很多种。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ReplicationController：最早的一种，早期只有这一个控制器。比如启动一个Nginx pod，控制器控制了pod副本，一旦副本数量少了，立马补齐。多了就终止掉多余的Pod。ReplicationController支持滚动更新，比如一开始pod里的容器基于1.0版本的镜像启的，但是现在有新版本了，1.1版本的镜像，可以滚动更新。&lt;/li&gt;
+&lt;li&gt;ReplicaSet：副本集控制器。但是ReplicaSet不直接使用，它有个申明是更新的控制器Deployment。&lt;/li&gt;
+&lt;li&gt;Deployment：只能管理那些无状态的应用。&lt;/li&gt;
+&lt;li&gt;StatefulSet：有状态副本集，管理有状态应用。&lt;/li&gt;
+&lt;li&gt;DaemonSet：如果我们需要在每一个node上运行一个副本，而不是随意运行。&lt;/li&gt;
+&lt;li&gt;Job，CronJob：作业，周期性作业。Job：比如备份操作，或者一些临时操作，比如现在要处理数据集，临时启用一个pod，清理完数据这个Pod就结束了。这种不需要一直运行着。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在k8s上创建Pod，只需要定义控制器，控制器创建好就会帮我们创建Pod。&lt;br&gt;Deployment控制器还支持二级控制器，叫HPA，称为水平Pod自动升缩控制器。比如一开始运行着两个pod，但是某个时间段用户访问增加，需要增加pod。到底应该加几个呢？HPA控制可以自动进行扩展。比如：判断一下，现在的CPU、内存资源利用率有多高，我们必须要确保平均低于60%，计算后发现需要加两个，那么HPA就扩展了两个。一旦访问量小了，还可以自动减，当然Deployment可以确保至少有几个存在。&lt;/p&gt;
+&lt;h2 id=&quot;Service&quot;&gt;&lt;a href=&quot;#Service&quot; class=&quot;headerlink&quot; title=&quot;Service&quot;&gt;&lt;/a&gt;Service&lt;/h2&gt;&lt;p&gt;Pod有生命周期，万一Pod所在的节点宕机了，Pod有可能需要在其他节点上重建的，而重建完的Pod和之前的Pod不是同一个，只不过里面运行的是同一种服务。而且每一个容器都有ip地址，新Pod中的容器的ip地址可能和之前损坏的Pod中容器的ip地址也是不一样的。这样一来就有问题了，客户端怎么访问这些Pod呢？服务发现。客户端在访问后端服务时，应该不是直接访问后端服务的，这就需要服务发现机制了。&lt;br&gt;为了尽可能降低二者之间协调的复杂度，k8s为每一组提供同类服务的Pod和它的客户端之间添加了一个中间层，这个中间层是固定的，就叫service。service只要不删除，它的地址就是固定的，名称也是固定的。而后当客户端需要写在配置文件中访问某个服务时，它也不用再去自动发现某个功能，它只需要在配置文件中写明service地址或者名称就行。这个Service是一个调度器，不但能提供一个稳定的访问入口，还能将客户端带领到对应的Pod之上。一旦Pod因为什么原因消失了，新创建的Pod会立即被service关联进来，怎么实现这个关联的呢？客户端访问服务都是靠ip:port或者主机名:port来访问，service关联后端的pod不是靠IP地址来实现的，而是靠Pod上的元数据Label，标签。service靠&lt;strong&gt;标签选择器&lt;/strong&gt;来关联Pod。关联进来后，service在动态探测这个新Pod的ip地址是什么，端口是什么，并作为自己调度的后端服务器的可用对象。&lt;br&gt;在k8s上，service不是应用程序，也不是实体组件，它只不过是iptables的DNAT规则。我们在创建DNAT规则时，所有到达某地址的都通通被目标地址转换成某某某地址。DNAT规则只是规则，其中的service地址并没有配置到任何一张网卡上，是不存在的，它仅仅出现在规则里，所以service的IP是ping不通的。但是的确可以请求作为服务端。能ping通是因为有TCP/IP协议栈支持这个IP地址，所以它能够在协议栈上进行响应，而这里是没有的，地址仅出现在规则里。&lt;br&gt;service作为k8s中对象来讲，service有自己的名称，相当于这个服务的名称，而名称可以被解析。你可以把service名称解析成service的IP。名称解析得靠dns来实现，装完k8s集群，第一件事就是在k8s集群上部署一个dns pod，以确保各service名称能被解析。像这种Pod是k8s自身服务就需要的Pod，所以称为基础性的Pod，而且也称为集群的附件(附加组件)，Add-ons。可有可无，不作为程序本身的一部分组成。&lt;br&gt;k8s的附件有很多，dns只是其中一个。而且这个dns会动态改变，动态创建，动态删除，动态变动。怎么变动呢？比如说你把service的名称改一改，这会自动触发dns解析记录中对应的名称也改了。还有其他附件，比如监控，promethesure和grafana。&lt;br&gt;service后端可能是多个Pod，DNAT多目标要注意，对Linux来讲，iptables已经将负载均衡的功能主要交由ipvs来实现，因此如果后端是多个Pod时，使用DNAT来实现，在调度效果上可能不太尽如人意。因此在目前最新的1.11版本上，已经把iptables规则进一步改成了ipvs规则。也就意味着当你生成每一个service，就相当于一条ipvs规则，只不过是NAT模型的ipvs。因此支持用户指定的各种调度算法。service的地址是在iptables或ipvs规则中。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/38.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;k8s三种网络&quot;&gt;&lt;a href=&quot;#k8s三种网络&quot; class=&quot;headerlink&quot; title=&quot;k8s三种网络&quot;&gt;&lt;/a&gt;k8s三种网络&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/40.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;第一个网络：Pod网络。&lt;/strong&gt;各Pod运行在一个网络中。Pod地址是配置在Pod内部网络名称空间之上的，是可以ping通的。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;第二个网络：集群网络。&lt;/strong&gt;各service运行在一个网络中。service地址是虚拟的，是假的，只存在于iptables或ipvs的规则当中&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;第三个网络：节点网络。&lt;/strong&gt;各节点运行在一个网络中。节点网络在构建k8s之前就设置好了&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;外部访问时先到达节点网络，由节点网络代理至集群网络，在由集群网络代理至Pod网络。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/39.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;k8s三类通信&quot;&gt;&lt;a href=&quot;#k8s三类通信&quot; class=&quot;headerlink&quot; title=&quot;k8s三类通信&quot;&gt;&lt;/a&gt;k8s三类通信&lt;/h2&gt;&lt;h3 id=&quot;一个Pod内的多个容器通信&quot;&gt;&lt;a href=&quot;#一个Pod内的多个容器通信&quot; class=&quot;headerlink&quot; title=&quot;一个Pod内的多个容器通信&quot;&gt;&lt;/a&gt;一个Pod内的多个容器通信&lt;/h3&gt;&lt;p&gt;lo，本地通信。&lt;/p&gt;
+&lt;p&gt;###各Pod间通信&lt;br&gt;无论两个Pod运行在一个节点上还是两个节点上，两个Pod之间的地址不会冲突，大家在同一个网段，而且可以直接通信。是通过物理桥通信或者Overay Network方案(叠加网络)。叠加网络是通过隧道的方式来转发二层报文，使得两个不同节点上的Pod，虽然跨主机，但好像工作在同一个二层网络中一样。叠加器有二层叠加，也有三层叠加。我们可以转发对方的二层报文，或隧道转发对方的三层报文，从而实现叠加网络。使用叠加网络解决docker容器跨主机容器通信，设置每台服务器使用docker0网络要不一样，比如第一台设为172.17.0.xxx，第二台使用172.17.1.xxx，这样所有容器地址都不会冲突，然后通过隧道转发以后，可以直接通信，就相当于在同一个二层网络中一样。云计算中理解最难之一就在网络上。&lt;/p&gt;
+&lt;h3 id=&quot;Pod和service之间的通信&quot;&gt;&lt;a href=&quot;#Pod和service之间的通信&quot; class=&quot;headerlink&quot; title=&quot;Pod和service之间的通信&quot;&gt;&lt;/a&gt;Pod和service之间的通信&lt;/h3&gt;&lt;p&gt;两者都在各自的网络中，不是同一个网络，怎么通信？service地址只不过是节点主机中iptables或ipvs中的规则中的地址，所以只需要把容器中报文地址指向网关，网关假如是docker0桥，iptables在当前宿主机上就有规则，当容器需要访问service地址时，会把报文给网关，一般是docker0桥的地址，docker0桥收到以后，通过iptables或ipvs规则表一检查，就知道在哪了。但是service也是有可能变化的，比如被删除，被修改，这时候是如何触发修改iptables或ipvs规则的呢？在每个node上有一个守护进程，叫kube-proxy。负责随时与API server通信，Pod变化后是需要保存在API server中的。API server会生成一个通知事件，这个事件可以被任何关联的组件所接收到，一旦发现某个service背后的pod发生改变，对应的由kube-proxy将变化反应在iptables或ipvs的规则中。service的管理是由kube-proxy实现的。每一个service变动也要靠kube-proxy反应到规则上。&lt;/p&gt;
+&lt;h2 id=&quot;etcd和证书&quot;&gt;&lt;a href=&quot;#etcd和证书&quot; class=&quot;headerlink&quot; title=&quot;etcd和证书&quot;&gt;&lt;/a&gt;etcd和证书&lt;/h2&gt;&lt;p&gt;API Server要存储大量的信息，如果某个master挂了，则需要切换到另外一台master，那么master之间需要共享存储，也就是etcd。&lt;br&gt;etcd是键值存储的数据库系统，跟redis很相像。但是etcd本身有很多协调功能是redis不具备的。更像zk。如果etcd宕机了，整个集群就完了。所以etcd要做成至少3节点。etcd本身也是restful风格的集群，也就是通过http/https通讯。如果是http通信，数据就有可能被拿走，所以要配置成https通信。&lt;br&gt;etcd一个端口用于集群通讯，一个端口用于像客户端提供服务。其内部通讯需要一个专门的证书，叫点对点通信的证书。而后像客户端提供服务的时候，如果需要https，得靠另外一套证书。同样的道理，k8s的apiserver，http不可靠，加密https，另外一套证书，因为这套证书是服务于k8s的客户端与服务端之间通信。而且最好不要与etcd属于同一个CA来签署。还有apiserver对外提供服务，一套证书。apiserver与kube-proxy通讯，一套证书。apiserver与kubelet通信，一套证书。一共5个CA，5套证书，为了足够安全。不光是加密，还有认证，所以CA也得是不同的，签证机构得不同。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/40.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;CNI&quot;&gt;&lt;a href=&quot;#CNI&quot; class=&quot;headerlink&quot; title=&quot;CNI&quot;&gt;&lt;/a&gt;CNI&lt;/h2&gt;&lt;p&gt;k8s通过CNI插件体系来接入外部的网络服务解决方案，所以叫容器网络接口。只要网络服务提供商，能遵循CNI开发这个服务，那么这个网络服务商就可以作为k8s的网络解决方案来使用。这些网络解决方案可以以附件的形式托管在集群之上。常见的网络解决方案如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;flannel：网络配置，不支持网络策略，纯粹的叠加网络 &lt;/li&gt;
+&lt;li&gt;calico：网络配置，同时支持网络策略。但是这个部署和使用比较难，能基于bgp协议实现。。。&lt;/li&gt;
+&lt;li&gt;canel：用第一种方式提供网络，用第二个提供网络策略&lt;/li&gt;
+&lt;li&gt;…&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;以上解决方案都是第三方公司提供的，这些可以作为附件来运行，也可以作为节点上守护进程来运行。&lt;br&gt;在容器网络的构建中，CNI和kube-proxy两者都有参与。CNI插件的任务是在容器开启时为容器分配IP，并为这个IP构建虚拟设备，另外，CNI插件也负责将容器间通信的协议包（如TCP/UDP等）从K8s集群中的任意一台机器转发到指定容器所在的机器上，再转发到指定容器上。&lt;/p&gt;
+&lt;h2 id=&quot;k8s的名称空间&quot;&gt;&lt;a href=&quot;#k8s的名称空间&quot; class=&quot;headerlink&quot; title=&quot;k8s的名称空间&quot;&gt;&lt;/a&gt;k8s的名称空间&lt;/h2&gt;&lt;p&gt;这个名称空间和docker里所用到的名称空间的不一样。&lt;br&gt;整个k8s是作为一个集群存在的，我们可以在里面运行两万个pod，可能会互相干扰。可以把它切割成多个空间，一类pod只运行在一个空间中，这个空间提供的不是真正意义上的网络边界，只是管理边界。比如说第一个空间叫开发空间，所有开发相关的pod都放在这个空间中，第二个是生产环境，所有生产环境的pod都放到这个空间里。将来我们删除这个网络名称空间，可以把这个环境通通移除掉。所以这个名称空间给我们提供了管理的边界。但是第一个名称空间里的pod访问第二个名称空间的pod是没有问题的，所以CNI实现还要支持网络策略定义，可以定义名称空间和名称空间之间，甚至同一个名称空间里的各pod之间能不能互相访问。可以生成iptables规则来隔离他们之间的访问。&lt;br&gt;对k8s来讲&lt;strong&gt;网络功能&lt;/strong&gt;和&lt;strong&gt;网络策略&lt;/strong&gt;是两个维度的内容，flannel只实现网络功能配置。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;pod分类&quot;&gt;&lt;a href=&quot;#pod分类&quot; class=&quot;headerlink&quot; title=&quot;pod分类&quot;&gt;&lt;/a&gt;pod分类&lt;/h2&gt;&lt;h3 id=&quot;自主式Pod&quot;&gt;&lt;a href=&quot;#自主式Pod&quot; class=&quot;headerlink&quot; title=&quot;自主式Pod&quot;&gt;&lt;/a&gt;自主式Pod&lt;/h3&gt;&lt;p&gt;自我管理。scheduler调度到某台node，pod启动后，如果有容器出现故障，需要重启容器，是由k8s来完成的。但是如果节点故障了，pod就消失了，没法进行全局调度。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="容器编排" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8%E7%BC%96%E6%8E%92/"/>
+    
+      <category term="Kubernetes" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8%E7%BC%96%E6%8E%92/Kubernetes/"/>
+    
+    
+      <category term="Kubernetes" scheme="http://yoursite.com/tags/Kubernetes/"/>
+    
+  </entry>
   
   <entry>
     <title>Java调用Python脚本</title>
@@ -95,7 +151,7 @@
     <link href="http://yoursite.com/2019/04/08/kubeadm%E5%AE%89%E8%A3%85kubernetes-1-14-0/"/>
     <id>http://yoursite.com/2019/04/08/kubeadm安装kubernetes-1-14-0/</id>
     <published>2019-04-08T03:26:45.000Z</published>
-    <updated>2019-04-12T09:13:33.000Z</updated>
+    <updated>2019-07-31T03:43:25.000Z</updated>
     
     <content type="html">&lt;blockquote&gt;
 &lt;p&gt;之前采用二进制方式部署过Kubernetes，操作较为繁琐，此次采用kubeadm安装Kubernetes，Kubernetes相关组件介绍详见前面的文章。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
@@ -256,6 +312,8 @@
     </summary>
     
       <category term="容器编排" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8%E7%BC%96%E6%8E%92/"/>
+    
+      <category term="Kubernetes" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8%E7%BC%96%E6%8E%92/Kubernetes/"/>
     
     
       <category term="Kubernetes" scheme="http://yoursite.com/tags/Kubernetes/"/>
@@ -2232,210 +2290,6 @@ Query OK, 0 rows affected (0.03 sec)
     <summary type="html">
     
       &lt;h2 id=&quot;MySQL中字符大小写&quot;&gt;&lt;a href=&quot;#MySQL中字符大小写&quot; class=&quot;headerlink&quot; title=&quot;MySQL中字符大小写&quot;&gt;&lt;/a&gt;MySQL中字符大小写&lt;/h2&gt;&lt;p&gt;1、SQL关键字及函数名不区分字符大小写； 但是为了提高缓存命中率，无论你使用大写或小写，风格上要一致。
-    
-    </summary>
-    
-      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
-    
-    
-      <category term="MySQL" scheme="http://yoursite.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL数据类型和sql_mode</title>
-    <link href="http://yoursite.com/2018/03/23/MySQL%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%92%8Csql-mode/"/>
-    <id>http://yoursite.com/2018/03/23/MySQL数据类型和sql-mode/</id>
-    <published>2018-03-23T08:48:07.000Z</published>
-    <updated>2018-03-25T11:59:41.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;DBA&quot;&gt;&lt;a href=&quot;#DBA&quot; class=&quot;headerlink&quot; title=&quot;DBA&quot;&gt;&lt;/a&gt;DBA&lt;/h2&gt;&lt;h3 id=&quot;开发DBA&quot;&gt;&lt;a href=&quot;#开发DBA&quot; class=&quot;headerlink&quot; title=&quot;开发DBA&quot;&gt;&lt;/a&gt;开发DBA&lt;/h3&gt;&lt;p&gt;数据库设计(E-R关系图)、SQL开发、内置函数、存储例程(存储过程和存储函数，存储过程没有返回值，函数有返回值)、触发器、事件调度器(event scheduler) 。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;&lt;strong&gt;1.什么是mysql存储过程?&lt;/strong&gt;&lt;br&gt;存储过程是存储在数据库服务器中的一组sql语句，通过在查询中调用一个指定的名称来执行这些sql语句命令。&lt;br&gt;&lt;strong&gt;2.为什么要使用mysql存储过程？&lt;/strong&gt;&lt;br&gt;应用程序分为两种，一种是基于web，一种是基于桌面，他们都和数据库进行交互来完成数据的存取工作。假设现在有一种应用程序包含了这两种，现在要修改其中的一个查询sql语句，那么我们可能要同时修改他们中对应的查询sql语句，当我们的应用程序很庞大很复杂的时候问题就出现这，不易维护！另外把sql查询语句放在我们的web程序或桌面中很容易遭到sql注入的破坏。而存储过程正好可以帮我们解决这些问题。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;存储函数(stored function)。返回一个计算结果，该结果可以用在表达式里。&lt;/li&gt;
-&lt;li&gt;存储过程(stored procedure)。不直接返回一个结果，但可以用来完成一般的运算或是生成一个结果集并传递回客户。&lt;/li&gt;
-&lt;li&gt;触发器(trigger)。与数据表相关联，当那个数据表被INSERT、DELETE或UPDATE语句修改时，触发器将自动执行。&lt;/li&gt;
-&lt;li&gt;事件(event)。根据时间表在预定时刻自动执行。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;管理DBA&quot;&gt;&lt;a href=&quot;#管理DBA&quot; class=&quot;headerlink&quot; title=&quot;管理DBA&quot;&gt;&lt;/a&gt;管理DBA&lt;/h3&gt;&lt;p&gt;安装、升级，备份、恢复，用户管理、权限管理，监控、分析、基准测试，语句优化(要会写SQL语句)，数据字典，按需要配置服务器（服务器变量：MyISAM, InnoDB, 缓存, 日志）&lt;br&gt;运维人员虽然不是开发SQL的，但是我们需要对别人写出来的SQL语句做性能评估，去分析他写的SQL是不是足够高效。如果不是，我们需要对对方的SQL语句做改写。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;SQL注入攻击&lt;/strong&gt;指的是通过构建特殊的输入作为参数传入Web应用程序，而这些输入大都是SQL语法里的一些组合，通过执行SQL语句进而执行攻击者所要的操作，其主要原因是程序没有细致地过滤用户输入的数据，致使非法数据侵入系统。&lt;/p&gt;
-&lt;h2 id=&quot;MySQL数据类型&quot;&gt;&lt;a href=&quot;#MySQL数据类型&quot; class=&quot;headerlink&quot; title=&quot;MySQL数据类型&quot;&gt;&lt;/a&gt;MySQL数据类型&lt;/h2&gt;&lt;h3 id=&quot;数据类型的作用&quot;&gt;&lt;a href=&quot;#数据类型的作用&quot; class=&quot;headerlink&quot; title=&quot;数据类型的作用&quot;&gt;&lt;/a&gt;数据类型的作用&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;1、存储的值类型；比如如果定义成字符型，往里面存数值是不允许的。就算你存1，也是被存储为字符了。
-2、占据的存储空间大小；
-3、定长，变长；
-4、如何被索引及排序；
-5、是否能够被索引。有些数据类型不能被索引的。
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;数据字典&quot;&gt;&lt;a href=&quot;#数据字典&quot; class=&quot;headerlink&quot; title=&quot;数据字典&quot;&gt;&lt;/a&gt;数据字典&lt;/h3&gt;&lt;p&gt;系统编目(system catalog)&lt;br&gt;保存数据库服务器上的元数据。可以把初始化后的mysql库理解为mysql的数据字典。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;元数据：&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;关系的名字    ——关系就是表&lt;/li&gt;
-&lt;li&gt;每个关系的各字段的名字   ——字段就是属性&lt;/li&gt;
-&lt;li&gt;各字段的数据类型和长度&lt;/li&gt;
-&lt;li&gt;约束&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;每个关系上的视图的名字及视图的定义&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;授权用户的名字&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;用户的授权和帐户信息  ——这些元数据是存储在user表&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;统计类的数据：   ——很重要，可以评估数据库性能&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;每个关系字段的个数；&lt;/li&gt;
-&lt;li&gt;每个关系中行数；&lt;/li&gt;
-&lt;li&gt;每个关系的存储方法；   ——表使用哪种存储引擎存储的&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;保存元数据的数据库：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;information_schema    ——存储统计类元数据&lt;/li&gt;
-&lt;li&gt;mysql&lt;/li&gt;
-&lt;li&gt;performance_schema   &lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;performance_schema和information_schma一样，是两个虚库，有点类似于Linux的/proc文件系统，开机里面会有很多文件，但是一关机去看磁盘那个目录，里面没有任何数据。提供这两个接口就是为了兼容SQL语句的，能够实现对于整个数据库中任何信息的查找都能够基于SQL语句实现。所以mysql把这些信息虚拟成关系了。就像Linux一样，为什么提供/proc？/proc中存储的都是linux的内核参数，它把每个参数映射成一个文件中的数据。说白了就是把一个本来不是文件系统的东西映射成了一个文件系统，所以我们称/proc为伪文件系统。这样我们就可以操作文件系统的统一接口来操作内核。mysql也是同样的道理，本来获取mysql的这些数据需要通过其他方式，但是对于mysql的接口的操作方式绝大多数是通过SQL语句实现的。所以它也把这些信息抽象为关系的形式了。&lt;/p&gt;
-&lt;h3 id=&quot;MySQL数据类型-1&quot;&gt;&lt;a href=&quot;#MySQL数据类型-1&quot; class=&quot;headerlink&quot; title=&quot;MySQL数据类型&quot;&gt;&lt;/a&gt;MySQL数据类型&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;字符型&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;char&lt;/li&gt;
-&lt;li&gt;varchar&lt;/li&gt;
-&lt;li&gt;binary&lt;/li&gt;
-&lt;li&gt;varbinary&lt;/li&gt;
-&lt;li&gt;text&lt;/li&gt;
-&lt;li&gt;blob&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;数值型&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;精确数值型&lt;ul&gt;
-&lt;li&gt;整型&lt;/li&gt;
-&lt;li&gt;十进制数据：decimal&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;近似数值型&lt;ul&gt;
-&lt;li&gt;单精度浮点型&lt;/li&gt;
-&lt;li&gt;双精度浮点型&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;日期时间型&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;日期型 DATE&lt;/li&gt;
-&lt;li&gt;时间型 TIME&lt;/li&gt;
-&lt;li&gt;日期时间型 DATETIME&lt;/li&gt;
-&lt;li&gt;时间戳 TIMESTAMP&lt;/li&gt;
-&lt;li&gt;YEAR&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;布尔型：mysql没有真正意义上的布尔型，实际上使用tinyint来表示的，且只用1位表示。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;内建类型&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;ENUM &lt;/li&gt;
-&lt;li&gt;SET&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&quot;数值型&quot;&gt;&lt;a href=&quot;#数值型&quot; class=&quot;headerlink&quot; title=&quot;数值型&quot;&gt;&lt;/a&gt;数值型&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;TINYINT、SMALLINT、MEDIUMINT、INT和BIGINT 这5种是整型&lt;/li&gt;
-&lt;li&gt;DECIMAL是十进制&lt;/li&gt;
-&lt;li&gt;FLOAT：单精度&lt;/li&gt;
-&lt;li&gt;DOUBLE：双精度&lt;/li&gt;
-&lt;li&gt;BIT：按位实现数据存取的，但是不建议使用。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&quot;字符型&quot;&gt;&lt;a href=&quot;#字符型&quot; class=&quot;headerlink&quot; title=&quot;字符型&quot;&gt;&lt;/a&gt;字符型&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;CHAR、VARCHAR、TINYTEXT、TEXT、MEDIUMTEXT和LONGTEXT，这几种不区分大小写&lt;/li&gt;
-&lt;li&gt;BINARY、VARBINARY、TINYBLOB、BLOB、MEDIUMBLOB、LONGBLOB、ENUM、SET，这些都是二进制形式存取的，区分大小写，没有字符集      &lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&quot;日期时间型&quot;&gt;&lt;a href=&quot;#日期时间型&quot; class=&quot;headerlink&quot; title=&quot;日期时间型&quot;&gt;&lt;/a&gt;日期时间型&lt;/h4&gt;&lt;p&gt;DATE、TIME、DATETIME、TIMESTAMP、YEAR&lt;br&gt;会涉及到很多转换：&lt;br&gt;1、字符串varchar/char转日期&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;select STR_TO_DATE(&amp;apos;2013-01-29 13:49:18&amp;apos;, &amp;apos;%Y-%m-%d %H:%i:%s&amp;apos;)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2、日期转字符串&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;select DATE_FORMAT(&amp;apos;2013-01-29 13:49:18&amp;apos;, &amp;apos;%Y-%m-%d %H:%i:%s&amp;apos;) 
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;数据类型的修饰符&quot;&gt;&lt;a href=&quot;#数据类型的修饰符&quot; class=&quot;headerlink&quot; title=&quot;数据类型的修饰符&quot;&gt;&lt;/a&gt;数据类型的修饰符&lt;/h3&gt;&lt;h4 id=&quot;CHAR、VARCHAR和TEXT几种字符型常用的属性修饰符&quot;&gt;&lt;a href=&quot;#CHAR、VARCHAR和TEXT几种字符型常用的属性修饰符&quot; class=&quot;headerlink&quot; title=&quot;CHAR、VARCHAR和TEXT几种字符型常用的属性修饰符&quot;&gt;&lt;/a&gt;CHAR、VARCHAR和TEXT几种字符型常用的属性修饰符&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;NOT NULL：非空约束&lt;/li&gt;
-&lt;li&gt;NULL：允许为空&lt;/li&gt;
-&lt;li&gt;DEFAULT ‘string’：指定默认值，只适用于char和varchar，不适用于TEXT类型&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;CHARACTER SET ‘字符集’  #如果你不指定，默认从表继承，如果表没有，默认从库继承，如果库也没有，就从数据库服务器的全局继承。字符集对于我们将来存储、检索、比较等等是很关键的。&lt;/p&gt;
-&lt;p&gt;  mysql&amp;gt; SHOW VARIABLES LIKE ‘%char%’; #查看当前数据库服务器的默认字符集&lt;br&gt;  mysql&amp;gt; SHOW CHARACTER SET  #查看支持的字符集&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;COLLATION ‘规则’: 排序规则。什么是排序规则呢？就算是gb2312的中文编码，你怎么对中文字符排序呢？谁应该大于谁，谁应该小于谁呢？我们有很多种方式，第一按拼音字母表，第二按照起笔(. — 丿)，第三按照笔画的多少排序等。所以同一种字符集内部要定义排序规则。&lt;/p&gt;
-&lt;p&gt;  mysql&amp;gt; SHOW COLLATION;   #查看支持的排序规则。如果设定了字符集没有指定排序规则，每一种字符集都有其默认的排序规则。&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;【注意】:char是不需要字符结束符的，而varchar是有结束符的。char本身最多能存储255个字符，varchar最多能使用两个字节，65535个字符。而且能使用定长就不要使用变长，这跟我们在磁盘上快速查找记录有关系。变长的记录维护起来非常困难。无论是对插入、删除等对性能上都有负面影响。&lt;br&gt;另外要想存储大段文本，就要用text。但是不到万不得已的时候不要使用text，因为text本身索引起来很困难，并且text是作为对象存储的。什么对象存储？就是说不会直接存储到表中，而是存储在表之外的某个存储空间，而表中的那个字段存的仅仅是指向这个存储位置的指针。而且text不能使用全字段索引，但是char可以。&lt;/p&gt;
-&lt;h4 id=&quot;BINARY、VARBINARY和BLOB几种字符型常用的属性修饰符&quot;&gt;&lt;a href=&quot;#BINARY、VARBINARY和BLOB几种字符型常用的属性修饰符&quot; class=&quot;headerlink&quot; title=&quot;BINARY、VARBINARY和BLOB几种字符型常用的属性修饰符&quot;&gt;&lt;/a&gt;BINARY、VARBINARY和BLOB几种字符型常用的属性修饰符&lt;/h4&gt;&lt;p&gt;默认是没有字符集的，因为它们是以二进制字节串的方式或者说是字节码的方式存储的。因此它们排序的时候是按照字节大小排序&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;NOT NULL&lt;/li&gt;
-&lt;li&gt;NULL&lt;/li&gt;
-&lt;li&gt;DEFAULT: 不适用于BLOB&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&quot;整型的常用属性修饰符：&quot;&gt;&lt;a href=&quot;#整型的常用属性修饰符：&quot; class=&quot;headerlink&quot; title=&quot;整型的常用属性修饰符：&quot;&gt;&lt;/a&gt;整型的常用属性修饰符：&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;AUTO_INCREMENT：自动增长。前提：非空，且惟一；支持索引，非负值；&lt;br&gt;【注意】:清空表后，重新插入数值，这个值继续增长，而不会从头开始计数。如果想把表中数据清空以后从头开始计数，alter表重置计数器，或者是清空表时用truncate，不用delete。&lt;/li&gt;
-&lt;li&gt;UNSIGNED：无符号，表示不支持负值。&lt;/li&gt;
-&lt;li&gt;NULL&lt;/li&gt;
-&lt;li&gt;NOT NULL&lt;/li&gt;
-&lt;li&gt;DEFAULT&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&quot;浮点型常用修饰符&quot;&gt;&lt;a href=&quot;#浮点型常用修饰符&quot; class=&quot;headerlink&quot; title=&quot;浮点型常用修饰符&quot;&gt;&lt;/a&gt;浮点型常用修饰符&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;NOT NULL&lt;/li&gt;
-&lt;li&gt;NULL&lt;/li&gt;
-&lt;li&gt;DEFAULT&lt;/li&gt;
-&lt;li&gt;UNSIGNED&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&quot;日期时间型的修饰符&quot;&gt;&lt;a href=&quot;#日期时间型的修饰符&quot; class=&quot;headerlink&quot; title=&quot;日期时间型的修饰符&quot;&gt;&lt;/a&gt;日期时间型的修饰符&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;NOT NULL&lt;/li&gt;
-&lt;li&gt;NULL&lt;/li&gt;
-&lt;li&gt;DEFAULT&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&quot;ENUM和SET的修饰符&quot;&gt;&lt;a href=&quot;#ENUM和SET的修饰符&quot; class=&quot;headerlink&quot; title=&quot;ENUM和SET的修饰符&quot;&gt;&lt;/a&gt;ENUM和SET的修饰符&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;NOT NULL&lt;/li&gt;
-&lt;li&gt;NULL&lt;/li&gt;
-&lt;li&gt;DEFAULT ‘’&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;SQL-MODE&quot;&gt;&lt;a href=&quot;#SQL-MODE&quot; class=&quot;headerlink&quot; title=&quot;SQL_MODE&quot;&gt;&lt;/a&gt;SQL_MODE&lt;/h2&gt;&lt;h3 id=&quot;MySQL-SQL-MODE&quot;&gt;&lt;a href=&quot;#MySQL-SQL-MODE&quot; class=&quot;headerlink&quot; title=&quot;MySQL SQL_MODE&quot;&gt;&lt;/a&gt;MySQL SQL_MODE&lt;/h3&gt;&lt;p&gt;MySQL SQL_MODE: SQL模式。&lt;br&gt;SQL模式就是定义mysql的工作模式的。比如下面那个例子，超出了范围怎么办呢？是截取后发waringings还是直接拒绝插入呢？SQL模式还能定义mysql在某些特性场景下能够模拟其他关系型数据库的行为，比如mysql有自己的工作特性，但是在一定程度上可以模拟oracle的工作特性。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; create table t2 (name CHAR(3));
-Query OK, 0 rows affected (0.04 sec)
-
-mysql&amp;gt; INSERT INTO t2 VALUES (&amp;apos;jerry&amp;apos;);
-ERROR 1406 (22001): Data too long for column &amp;apos;name&amp;apos; at row 1
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;修改sql_mode是通过修改全局变量的值来实现的。&lt;br&gt;有这几种模式：TRADITIONAL, STRICT_TRANS_TABLES(只对支持事务的表有效), or STRICT_ALL_TABLES(对所有表都支持严格模式)。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SHOW GLOBAL VARIABLES like &amp;apos;sql_mode&amp;apos;;
-+---------------+--------------------------------------------+
-| Variable_name | Value                                      |
-+---------------+--------------------------------------------+
-| sql_mode      | STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION |
-+---------------+--------------------------------------------+
-1 row in set (0.00 sec)
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;服务器变量&quot;&gt;&lt;a href=&quot;#服务器变量&quot; class=&quot;headerlink&quot; title=&quot;服务器变量&quot;&gt;&lt;/a&gt;服务器变量&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1.设定服务器变量的值：（仅用于支持动态的变量，比如dataDir改了也没用）&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;支持修改的服务器变量：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;动态变量：可以MySQL运行时修改。sql_mode支持运行时修改。&lt;/li&gt;
-&lt;li&gt;静态变量：于配置文件中修改其值，并重启后方能生效。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;服务器变量从其生效范围来讲，有两类：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;全局变量：服务器级别，修改之后仅对新建立的会话有效。&lt;/li&gt;
-&lt;li&gt;会话变量：会话级别，仅对当前会话有效。&lt;br&gt;会话建立时，从全局继承各变量。继承完了，每个会话都独立管理自己的会话变量。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;2.查看服务器变量&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SHOW [{GLOBAL|SESSION}] VARIABLES [LIKE &amp;apos;&amp;apos;];   默认是查SESSION的变量值
-mysql&amp;gt; SELECT @@{GLOBAL|SESSION}.VARILABLE_NAME; 
-mysql&amp;gt; SELECT * FROM INFORMATION_SCHEMA.GLOBAL_VARIABLES WHERE VARIABLE_NAME=&amp;apos;SOME_VARIABLE_NAME&amp;apos;;      #information_schema这个库里有个表叫GLOBAL_VARIABLES。
-mysql&amp;gt; SELECT * FROM INFORMATION_SCHEMA.SESSION_VARIABLES WHERE VARIABLE_NAME=&amp;apos;SOME_VARIABLE_NAME&amp;apos;;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/13.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;【示例】：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/14.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;3.修改变量&lt;/strong&gt;&lt;br&gt;前提：默认仅管理员有权限修改全局变量&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SET {GLOBAL|SESSION} VARIABLE_NAME=&amp;apos;VALUE&amp;apos;;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【注意】:无论是全局还是会话级别的动态变量修改，在重启mysqld后都会失效；想永久有效，可定义在配置文件中的相应段中[mysqld]；另外，不是所有的服务器变量都可以写在配置文件中，绝大多数都可以。所以mysql服务器变量很独特，有3种生效方式：动态修改、定义配置文件或者执行命令时传递命令行参数。但这3者能使用的变量并不完全相同。有些变量可以作为命令行参数但是不能配置文件中。&lt;/p&gt;
-&lt;p&gt;查看mysql支持的命令行参数有哪些以及哪些可以写在配置文件中：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[root@console ~]# mysqld --help --verbose
-&lt;/code&gt;&lt;/pre&gt;</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;DBA&quot;&gt;&lt;a href=&quot;#DBA&quot; class=&quot;headerlink&quot; title=&quot;DBA&quot;&gt;&lt;/a&gt;DBA&lt;/h2&gt;&lt;h3 id=&quot;开发DBA&quot;&gt;&lt;a href=&quot;#开发DBA&quot; class=&quot;headerlink&quot; title=&quot;开发DBA&quot;&gt;&lt;/a&gt;开发DBA&lt;/h3&gt;&lt;p&gt;数据库设计(E-R关系图)、SQL开发、内置函数、存储例程(存储过程和存储函数，存储过程没有返回值，函数有返回值)、触发器、事件调度器(event scheduler) 。&lt;br&gt;
     
     </summary>
     
