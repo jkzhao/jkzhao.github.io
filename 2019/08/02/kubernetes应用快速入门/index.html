@@ -134,7 +134,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/61.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/62.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/63.png">
-<meta property="og:updated_time" content="2019-08-02T07:11:53.000Z">
+<meta property="og:updated_time" content="2019-08-02T07:14:22.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="kubernetes应用快速入门">
 <meta name="twitter:description" content="kubectl简介API Server是Kubernetes集群的网关，任何人只能通过API Server接口与集群进行交互。而kubectl是Kubernetes的终端客户端，此前博客里讲解的使用kubeadm初始化Kubernetes集群时，">
@@ -367,7 +367,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2019-08-02T15:11:53+08:00" content="2019-08-02">
+              <time itemprop="dateUpdated" datetime="2019-08-02T15:14:22+08:00" content="2019-08-02">
               2019-08-02
               </time>
               </span>
@@ -464,7 +464,8 @@ pod &quot;nginx-deploy-55d8d67cf-bh8z5&quot; deleted
 NAME                           READY   STATUS    RESTARTS   AGE   IP           NODE      NOMINATED NODE   READINESS GATES
 nginx-deploy-55d8d67cf-qrd2s   1/1     Running   0          11s   10.244.1.4   spark17   &lt;none&gt;           &lt;none&gt;
 </code></pre><p>删除了pod，控制器Deployment发现副本少了一个，会自动创建一个。但是这个新Pod的IP地址已经变了，跑到另外一个node主机上去了。<br>在上一篇博文中，提到了需要在Pod前创建一个service，让service关联到Pod上。这样用户在访问时只需要访问service的地址或名称，只要service不被删除，后端的Pod因为各种原因被终止掉或删除掉后重新创建后，哪怕IP地址变了也没什么关系。</p>
-<p>###【示例2】：创建service<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl expose --help</div><div class="line">...</div><div class="line">      --type=&apos;&apos;: Type for this service: ClusterIP, NodePort, LoadBalancer, or ExternalName. Default is &apos;ClusterIP&apos;.</div><div class="line"></div><div class="line">Usage:</div><div class="line">  kubectl expose (-f FILENAME | TYPE NAME) [--port=port] [--protocol=TCP|UDP|SCTP] [--target-port=number-or-name]</div><div class="line">[--name=name] [--external-ip=external-ip-of-service] [--type=type] [options]</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p>###【示例2】：创建service</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl expose --help</div><div class="line">...</div><div class="line">      --type=&apos;&apos;: Type for this service: ClusterIP, NodePort, LoadBalancer, or ExternalName. Default is &apos;ClusterIP&apos;.</div><div class="line"></div><div class="line">Usage:</div><div class="line">  kubectl expose (-f FILENAME | TYPE NAME) [--port=port] [--protocol=TCP|UDP|SCTP] [--target-port=number-or-name]</div><div class="line">[--name=name] [--external-ip=external-ip-of-service] [--type=type] [options]</div><div class="line">...</div></pre></td></tr></table></figure>
 <p>【说明】：</p>
 <ul>
 <li>–type=’’：指定service类型。service类型有4种，默认是ClusterIP。</li>
