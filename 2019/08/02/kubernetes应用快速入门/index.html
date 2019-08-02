@@ -134,7 +134,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/61.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/62.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/63.png">
-<meta property="og:updated_time" content="2019-08-02T07:03:42.000Z">
+<meta property="og:updated_time" content="2019-08-02T07:07:34.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="kubernetes应用快速入门">
 <meta name="twitter:description" content="kubectl简介API Server是Kubernetes集群的网关，任何人只能通过API Server接口与集群进行交互。而kubectl是Kubernetes的终端客户端，此前博客里讲解的使用kubeadm初始化Kubernetes集群时，">
@@ -367,7 +367,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2019-08-02T15:03:42+08:00" content="2019-08-02">
+              <time itemprop="dateUpdated" datetime="2019-08-02T15:07:34+08:00" content="2019-08-02">
               2019-08-02
               </time>
               </span>
@@ -446,7 +446,11 @@
 <p>【说明】：</p>
 <ul>
 <li>–dry-run=true：干跑模式，并没有真正运行</li>
-<li>–port=80：不指定这个也会暴露容器中的相应端口<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/48.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/49.png" alt=""><br>这是Pod的地址，只能在k8s集群内使用。Pod的客户端一般有两类：</li>
+<li>–port=80：不指定这个也会暴露容器中的相应端口</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/48.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/49.png" alt=""></p>
+<p>这是Pod的地址，只能在k8s集群内使用。Pod的客户端一般有两类：</p>
+<ul>
 <li>其他Pod</li>
 <li>集群外部客户端：怎么访问？</li>
 </ul>
