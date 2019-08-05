@@ -1,0 +1,943 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="资源和对象Kubernetes之上常用的资源，它把所有内容都抽象为资源，把资源实例化出来后称为对象。Kubernetes核心资源：  workload： 工作负载型资源，运行应用程序，对外提供服务。Pod, ReplicaSet, Deployment, StatefulSet, DaemonSet, Job, Cronjob, …">
+<meta name="keywords" content="Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes资源清单定义">
+<meta property="og:url" content="http://yoursite.com/2019/08/05/Kubernetes资源清单定义/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="资源和对象Kubernetes之上常用的资源，它把所有内容都抽象为资源，把资源实例化出来后称为对象。Kubernetes核心资源：  workload： 工作负载型资源，运行应用程序，对外提供服务。Pod, ReplicaSet, Deployment, StatefulSet, DaemonSet, Job, Cronjob, …">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/64.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/65.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/66.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/67.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/68.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/69.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/70.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/71.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/72.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/73.png">
+<meta property="og:updated_time" content="2019-08-05T03:02:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kubernetes资源清单定义">
+<meta name="twitter:description" content="资源和对象Kubernetes之上常用的资源，它把所有内容都抽象为资源，把资源实例化出来后称为对象。Kubernetes核心资源：  workload： 工作负载型资源，运行应用程序，对外提供服务。Pod, ReplicaSet, Deployment, StatefulSet, DaemonSet, Job, Cronjob, …">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/64.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Kubernetes资源清单定义 | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Kubernetes资源清单定义
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-08-05T08:54:38+08:00" content="2019-08-05">
+              2019-08-05
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-08-05T11:02:10+08:00" content="2019-08-05">
+              2019-08-05
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/08/05/Kubernetes资源清单定义/" class="leancloud_visitors" data-flag-title="Kubernetes资源清单定义">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="资源和对象"><a href="#资源和对象" class="headerlink" title="资源和对象"></a>资源和对象</h2><p>Kubernetes之上常用的资源，它把所有内容都抽象为资源，把资源实例化出来后称为对象。<br><strong>Kubernetes核心资源：</strong></p>
+<ul>
+<li>workload： 工作负载型资源，运行应用程序，对外提供服务。<br>Pod, ReplicaSet, Deployment, StatefulSet, DaemonSet, Job, Cronjob, … <a id="more"></a></li>
+<li>跟服务发现及均衡相关：<br>Service, Ingress, …</li>
+<li>配置与存储相关：<br>Volume, CSI：还支持容器存储接口来对接第三方存储卷, ConfigMap, Secret, DownwardAPI</li>
+<li>集群级的资源：上面提到的都是配置在名称空间级别的资源。只不过没指都是default名称空间的。而有些资源需要在集群级别定义。<br>Namespace, Node, Role, ClusterRole, RoleBinding, ClusterRoleBinding</li>
+<li>元数据型资源：<br>HPA：能够自动去调整其他资源的元数据信息。<br>PodTemplate, LimitRange</li>
+</ul>
+<h2 id="资源清单示例"><a href="#资源清单示例" class="headerlink" title="资源清单示例"></a>资源清单示例</h2><p>在上一篇博文中，我们使用了命令去创建了一些资源。在创建这些资源时，除了使用命令去创建，还可以使用配置清单来创建。举例看看配置清单是什么样子的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl get pods</div><div class="line">NAME                           READY   STATUS    RESTARTS   AGE</div><div class="line">client-69fd89d767-95nqt        1/1     Running   1          2d15h</div><div class="line">myapp-5bc569c47d-qq8lb         1/1     Running   0          2d18h</div><div class="line">myapp-5bc569c47d-stvj9         1/1     Running   0          2d18h</div><div class="line">myapp-5bc569c47d-tzlsf         1/1     Running   0          2d18h</div><div class="line">nginx-deploy-55d8d67cf-wf28j   1/1     Running   0          2d19h</div><div class="line">[root@spark32 ~]# kubectl get pod myapp-5bc569c47d-qq8lb -o yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  creationTimestamp: &quot;2019-08-02T06:54:36Z&quot;</div><div class="line">  generateName: myapp-5bc569c47d-</div><div class="line">  labels:</div><div class="line">    pod-template-hash: 5bc569c47d</div><div class="line">    run: myapp</div><div class="line">  name: myapp-5bc569c47d-qq8lb</div><div class="line">  namespace: default</div><div class="line">  ownerReferences:</div><div class="line">  - apiVersion: apps/v1</div><div class="line">    blockOwnerDeletion: true</div><div class="line">    controller: true</div><div class="line">    kind: ReplicaSet</div><div class="line">    name: myapp-5bc569c47d</div><div class="line">    uid: f241ea22-b4eb-11e9-9e1c-60a44c223099</div><div class="line">  resourceVersion: &quot;13132088&quot;</div><div class="line">  selfLink: /api/v1/namespaces/default/pods/myapp-5bc569c47d-qq8lb</div><div class="line">  uid: 64232e79-b4f2-11e9-9e1c-60a44c223099</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - image: ikubernetes/myapp:v1</div><div class="line">    imagePullPolicy: IfNotPresent</div><div class="line">    name: myapp</div><div class="line">    resources: &#123;&#125;</div><div class="line">    terminationMessagePath: /dev/termination-log</div><div class="line">    terminationMessagePolicy: File</div><div class="line">    volumeMounts:</div><div class="line">    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount</div><div class="line">      name: default-token-wb7fl</div><div class="line">      readOnly: true</div><div class="line">  dnsPolicy: ClusterFirst</div><div class="line">  enableServiceLinks: true</div><div class="line">  nodeName: ubuntu31</div><div class="line">  priority: 0</div><div class="line">  restartPolicy: Always</div><div class="line">  schedulerName: default-scheduler</div><div class="line">  securityContext: &#123;&#125;</div><div class="line">  serviceAccount: default</div><div class="line">  serviceAccountName: default</div><div class="line">  terminationGracePeriodSeconds: 30</div><div class="line">  tolerations:</div><div class="line">  - effect: NoExecute</div><div class="line">    key: node.kubernetes.io/not-ready</div><div class="line">    operator: Exists</div><div class="line">    tolerationSeconds: 300</div><div class="line">  - effect: NoExecute</div><div class="line">    key: node.kubernetes.io/unreachable</div><div class="line">    operator: Exists</div><div class="line">    tolerationSeconds: 300</div><div class="line">  volumes:</div><div class="line">  - name: default-token-wb7fl</div><div class="line">    secret:</div><div class="line">      defaultMode: 420</div><div class="line">      secretName: default-token-wb7fl</div><div class="line">status:</div><div class="line">  conditions:</div><div class="line">  - lastProbeTime: null</div><div class="line">    lastTransitionTime: &quot;2019-08-02T06:54:46Z&quot;</div><div class="line">    status: &quot;True&quot;</div><div class="line">    type: Initialized</div><div class="line">  - lastProbeTime: null</div><div class="line">    lastTransitionTime: &quot;2019-08-02T06:54:49Z&quot;</div><div class="line">    status: &quot;True&quot;</div><div class="line">    type: Ready</div><div class="line">  - lastProbeTime: null</div><div class="line">    lastTransitionTime: &quot;2019-08-02T06:54:49Z&quot;</div><div class="line">    status: &quot;True&quot;</div><div class="line">    type: ContainersReady</div><div class="line">  - lastProbeTime: null</div><div class="line">    lastTransitionTime: &quot;2019-08-02T06:54:36Z&quot;</div><div class="line">    status: &quot;True&quot;</div><div class="line">    type: PodScheduled</div><div class="line">  containerStatuses:</div><div class="line">  - containerID: docker://bebf87f526684a20413175bce9f9aa2382bd000ef5b9446c49e390d585e04db8</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">    imageID: docker-pullable://ikubernetes/myapp@sha256:9c3dc30b5219788b2b8a4b065f548b922a34479577befb54b03330999d30d513</div><div class="line">    lastState: &#123;&#125;</div><div class="line">    name: myapp</div><div class="line">    ready: true</div><div class="line">    restartCount: 0</div><div class="line">    state:</div><div class="line">      running:</div><div class="line">        startedAt: &quot;2019-08-02T06:54:48Z&quot;</div><div class="line">  hostIP: 172.16.206.31</div><div class="line">  phase: Running</div><div class="line">  podIP: 10.244.2.12</div><div class="line">  qosClass: BestEffort</div><div class="line">  startTime: &quot;2019-08-02T06:54:46Z&quot;</div></pre></td></tr></table></figure></p>
+<p><strong>【说明】：</strong><br><strong>apiVersion: v1</strong><br>指定该对象属于k8s的哪个api版本，或者叫api组。这叫api群组的名称和版本。我们给定apiversion时有两个部分组成，group/version。如果group省略，表示core，核心组，最根本的资源。</p>
+<p><strong>kind: Pod</strong><br>资源类别，Pod、控制器、service都是资源。</p>
+<p><strong>metadata：</strong><br>元数据。内部嵌套了很多二级字段，甚至三级字段来定义。</p>
+<p><strong>spec:</strong><br>可以理解为“规格”。我们要去定义接下来要创建的资源对象应该具有什么样的特性，或者应该满足什么样的规范。比如说容器有几个，每个容器应该用什么镜像文件来创建。包括它的容忍度，能容忍哪些污点。这也是资源对象中一个最重要的字段，因为它正是用来定义我们所期望的资源应该拥有什么样的特性。而后靠控制器来确保它的特性能够被满足。</p>
+<p><strong>status:</strong><br>spec用来让用户定义一个资源对象应该所处的目标状态。而status则是显示当前这个资源的当前状态。如果当前状态和目标状态不一样怎么办？应该以目标状态为准。k8s保证当前状态无限向目标状态靠近或转移从而能满足用户期望。因此从这个角度讲，status应该是只读的，因为会动态维护。而spec是用户定义的。</p>
+<h2 id="创建资源的方法"><a href="#创建资源的方法" class="headerlink" title="创建资源的方法"></a>创建资源的方法</h2><p>1.在定义资源时，apiserver仅接收JSON格式的资源定义；<br>之前通过kubectl run创建一个deployment的时候，run命令被自动把我们给的内容转成了JSON格式而已。但JSON格式写起来太重量级了，而yaml格式几乎没有冗余数据。人更容易理解和记忆的是yaml格式的。</p>
+<p>2.提供yaml格式的配置清单<br>apiserver可自动将其转为JSON格式，而后在执行。JSON格式对于apiserver才是根本。</p>
+<h2 id="资源的配置清单详解"><a href="#资源的配置清单详解" class="headerlink" title="资源的配置清单详解"></a>资源的配置清单详解</h2><p>大部分资源的配置清单都有5个一级字段组成：</p>
+<h3 id="apiVersion-group-version"><a href="#apiVersion-group-version" class="headerlink" title="apiVersion: group/version"></a>apiVersion: group/version</h3><p>api版本。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"># kubectl api-versions</div><div class="line">admissionregistration.k8s.io/v1beta1</div><div class="line">apiextensions.k8s.io/v1beta1</div><div class="line">apiregistration.k8s.io/v1</div><div class="line">apiregistration.k8s.io/v1beta1</div><div class="line">apps/v1</div><div class="line">apps/v1beta1</div><div class="line">apps/v1beta2</div><div class="line">authentication.k8s.io/v1</div><div class="line">authentication.k8s.io/v1beta1</div><div class="line">authorization.k8s.io/v1</div><div class="line">authorization.k8s.io/v1beta1</div><div class="line">autoscaling/v1</div><div class="line">autoscaling/v2beta1</div><div class="line">autoscaling/v2beta2</div><div class="line">batch/v1</div><div class="line">batch/v1beta1</div><div class="line">certificates.k8s.io/v1beta1</div><div class="line">coordination.k8s.io/v1</div><div class="line">coordination.k8s.io/v1beta1</div><div class="line">events.k8s.io/v1beta1</div><div class="line">extensions/v1beta1</div><div class="line">networking.k8s.io/v1</div><div class="line">networking.k8s.io/v1beta1</div><div class="line">node.k8s.io/v1beta1</div><div class="line">policy/v1beta1</div><div class="line">rbac.authorization.k8s.io/v1</div><div class="line">rbac.authorization.k8s.io/v1beta1</div><div class="line">scheduling.k8s.io/v1</div><div class="line">scheduling.k8s.io/v1beta1</div><div class="line">storage.k8s.io/v1</div><div class="line">storage.k8s.io/v1beta1</div><div class="line">v1</div></pre></td></tr></table></figure></p>
+<p>资源所属群组，k8s把apiserver中所支持的api有多少种，分组来管理。<br>分组的好处是：如果不分组，假设将来要更新一个，牵一发而动全身。而现在分成组以后，如果某一组当中的改变了，我们只需要改这一个组就可以了，其他组不受影响，可以继续使用。另外，组还加了版本号，同一个群组的多个不同版本还可以并存。Pod是最核心的资源，所以属于核心群组v1。像控制器Deployment、ReplicaSet等属于应用程序管理的资源，属于群组apps/v1。在创建Deployment的时候，可以使用apps/v1，也可以使用apps/v1beta1，或者apps/v1beta2。如果某一组标记为beta，意味着属于公测版。不同的版本，对于同一个资源来讲，可支持的字段有可能是不一样的。</p>
+<h3 id="kind"><a href="#kind" class="headerlink" title="kind"></a>kind</h3><p>资源类别</p>
+<h3 id="metadata"><a href="#metadata" class="headerlink" title="metadata"></a>metadata</h3><p>元数据</p>
+<ul>
+<li>name，对象名称</li>
+<li>namespace: 对象属于哪个名称空间的</li>
+<li>labels：标签</li>
+<li>annotation：资源注解</li>
+<li>uid：系统自己生成的，不要自己去定义。自己去定义有可能冲突。</li>
+<li>每个资源的引用PATH：基于HTPP<br>/api/GROUP/VERSION/namespaces/NAMESPACE/TYPE/NAME</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/64.png" alt=""></p>
+<h3 id="spec"><a href="#spec" class="headerlink" title="spec"></a>spec</h3><p>期望的状态。disired state。<br>不同的资源类型，spec中所需要嵌套的字段不尽相同。字段这么多，我们可能无法全部记下来，可以通过命令行来查看文档。比如查看Pod清单定义文档：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain pods</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/65.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain pods.metadata</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/66.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain pods.spec</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/67.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain pods.spec.containers</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/68.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/69.png" alt=""></p>
+<h3 id="status"><a href="#status" class="headerlink" title="status"></a>status</h3><p>资源当前状态，current state。<br>该字段由Kubernetes集群维护，用户不能定义和删除。</p>
+<h2 id="清单定义示例"><a href="#清单定义示例" class="headerlink" title="清单定义示例"></a>清单定义示例</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# mkdir manifests</div><div class="line">[root@spark32 ~]# cd manifests/</div><div class="line">[root@spark32 manifests]# vim pod-demo.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-demo</div><div class="line">  namespace: default</div><div class="line">  labels:</div><div class="line">    app: myapp</div><div class="line">    tier: frontend</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: myapp</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">  - name: busybox</div><div class="line">    image: busybox:latest</div><div class="line">    command:</div><div class="line">    - &quot;/bin/sh&quot;</div><div class="line">    - &quot;-c&quot;</div><div class="line">    - &quot;sleep 3600&quot;</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/70.png" alt=""><br><strong>【说明】：</strong></p>
+<ul>
+<li>containers的值是个对象列表，列表我们使用 []  或者 - 来引导。<br>容器名、容器镜像。一个pod内可以有多个容器。</li>
+<li>对于busybox这个镜像启动起来运行的命令是shell，启动起来一会就挂了，所以需要需要额外改个命令来运行，使用command。command是个列表，可以使用[]，也可以使用 - 来引导。对于第一个镜像没有加command，表示运行镜像启动后默认的命令。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/71.png" alt=""></p>
+<p>访问myapp服务：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get pods -o wide</div><div class="line">NAME                           READY   STATUS    RESTARTS   AGE     IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">client-69fd89d767-95nqt        1/1     Running   1          2d16h   10.244.2.27   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-5bc569c47d-qq8lb         1/1     Running   0          2d19h   10.244.2.12   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-5bc569c47d-stvj9         1/1     Running   0          2d19h   10.244.2.13   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-5bc569c47d-tzlsf         1/1     Running   0          2d19h   10.244.1.9    spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">nginx-deploy-55d8d67cf-wf28j   1/1     Running   0          2d21h   10.244.1.5    spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">pod-demo                       2/2     Running   0          12m     10.244.2.28   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">[root@spark32 manifests]# curl 10.244.2.28</div><div class="line">Hello MyApp | Version: v1 | &lt;a href=&quot;hostname.html&quot;&gt;Pod Name&lt;/a&gt;</div></pre></td></tr></table></figure></p>
+<p>查看日志：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/72.png" alt=""></p>
+<p>进入Pod中的myapp容器：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/73.png" alt=""></p>
+<p>删除这个Pod：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl delete pod pod-demo</div><div class="line">pod &quot;pod-demo&quot; deleted</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get pods -w</div><div class="line">NAME                           READY   STATUS        RESTARTS   AGE</div><div class="line">client-69fd89d767-95nqt        1/1     Running       1          2d17h</div><div class="line">myapp-5bc569c47d-qq8lb         1/1     Running       0          2d20h</div><div class="line">myapp-5bc569c47d-stvj9         1/1     Running       0          2d20h</div><div class="line">myapp-5bc569c47d-tzlsf         1/1     Running       0          2d20h</div><div class="line">nginx-deploy-55d8d67cf-wf28j   1/1     Running       0          2d21h</div><div class="line">pod-demo                       2/2     Terminating   0          19m</div><div class="line">pod-demo                       0/2     Terminating   0          19m</div><div class="line">pod-demo                       0/2     Terminating   0          19m</div><div class="line">pod-demo                       0/2     Terminating   0          19m</div><div class="line">pod-demo                       0/2     Terminating   0          19m</div></pre></td></tr></table></figure>
+<p>再次创建这个Pod：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl create -f pod-demo.yaml </div><div class="line">pod/pod-demo created</div></pre></td></tr></table></figure></p>
+<p>删除这个清单文件中定义的资源：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl delete -f pod-demo.yaml       </div><div class="line">pod &quot;pod-demo&quot; deleted</div></pre></td></tr></table></figure></p>
+<p>这个文件里定义的资源Pod是“自主式Pod”，不受任何控制器控制的，这种Pod一删除就没了。不像控制器控制的Pod，哪怕删了，也会根据副本数量进行重新创建。</p>
+<h2 id="kubectl管理资源的方式"><a href="#kubectl管理资源的方式" class="headerlink" title="kubectl管理资源的方式"></a>kubectl管理资源的方式</h2><p>有三种方式：</p>
+<ul>
+<li>命令式</li>
+<li>刚刚上面演示的配置清单式</li>
+<li>第三种也是清单，但要使用另外的命令。和第二种方式的区别为：第二种叫命令式资源清单，第三种叫声明式资源清单。使用声明式，我们可以确保资源尽可能地像我们声明的状态改变，而且可以随时改变我们的声明，并随时应用。后面的博文中将介绍使用声明式方式创建资源。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"><i class="fa fa-tag"></i>Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/02/kubernetes应用快速入门/" rel="next" title="kubernetes应用快速入门">
+                <i class="fa fa-chevron-left"></i> kubernetes应用快速入门
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">85</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#资源和对象"><span class="nav-number">1.</span> <span class="nav-text">资源和对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资源清单示例"><span class="nav-number">2.</span> <span class="nav-text">资源清单示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建资源的方法"><span class="nav-number">3.</span> <span class="nav-text">创建资源的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资源的配置清单详解"><span class="nav-number">4.</span> <span class="nav-text">资源的配置清单详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#apiVersion-group-version"><span class="nav-number">4.1.</span> <span class="nav-text">apiVersion: group/version</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kind"><span class="nav-number">4.2.</span> <span class="nav-text">kind</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#metadata"><span class="nav-number">4.3.</span> <span class="nav-text">metadata</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#spec"><span class="nav-number">4.4.</span> <span class="nav-text">spec</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#status"><span class="nav-number">4.5.</span> <span class="nav-text">status</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#清单定义示例"><span class="nav-number">5.</span> <span class="nav-text">清单定义示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kubectl管理资源的方式"><span class="nav-number">6.</span> <span class="nav-text">kubectl管理资源的方式</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共225.3k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>

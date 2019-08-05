@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-08-02T07:20:49.000Z</updated>
+  <updated>2019-08-05T03:02:10.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,89 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Kubernetes资源清单定义</title>
+    <link href="http://yoursite.com/2019/08/05/Kubernetes%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95%E5%AE%9A%E4%B9%89/"/>
+    <id>http://yoursite.com/2019/08/05/Kubernetes资源清单定义/</id>
+    <published>2019-08-05T00:54:38.000Z</published>
+    <updated>2019-08-05T03:02:10.000Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;资源和对象&quot;&gt;&lt;a href=&quot;#资源和对象&quot; class=&quot;headerlink&quot; title=&quot;资源和对象&quot;&gt;&lt;/a&gt;资源和对象&lt;/h2&gt;&lt;p&gt;Kubernetes之上常用的资源，它把所有内容都抽象为资源，把资源实例化出来后称为对象。&lt;br&gt;&lt;strong&gt;Kubernetes核心资源：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;workload： 工作负载型资源，运行应用程序，对外提供服务。&lt;br&gt;Pod, ReplicaSet, Deployment, StatefulSet, DaemonSet, Job, Cronjob, … &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;跟服务发现及均衡相关：&lt;br&gt;Service, Ingress, …&lt;/li&gt;
+&lt;li&gt;配置与存储相关：&lt;br&gt;Volume, CSI：还支持容器存储接口来对接第三方存储卷, ConfigMap, Secret, DownwardAPI&lt;/li&gt;
+&lt;li&gt;集群级的资源：上面提到的都是配置在名称空间级别的资源。只不过没指都是default名称空间的。而有些资源需要在集群级别定义。&lt;br&gt;Namespace, Node, Role, ClusterRole, RoleBinding, ClusterRoleBinding&lt;/li&gt;
+&lt;li&gt;元数据型资源：&lt;br&gt;HPA：能够自动去调整其他资源的元数据信息。&lt;br&gt;PodTemplate, LimitRange&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;资源清单示例&quot;&gt;&lt;a href=&quot;#资源清单示例&quot; class=&quot;headerlink&quot; title=&quot;资源清单示例&quot;&gt;&lt;/a&gt;资源清单示例&lt;/h2&gt;&lt;p&gt;在上一篇博文中，我们使用了命令去创建了一些资源。在创建这些资源时，除了使用命令去创建，还可以使用配置清单来创建。举例看看配置清单是什么样子的：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;32&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;33&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;34&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;35&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;36&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;37&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;38&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;39&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;40&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;41&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;42&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;43&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;44&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;45&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;46&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;47&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;48&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;49&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;50&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;51&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;52&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;53&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;54&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;55&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;56&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;57&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;58&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;59&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;60&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;61&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;62&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;63&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;64&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;65&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;66&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;67&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;68&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;69&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;70&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;71&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;72&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;73&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;74&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;75&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;76&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;77&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;78&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;79&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;80&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;81&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;82&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;83&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;84&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;85&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;86&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;87&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;88&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;89&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;90&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;91&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;92&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;93&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;94&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;95&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;96&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;97&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;98&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 ~]# kubectl get pods&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;NAME                           READY   STATUS    RESTARTS   AGE&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;client-69fd89d767-95nqt        1/1     Running   1          2d15h&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;myapp-5bc569c47d-qq8lb         1/1     Running   0          2d18h&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;myapp-5bc569c47d-stvj9         1/1     Running   0          2d18h&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;myapp-5bc569c47d-tzlsf         1/1     Running   0          2d18h&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;nginx-deploy-55d8d67cf-wf28j   1/1     Running   0          2d19h&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 ~]# kubectl get pod myapp-5bc569c47d-qq8lb -o yaml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apiVersion: v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;kind: Pod&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  creationTimestamp: &amp;quot;2019-08-02T06:54:36Z&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  generateName: myapp-5bc569c47d-&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  labels:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    pod-template-hash: 5bc569c47d&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    run: myapp&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  name: myapp-5bc569c47d-qq8lb&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  namespace: default&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  ownerReferences:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - apiVersion: apps/v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    blockOwnerDeletion: true&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    controller: true&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    kind: ReplicaSet&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    name: myapp-5bc569c47d&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    uid: f241ea22-b4eb-11e9-9e1c-60a44c223099&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  resourceVersion: &amp;quot;13132088&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  selfLink: /api/v1/namespaces/default/pods/myapp-5bc569c47d-qq8lb&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  uid: 64232e79-b4f2-11e9-9e1c-60a44c223099&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  containers:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - image: ikubernetes/myapp:v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    imagePullPolicy: IfNotPresent&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    name: myapp&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    resources: &amp;#123;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    terminationMessagePath: /dev/termination-log&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    terminationMessagePolicy: File&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    volumeMounts:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      name: default-token-wb7fl&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      readOnly: true&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  dnsPolicy: ClusterFirst&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  enableServiceLinks: true&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  nodeName: ubuntu31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  priority: 0&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  restartPolicy: Always&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  schedulerName: default-scheduler&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  securityContext: &amp;#123;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  serviceAccount: default&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  serviceAccountName: default&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  terminationGracePeriodSeconds: 30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  tolerations:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - effect: NoExecute&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    key: node.kubernetes.io/not-ready&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    operator: Exists&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    tolerationSeconds: 300&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - effect: NoExecute&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    key: node.kubernetes.io/unreachable&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    operator: Exists&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    tolerationSeconds: 300&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  volumes:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - name: default-token-wb7fl&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    secret:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      defaultMode: 420&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      secretName: default-token-wb7fl&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;status:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  conditions:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - lastProbeTime: null&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    lastTransitionTime: &amp;quot;2019-08-02T06:54:46Z&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    status: &amp;quot;True&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    type: Initialized&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - lastProbeTime: null&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    lastTransitionTime: &amp;quot;2019-08-02T06:54:49Z&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    status: &amp;quot;True&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    type: Ready&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - lastProbeTime: null&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    lastTransitionTime: &amp;quot;2019-08-02T06:54:49Z&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    status: &amp;quot;True&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    type: ContainersReady&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - lastProbeTime: null&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    lastTransitionTime: &amp;quot;2019-08-02T06:54:36Z&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    status: &amp;quot;True&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    type: PodScheduled&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  containerStatuses:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - containerID: docker://bebf87f526684a20413175bce9f9aa2382bd000ef5b9446c49e390d585e04db8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    image: ikubernetes/myapp:v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    imageID: docker-pullable://ikubernetes/myapp@sha256:9c3dc30b5219788b2b8a4b065f548b922a34479577befb54b03330999d30d513&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    lastState: &amp;#123;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    name: myapp&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    ready: true&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    restartCount: 0&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    state:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;      running:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        startedAt: &amp;quot;2019-08-02T06:54:48Z&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  hostIP: 172.16.206.31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  phase: Running&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  podIP: 10.244.2.12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  qosClass: BestEffort&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  startTime: &amp;quot;2019-08-02T06:54:46Z&amp;quot;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;【说明】：&lt;/strong&gt;&lt;br&gt;&lt;strong&gt;apiVersion: v1&lt;/strong&gt;&lt;br&gt;指定该对象属于k8s的哪个api版本，或者叫api组。这叫api群组的名称和版本。我们给定apiversion时有两个部分组成，group/version。如果group省略，表示core，核心组，最根本的资源。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;kind: Pod&lt;/strong&gt;&lt;br&gt;资源类别，Pod、控制器、service都是资源。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;metadata：&lt;/strong&gt;&lt;br&gt;元数据。内部嵌套了很多二级字段，甚至三级字段来定义。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;spec:&lt;/strong&gt;&lt;br&gt;可以理解为“规格”。我们要去定义接下来要创建的资源对象应该具有什么样的特性，或者应该满足什么样的规范。比如说容器有几个，每个容器应该用什么镜像文件来创建。包括它的容忍度，能容忍哪些污点。这也是资源对象中一个最重要的字段，因为它正是用来定义我们所期望的资源应该拥有什么样的特性。而后靠控制器来确保它的特性能够被满足。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;status:&lt;/strong&gt;&lt;br&gt;spec用来让用户定义一个资源对象应该所处的目标状态。而status则是显示当前这个资源的当前状态。如果当前状态和目标状态不一样怎么办？应该以目标状态为准。k8s保证当前状态无限向目标状态靠近或转移从而能满足用户期望。因此从这个角度讲，status应该是只读的，因为会动态维护。而spec是用户定义的。&lt;/p&gt;
+&lt;h2 id=&quot;创建资源的方法&quot;&gt;&lt;a href=&quot;#创建资源的方法&quot; class=&quot;headerlink&quot; title=&quot;创建资源的方法&quot;&gt;&lt;/a&gt;创建资源的方法&lt;/h2&gt;&lt;p&gt;1.在定义资源时，apiserver仅接收JSON格式的资源定义；&lt;br&gt;之前通过kubectl run创建一个deployment的时候，run命令被自动把我们给的内容转成了JSON格式而已。但JSON格式写起来太重量级了，而yaml格式几乎没有冗余数据。人更容易理解和记忆的是yaml格式的。&lt;/p&gt;
+&lt;p&gt;2.提供yaml格式的配置清单&lt;br&gt;apiserver可自动将其转为JSON格式，而后在执行。JSON格式对于apiserver才是根本。&lt;/p&gt;
+&lt;h2 id=&quot;资源的配置清单详解&quot;&gt;&lt;a href=&quot;#资源的配置清单详解&quot; class=&quot;headerlink&quot; title=&quot;资源的配置清单详解&quot;&gt;&lt;/a&gt;资源的配置清单详解&lt;/h2&gt;&lt;p&gt;大部分资源的配置清单都有5个一级字段组成：&lt;/p&gt;
+&lt;h3 id=&quot;apiVersion-group-version&quot;&gt;&lt;a href=&quot;#apiVersion-group-version&quot; class=&quot;headerlink&quot; title=&quot;apiVersion: group/version&quot;&gt;&lt;/a&gt;apiVersion: group/version&lt;/h3&gt;&lt;p&gt;api版本。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;32&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;33&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;# kubectl api-versions&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;admissionregistration.k8s.io/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apiextensions.k8s.io/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apiregistration.k8s.io/v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apiregistration.k8s.io/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apps/v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apps/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apps/v1beta2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;authentication.k8s.io/v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;authentication.k8s.io/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;authorization.k8s.io/v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;authorization.k8s.io/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;autoscaling/v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;autoscaling/v2beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;autoscaling/v2beta2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;batch/v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;batch/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;certificates.k8s.io/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;coordination.k8s.io/v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;coordination.k8s.io/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;events.k8s.io/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;extensions/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;networking.k8s.io/v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;networking.k8s.io/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;node.k8s.io/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;policy/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;rbac.authorization.k8s.io/v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;rbac.authorization.k8s.io/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;scheduling.k8s.io/v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;scheduling.k8s.io/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;storage.k8s.io/v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;storage.k8s.io/v1beta1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;v1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;资源所属群组，k8s把apiserver中所支持的api有多少种，分组来管理。&lt;br&gt;分组的好处是：如果不分组，假设将来要更新一个，牵一发而动全身。而现在分成组以后，如果某一组当中的改变了，我们只需要改这一个组就可以了，其他组不受影响，可以继续使用。另外，组还加了版本号，同一个群组的多个不同版本还可以并存。Pod是最核心的资源，所以属于核心群组v1。像控制器Deployment、ReplicaSet等属于应用程序管理的资源，属于群组apps/v1。在创建Deployment的时候，可以使用apps/v1，也可以使用apps/v1beta1，或者apps/v1beta2。如果某一组标记为beta，意味着属于公测版。不同的版本，对于同一个资源来讲，可支持的字段有可能是不一样的。&lt;/p&gt;
+&lt;h3 id=&quot;kind&quot;&gt;&lt;a href=&quot;#kind&quot; class=&quot;headerlink&quot; title=&quot;kind&quot;&gt;&lt;/a&gt;kind&lt;/h3&gt;&lt;p&gt;资源类别&lt;/p&gt;
+&lt;h3 id=&quot;metadata&quot;&gt;&lt;a href=&quot;#metadata&quot; class=&quot;headerlink&quot; title=&quot;metadata&quot;&gt;&lt;/a&gt;metadata&lt;/h3&gt;&lt;p&gt;元数据&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;name，对象名称&lt;/li&gt;
+&lt;li&gt;namespace: 对象属于哪个名称空间的&lt;/li&gt;
+&lt;li&gt;labels：标签&lt;/li&gt;
+&lt;li&gt;annotation：资源注解&lt;/li&gt;
+&lt;li&gt;uid：系统自己生成的，不要自己去定义。自己去定义有可能冲突。&lt;/li&gt;
+&lt;li&gt;每个资源的引用PATH：基于HTPP&lt;br&gt;/api/GROUP/VERSION/namespaces/NAMESPACE/TYPE/NAME&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/64.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;spec&quot;&gt;&lt;a href=&quot;#spec&quot; class=&quot;headerlink&quot; title=&quot;spec&quot;&gt;&lt;/a&gt;spec&lt;/h3&gt;&lt;p&gt;期望的状态。disired state。&lt;br&gt;不同的资源类型，spec中所需要嵌套的字段不尽相同。字段这么多，我们可能无法全部记下来，可以通过命令行来查看文档。比如查看Pod清单定义文档：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 ~]# kubectl explain pods&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/65.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 ~]# kubectl explain pods.metadata&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/66.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 ~]# kubectl explain pods.spec&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/67.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 ~]# kubectl explain pods.spec.containers&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/68.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/69.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;status&quot;&gt;&lt;a href=&quot;#status&quot; class=&quot;headerlink&quot; title=&quot;status&quot;&gt;&lt;/a&gt;status&lt;/h3&gt;&lt;p&gt;资源当前状态，current state。&lt;br&gt;该字段由Kubernetes集群维护，用户不能定义和删除。&lt;/p&gt;
+&lt;h2 id=&quot;清单定义示例&quot;&gt;&lt;a href=&quot;#清单定义示例&quot; class=&quot;headerlink&quot; title=&quot;清单定义示例&quot;&gt;&lt;/a&gt;清单定义示例&lt;/h2&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 ~]# mkdir manifests&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 ~]# cd manifests/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 manifests]# vim pod-demo.yaml&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;apiVersion: v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;kind: Pod&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;metadata:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  name: pod-demo&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  namespace: default&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  labels:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    app: myapp&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    tier: frontend&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;spec:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  containers:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - name: myapp&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    image: ikubernetes/myapp:v1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  - name: busybox&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    image: busybox:latest&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    command:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    - &amp;quot;/bin/sh&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    - &amp;quot;-c&amp;quot;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    - &amp;quot;sleep 3600&amp;quot;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/70.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;strong&gt;【说明】：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;containers的值是个对象列表，列表我们使用 []  或者 - 来引导。&lt;br&gt;容器名、容器镜像。一个pod内可以有多个容器。&lt;/li&gt;
+&lt;li&gt;对于busybox这个镜像启动起来运行的命令是shell，启动起来一会就挂了，所以需要需要额外改个命令来运行，使用command。command是个列表，可以使用[]，也可以使用 - 来引导。对于第一个镜像没有加command，表示运行镜像启动后默认的命令。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/71.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;访问myapp服务：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 manifests]# kubectl get pods -o wide&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;NAME                           READY   STATUS    RESTARTS   AGE     IP            NODE       NOMINATED NODE   READINESS GATES&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;client-69fd89d767-95nqt        1/1     Running   1          2d16h   10.244.2.27   ubuntu31   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;myapp-5bc569c47d-qq8lb         1/1     Running   0          2d19h   10.244.2.12   ubuntu31   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;myapp-5bc569c47d-stvj9         1/1     Running   0          2d19h   10.244.2.13   ubuntu31   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;myapp-5bc569c47d-tzlsf         1/1     Running   0          2d19h   10.244.1.9    spark17    &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;nginx-deploy-55d8d67cf-wf28j   1/1     Running   0          2d21h   10.244.1.5    spark17    &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;pod-demo                       2/2     Running   0          12m     10.244.2.28   ubuntu31   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 manifests]# curl 10.244.2.28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Hello MyApp | Version: v1 | &amp;lt;a href=&amp;quot;hostname.html&amp;quot;&amp;gt;Pod Name&amp;lt;/a&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;查看日志：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/72.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;进入Pod中的myapp容器：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/73.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;删除这个Pod：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 manifests]# kubectl delete pod pod-demo&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;pod &amp;quot;pod-demo&amp;quot; deleted&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 manifests]# kubectl get pods -w&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;NAME                           READY   STATUS        RESTARTS   AGE&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;client-69fd89d767-95nqt        1/1     Running       1          2d17h&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;myapp-5bc569c47d-qq8lb         1/1     Running       0          2d20h&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;myapp-5bc569c47d-stvj9         1/1     Running       0          2d20h&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;myapp-5bc569c47d-tzlsf         1/1     Running       0          2d20h&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;nginx-deploy-55d8d67cf-wf28j   1/1     Running       0          2d21h&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;pod-demo                       2/2     Terminating   0          19m&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;pod-demo                       0/2     Terminating   0          19m&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;pod-demo                       0/2     Terminating   0          19m&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;pod-demo                       0/2     Terminating   0          19m&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;pod-demo                       0/2     Terminating   0          19m&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;再次创建这个Pod：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 manifests]# kubectl create -f pod-demo.yaml &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;pod/pod-demo created&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;删除这个清单文件中定义的资源：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 manifests]# kubectl delete -f pod-demo.yaml       &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;pod &amp;quot;pod-demo&amp;quot; deleted&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;这个文件里定义的资源Pod是“自主式Pod”，不受任何控制器控制的，这种Pod一删除就没了。不像控制器控制的Pod，哪怕删了，也会根据副本数量进行重新创建。&lt;/p&gt;
+&lt;h2 id=&quot;kubectl管理资源的方式&quot;&gt;&lt;a href=&quot;#kubectl管理资源的方式&quot; class=&quot;headerlink&quot; title=&quot;kubectl管理资源的方式&quot;&gt;&lt;/a&gt;kubectl管理资源的方式&lt;/h2&gt;&lt;p&gt;有三种方式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;命令式&lt;/li&gt;
+&lt;li&gt;刚刚上面演示的配置清单式&lt;/li&gt;
+&lt;li&gt;第三种也是清单，但要使用另外的命令。和第二种方式的区别为：第二种叫命令式资源清单，第三种叫声明式资源清单。使用声明式，我们可以确保资源尽可能地像我们声明的状态改变，而且可以随时改变我们的声明，并随时应用。后面的博文中将介绍使用声明式方式创建资源。&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;资源和对象&quot;&gt;&lt;a href=&quot;#资源和对象&quot; class=&quot;headerlink&quot; title=&quot;资源和对象&quot;&gt;&lt;/a&gt;资源和对象&lt;/h2&gt;&lt;p&gt;Kubernetes之上常用的资源，它把所有内容都抽象为资源，把资源实例化出来后称为对象。&lt;br&gt;&lt;strong&gt;Kubernetes核心资源：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;workload： 工作负载型资源，运行应用程序，对外提供服务。&lt;br&gt;Pod, ReplicaSet, Deployment, StatefulSet, DaemonSet, Job, Cronjob, …
+    
+    </summary>
+    
+      <category term="容器编排" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8%E7%BC%96%E6%8E%92/"/>
+    
+      <category term="Kubernetes" scheme="http://yoursite.com/categories/%E5%AE%B9%E5%99%A8%E7%BC%96%E6%8E%92/Kubernetes/"/>
+    
+    
+      <category term="Kubernetes" scheme="http://yoursite.com/tags/Kubernetes/"/>
+    
+  </entry>
   
   <entry>
     <title>kubernetes应用快速入门</title>
@@ -1775,480 +1858,6 @@ Query OK, 0 rows affected (0.00 sec)
 &lt;li&gt;DATABASE&lt;/li&gt;
 &lt;li&gt;TABLE&lt;/li&gt;
 &lt;li&gt;VIEW
-    
-    </summary>
-    
-      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
-    
-    
-      <category term="MySQL" scheme="http://yoursite.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL查询和视图</title>
-    <link href="http://yoursite.com/2018/03/29/MySQL%E6%9F%A5%E8%AF%A2%E5%92%8C%E8%A7%86%E5%9B%BE/"/>
-    <id>http://yoursite.com/2018/03/29/MySQL查询和视图/</id>
-    <published>2018-03-29T01:20:40.000Z</published>
-    <updated>2018-04-03T06:23:16.000Z</updated>
-    
-    <content type="html">&lt;h2 id=&quot;查询的执行路径&quot;&gt;&lt;a href=&quot;#查询的执行路径&quot; class=&quot;headerlink&quot; title=&quot;查询的执行路径&quot;&gt;&lt;/a&gt;查询的执行路径&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;查询执行路径：&lt;/strong&gt;先查缓存，缓存未命中交给解析器。MySQL是允许多个用户连接进来的，因此有多个线程，如果每个线程上的用户都发起查询请求，而mysql真正能够执行查询的查询引擎只有一个，所以要排队，要给一个队列。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;所以就需要有查询执行计划和查询执行引擎。但是查询执行引擎不能直接去硬盘取数据，所以查询引擎是接收查询执行计划传递而来的优化器优化后的查询语句，它负责转换为对应表的存储引擎的API调用。后面的数据获取是由对应的存储引擎负责到磁盘上取数据，并将数据返回给执行引擎，最后在层层返回给客户端，返回客户端之前有可能要判断要不要缓存下来。比如查当前系统时间，这个就没必要缓存下来了。查询的结果缓存与否，用户是可以定义的。当然不是说用户想缓存就一定能缓存。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/25.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;MySQL的查询操作&quot;&gt;&lt;a href=&quot;#MySQL的查询操作&quot; class=&quot;headerlink&quot; title=&quot;MySQL的查询操作&quot;&gt;&lt;/a&gt;MySQL的查询操作&lt;/h2&gt;&lt;p&gt;使用SELECT语句查询数据，查询语句的通用语法格式：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;SELECT values_to_dispaly
-FROM table_name 
-WHERE expression
-GROUP BY how_to_group
-HAVING expression
-ORDER BY how_to_sort
-LIMIT row_count;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查询又可分为：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;单表查询：也称为简单查询&lt;/li&gt;
-&lt;li&gt;多表查询：也称为连接查询&lt;/li&gt;
-&lt;li&gt;联合查询&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;选择和投影：就是关系代数，其实SELECT主要就包括这两方面&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;投影：挑选要显示的字段&lt;/li&gt;
-&lt;li&gt;选择：挑选符合条件的行&lt;ul&gt;
-&lt;li&gt;投影：SELECT 字段1, 字段2, … FROM tb_name; &lt;ul&gt;
-&lt;li&gt;SELECT * FROM tb_name;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;选择：SELECT 字段1, … FROM tb_name WHERE 子句; &lt;ul&gt;
-&lt;li&gt;WHERE 子句就是布尔条件表达式&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;WHERE子句&quot;&gt;&lt;a href=&quot;#WHERE子句&quot; class=&quot;headerlink&quot; title=&quot;WHERE子句&quot;&gt;&lt;/a&gt;WHERE子句&lt;/h3&gt;&lt;p&gt;HERE 子句就是布尔条件表达式&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;布尔条件表达式操作符： &lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;=&lt;/li&gt;
-&lt;li&gt;&amp;lt;=&amp;gt; ：空值安全比较。与空比较值的安全方式，跟空值比较不会产生意外情况的等值比较。和上面那个一样都是等值比较。&lt;/li&gt;
-&lt;li&gt;&amp;lt;&amp;gt; ：不等于&lt;/li&gt;
-&lt;li&gt;&amp;lt;&lt;/li&gt;
-&lt;li&gt;&amp;lt;=&lt;/li&gt;
-&lt;li&gt;&amp;gt;&lt;/li&gt;
-&lt;li&gt;&lt;blockquote&gt;
-&lt;p&gt;=&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;IS NULL ：判断一个字段的值是否为空。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;IS NOT NULL&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;LIKE: 支持的通配符: %(任意长度的任意字符)， _（任意单个字符） 。&lt;br&gt;【注意】:能用等值比较或不等值比较，就尽量不要用LIKE。因为它的性能要差得多。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;RLIKE(REGEXP): 支持使用正则表达式 。&lt;br&gt;【注意】:性能比较低。LIKE和RLIKE是用来做字符串比较的，千万不要拿来做数值比较。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;IN: 判断指定字段的值是否在给定在列表中。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;BETWEEN … AND …: 位于指定的范围之间 。&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;【示例1】：NULL示例&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; CREATE TABLE `students` (`SID` int(100), `Name` varchar(50) NOT NULL, `Age` TINYINT UNSIGNED NOT NULL, `Gender` ENUM(&amp;apos;M&amp;apos;,&amp;apos;F&amp;apos;) NOT NULL DEFAULT &amp;apos;M&amp;apos;, `Tutor` varchar(50), PRIMARY KEY(`SID`));
-Query OK, 0 rows affected (0.04 sec)
-
-mysql&amp;gt; INSERT INTO `students` VALUES (1,&amp;apos;tom&amp;apos;,13,&amp;apos;M&amp;apos;,&amp;apos;Song Jiang&amp;apos;);
-Query OK, 1 row affected (0.00 sec)
-
-mysql&amp;gt; INSERT INTO `students` VALUES (2,&amp;apos;jerry&amp;apos;,14,&amp;apos;F&amp;apos;,&amp;apos;Jiabaoyu&amp;apos;); 
-Query OK, 1 row affected (0.01 sec)
-
-mysql&amp;gt; INSERT INTO `students` VALUES (3,&amp;apos;jack&amp;apos;,14,&amp;apos;M&amp;apos;,&amp;apos;JinJiao&amp;apos;);
-Query OK, 1 row affected (0.01 sec)
-
-mysql&amp;gt; INSERT INTO `students` VALUES (4,&amp;apos;Lucy&amp;apos;,14,&amp;apos;F&amp;apos;,NULL);
-Query OK, 1 row affected (0.00 sec)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/26.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;【示例2】：LIKE示例&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/27.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;【示例3】：RLIKE示例&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/28.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;【示例4】：IN示例&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/29.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;【示例5】：BETWEEN … AND示例&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/30.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;组合条件测试： 逻辑操作符组合多个条件。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;NOT, 可以用 ! 表示。&lt;/li&gt;
-&lt;li&gt;AND, 可以用&amp;amp;&amp;amp;表示&lt;/li&gt;
-&lt;li&gt;OR, 可以用 || 表示&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;聚合函数&quot;&gt;&lt;a href=&quot;#聚合函数&quot; class=&quot;headerlink&quot; title=&quot;聚合函数&quot;&gt;&lt;/a&gt;聚合函数&lt;/h3&gt;&lt;p&gt;聚合函数是mysql内置的。&lt;br&gt;&lt;strong&gt;SUM(), AVG(), MAX(), MIN(), COUNT()&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/31.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/32.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;分组&quot;&gt;&lt;a href=&quot;#分组&quot; class=&quot;headerlink&quot; title=&quot;分组&quot;&gt;&lt;/a&gt;分组&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;GROUP BY&lt;/strong&gt;。在聚合函数使用时，往往伴随着分组的使用，然后对一组进行聚合。分组的目的主要是来用聚合。我们可以在GROUP BY之前使用WHERE子句做条件过滤。具体前面写的通用查询格式。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/33.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;HAVING子句&quot;&gt;&lt;a href=&quot;#HAVING子句&quot; class=&quot;headerlink&quot; title=&quot;HAVING子句&quot;&gt;&lt;/a&gt;HAVING子句&lt;/h3&gt;&lt;p&gt;对GROUP BY、聚合函数查出的结果做条件过滤用HAVING子句。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; ALTER TABLE students ADD column `ClassID` int(10);
-Query OK, 0 rows affected (0.05 sec)
-Records: 0  Duplicates: 0  Warnings: 0
-
-mysql&amp;gt; UPDATE students SET ClassID=1 WHERE Name=&amp;apos;Tom&amp;apos;;
-Query OK, 1 row affected (0.00 sec)
-Rows matched: 1  Changed: 1  Warnings: 0
-
-mysql&amp;gt; UPDATE students SET ClassID=1 WHERE Name=&amp;apos;Jerry&amp;apos;;
-Query OK, 1 row affected (0.00 sec)
-Rows matched: 1  Changed: 1  Warnings: 0
-
-mysql&amp;gt; UPDATE students SET ClassID=1 WHERE Name=&amp;apos;Jack&amp;apos;;
-Query OK, 1 row affected (0.01 sec)
-Rows matched: 1  Changed: 1  Warnings: 0
-
-mysql&amp;gt; UPDATE students SET ClassID=2 WHERE Name=&amp;apos;Lucy&amp;apos;;
-Query OK, 1 row affected (0.01 sec)
-Rows matched: 1  Changed: 1  Warnings: 0
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/34.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;排序&quot;&gt;&lt;a href=&quot;#排序&quot; class=&quot;headerlink&quot; title=&quot;排序&quot;&gt;&lt;/a&gt;排序&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;ORDER BY。&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/35.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;LIMIT&quot;&gt;&lt;a href=&quot;#LIMIT&quot; class=&quot;headerlink&quot; title=&quot;LIMIT&quot;&gt;&lt;/a&gt;LIMIT&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;【注意】:有的时候为了简单的判断工作，我们只需要查询结果返回一部分结果，这时候可以使用LIMIT子句。&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/36.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h3 id=&quot;总结SELECT几种惯常用法&quot;&gt;&lt;a href=&quot;#总结SELECT几种惯常用法&quot; class=&quot;headerlink&quot; title=&quot;总结SELECT几种惯常用法&quot;&gt;&lt;/a&gt;总结SELECT几种惯常用法&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;SELECT ...
-FROM ...
-ORDER BY ...
-
-SELECT ...
-FROM ...
-GROUP BY ...
-HAVING ...
-
-SELECT ...
-FROM ...
-WHERE ...
-
-SELECT ...
-
-SELECT ...
-FROM ...
-WHERE ...
-GROUP BY ...
-LIMIT ...
-
-SELECT ...
-FROM ...
-HAVING ...
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&quot;SELECT语句的执行流程&quot;&gt;&lt;a href=&quot;#SELECT语句的执行流程&quot; class=&quot;headerlink&quot; title=&quot;SELECT语句的执行流程&quot;&gt;&lt;/a&gt;SELECT语句的执行流程&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;FROM clause --&amp;gt; WHERE clause --&amp;gt; GROUP BY --&amp;gt; HAVING clause --&amp;gt; ORDER BY ... --&amp;gt; SELECT --&amp;gt; LIMIT
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;【注意】:where子句不能使用聚合函数&lt;/strong&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/37.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;【补充】：SELECT语句:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;DISTINCT：指定的结果相同的只显示一次；&lt;/li&gt;
-&lt;li&gt;SQL_CACHE：缓存于查询缓存中；&lt;/li&gt;
-&lt;li&gt;SQL_NO_CACHE：不缓存查询结果。&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/38.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;多表查询&quot;&gt;&lt;a href=&quot;#多表查询&quot; class=&quot;headerlink&quot; title=&quot;多表查询&quot;&gt;&lt;/a&gt;多表查询&lt;/h2&gt;&lt;p&gt;联结查询：事先将两张或多张表join，根据join的结果进行查询。&lt;br&gt;为什么会有多表查询？数据库设计要求降低冗余。如果一个数据我们来回存了n次，就建议拆分成两张表，并且在两张表中都有的字段建立关联关系。&lt;/p&gt;
-&lt;p&gt;下面先初始化数据，导入一个sql脚本，用于举例子。脚本内容如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;CREATE DATABASE /*!32312 IF NOT EXISTS*/ `test` /*!40100 DEFAULT CHARACTER SET utf8 */;
-
-USE `test`;
-
---
--- Table structure for table `classes`
---
-
-DROP TABLE IF EXISTS `classes`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `classes` (
-  `ClassID` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
-  `Class` varchar(100) DEFAULT NULL,
-  `NumOfStu` smallint(5) unsigned DEFAULT NULL,
-  PRIMARY KEY (`ClassID`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `classes`
---
-
-LOCK TABLES `classes` WRITE;
-/*!40000 ALTER TABLE `classes` DISABLE KEYS */;
-INSERT INTO `classes` VALUES (1,&amp;apos;Shaolin Pai&amp;apos;,10),(2,&amp;apos;Emei Pai&amp;apos;,7),(3,&amp;apos;QingCheng Pai&amp;apos;,11),(4,&amp;apos;Wudang Pai&amp;apos;,12),(5,&amp;apos;Riyue Shenjiao&amp;apos;,31),(6,&amp;apos;Lianshan Pai&amp;apos;,27),(7,&amp;apos;Ming Jiao&amp;apos;,27),(8,&amp;apos;Xiaoyao Pai&amp;apos;,15);
-/*!40000 ALTER TABLE `classes` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `coc`
---
-
-DROP TABLE IF EXISTS `coc`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `coc` (
-  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `ClassID` tinyint(3) unsigned NOT NULL,
-  `CourseID` smallint(5) unsigned DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `coc`
---
-
-LOCK TABLES `coc` WRITE;
-/*!40000 ALTER TABLE `coc` DISABLE KEYS */;
-INSERT INTO `coc` VALUES (1,1,2),(2,1,5),(3,2,2),(4,2,6),(5,3,1),(6,3,7),(7,4,5),(8,4,2),(9,5,1),(10,5,9),(11,6,3),(12,6,4),(13,7,4),(14,7,3);
-/*!40000 ALTER TABLE `coc` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `courses`
---
-
-DROP TABLE IF EXISTS `courses`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `courses` (
-  `CourseID` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-  `Course` varchar(100) NOT NULL,
-  PRIMARY KEY (`CourseID`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `courses`
---
-
-LOCK TABLES `courses` WRITE;
-/*!40000 ALTER TABLE `courses` DISABLE KEYS */;
-INSERT INTO `courses` VALUES (1,&amp;apos;Hamo Gong&amp;apos;),(2,&amp;apos;Kuihua Baodian&amp;apos;),(3,&amp;apos;Jinshe Jianfa&amp;apos;),(4,&amp;apos;Taiji Quan&amp;apos;),(5,&amp;apos;Daiyu Zanghua&amp;apos;),(6,&amp;apos;Weituo Zhang&amp;apos;),(7,&amp;apos;Dagou Bangfa&amp;apos;);
-/*!40000 ALTER TABLE `courses` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `scores`
---
-
-DROP TABLE IF EXISTS `scores`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `scores` (
-  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `StuID` int(10) unsigned NOT NULL,
-  `CourseID` smallint(5) unsigned NOT NULL,
-  `Score` tinyint(3) unsigned DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `scores`
---
-
-LOCK TABLES `scores` WRITE;
-/*!40000 ALTER TABLE `scores` DISABLE KEYS */;
-INSERT INTO `scores` VALUES (1,1,2,77),(2,1,6,93),(3,2,2,47),(4,2,5,97),(5,3,2,88),(6,3,6,75),(7,4,5,71),(8,4,2,89),(9,5,1,39),(10,5,7,63),(11,6,1,96),(12,7,1,86),(13,7,7,83),(14,8,4,57),(15,8,3,93);
-/*!40000 ALTER TABLE `scores` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `students`
---
-
-DROP TABLE IF EXISTS `students`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `students` (
-  `StuID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `Name` varchar(50) NOT NULL,
-  `Age` tinyint(3) unsigned NOT NULL,
-  `Gender` enum(&amp;apos;F&amp;apos;,&amp;apos;M&amp;apos;) NOT NULL,
-  `ClassID` tinyint(3) unsigned DEFAULT NULL,
-  `TeacherID` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`StuID`)
-) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `students`
---
-
-LOCK TABLES `students` WRITE;
-/*!40000 ALTER TABLE `students` DISABLE KEYS */;
-INSERT INTO `students` VALUES (1,&amp;apos;Shi Zhongyu&amp;apos;,22,&amp;apos;M&amp;apos;,2,3),(2,&amp;apos;Shi Potian&amp;apos;,22,&amp;apos;M&amp;apos;,1,7),(3,&amp;apos;Xie Yanke&amp;apos;,53,&amp;apos;M&amp;apos;,2,16),(4,&amp;apos;Ding Dian&amp;apos;,32,&amp;apos;M&amp;apos;,4,4),(5,&amp;apos;Yu Yutong&amp;apos;,26,&amp;apos;M&amp;apos;,3,1),(6,&amp;apos;Shi Qing&amp;apos;,46,&amp;apos;M&amp;apos;,5,NULL),(7,&amp;apos;Xi Ren&amp;apos;,19,&amp;apos;F&amp;apos;,3,NULL),(8,&amp;apos;Lin Daiyu&amp;apos;,17,&amp;apos;F&amp;apos;,7,NULL),(9,&amp;apos;Ren Yingying&amp;apos;,20,&amp;apos;F&amp;apos;,6,NULL),(10,&amp;apos;Yue Lingshan&amp;apos;,19,&amp;apos;F&amp;apos;,3,NULL),(11,&amp;apos;Yuan Chengzhi&amp;apos;,23,&amp;apos;M&amp;apos;,6,NULL),(12,&amp;apos;Wen Qingqing&amp;apos;,19,&amp;apos;F&amp;apos;,1,NULL),(13,&amp;apos;Tian Boguang&amp;apos;,33,&amp;apos;M&amp;apos;,2,NULL),(14,&amp;apos;Lu Wushuang&amp;apos;,17,&amp;apos;F&amp;apos;,3,NULL),(15,&amp;apos;Duan Yu&amp;apos;,19,&amp;apos;M&amp;apos;,4,NULL),(16,&amp;apos;Xu Zhu&amp;apos;,21,&amp;apos;M&amp;apos;,1,NULL),(17,&amp;apos;Lin Chong&amp;apos;,25,&amp;apos;M&amp;apos;,4,NULL),(18,&amp;apos;Hua Rong&amp;apos;,23,&amp;apos;M&amp;apos;,7,NULL),(19,&amp;apos;Xue Baochai&amp;apos;,18,&amp;apos;F&amp;apos;,6,NULL),(20,&amp;apos;Diao Chan&amp;apos;,19,&amp;apos;F&amp;apos;,7,NULL),(21,&amp;apos;Huang Yueying&amp;apos;,22,&amp;apos;F&amp;apos;,6,NULL),(22,&amp;apos;Xiao Qiao&amp;apos;,20,&amp;apos;F&amp;apos;,1,NULL),(23,&amp;apos;Ma Chao&amp;apos;,23,&amp;apos;M&amp;apos;,4,NULL),(24,&amp;apos;Xu Xian&amp;apos;,27,&amp;apos;M&amp;apos;,NULL,NULL),(25,&amp;apos;Sun Dasheng&amp;apos;,100,&amp;apos;M&amp;apos;,NULL,NULL);
-/*!40000 ALTER TABLE `students` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `teachers`
---
-
-DROP TABLE IF EXISTS `teachers`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `teachers` (
-  `TID` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-  `Name` varchar(100) NOT NULL,
-  `Age` tinyint(3) unsigned NOT NULL,
-  `Gender` enum(&amp;apos;F&amp;apos;,&amp;apos;M&amp;apos;) DEFAULT NULL,
-  PRIMARY KEY (`TID`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `teachers`
---
-
-LOCK TABLES `teachers` WRITE;
-/*!40000 ALTER TABLE `teachers` DISABLE KEYS */;
-INSERT INTO `teachers` VALUES (1,&amp;apos;Song Jiang&amp;apos;,45,&amp;apos;M&amp;apos;),(2,&amp;apos;Zhang Sanfeng&amp;apos;,94,&amp;apos;M&amp;apos;),(3,&amp;apos;Miejue Shitai&amp;apos;,77,&amp;apos;F&amp;apos;),(4,&amp;apos;Lin Chaoying&amp;apos;,93,&amp;apos;F&amp;apos;);
-/*!40000 ALTER TABLE `teachers` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `toc`
---
-
-DROP TABLE IF EXISTS `toc`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `toc` (
-  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `CourseID` smallint(5) unsigned DEFAULT NULL,
-  `TID` smallint(5) unsigned DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `toc`
---
-
-LOCK TABLES `toc` WRITE;
-/*!40000 ALTER TABLE `toc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `toc` ENABLE KEYS */;
-UNLOCK TABLES;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;join的方式：&lt;/strong&gt;&lt;br&gt;&lt;strong&gt;1.cross join: 交叉联结。多项式相乘。效率极低，很少用。&lt;/strong&gt;&lt;br&gt;(a+b)(c+d+e)=ac+ad+ae+bc+bd+be&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;2.自然联结：内连接，等值连接。&lt;/strong&gt;&lt;br&gt;等值连接:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT * FROM students, classes WHERE students.ClassID = classes.ClassID;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/39.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;3.外联结：&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;左外联结：只保留出现在左外连接运算之前（左边）的关系中的元组(元组就是记录)；&lt;br&gt;left_tb LEFT JOIN right_tb ON 连接条件(通常是一种等值比较)&lt;/li&gt;
-&lt;li&gt;右外联结：只保留出现在右外连接运算之后（右边）的关系中的元组；left_tb RIGHT JOIN right_tb ON 连接条件&lt;/li&gt;
-&lt;li&gt;全外联结：左右都出现，保留关系中的每一个元组。对应于右外连接来讲，左侧没有的左侧留空；对应于左外链接来讲，右侧没有的右留空。但是mysql是不支持全外联结。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;【示例】：左外连接&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT s.Name,c.Class FROM students AS s LEFT JOIN classes AS c ON s.ClassID=c.ClassID;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/40.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;【示例】：右外连接&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT s.Name,c.Class FROM students AS s RIGHT JOIN classes AS c ON s.ClassID=c.ClassID;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/41.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;4.自联结：自己连接自己。&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT t.Name,s.Name FROM students AS s,students AS t WHERE s.StuID = t.TeacherID;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/42.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;别名：&lt;/strong&gt;当表名、字段名太长时，或者为了区分，可以起个别名。使用AS&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/43.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/44.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/45.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;【示例】：&lt;/strong&gt;&lt;br&gt; 1、显示前5位同学的姓名、课程及成绩；&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,Course FROM students AS s,courses AS c,coc WHERE s.ClassID = coc.ClassID AND coc.CourseID = c.CourseID AND s.StuID &amp;lt; 5;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/46.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,Course,Score FROM students AS s,courses AS c,coc,scores AS ss WHERE s.ClassID = coc.ClassID AND coc.CourseID = c.CourseID AND s.StuID &amp;lt; 5 AND s.StuID=ss.StuID;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/47.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;但是由于scores表的StuID有重复，导致上面的s.StuID=ss.StuID条件挑选出来有重复，所以还要加一个条件。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,Course,Score FROM students AS s,courses AS c,coc,scores AS ss WHERE s.ClassID = coc.ClassID AND coc.CourseID = c.CourseID AND s.StuID &amp;lt; 5 AND s.StuID=ss.StuID AND coc.CourseID=ss.CourseID;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/48.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;2、求前8位同学每位同学自己两门课的平均成绩，并按降序排列；&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,AVG(Score) FROM students AS s,courses AS c,coc,scores AS ss WHERE s.ClassID = coc.ClassID AND coc.CourseID = c.CourseID AND s.StuID&amp;lt;=8 AND s.StuID=ss.StuID AND coc.CourseID=ss.CourseID GROUP BY Name ORDER BY AVG(Score) DESC;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/49.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;子查询&quot;&gt;&lt;a href=&quot;#子查询&quot; class=&quot;headerlink&quot; title=&quot;子查询&quot;&gt;&lt;/a&gt;子查询&lt;/h2&gt;&lt;p&gt;【思考】：如何显示其年龄大于平均年龄的同学的名字？&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/50.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;子查询：在查询中嵌套的查询。&lt;/p&gt;
-&lt;h3 id=&quot;用于WHERE中的子查询&quot;&gt;&lt;a href=&quot;#用于WHERE中的子查询&quot; class=&quot;headerlink&quot; title=&quot;用于WHERE中的子查询&quot;&gt;&lt;/a&gt;用于WHERE中的子查询&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1、用于比较表达式中的子查询&lt;/strong&gt;&lt;br&gt;子查询的返回值只能有一个；&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,Age FROM students WHERE Age &amp;gt; (SELECT AVG(Age) FROM students GROUP BY Gender); 
-ERROR 1242 (21000): Subquery returns more than 1 row
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;2、用于EXISTS中的子查询&lt;/strong&gt;&lt;br&gt;判断存在与否&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;3、用于IN中的子查询&lt;/strong&gt;&lt;br&gt;判断存在于指定列表中&lt;/p&gt;
-&lt;h3 id=&quot;用于FROM中的子查询&quot;&gt;&lt;a href=&quot;#用于FROM中的子查询&quot; class=&quot;headerlink&quot; title=&quot;用于FROM中的子查询&quot;&gt;&lt;/a&gt;用于FROM中的子查询&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;SELECT alias.col,... FROM (SELECT clause) AS alias WHERE condition  
-mysql&amp;gt; SELECT s.Name,s.Age,s.Gender FROM (SELECT * FROM students WHERE Gender=&amp;apos;M&amp;apos;) AS s WHERE s.Age &amp;gt; 25;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/51.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;【注意】：MySQL不擅长于子查询：应该避免使用子查询。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;【总结】：MySQL的联结查询及子查询&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;联结&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;交叉联结&lt;/li&gt;
-&lt;li&gt;内联结&lt;/li&gt;
-&lt;li&gt;外联结&lt;ul&gt;
-&lt;li&gt;左外&lt;/li&gt;
-&lt;li&gt;右外&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;自联结&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;子查询&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;用于WHERE中的子查询&lt;ul&gt;
-&lt;li&gt;用于条件比较：子查询只能一个值&lt;/li&gt;
-&lt;li&gt;用于IN：子查询可以返回多个值&lt;/li&gt;
-&lt;li&gt;EXISTS：子查询可以返回多个值&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;用于FROM子句的子查询&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;MySQL的联合查询&quot;&gt;&lt;a href=&quot;#MySQL的联合查询&quot; class=&quot;headerlink&quot; title=&quot;MySQL的联合查询&quot;&gt;&lt;/a&gt;MySQL的联合查询&lt;/h2&gt;&lt;p&gt;把两个或多个查询语句的结果合并成一个结果进行输出。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;SELECT clauase UNION SELECT clause UNION ...
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;【示例】：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,Age FROM teachers UNION SELECT Name,Age FROM students;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;所谓索引有用，就是查询条件上面有索引，比如下例，你在姓名上创建索引，根据年龄来查找是没用的。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; SELECT Name,Age FROM students WHERE Age &amp;gt; 25;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查询表中是否有索引：&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/52.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;查看一个查询语句是否用到索引：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; EXPLAIN SELECT Name,Age FROM students WHERE Age &amp;gt; 25\G
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/53.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;在某个字段上添加一个索引，然后再来查看这个查询是否用到索引：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; ALTER TABLE students ADD INDEX (Age);
-mysql&amp;gt; SHOW INDEXES FROM students;
-mysql&amp;gt; EXPLAIN SELECT Name,Age FROM students WHERE Age &amp;gt; 25\G
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/54.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;MySQL视图&quot;&gt;&lt;a href=&quot;#MySQL视图&quot; class=&quot;headerlink&quot; title=&quot;MySQL视图&quot;&gt;&lt;/a&gt;MySQL视图&lt;/h2&gt;&lt;p&gt;视图就是一虚表，MySQL对视图的支持很有限，因为MySQL支持子查询很有限。&lt;/p&gt;
-&lt;p&gt;【示例】：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; GRANT ALL on hellodb.students TO &amp;apos;testuser&amp;apos;@&amp;apos;172.%.%.%&amp;apos; IDENTIFIED BY &amp;apos;testpass&amp;apos;;
-Query OK, 0 rows affected (0.00 sec)
-mysql&amp;gt; GRANT ALL on hellodb.students TO &amp;apos;testuser&amp;apos;@&amp;apos;localhost&amp;apos; IDENTIFIED BY &amp;apos;testpass&amp;apos;;          
-Query OK, 0 rows affected (0.00 sec)
-mysql&amp;gt; FLUSH PRIVILEGES;
-Query OK, 0 rows affected (0.00 sec)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/55.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;为什么会出现这样的情况？&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;In many default installations, all users have all privileges on tables within any database called test or beginning with test_.
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;所以我这边重新导入上面的数据，并将数据库名字命名为hellodb。然后删除上面的两个用户，并且重新授权。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; use mysql
-Database changed
-mysql&amp;gt; DELETE FROM user WHERE user=&amp;apos;testuser&amp;apos;;
-Query OK, 2 rows affected (0.00 sec)
-
-mysql&amp;gt; FLUSH PRIVILEGES;
-Query OK, 0 rows affected (0.00 sec)
-
-mysql&amp;gt; GRANT ALL on hellodb.students TO &amp;apos;testuser&amp;apos;@&amp;apos;172.%.%.%&amp;apos; IDENTIFIED BY &amp;apos;testpass&amp;apos;;
-Query OK, 0 rows affected (0.01 sec)
-
-mysql&amp;gt; GRANT ALL on hellodb.students TO &amp;apos;testuser&amp;apos;@&amp;apos;localhost&amp;apos; IDENTIFIED BY &amp;apos;testpass&amp;apos;; 
-Query OK, 0 rows affected (0.00 sec)
-
-mysql&amp;gt; FLUSH PRIVILEGES;
-Query OK, 0 rows affected (0.00 sec)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/56.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/57.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;其实授权的时候可以指定只给看表的某几个字段，但是用户用DESC students还是能看到这两个字段的定义。所以如果我们要想让用户意识到这两个用户不存在怎么办？这就是视图的意义了。创建一个虚表。授权视图给用户。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;视图：存储下来的SELECT语句； 说白了就是把SELECT语句当表来用。&lt;/strong&gt;&lt;br&gt;【注意】:你什么时候用，它什么时候才执行，平时是没有的。因为存下来的是SELECT语句，不是SELECT查询的结果。当然，Oracle支持物化视图，MySQL不支持。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; HELP CREATE VIEW
-Name: &amp;apos;CREATE VIEW&amp;apos;
-Description:
-Syntax:
-CREATE
-    [OR REPLACE]
-    [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
-    [DEFINER = { user | CURRENT_USER }]
-    [SQL SECURITY { DEFINER | INVOKER }]
-    VIEW view_name [(column_list)]
-    AS select_statement
-    [WITH [CASCADED | LOCAL] CHECK OPTION]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/58.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/59.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/60.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/MySQL/61.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;删除视图：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;mysql&amp;gt; DROP VIEW stu;
-Query OK, 0 rows affected (0.00 sec)
-&lt;/code&gt;&lt;/pre&gt;</content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;查询的执行路径&quot;&gt;&lt;a href=&quot;#查询的执行路径&quot; class=&quot;headerlink&quot; title=&quot;查询的执行路径&quot;&gt;&lt;/a&gt;查询的执行路径&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;查询执行路径：&lt;/strong&gt;先查缓存，缓存未命中交给解析器。MySQL是允许多个用户连接进来的，因此有多个线程，如果每个线程上的用户都发起查询请求，而mysql真正能够执行查询的查询引擎只有一个，所以要排队，要给一个队列。
     
     </summary>
     
