@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-08-09T08:40:17.000Z</updated>
+  <updated>2019-08-09T08:45:54.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,9 +20,10 @@
     <link href="http://yoursite.com/2019/08/09/Kubernetes-Pod%E6%8E%A2%E9%92%88/"/>
     <id>http://yoursite.com/2019/08/09/Kubernetes-Pod探针/</id>
     <published>2019-08-09T01:25:46.000Z</published>
-    <updated>2019-08-09T08:40:17.000Z</updated>
+    <updated>2019-08-09T08:45:54.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;探针类型&quot;&gt;&lt;a href=&quot;#探针类型&quot; class=&quot;headerlink&quot; title=&quot;探针类型&quot;&gt;&lt;/a&gt;探针类型&lt;/h2&gt;&lt;p&gt;探针主要有两种：livenessProbe和readinessProbe。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 ~]# kubectl explain pods.spec.containers&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
 &lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/83.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;容器探测无非就是我们在里面设置了一些探针，或传感器来获取相应的数据作为判定其存活与否的标准和就绪与否的标准。对于 livenessProbe和readinessProbe 这两种探针，可定义的具体探针有三种：&lt;/p&gt;
 &lt;ul&gt;
@@ -79,7 +80,7 @@
     
     <summary type="html">
     
-      &lt;h2 id=&quot;探针类型&quot;&gt;&lt;a href=&quot;#探针类型&quot; class=&quot;headerlink&quot; title=&quot;探针类型&quot;&gt;&lt;/a&gt;探针类型&lt;/h2&gt;&lt;p&gt;探针主要有两种：livenessProbe和readinessProbe。&lt;br&gt;&lt;figure class=&quot;highli
+      &lt;h2 id=&quot;探针类型&quot;&gt;&lt;a href=&quot;#探针类型&quot; class=&quot;headerlink&quot; title=&quot;探针类型&quot;&gt;&lt;/a&gt;探针类型&lt;/h2&gt;&lt;p&gt;探针主要有两种：livenessProbe和readinessProbe。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 ~]# kubectl explain pods.spec.containers&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
     
     </summary>
     
