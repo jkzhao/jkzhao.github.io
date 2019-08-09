@@ -121,7 +121,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/89.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/90.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/91.png">
-<meta property="og:updated_time" content="2019-08-09T09:30:32.000Z">
+<meta property="og:updated_time" content="2019-08-09T09:32:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kubernetes Pod探针">
 <meta name="twitter:description" content="探针类型探针主要有两种：livenessProbe和readinessProbe。1[root@spark32 ~]# kubectl explain pods.spec.containers">
@@ -354,7 +354,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2019-08-09T17:30:32+08:00" content="2019-08-09">
+              <time itemprop="dateUpdated" datetime="2019-08-09T17:32:54+08:00" content="2019-08-09">
               2019-08-09
               </time>
               </span>
@@ -436,24 +436,7 @@
 <li>HTTPGetAction      </li>
 </ul>
 <p>每次定义三者之中的一个就可以了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ kubectl explain pods.spec.containers.livenessProbe</div></pre></td></tr></table></figure></p>
-<ul>
-<li><p>exec <object><br>exec探针。执行用户自定义命令，这个命令得是容器中存在的命令才行</object></p>
-</li>
-<li><p>failureThreshold  <integer><br>探测几次都失败，才认为是失败的。默认是3个。</integer></p>
-</li>
-<li><p>httpGet <object><br>httpGet探针</object></p>
-</li>
-<li><p>initialDelaySeconds <integer><br>在容器启动以后多久做探测，很多时间容器启动了，但是主程序很可能还没初始化完成。因此应该等一些时间在探测。默认是容器一启动就探测。</integer></p>
-</li>
-<li><p>periodSeconds <integer><br>每次探测之间间隔多长时间，默认10s</integer></p>
-</li>
-<li><p>successThreshold <integer><br>成功几次说明ok，默认是1次</integer></p>
-</li>
-<li><p>tcpSocket <object><br>tcpSocket探针</object></p>
-</li>
-<li><p>timeoutSeconds <integer><br>超时时间，发出探测，多久没响应，默认1s。</integer></p>
-</li>
-</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">- exec &lt;Object&gt;</div><div class="line">exec探针。执行用户自定义命令，这个命令得是容器中存在的命令才行</div><div class="line"></div><div class="line">- failureThreshold  &lt;integer&gt;</div><div class="line">探测几次都失败，才认为是失败的。默认是3个。</div><div class="line"></div><div class="line">- httpGet &lt;Object&gt;</div><div class="line">httpGet探针</div><div class="line"></div><div class="line">- initialDelaySeconds &lt;integer&gt;</div><div class="line">在容器启动以后多久做探测，很多时间容器启动了，但是主程序很可能还没初始化完成。因此应该等一些时间在探测。默认是容器一启动就探测。</div><div class="line"></div><div class="line">- periodSeconds &lt;integer&gt;</div><div class="line">每次探测之间间隔多长时间，默认10s</div><div class="line"></div><div class="line">- successThreshold &lt;integer&gt;</div><div class="line">成功几次说明ok，默认是1次</div><div class="line"></div><div class="line">- tcpSocket &lt;Object&gt;</div><div class="line">tcpSocket探针</div><div class="line"></div><div class="line">- timeoutSeconds &lt;integer&gt;</div><div class="line">超时时间，发出探测，多久没响应，默认1s。</div></pre></td></tr></table></figure>
 <p>readiness探测所使用的字段和liveness字段是一样的。只是两者探测目的不一样。</p>
 <h2 id="livenessProbe探针示例"><a href="#livenessProbe探针示例" class="headerlink" title="livenessProbe探针示例"></a>livenessProbe探针示例</h2><h3 id="exec探测"><a href="#exec探测" class="headerlink" title="exec探测"></a>exec探测</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain pods.spec.containers.livenessProbe.exec</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: exec &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     One and only one of the following should be specified. Exec specifies the</div><div class="line">     action to take.</div><div class="line"></div><div class="line">     ExecAction describes a &quot;run in container&quot; action.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   command      &lt;[]string&gt;</div><div class="line">     Command is the command line to execute inside the container, the working</div><div class="line">     directory for the command is root (&apos;/&apos;) in the container&apos;s filesystem. The</div><div class="line">     command is simply exec&apos;d, it is not run inside a shell, so traditional</div><div class="line">     shell instructions (&apos;|&apos;, etc) won&apos;t work. To use a shell, you need to</div><div class="line">     explicitly call out to that shell. Exit status of 0 is treated as</div><div class="line">     live/healthy and non-zero is unhealthy.</div></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# vim liveness-exec.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: liveness-exec-pod</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: liveness-exec-container</div><div class="line">    image: busybox:latest</div><div class="line">    imagePullPolicy: IfNotPresent</div><div class="line">    command: [&quot;sh&quot;,&quot;-c&quot;,&quot;touch /tmp/healthy; sleep 30; rm -f /tmp/healthy; sleep 3600&quot;]</div><div class="line">    livenessProbe:</div><div class="line">      exec:</div><div class="line">        command: [&quot;test&quot;,&quot;-e&quot;,&quot;/tmp/healthy&quot;]</div><div class="line">      initialDelaySeconds: 1 #默认0s，即容器一启动就探测</div><div class="line">      periodSeconds: 3 #每隔多长时间进行探测</div><div class="line">[root@spark32 manifests]# kubectl create -f liveness-exec.yaml </div><div class="line">pod/liveness-exec-pod created</div></pre></td></tr></table></figure>
@@ -727,7 +710,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共231.7k字</span>
+  <span class="post-count">博客全站共231.8k字</span>
 </div>
 
         
