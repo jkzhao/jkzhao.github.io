@@ -324,6 +324,202 @@
             
               
                 
+                <a class="post-title-link" href="/2019/08/09/Kubernetes-Pod探针/" itemprop="url">
+                  Kubernetes Pod探针
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-08-09T09:25:46+08:00" content="2019-08-09">
+              2019-08-09
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-08-09T16:40:17+08:00" content="2019-08-09">
+              2019-08-09
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/08/09/Kubernetes-Pod探针/" class="leancloud_visitors" data-flag-title="Kubernetes Pod探针">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="探针类型"><a href="#探针类型" class="headerlink" title="探针类型"></a>探针类型</h2><p>探针主要有两种：livenessProbe和readinessProbe。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain pods.spec.containers</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/83.png" alt=""></p>
+<p>容器探测无非就是我们在里面设置了一些探针，或传感器来获取相应的数据作为判定其存活与否的标准和就绪与否的标准。对于 livenessProbe和readinessProbe 这两种探针，可定义的具体探针有三种：</p>
+<ul>
+<li>ExecAction</li>
+<li>TCPSocketAction</li>
+<li>HTTPGetAction      </li>
+</ul>
+<p>每次定义三者之中的一个就可以了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ kubectl explain pods.spec.containers.livenessProbe</div></pre></td></tr></table></figure></p>
+<ul>
+<li><strong>exec <object></object></strong><br>exec探针。执行用户自定义命令，这个命令得是容器中存在的命令才行</li>
+<li><strong>failureThreshold     <integer></integer></strong><br>探测几次都失败，才认为是失败的。默认是3个。</li>
+<li><strong>httpGet      <object></object></strong><br>探针</li>
+<li><strong>initialDelaySeconds  <integer></integer></strong><br>在容器启动以后多久做探测，很多时间容器启动了，但是主程序很可能还没初始化完成。因此应该等一些时间在探测。默认是容器一启动就探测。</li>
+<li><strong>periodSeconds        <integer></integer></strong><br>每次探测之间间隔多长时间，默认10s</li>
+<li><strong>successThreshold     <integer></integer></strong><br>成功几次说明ok，默认是1次</li>
+<li><strong>tcpSocket    <object></object></strong><br>探针</li>
+<li><strong>timeoutSeconds       <integer></integer></strong><br>超时时间，发出探测，多久没响应，默认1s。</li>
+</ul>
+<p>readiness探测所使用的字段和liveness字段是一样的。只是两者探测目的不一样。</p>
+<h2 id="livenessProbe探针示例"><a href="#livenessProbe探针示例" class="headerlink" title="livenessProbe探针示例"></a>livenessProbe探针示例</h2><h3 id="exec探测"><a href="#exec探测" class="headerlink" title="exec探测"></a>exec探测</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain pods.spec.containers.livenessProbe.exec</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: exec &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     One and only one of the following should be specified. Exec specifies the</div><div class="line">     action to take.</div><div class="line"></div><div class="line">     ExecAction describes a &quot;run in container&quot; action.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   command      &lt;[]string&gt;</div><div class="line">     Command is the command line to execute inside the container, the working</div><div class="line">     directory for the command is root (&apos;/&apos;) in the container&apos;s filesystem. The</div><div class="line">     command is simply exec&apos;d, it is not run inside a shell, so traditional</div><div class="line">     shell instructions (&apos;|&apos;, etc) won&apos;t work. To use a shell, you need to</div><div class="line">     explicitly call out to that shell. Exit status of 0 is treated as</div><div class="line">     live/healthy and non-zero is unhealthy.</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# vim liveness-exec.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: liveness-exec-pod</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: liveness-exec-container</div><div class="line">    image: busybox:latest</div><div class="line">    imagePullPolicy: IfNotPresent</div><div class="line">    command: [&quot;sh&quot;,&quot;-c&quot;,&quot;touch /tmp/healthy; sleep 30; rm -f /tmp/healthy; sleep 3600&quot;]</div><div class="line">    livenessProbe:</div><div class="line">      exec:</div><div class="line">        command: [&quot;test&quot;,&quot;-e&quot;,&quot;/tmp/healthy&quot;]</div><div class="line">      initialDelaySeconds: 1 #默认0s，即容器一启动就探测</div><div class="line">      periodSeconds: 3 #每隔多长时间进行探测</div><div class="line">[root@spark32 manifests]# kubectl create -f liveness-exec.yaml </div><div class="line">pod/liveness-exec-pod created</div></pre></td></tr></table></figure>
+<p>过个30s，然后去查看下这个pod的状态：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl describe pod liveness-exec-pod</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/84.png" alt=""></p>
+<h3 id="httpGet探测"><a href="#httpGet探测" class="headerlink" title="httpGet探测"></a>httpGet探测</h3><p>如果容器内是个web服务，可以使用TCP套接字探测，还可以使用HTTP探测。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain pods.spec.containers.livenessProbe.httpGet</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: httpGet &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     HTTPGet specifies the http request to perform.</div><div class="line"></div><div class="line">     HTTPGetAction describes an action based on HTTP Get requests.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   host &lt;string&gt;</div><div class="line">     Host name to connect to, defaults to the pod IP. You probably want to set</div><div class="line">     &quot;Host&quot; in httpHeaders instead.</div><div class="line"></div><div class="line">   httpHeaders  &lt;[]Object&gt;</div><div class="line">     Custom headers to set in the request. HTTP allows repeated headers.</div><div class="line"></div><div class="line">   path &lt;string&gt;</div><div class="line">     Path to access on the HTTP server.</div><div class="line"></div><div class="line">   port &lt;string&gt; -required-</div><div class="line">     Name or number of the port to access on the container. Number must be in</div><div class="line">     the range 1 to 65535. Name must be an IANA_SVC_NAME.</div><div class="line"></div><div class="line">   scheme       &lt;string&gt;</div><div class="line">     Scheme to use for connecting to the host. Defaults to HTTP.</div></pre></td></tr></table></figure></p>
+<ul>
+<li><p><strong>host <string></string></strong><br>默认往Pod IP发请求。</p>
+</li>
+<li><p><strong>httpHeaders  &lt;[]Object&gt;</strong><br>自定义首部。</p>
+</li>
+<li><p><strong>path <string></string></strong><br>向哪个url发请求</p>
+</li>
+<li><p><strong>port <string> -required-</string></strong><br>Name or number of the port to access on the container. Number must be in<br>the range 1 to 65535. Name must be an <strong>IANA_SVC_NAME</strong>.<br>如果我们在containers暴露定义了名称，这里port这个字段可以使用定义的名称。</p>
+</li>
+<li><p><strong>scheme       <string></string></strong><br>Scheme to use for connecting to the host. Defaults to HTTP.</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# vim liveness-httpget.yaml </div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: liveness-httpget-pod</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: liveness-httpget-container</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">    imagePullPolicy: IfNotPresent</div><div class="line">    ports:</div><div class="line">    - name: http</div><div class="line">      containerPort: 80</div><div class="line">    livenessProbe:</div><div class="line">      httpGet:</div><div class="line">        port: http</div><div class="line">        path: /index.html</div><div class="line">      initialDelaySeconds: 1 #默认0s，即容器一启动就探测</div><div class="line">      periodSeconds: 3 #每隔多长时间进行探测</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl create -f liveness-httpget.yaml </div><div class="line">pod/liveness-httpget-pod created</div><div class="line">[root@spark32 manifests]# kubectl describe pod liveness-httpget-pod</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/85.png" alt=""><br>下面手动进入Pod中的容器，删除这个index.html文件，然后看看探针是否探测失败：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl exec -it liveness-httpget-pod -- /bin/sh</div><div class="line">/ # ls /usr/share/nginx/html/</div><div class="line">50x.html    index.html</div><div class="line">/ # rm -f /usr/share/nginx/html/index.html</div></pre></td></tr></table></figure></p>
+<p>在另一个终端 describe 这个pod：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl describe pod liveness-httpget-pod | grep -i liveness</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/86.png" alt=""></p>
+<h2 id="readinessProbe探针示例"><a href="#readinessProbe探针示例" class="headerlink" title="readinessProbe探针示例"></a>readinessProbe探针示例</h2><h3 id="就绪性探测必要性"><a href="#就绪性探测必要性" class="headerlink" title="就绪性探测必要性"></a>就绪性探测必要性</h3><p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/87.png" alt=""><br>如果你不定义就绪，那么容器一启动，该容器状态就显示为1，就绪。<br>就绪性探测和service调度有着重要的关联性。service是个固定入口端点，为动态地、有生命周期的Pod资源提供一个固定的入口端口。客户端不是直接访问Pod，而是访问service。service使用标签选择器关联至各Pod资源。这里有个问题，比如现在又创建了一个新Pod出来，这个新Pod正好符合这个service标签选择器的选择条件，立即把这个Pod作为后端对象了。用户请求进来可能被调度到这个新Pod上了。但是这个新Pod一创建成功，就被service关联到后端去了，但是此时Pod里的服务很有可能还没就绪。这个时候有请求被调度上来，肯定是访问不到服务的。因此要做就绪性探测，否则Pod一创建就被立即关联到service上了。所以以后使用Pod必须要做readinessProbe。<br>readinessProbe和livenessProbe支持的探针都是一样的，但是两者目的不一样。</p>
+<h3 id="httpGet探测-1"><a href="#httpGet探测-1" class="headerlink" title="httpGet探测"></a>httpGet探测</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# cp liveness-httpget.yaml readiness-httpget.yaml</div><div class="line">[root@spark32 manifests]# vim readiness-httpget.yaml </div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: readiness-httpget-pod</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: readiness-httpget-container</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">    imagePullPolicy: IfNotPresent</div><div class="line">    ports:</div><div class="line">    - name: http</div><div class="line">      containerPort: 80</div><div class="line">    readinessProbe:</div><div class="line">      httpGet:</div><div class="line">        port: http</div><div class="line">        path: /index.html</div><div class="line">      initialDelaySeconds: 1 #默认0s，即容器一启动就探测</div><div class="line">      periodSeconds: 3 #每隔多长时间进行探测</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl create -f readiness-httpget.yaml </div><div class="line">[root@spark32 manifests]# kubectl get pods</div><div class="line">NAME                           READY   STATUS    RESTARTS   AGE</div><div class="line">client-69fd89d767-95nqt        1/1     Running   1          6d21h</div><div class="line">liveness-httpget-pod           1/1     Running   1          34m</div><div class="line">myapp-5bc569c47d-qq8lb         1/1     Running   0          7d</div><div class="line">myapp-5bc569c47d-stvj9         1/1     Running   0          7d</div><div class="line">myapp-5bc569c47d-tzlsf         1/1     Running   0          7d</div><div class="line">nginx-deploy-55d8d67cf-wf28j   1/1     Running   0          7d1h</div><div class="line">readiness-httpget-pod          1/1     Running   0          3s</div></pre></td></tr></table></figure>
+<p>已经显示为就绪状态。然后我们进入这个Pod中的容器，删除index.html文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl exec -it readiness-httpget-pod -- /bin/sh</div><div class="line">/ # rm -f /usr/share/nginx/html/index.html</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/88.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/89.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/ # echo &quot;hi&quot; &gt;&gt; /usr/share/nginx/html/index.html</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/90.png" alt=""></p>
+<h2 id="Pod生命周期中的另外一种行为lifecycle：启动后钩子和终止前钩子"><a href="#Pod生命周期中的另外一种行为lifecycle：启动后钩子和终止前钩子" class="headerlink" title="Pod生命周期中的另外一种行为lifecycle：启动后钩子和终止前钩子"></a>Pod生命周期中的另外一种行为lifecycle：启动后钩子和终止前钩子</h2><p>在主容器刚刚启动之后，用户可以手动嵌入做一些操作，可以做一个 post start，比如执行完一个命令就退出。<br>如果主容器要退出，在结束之前，也可以做一些事情，pre stop。类似于awk的BEGIN和END。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain pods.spec.containers.lifecycle</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: lifecycle &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Actions that the management system should take in response to container</div><div class="line">     lifecycle events. Cannot be updated.</div><div class="line"></div><div class="line">     Lifecycle describes actions that the management system should take in</div><div class="line">     response to container lifecycle events. For the PostStart and PreStop</div><div class="line">     lifecycle handlers, management of the container blocks until the action is</div><div class="line">     complete, unless the container process fails, in which case the handler is</div><div class="line">     aborted.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   postStart    &lt;Object&gt;</div><div class="line">     PostStart is called immediately after a container is created. If the</div><div class="line">     handler fails, the container is terminated and restarted according to its</div><div class="line">     restart policy. Other management of the container blocks until the hook</div><div class="line">     completes. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks</div><div class="line"></div><div class="line">   preStop      &lt;Object&gt;</div><div class="line">     PreStop is called immediately before a container is terminated due to an</div><div class="line">     API request or management event such as liveness probe failure, preemption,</div><div class="line">     resource contention, etc. The handler is not called if the container</div><div class="line">     crashes or exits. The reason for termination is passed to the handler. The</div><div class="line">     Pod&apos;s termination grace period countdown begins before the PreStop hooked</div><div class="line">     is executed. Regardless of the outcome of the handler, the container will</div><div class="line">     eventually terminate within the Pod&apos;s termination grace period. Other</div><div class="line">     management of the container blocks until the hook completes or until the</div><div class="line">     termination grace period is reached. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain pods.spec.containers.lifecycle.postStart</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: postStart &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     PostStart is called immediately after a container is created. If the</div><div class="line">     handler fails, the container is terminated and restarted according to its</div><div class="line">     restart policy. Other management of the container blocks until the hook</div><div class="line">     completes. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks</div><div class="line"></div><div class="line">     Handler defines a specific action that should be taken</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   exec &lt;Object&gt;</div><div class="line">     One and only one of the following should be specified. Exec specifies the</div><div class="line">     action to take.</div><div class="line"></div><div class="line">   httpGet      &lt;Object&gt;</div><div class="line">     HTTPGet specifies the http request to perform.</div><div class="line"></div><div class="line">   tcpSocket    &lt;Object&gt;</div><div class="line">     TCPSocket specifies an action involving a TCP port. TCP hooks not yet</div><div class="line">     supported</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain pods.spec.containers.lifecycle.preStop</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: preStop &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     PreStop is called immediately before a container is terminated due to an</div><div class="line">     API request or management event such as liveness probe failure, preemption,</div><div class="line">     resource contention, etc. The handler is not called if the container</div><div class="line">     crashes or exits. The reason for termination is passed to the handler. The</div><div class="line">     Pod&apos;s termination grace period countdown begins before the PreStop hooked</div><div class="line">     is executed. Regardless of the outcome of the handler, the container will</div><div class="line">     eventually terminate within the Pod&apos;s termination grace period. Other</div><div class="line">     management of the container blocks until the hook completes or until the</div><div class="line">     termination grace period is reached. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks</div><div class="line"></div><div class="line">     Handler defines a specific action that should be taken</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   exec &lt;Object&gt;</div><div class="line">     One and only one of the following should be specified. Exec specifies the</div><div class="line">     action to take.</div><div class="line"></div><div class="line">   httpGet      &lt;Object&gt;</div><div class="line">     HTTPGet specifies the http request to perform.</div><div class="line"></div><div class="line">   tcpSocket    &lt;Object&gt;</div><div class="line">     TCPSocket specifies an action involving a TCP port. TCP hooks not yet</div><div class="line">     supported</div></pre></td></tr></table></figure>
+<p>【示例】：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# vim poststart-pod.yaml </div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: poststart-pod</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: busybox-httpd</div><div class="line">    image: busybox:latest</div><div class="line">    imagePullPolicy: IfNotPresent</div><div class="line">    lifecycle:</div><div class="line">      postStart:</div><div class="line">        exec:</div><div class="line">          command: [&quot;mkdir&quot;,&quot;-p&quot;,&quot;/data/web/html&quot;]</div><div class="line">    command: [&quot;/bin/sh&quot;,&quot;-c&quot;,&quot;sleep 3600&quot;]</div><div class="line">[root@spark32 manifests]# kubectl create -f poststart-pod.yaml </div><div class="line">pod/poststart-pod created</div><div class="line">[root@spark32 manifests]# kubectl get pods</div><div class="line">NAME                           READY   STATUS    RESTARTS   AGE</div><div class="line">client-69fd89d767-95nqt        1/1     Running   1          6d22h</div><div class="line">liveness-httpget-pod           1/1     Running   1          134m</div><div class="line">myapp-5bc569c47d-qq8lb         1/1     Running   0          7d1h</div><div class="line">myapp-5bc569c47d-stvj9         1/1     Running   0          7d1h</div><div class="line">myapp-5bc569c47d-tzlsf         1/1     Running   0          7d1h</div><div class="line">nginx-deploy-55d8d67cf-wf28j   1/1     Running   0          7d2h</div><div class="line">poststart-pod                  1/1     Running   0          6s</div><div class="line">readiness-httpget-pod          1/1     Running   0          100m</div><div class="line">[root@spark32 manifests]# kubectl exec -it poststart-pod -- /bin/sh</div><div class="line">/ # ls /data/web/html/</div><div class="line">/ # ls /data/</div><div class="line">web</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/91.png" alt=""></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2019/08/07/Kubernetes-Pod控制器/" itemprop="url">
                   Kubernetes Pod控制器
                 </a>
@@ -344,7 +540,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2019-08-08T14:07:18+08:00" content="2019-08-08">
+              <time itemprop="dateUpdated" datetime="2019-08-08T14:12:43+08:00" content="2019-08-08">
               2019-08-08
               </time>
               </span>
@@ -1556,143 +1752,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2019/03/14/Nginx缓存功能/" itemprop="url">
-                  Nginx缓存功能
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2019-03-14T13:27:37+08:00" content="2019-03-14">
-              2019-03-14
-            </time>
-            
-              <span class="post-updated">
-              &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2019-03-14T15:38:54+08:00" content="2019-03-14">
-              2019-03-14
-              </time>
-              </span>
-            
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Nginx/" itemprop="url" rel="index">
-                    <span itemprop="name">Nginx</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-             <span id="/2019/03/14/Nginx缓存功能/" class="leancloud_visitors" data-flag-title="Nginx缓存功能">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <blockquote>
-<p>业务线在压测性能时，希望将应用一些图标(appIcon.do)利用Nginx缓存功能缓存下来。</p>
-</blockquote>
-<h2 id="Nginx缓存功能"><a href="#Nginx缓存功能" class="headerlink" title="Nginx缓存功能"></a>Nginx缓存功能</h2><p>简单来说，就是Nginx将后端服务器返回来的部分内容缓存到本地磁盘，后面客户端请求中含有这部分内容时，可以从本地磁盘取出这些内容返回给客户端。
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2019/03/14/Nginx缓存功能/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1740,7 +1799,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">86</span>
+              <span class="site-state-item-count">87</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1862,7 +1921,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共229.4k字</span>
+  <span class="post-count">博客全站共231.7k字</span>
 </div>
 
         

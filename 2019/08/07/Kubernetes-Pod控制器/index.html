@@ -121,7 +121,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/80.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/81.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/82.png">
-<meta property="og:updated_time" content="2019-08-08T06:07:18.000Z">
+<meta property="og:updated_time" content="2019-08-08T06:12:43.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kubernetes Pod控制器">
 <meta name="twitter:description" content="Pod控制器资源配置清单重要字段详解资源的清单格式:一级字段：apiVersion(group/version), kind, metadata(name,namespace,labels,annotations,…), spec, status(只读)">
@@ -354,7 +354,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2019-08-08T14:07:18+08:00" content="2019-08-08">
+              <time itemprop="dateUpdated" datetime="2019-08-08T14:12:43+08:00" content="2019-08-08">
               2019-08-08
               </time>
               </span>
@@ -454,6 +454,7 @@
 <p>TYPE NAME：表示什么类型的、什么名字的资源。</p>
 <p>给Pod pod-demo添加一个标签：release=canary<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl label pods pod-demo release=canary</div><div class="line">pod/pod-demo labeled</div><div class="line">[root@spark32 manifests]# kubectl get pods pod-demo --show-labels</div><div class="line">NAME       READY   STATUS    RESTARTS   AGE   LABELS</div><div class="line">pod-demo   2/2     Running   0          10m   app=myapp,release=canary,tier=frontend</div></pre></td></tr></table></figure></p>
 <h3 id="示例3：修改标签"><a href="#示例3：修改标签" class="headerlink" title="示例3：修改标签"></a>示例3：修改标签</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl label pods pod-demo release=stable</div><div class="line">error: &apos;release&apos; already has a value (canary), and --overwrite is false</div><div class="line">[root@spark32 manifests]# kubectl label pods pod-demo release=stable --overwrite</div><div class="line">pod/pod-demo labeled</div><div class="line">[root@spark32 manifests]# kubectl get pods pod-demo --show-labels   </div><div class="line">NAME       READY   STATUS    RESTARTS   AGE   LABELS</div><div class="line">pod-demo   2/2     Running   0          13m   app=myapp,release=stable,tier=frontend</div></pre></td></tr></table></figure>
+<h3 id="示例4：删除标签"><a href="#示例4：删除标签" class="headerlink" title="示例4：删除标签"></a>示例4：删除标签</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get pods pod-demo --show-labels  </div><div class="line">NAME       READY   STATUS    RESTARTS   AGE   LABELS</div><div class="line">pod-demo   2/2     Running   0          38m   app=myapp,release=stable,tier=frontend</div><div class="line">[root@spark32 manifests]# kubectl label pod pod-demo release-</div><div class="line">pod/pod-demo labeled</div><div class="line">[root@spark32 manifests]# kubectl get pods pod-demo --show-labels</div><div class="line">NAME       READY   STATUS    RESTARTS   AGE   LABELS</div><div class="line">pod-demo   2/2     Running   0          38m   app=myapp,tier=frontend</div></pre></td></tr></table></figure>
 <h3 id="标签选择器介绍"><a href="#标签选择器介绍" class="headerlink" title="标签选择器介绍"></a>标签选择器介绍</h3><p>k8s的标签选择器支持两类：</p>
 <ul>
 <li>等值关系的标签选择器：=、==、!=</li>
@@ -556,6 +557,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2019/08/09/Kubernetes-Pod探针/" rel="prev" title="Kubernetes Pod探针">
+                Kubernetes Pod探针 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -624,7 +629,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">86</span>
+              <span class="site-state-item-count">87</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -711,7 +716,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod控制器资源配置清单重要字段详解"><span class="nav-number">1.</span> <span class="nav-text">Pod控制器资源配置清单重要字段详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#标签和标签选择器"><span class="nav-number">2.</span> <span class="nav-text">标签和标签选择器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#标签简介"><span class="nav-number">2.1.</span> <span class="nav-text">标签简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例1：利用标签选择器查看资源"><span class="nav-number">2.2.</span> <span class="nav-text">示例1：利用标签选择器查看资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例2：添加标签"><span class="nav-number">2.3.</span> <span class="nav-text">示例2：添加标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例3：修改标签"><span class="nav-number">2.4.</span> <span class="nav-text">示例3：修改标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#标签选择器介绍"><span class="nav-number">2.5.</span> <span class="nav-text">标签选择器介绍</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注解"><span class="nav-number">3.</span> <span class="nav-text">注解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod的生命周期"><span class="nav-number">4.</span> <span class="nav-text">Pod的生命周期</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod控制器资源配置清单重要字段详解"><span class="nav-number">1.</span> <span class="nav-text">Pod控制器资源配置清单重要字段详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#标签和标签选择器"><span class="nav-number">2.</span> <span class="nav-text">标签和标签选择器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#标签简介"><span class="nav-number">2.1.</span> <span class="nav-text">标签简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例1：利用标签选择器查看资源"><span class="nav-number">2.2.</span> <span class="nav-text">示例1：利用标签选择器查看资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例2：添加标签"><span class="nav-number">2.3.</span> <span class="nav-text">示例2：添加标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例3：修改标签"><span class="nav-number">2.4.</span> <span class="nav-text">示例3：修改标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例4：删除标签"><span class="nav-number">2.5.</span> <span class="nav-text">示例4：删除标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#标签选择器介绍"><span class="nav-number">2.6.</span> <span class="nav-text">标签选择器介绍</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注解"><span class="nav-number">3.</span> <span class="nav-text">注解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod的生命周期"><span class="nav-number">4.</span> <span class="nav-text">Pod的生命周期</span></a></li></ol></div>
             
           </div>
         </section>
@@ -757,7 +762,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共229.4k字</span>
+  <span class="post-count">博客全站共231.7k字</span>
 </div>
 
         
