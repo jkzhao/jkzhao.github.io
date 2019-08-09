@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-08-09T09:28:08.000Z</updated>
+  <updated>2019-08-09T09:30:32.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2019/08/09/Kubernetes-Pod%E6%8E%A2%E9%92%88/"/>
     <id>http://yoursite.com/2019/08/09/Kubernetes-Pod探针/</id>
     <published>2019-08-09T01:25:46.000Z</published>
-    <updated>2019-08-09T09:28:08.000Z</updated>
+    <updated>2019-08-09T09:30:32.000Z</updated>
     
     <content type="html">&lt;h2 id=&quot;探针类型&quot;&gt;&lt;a href=&quot;#探针类型&quot; class=&quot;headerlink&quot; title=&quot;探针类型&quot;&gt;&lt;/a&gt;探针类型&lt;/h2&gt;&lt;p&gt;探针主要有两种：livenessProbe和readinessProbe。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[root@spark32 ~]# kubectl explain pods.spec.containers&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
 &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
@@ -33,21 +33,21 @@
 &lt;/ul&gt;
 &lt;p&gt;每次定义三者之中的一个就可以了。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;$ kubectl explain pods.spec.containers.livenessProbe&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;exec &lt;object&gt;&lt;/object&gt;&lt;/strong&gt;&lt;br&gt;exec探针。执行用户自定义命令，这个命令得是容器中存在的命令才行&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;exec &lt;object&gt;&lt;br&gt;exec探针。执行用户自定义命令，这个命令得是容器中存在的命令才行&lt;/object&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;failureThreshold  &lt;integer&gt;&lt;/integer&gt;&lt;/strong&gt;&lt;br&gt;探测几次都失败，才认为是失败的。默认是3个。&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;failureThreshold  &lt;integer&gt;&lt;br&gt;探测几次都失败，才认为是失败的。默认是3个。&lt;/integer&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;httpGet &lt;object&gt;&lt;/object&gt;&lt;/strong&gt;&lt;br&gt;httpGet探针&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;httpGet &lt;object&gt;&lt;br&gt;httpGet探针&lt;/object&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;initialDelaySeconds &lt;integer&gt;&lt;/integer&gt;&lt;/strong&gt;&lt;br&gt;在容器启动以后多久做探测，很多时间容器启动了，但是主程序很可能还没初始化完成。因此应该等一些时间在探测。默认是容器一启动就探测。&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;initialDelaySeconds &lt;integer&gt;&lt;br&gt;在容器启动以后多久做探测，很多时间容器启动了，但是主程序很可能还没初始化完成。因此应该等一些时间在探测。默认是容器一启动就探测。&lt;/integer&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;periodSeconds &lt;integer&gt;&lt;/integer&gt;&lt;/strong&gt;&lt;br&gt;每次探测之间间隔多长时间，默认10s&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;periodSeconds &lt;integer&gt;&lt;br&gt;每次探测之间间隔多长时间，默认10s&lt;/integer&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;successThreshold &lt;integer&gt;&lt;/integer&gt;&lt;/strong&gt;&lt;br&gt;成功几次说明ok，默认是1次&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;successThreshold &lt;integer&gt;&lt;br&gt;成功几次说明ok，默认是1次&lt;/integer&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;tcpSocket &lt;object&gt;&lt;/object&gt;&lt;/strong&gt;&lt;br&gt;tcpSocket探针&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;tcpSocket &lt;object&gt;&lt;br&gt;tcpSocket探针&lt;/object&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;timeoutSeconds &lt;integer&gt;&lt;/integer&gt;&lt;/strong&gt;&lt;br&gt;超时时间，发出探测，多久没响应，默认1s。&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;timeoutSeconds &lt;integer&gt;&lt;br&gt;超时时间，发出探测，多久没响应，默认1s。&lt;/integer&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;readiness探测所使用的字段和liveness字段是一样的。只是两者探测目的不一样。&lt;/p&gt;
