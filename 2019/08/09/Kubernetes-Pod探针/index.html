@@ -121,7 +121,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/89.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/90.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/91.png">
-<meta property="og:updated_time" content="2019-08-09T08:45:54.000Z">
+<meta property="og:updated_time" content="2019-08-09T09:25:22.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kubernetes Pod探针">
 <meta name="twitter:description" content="探针类型探针主要有两种：livenessProbe和readinessProbe。1[root@spark32 ~]# kubectl explain pods.spec.containers">
@@ -354,7 +354,7 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2019-08-09T16:45:54+08:00" content="2019-08-09">
+              <time itemprop="dateUpdated" datetime="2019-08-09T17:25:22+08:00" content="2019-08-09">
               2019-08-09
               </time>
               </span>
@@ -437,14 +437,22 @@
 </ul>
 <p>每次定义三者之中的一个就可以了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ kubectl explain pods.spec.containers.livenessProbe</div></pre></td></tr></table></figure></p>
 <ul>
-<li><strong>exec <object></object></strong><br>exec探针。执行用户自定义命令，这个命令得是容器中存在的命令才行</li>
-<li><strong>failureThreshold     <integer></integer></strong><br>探测几次都失败，才认为是失败的。默认是3个。</li>
-<li><strong>httpGet      <object></object></strong><br>探针</li>
-<li><strong>initialDelaySeconds  <integer></integer></strong><br>在容器启动以后多久做探测，很多时间容器启动了，但是主程序很可能还没初始化完成。因此应该等一些时间在探测。默认是容器一启动就探测。</li>
-<li><strong>periodSeconds        <integer></integer></strong><br>每次探测之间间隔多长时间，默认10s</li>
-<li><strong>successThreshold     <integer></integer></strong><br>成功几次说明ok，默认是1次</li>
-<li><strong>tcpSocket    <object></object></strong><br>探针</li>
-<li><strong>timeoutSeconds       <integer></integer></strong><br>超时时间，发出探测，多久没响应，默认1s。</li>
+<li><p><strong>exec <object></object></strong><br>exec探针。执行用户自定义命令，这个命令得是容器中存在的命令才行</p>
+</li>
+<li><p><strong>failureThreshold     <integer></integer></strong><br>探测几次都失败，才认为是失败的。默认是3个。</p>
+</li>
+<li><p><strong>httpGet      <object></object></strong><br>httpGet探针</p>
+</li>
+<li><p><strong>initialDelaySeconds  <integer></integer></strong><br>在容器启动以后多久做探测，很多时间容器启动了，但是主程序很可能还没初始化完成。因此应该等一些时间在探测。默认是容器一启动就探测。</p>
+</li>
+<li><p><strong>periodSeconds        <integer></integer></strong><br>每次探测之间间隔多长时间，默认10s</p>
+</li>
+<li><p><strong>successThreshold     <integer></integer></strong><br>成功几次说明ok，默认是1次</p>
+</li>
+<li><p><strong>tcpSocket    <object></object></strong><br>tcpSocket探针</p>
+</li>
+<li><p><strong>timeoutSeconds       <integer></integer></strong><br>超时时间，发出探测，多久没响应，默认1s。</p>
+</li>
 </ul>
 <p>readiness探测所使用的字段和liveness字段是一样的。只是两者探测目的不一样。</p>
 <h2 id="livenessProbe探针示例"><a href="#livenessProbe探针示例" class="headerlink" title="livenessProbe探针示例"></a>livenessProbe探针示例</h2><h3 id="exec探测"><a href="#exec探测" class="headerlink" title="exec探测"></a>exec探测</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain pods.spec.containers.livenessProbe.exec</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: exec &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     One and only one of the following should be specified. Exec specifies the</div><div class="line">     action to take.</div><div class="line"></div><div class="line">     ExecAction describes a &quot;run in container&quot; action.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   command      &lt;[]string&gt;</div><div class="line">     Command is the command line to execute inside the container, the working</div><div class="line">     directory for the command is root (&apos;/&apos;) in the container&apos;s filesystem. The</div><div class="line">     command is simply exec&apos;d, it is not run inside a shell, so traditional</div><div class="line">     shell instructions (&apos;|&apos;, etc) won&apos;t work. To use a shell, you need to</div><div class="line">     explicitly call out to that shell. Exit status of 0 is treated as</div><div class="line">     live/healthy and non-zero is unhealthy.</div></pre></td></tr></table></figure>
