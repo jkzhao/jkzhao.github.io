@@ -1,0 +1,920 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Pod控制器Pod控制器介绍此前使用配置清单创建Pod，都是在配置文件中定义要创建的Pod具体是什么。而后就提交给apiserver，由apiserver转交给Scheduler完成调度，由目标节点予以创建并启动相关的Pod资源。如果我们把Pod资源意外删除，Pod不会重建。">
+<meta name="keywords" content="Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes Pod控制器——ReplicaSet">
+<meta property="og:url" content="http://yoursite.com/2019/08/12/Kubernetes-Pod控制器——ReplicaSet/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="Pod控制器Pod控制器介绍此前使用配置清单创建Pod，都是在配置文件中定义要创建的Pod具体是什么。而后就提交给apiserver，由apiserver转交给Scheduler完成调度，由目标节点予以创建并启动相关的Pod资源。如果我们把Pod资源意外删除，Pod不会重建。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/92.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/93.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/94.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/95.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/96.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/97.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/98.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/99.png">
+<meta property="og:updated_time" content="2019-08-12T05:38:41.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kubernetes Pod控制器——ReplicaSet">
+<meta name="twitter:description" content="Pod控制器Pod控制器介绍此前使用配置清单创建Pod，都是在配置文件中定义要创建的Pod具体是什么。而后就提交给apiserver，由apiserver转交给Scheduler完成调度，由目标节点予以创建并启动相关的Pod资源。如果我们把Pod资源意外删除，Pod不会重建。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/92.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Kubernetes Pod控制器——ReplicaSet | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Kubernetes Pod控制器——ReplicaSet
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-08-12T09:23:02+08:00" content="2019-08-12">
+              2019-08-12
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-08-12T13:38:41+08:00" content="2019-08-12">
+              2019-08-12
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/08/12/Kubernetes-Pod控制器——ReplicaSet/" class="leancloud_visitors" data-flag-title="Kubernetes Pod控制器——ReplicaSet">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Pod控制器"><a href="#Pod控制器" class="headerlink" title="Pod控制器"></a>Pod控制器</h2><h3 id="Pod控制器介绍"><a href="#Pod控制器介绍" class="headerlink" title="Pod控制器介绍"></a>Pod控制器介绍</h3><p>此前使用配置清单创建Pod，都是在配置文件中定义要创建的Pod具体是什么。而后就提交给apiserver，由apiserver转交给Scheduler完成调度，由目标节点予以创建并启动相关的Pod资源。如果我们把Pod资源意外删除，Pod不会重建。<a id="more"></a><br>在实际应用中，去管理Pod资源时很少用自主式Pod方式。之所以介绍自主式Pod，是为了讲清楚Pod是怎么创建的，而后面介绍的控制器创建Pod时，都是内嵌了Pod模板的。也就是将此前手动管理的Pod资源的定义方式内嵌到控制器的定义结构中去。<br>Pod控制器是用于实现代我们去管理Pod的中间层，并帮我们确保每一个Pod资源始终处于我们所定义或者所期望的目标状态。万一这个Pod资源出现故障，首先它会尝试着去重启容器，如果一直重启有问题的话，那么可能会基于某种策略来重新委派。如果Pod的副本数量低于用户所定义的目标数量，它也会自动补全。</p>
+<h3 id="Pod控制器分类"><a href="#Pod控制器分类" class="headerlink" title="Pod控制器分类"></a>Pod控制器分类</h3><ul>
+<li><p><strong>ReplicationController:</strong> 最早k8s只有这一种控制器。后来发现ReplicationController设计目标过于庞大，一个想完成所有的功能。目前推荐使用ReplicaSet。</p>
+</li>
+<li><p><strong>ReplicaSet:</strong> 主要是帮助用户管理无状态的Pod资源。代用户创建指定数量的Pod副本，并确保Pod副本一直处于满足用户期望的数量的状态。多退少补。支持自动扩缩容策略。主要有三个核心资源组成：<br>1.用户期望的Pod副本数<br>2.标签选择器，判定哪些Pod是自己来管理的<br>3.Pod资源模板：如果集群中现存的Pod副本数量不够用户定义的副本数量时怎么办？新建Pod，根据Pod模板来建立。<br>但是ReplicaSet却不是我们直接使用的控制器。或者说k8s不建议我们直接使用ReplicaSet，而是使用Deployment。</p>
+</li>
+<li><p><strong>Deployment:</strong> 也是个控制器，工作在ReplicaSet之上。也就是说Deployment不是直接控制Pod，而是通过控制ReplicaSet来控制Pod。基于此，一定是Deployment能够提供比ReplicaSet更为强大的功能。Deployment还支持滚动更新和回滚等众多更为强大的机制，还提供了声明式配置的功能。这种声明式配置使得我们将来创建资源时可以基于声明的逻辑来定义。那些所有更新的资源我们可以随时重新进行声明，随时可以改变在apiserver上定义的资源的目标状态，只要对应的资源支持动态运行时修改。</p>
+</li>
+<li><p><strong>DaemonSet:</strong> 用于确保集群中的每一个节点只运行一个特定的Pod副本。这些Pod通常是用来实现所谓的系统级的后台任务。当然系统级的后台任务本可以以守护进程的方式来运行这些任务，但是这种方式，服务宕了没法恢复。把这些任务托管到k8s之上有一个好处，宕了后可以被控制器自动重启。还有一个好处，当集群中新加入节点，DaemonSet会确保集群中的每个节点精确运行一个Pod，新节点进来了，上面也会启动一个这样的Pod。所以对于DaemonSet来说，不用定义Pod副本数量了，但是Pod模板肯定是要存在的。只有有了Pod模板，才能够建立起Pod资源。另外，标签选择器也是需要的，毕竟每一个节点上有没有符合我们所指定条件的Pod资源，是要靠标签选择器来判定。<br>用于确保集群中的每一个节点只运行一个特定的Pod副本。其实还有另外一个需求，我们也可以根据自己的需求在集群中的部分节点上，每一个节点只运行一个Pod副本。比如说要监控ssd硬盘的Pod，如果不是所有节点都有ssd，就没必要在没有ssd硬盘的节点上运行这个Pod了。</p>
+</li>
+</ul>
+<p>无论是Deployment还是DaemonSet，都有这么几个特点。一是服务都是无状态的，二是这些服务必须是守护进程类的，就是必须持续地运行在后台。但是有的时候我们有这种需求，比如对数据库做备份操作，这种备份操作可以自己手动启动一个程序来运行，也可以在k8s上启动一个Pod来实现。备份结束了，这个Pod就没必要运行下去了。能实现这种功能的叫Job。</p>
+<ul>
+<li><p><strong>Job:</strong> 也是控制器。要不要重建Pod，就看任务是否完成。只能执行一次性的作业。</p>
+</li>
+<li><p><strong>Cronjob:</strong> 周期性任务。Job只是一次性运行。对于Cronjob来说，如果前一次任务还没结束，下一次任务时间已经来临了，怎么办？所以Cronjob要去处理这个问题。</p>
+</li>
+<li><p><strong>StatefulSet:</strong> 管理有状态应用。而且每一个Pod副本都是被单独管理的。它拥有着自己独有的标识和数据集。一旦这个Pod出现故障了，新的Pod加进来之前，我们可能需要做很多初始化操作。<br>假设要管理redis cluster，cluster中几个Pod，没办法取代任何一个。这种场景中我们关注的是个体行为。每个个体都要被单独对待。而不像Deployment，假如运行了3个Nginx，任何一个Nginx挂了，调度器生成一个新Pod，把配置文件一改启动起来就可以了。但是redis cluster中任何一个Pod故障了，新生成一个Pod，是取代不了之前那个的。<br>看起来很美好，把每个Pod当做个体来管理。但是用StatefulSet去定义管理Redis、Mysql、Zookeeper，配置方式肯定不一样。配置主从复制操作步骤肯定是不一样的。部署方式也是不一样的，没有什么共通的规律可循。因此StatefulSet最多给我们提供了一个封装控制器，这个封装指的是我们需要人为地把我们需要手动做的操作，那些复杂的操作逻辑定义成脚本，放置在StatefulSet的Pod模板的定义之中。每一次Pod故障发生后，通过脚本能自动恢复回来。难度比较大，试想一下，MySQL主从，那个代表从的Pod副本宕了，怎么能够重建个Pod副本过来，让这个Pod副本能够作为从节点。一个运行很久的MySQL，里面会有大量的数据，我们需要先从主节点做备份，备份后恢复到从节点。而且备份的时候还需要记下binlog的文件名和位置。随后在从节点上启动时还要指定从指定文件的指定位置开始。这些操作要封装成脚本实现。Pod副本创建时自动实现。好不容易开发成功这个StatefulSet，后面还有redis集群。redis主从和mysql是不一样的，又是另外一套脚本。而且脚本未必能考虑到所有情形。<br>所以有状态应用在k8s托管管理是极其麻烦的，原因在于有状态应用的运维技能要求非常高，运维操作步骤是各不相同的。没办法抽取共同特点，并定义模式来工作。只能每一种应用分别、单独地对待。k8s还支持一种特殊的资源叫TPR。<br><strong>TPR:</strong> Third Party Resources, 从k8s 1.2+开始支持第三方资源, 但是到1.7又被废了。因为有了更新的功能叫CDR。<br><strong>CDR:</strong> Custom Defined Resources, 用户自定义资源。从k8s 1.8+开始支持。自定义资源可以把我们运维操作技能封装进去，定义成一种特殊类型的资源，或者把我们要管理的目标资源的管理方式定义成一个独特的管理逻辑来实现。我们还可以借助CoreOS研发的叫做Operator的东西来实现灌进去我们的运维技能。<br>Operator：实现的灌进去的运维技能比StatefulSet要强大的太多了，但是到今天为止，成熟的Operator支持的也不过是etcd，promethus等几个。</p>
+</li>
+</ul>
+<p>k8s现在难就难在使用门槛太高。每一次创建资源都需要自己写配置清单才行。任何一个系统，如果不把用户当傻瓜的话，注定用户不可能太多。为了解决这样的问题，k8s后来提供了一种功能叫Helm，头盔，外壳。Helm跟Linux上的yum一样。以后在部署应用程序，比如要在k8s之上部署redis cluster，刚才那样写要写半天，现在有人写好了，我们直接helm install就ok了。当然我们用的不是install命令，而是传一些参数告诉它，要创建什么样的存储卷，利用多少空间来存数据，以及我们要创建几个规模的集群。<br>目前Helm诞生还不超过3年，即便如此，大量主流的应用在Helm上已经有了。我们可以直接使用Helm就可以安装了。</p>
+<h2 id="查看ReplicaSet帮助文档"><a href="#查看ReplicaSet帮助文档" class="headerlink" title="查看ReplicaSet帮助文档"></a>查看ReplicaSet帮助文档</h2><p>简称rs。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain rs</div><div class="line">KIND:     ReplicaSet</div><div class="line">VERSION:  extensions/v1beta1</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     DEPRECATED - This group version of ReplicaSet is deprecated by</div><div class="line">     apps/v1beta2/ReplicaSet. See the release notes for more information.</div><div class="line">     ReplicaSet ensures that a specified number of pod replicas are running at</div><div class="line">     any given time.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   apiVersion   &lt;string&gt;</div><div class="line">     APIVersion defines the versioned schema of this representation of an</div><div class="line">     object. Servers should convert recognized schemas to the latest internal</div><div class="line">     value, and may reject unrecognized values. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#resources</div><div class="line"></div><div class="line">   kind &lt;string&gt;</div><div class="line">     Kind is a string value representing the REST resource this object</div><div class="line">     represents. Servers may infer this from the endpoint the client submits</div><div class="line">     requests to. Cannot be updated. In CamelCase. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds</div><div class="line"></div><div class="line">   metadata     &lt;Object&gt;</div><div class="line">     If the Labels of a ReplicaSet are empty, they are defaulted to be the same</div><div class="line">     as the Pod(s) that the ReplicaSet manages. Standard object&apos;s metadata. More</div><div class="line">     info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata</div><div class="line"></div><div class="line">   spec &lt;Object&gt;</div><div class="line">     Spec defines the specification of the desired behavior of the ReplicaSet.</div><div class="line">     More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status</div><div class="line"></div><div class="line">   status       &lt;Object&gt;</div><div class="line">     Status is the most recently observed status of the ReplicaSet. This data</div><div class="line">     may be out of date by some window of time. Populated by the system.</div><div class="line">     Read-only. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status</div></pre></td></tr></table></figure></p>
+<p>【注意】：截至目前为止，rs在使用时的apiVersion是apps/v1，explain时看到的显示的是旧版本，帮助文档没更新到最新。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain rs.spec</div><div class="line">KIND:     ReplicaSet</div><div class="line">VERSION:  extensions/v1beta1</div><div class="line"></div><div class="line">RESOURCE: spec &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Spec defines the specification of the desired behavior of the ReplicaSet.</div><div class="line">     More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status</div><div class="line"></div><div class="line">     ReplicaSetSpec is the specification of a ReplicaSet.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   minReadySeconds      &lt;integer&gt;</div><div class="line">     Minimum number of seconds for which a newly created pod should be ready</div><div class="line">     without any of its container crashing, for it to be considered available.</div><div class="line">     Defaults to 0 (pod will be considered available as soon as it is ready)</div><div class="line"></div><div class="line">   replicas     &lt;integer&gt;</div><div class="line">     Replicas is the number of desired replicas. This is a pointer to</div><div class="line">     distinguish between explicit zero and unspecified. Defaults to 1. More</div><div class="line">     info:</div><div class="line">     https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller</div><div class="line"></div><div class="line">   selector     &lt;Object&gt;</div><div class="line">     Selector is a label query over pods that should match the replica count. If</div><div class="line">     the selector is empty, it is defaulted to the labels present on the pod</div><div class="line">     template. Label keys and values that must match in order to be controlled</div><div class="line">     by this replica set. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors</div><div class="line"></div><div class="line">   template     &lt;Object&gt;</div><div class="line">     Template is the object that describes the pod that will be created if</div><div class="line">     insufficient replicas are detected. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template</div></pre></td></tr></table></figure></p>
+<p>rs.spec下定义的主要是replicas、selector和template这3个字段。其中，template就是定义Pod的模板。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain rs.spec.template</div><div class="line">KIND:     ReplicaSet</div><div class="line">VERSION:  extensions/v1beta1</div><div class="line"></div><div class="line">RESOURCE: template &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Template is the object that describes the pod that will be created if</div><div class="line">     insufficient replicas are detected. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template</div><div class="line"></div><div class="line">     PodTemplateSpec describes the data a pod should have when created from a</div><div class="line">     template</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   metadata     &lt;Object&gt;</div><div class="line">     Standard object&apos;s metadata. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata</div><div class="line"></div><div class="line">   spec &lt;Object&gt;</div><div class="line">     Specification of the desired behavior of the pod. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status</div></pre></td></tr></table></figure></p>
+<p>这里的metadata和spec是Pod的metadata和spec。</p>
+<h2 id="ReplicaSet示例"><a href="#ReplicaSet示例" class="headerlink" title="ReplicaSet示例"></a>ReplicaSet示例</h2><h3 id="示例1：创建ReplicaSet"><a href="#示例1：创建ReplicaSet" class="headerlink" title="示例1：创建ReplicaSet"></a>示例1：创建ReplicaSet</h3><p>先清理掉集群中无用的Pod。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl get pods</div><div class="line">NAME                           READY   STATUS    RESTARTS   AGE</div><div class="line">client-69fd89d767-95nqt        1/1     Running   1          9d</div><div class="line">liveness-httpget-pod           1/1     Running   1          2d19h</div><div class="line">myapp-5bc569c47d-qq8lb         1/1     Running   0          9d</div><div class="line">myapp-5bc569c47d-stvj9         1/1     Running   0          9d</div><div class="line">myapp-5bc569c47d-tzlsf         1/1     Running   0          9d</div><div class="line">nginx-deploy-55d8d67cf-wf28j   1/1     Running   0          9d</div><div class="line">poststart-pod                  1/1     Running   65         2d17h</div><div class="line">readiness-httpget-pod          1/1     Running   0          2d19h</div><div class="line"></div><div class="line">[root@spark32 manifests]# kubectl get deploy</div><div class="line">NAME           READY   UP-TO-DATE   AVAILABLE   AGE</div><div class="line">client         1/1     1            1           9d</div><div class="line">myapp          3/3     3            3           9d</div><div class="line">nginx-deploy   1/1     1            1           9d</div><div class="line">[root@spark32 manifests]# kubectl delete deploy client</div><div class="line">deployment.extensions &quot;client&quot; deleted</div><div class="line">[root@spark32 manifests]# kubectl delete deploy myapp</div><div class="line">deployment.extensions &quot;myapp&quot; deleted</div><div class="line">[root@spark32 manifests]# kubectl delete deploy nginx-deploy </div><div class="line">deployment.extensions &quot;nginx-deploy&quot; deleted</div><div class="line"></div><div class="line">[root@spark32 manifests]# kubectl get svc</div><div class="line">NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE</div><div class="line">kubernetes   ClusterIP   10.96.0.1        &lt;none&gt;        443/TCP        121d</div><div class="line">myapp        NodePort    10.109.204.135   &lt;none&gt;        80:31784/TCP   9d</div><div class="line">nginx        ClusterIP   10.107.191.247   &lt;none&gt;        80/TCP         9d</div><div class="line">[root@spark32 manifests]# kubectl delete svc myapp </div><div class="line">service &quot;myapp&quot; deleted</div><div class="line">[root@spark32 manifests]# kubectl delete svc nginx</div><div class="line">service &quot;nginx&quot; deleted</div><div class="line"></div><div class="line">[root@spark32 manifests]# kubectl delete -f liveness-httpget.yaml </div><div class="line">pod &quot;liveness-httpget-pod&quot; deleted</div><div class="line">[root@spark32 manifests]# kubectl delete -f readiness-httpget.yaml </div><div class="line">pod &quot;readiness-httpget-pod&quot; deleted</div><div class="line">[root@spark32 manifests]# kubectl delete -f poststart-pod.yaml </div><div class="line">pod &quot;poststart-pod&quot; deleted</div></pre></td></tr></table></figure></p>
+<p><strong>【示例】：</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# vim rs-demo.yaml</div><div class="line">apiVersion: apps/v1</div><div class="line">kind: ReplicaSet</div><div class="line">metadata:</div><div class="line">  name: myapp</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  replicas: 2</div><div class="line">  selector:</div><div class="line">    matchLabels:</div><div class="line">      app: myapp</div><div class="line">      release: canary</div><div class="line">  template:</div><div class="line">    metadata:</div><div class="line">      name: myapp-pod</div><div class="line">      labels:</div><div class="line">        app: myapp</div><div class="line">        release: canary</div><div class="line">        environment: qa</div><div class="line">    spec:</div><div class="line">      containers:</div><div class="line">      - name: myapp-container</div><div class="line">        image: ikubernetes/myapp:v1</div><div class="line">        imagePullPolicy: IfNotPresent</div><div class="line">        ports:</div><div class="line">        - name: http</div><div class="line">          containerPort: 80</div><div class="line">[root@spark32 manifests]# kubectl create -f rs-demo.yaml </div><div class="line">replicaset.apps/myapp created</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/92.png" alt=""><br>【说明】：<br>1、rs的metadata和Pod的metadata很类似，rs自己也是个资源，也可以有标签，也可以有注解。如果需要的话自己定义就行。这里为了结构清晰一点，就不写了。<br>2、spec.selector是个标签选择器，它是一个对象，支持两种挑选方式。第一种是基于等值的标签选择，matchLabels。它是个map，可以给定多个键值。第二种叫matchExpressions。<br>3、spec.template也是个对象，嵌套的字段有两个：metadata和spec。template中定义的的metadata中标签要包含selector中的标签，否则创建的Pod不符合自己的选择器，没有意义。当然也可以在template中定义多余的标签。<br>4、对于容器来讲，一般要做存活性探测和就绪性探测的，这里为了结构清晰和简单，就没写。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/93.png" alt=""></p>
+<p>现在删除一个Pod，看控制器是否会自动重新创建一个Pod：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/94.png" alt=""></p>
+<p>创建一个别的Pod，并为这个Pod打上标签，使得这个Pod可以被上面创建的RS的标签选择器选中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl create -f pod-demo.yaml </div><div class="line">pod/pod-demo created</div><div class="line">[root@spark32 manifests]# kubectl get pods --show-labels</div><div class="line">NAME          READY   STATUS    RESTARTS   AGE     LABELS</div><div class="line">myapp-g4vt8   1/1     Running   0          12m     app=myapp,environment=qa,release=canary</div><div class="line">myapp-tj86f   1/1     Running   0          3m36s   app=myapp,environment=qa,release=canary</div><div class="line">pod-demo      2/2     Running   0          19s     app=myapp,tier=frontend</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl label pod pod-demo app=myapp release=canary --overwrite</div><div class="line">pod/pod-demo labeled</div><div class="line">[root@spark32 manifests]# kubectl get pods --show-labels</div><div class="line">NAME          READY   STATUS        RESTARTS   AGE     LABELS</div><div class="line">myapp-g4vt8   1/1     Running       0          13m     app=myapp,environment=qa,release=canary</div><div class="line">myapp-tj86f   1/1     Running       0          4m56s   app=myapp,environment=qa,release=canary</div><div class="line">pod-demo      2/2     Terminating   0          99s     app=myapp,release=canary,tier=frontend</div><div class="line">[root@spark32 manifests]# kubectl get pods --show-labels</div><div class="line">NAME          READY   STATUS    RESTARTS   AGE     LABELS</div><div class="line">myapp-g4vt8   1/1     Running   0          14m     app=myapp,environment=qa,release=canary</div><div class="line">myapp-tj86f   1/1     Running   0          5m13s   app=myapp,environment=qa,release=canary</div></pre></td></tr></table></figure>
+<p>结果这个新创建的Pod pod-demo被终止删除了，RS始终保持被选中的Pod的副本数量为我们在清单文件中定义的值2。</p>
+<h3 id="示例2：扩容"><a href="#示例2：扩容" class="headerlink" title="示例2：扩容"></a>示例2：扩容</h3><p>kubectl scale 或者 kubectl edit rs的清单文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get rs</div><div class="line">kubeNAME    DESIRED   CURRENT   READY   AGE</div><div class="line">myapp   2         2         2       19m</div><div class="line">You have mail in /var/spool/mail/root</div><div class="line">[root@spark32 manifests]# kubectl edit rs myapp</div><div class="line">replicaset.extensions/myapp edited</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/95.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get pods</div><div class="line">NAME          READY   STATUS    RESTARTS   AGE</div><div class="line">myapp-fsntj   1/1     Running   0          21s</div><div class="line">myapp-g4vt8   1/1     Running   0          21m</div><div class="line">myapp-lk7dr   1/1     Running   0          21s</div><div class="line">myapp-p7pm8   1/1     Running   0          21s</div><div class="line">myapp-tj86f   1/1     Running   0          12m</div></pre></td></tr></table></figure></p>
+<h3 id="示例3：更新升级"><a href="#示例3：更新升级" class="headerlink" title="示例3：更新升级"></a>示例3：更新升级</h3><p>更新升级：更新升级无非是去改容器的镜像文件的版本。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl edit rs myapp</div><div class="line">replicaset.extensions/myapp edited</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/96.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/97.png" alt=""><br>改了控制器的template中的镜像版本，Pod资源并不会被改掉，因为Pod资源不会被重建，只有重建的Pod资源，它的版本才会改掉。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/98.png" alt=""><br>删除一个，一个重建，发布完成；<br>删除一个，一个重建，发布完成；<br>删除一个，一个重建，发布完成；<br>…<br>这是“灰度发布”。但是这需要我们人为参与进来。节奏我们自己能掌握，如果只删除一个，这叫金丝雀。那些被导向到v2的就是小白鼠，试试新版本有没有问题，两天以后，没人反应有问题，那就可以全部升级了。这是金丝雀发布。<br>当然也可以一次性把所有Pod都删除了，但是一次性全删除了，一定会影响在线访问的。这种发布有点暴力，虽然更新也很快。最妥当的更新是用蓝绿的方式进行。在创建一个rs，新的rs的标签选择器可以和老的rs的标签选择器不完全一样，但跟前面的service都能兼容。即service关联的pod既来之rs1，也来自rs2。我们先创建rs2，在删除rs1，这就是蓝绿发布。<br>或者先创建rs2，等rs2就绪了，修改service，将service匹配rs2，不在指向rs1。这样才是真正意义上的蓝绿。但是仍然需要我们自己去规划部署。有一个组件就是建立在rs之上完成的，叫Deployment。Deployment就是帮我们干这个事情的，<strong>能提供滚动式、自定义更新。</strong>Deployment建立在rs之前，一个Deployment管理多个rs，但是当前正在使用的只有1个。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/99.png" alt=""><br>而且Deployment提供<strong>声明式更新配置</strong>，声明式创建一般使用apply，而不使用create。对于apply管理的，还可以patch打补丁来实现修改，而不用使用edit。我们完全可以在命令行中通过纯命令方式来直接完成对应资源版本内容修改。说白了就是可以使用POST方式来提交内容来进行修改，而不是直接改配置文件。直接通过打补丁的方式来修改。<br>Deployment除了可以实现滚动更新，还可以控制更新节奏和更新逻辑。假如说ReplicaSet有5个Pod副本，刚才手动更新是这么更新的，删除1个，由rs自动创建1个，在删1个，在自动创建1个。有这么个场景，假如这5个刚刚能满足用户访问需求，我们通过service将用户流量调度到这5个Pod上。删1个，这4个不足以承载这么大的流量。怎么办？不删又不能更新。如果支持先加1个，在删1个。加1个是违反Pod管理机制的，副本数是精确反应在清单中定义的数量，加1个就多了1个，所以这里是需要临时加1个。所以临时加几个，怎么加是可以控制的。我们不但可以指定在滚动更新期间，最多能够多出我们期望副本数量几个，还能定义最多能少于副本数量几个。<br>控制逻辑可以实现 灰度、金丝雀、蓝绿发布。<br>滚动更新时，定义liveness和readiness是很重要的，不然一启动就就绪了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"><i class="fa fa-tag"></i>Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/09/Kubernetes-Pod探针/" rel="next" title="Kubernetes Pod探针">
+                <i class="fa fa-chevron-left"></i> Kubernetes Pod探针
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">88</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod控制器"><span class="nav-number">1.</span> <span class="nav-text">Pod控制器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Pod控制器介绍"><span class="nav-number">1.1.</span> <span class="nav-text">Pod控制器介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pod控制器分类"><span class="nav-number">1.2.</span> <span class="nav-text">Pod控制器分类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看ReplicaSet帮助文档"><span class="nav-number">2.</span> <span class="nav-text">查看ReplicaSet帮助文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ReplicaSet示例"><span class="nav-number">3.</span> <span class="nav-text">ReplicaSet示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例1：创建ReplicaSet"><span class="nav-number">3.1.</span> <span class="nav-text">示例1：创建ReplicaSet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例2：扩容"><span class="nav-number">3.2.</span> <span class="nav-text">示例2：扩容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例3：更新升级"><span class="nav-number">3.3.</span> <span class="nav-text">示例3：更新升级</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共236.6k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>
