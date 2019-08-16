@@ -1,0 +1,954 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Deployment简称deploy。">
+<meta name="keywords" content="Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes Pod控制器-Deployment、DaemonSet">
+<meta property="og:url" content="http://yoursite.com/2019/08/14/Kubernetes-Pod控制器-Deployment、DaemonSet/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="Deployment简称deploy。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/100.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/101.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/102.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/103.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/104.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/105.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/106.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/107.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/108.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/109.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/110.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/111.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/112.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/113.png">
+<meta property="og:updated_time" content="2019-08-16T06:56:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kubernetes Pod控制器-Deployment、DaemonSet">
+<meta name="twitter:description" content="Deployment简称deploy。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/100.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Kubernetes Pod控制器-Deployment、DaemonSet | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Kubernetes Pod控制器-Deployment、DaemonSet
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-08-14T13:18:01+08:00" content="2019-08-14">
+              2019-08-14
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-08-16T14:56:44+08:00" content="2019-08-16">
+              2019-08-16
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/08/14/Kubernetes-Pod控制器-Deployment、DaemonSet/" class="leancloud_visitors" data-flag-title="Kubernetes Pod控制器-Deployment、DaemonSet">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Deployment"><a href="#Deployment" class="headerlink" title="Deployment"></a>Deployment</h2><p>简称deploy。<a id="more"></a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain deploy</div><div class="line">KIND:     Deployment</div><div class="line">VERSION:  extensions/v1beta1</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     DEPRECATED - This group version of Deployment is deprecated by</div><div class="line">     apps/v1beta2/Deployment. See the release notes for more information.</div><div class="line">     Deployment enables declarative updates for Pods and ReplicaSets.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   apiVersion   &lt;string&gt;</div><div class="line">     APIVersion defines the versioned schema of this representation of an</div><div class="line">     object. Servers should convert recognized schemas to the latest internal</div><div class="line">     value, and may reject unrecognized values. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#resources</div><div class="line"></div><div class="line">   kind &lt;string&gt;</div><div class="line">     Kind is a string value representing the REST resource this object</div><div class="line">     represents. Servers may infer this from the endpoint the client submits</div><div class="line">     requests to. Cannot be updated. In CamelCase. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds</div><div class="line"></div><div class="line">   metadata     &lt;Object&gt;</div><div class="line">     Standard object metadata.</div><div class="line"></div><div class="line">   spec &lt;Object&gt;</div><div class="line">     Specification of the desired behavior of the Deployment.</div><div class="line"></div><div class="line">   status       &lt;Object&gt;</div><div class="line">     Most recently observed status of the Deployment.</div></pre></td></tr></table></figure></p>
+<p>一级字段依然是5个。其中，version最新的是apps/v1，文档里显示的版本是落后的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain deploy.spec</div><div class="line">KIND:     Deployment</div><div class="line">VERSION:  extensions/v1beta1</div><div class="line"></div><div class="line">RESOURCE: spec &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Specification of the desired behavior of the Deployment.</div><div class="line"></div><div class="line">     DeploymentSpec is the specification of the desired behavior of the</div><div class="line">     Deployment.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   minReadySeconds      &lt;integer&gt;</div><div class="line">     Minimum number of seconds for which a newly created pod should be ready</div><div class="line">     without any of its container crashing, for it to be considered available.</div><div class="line">     Defaults to 0 (pod will be considered available as soon as it is ready)</div><div class="line"></div><div class="line">   paused       &lt;boolean&gt;</div><div class="line">     Indicates that the deployment is paused and will not be processed by the</div><div class="line">     deployment controller.</div><div class="line"></div><div class="line">   progressDeadlineSeconds      &lt;integer&gt;</div><div class="line">     The maximum time in seconds for a deployment to make progress before it is</div><div class="line">     considered to be failed. The deployment controller will continue to process</div><div class="line">     failed deployments and a condition with a ProgressDeadlineExceeded reason</div><div class="line">     will be surfaced in the deployment status. Note that progress will not be</div><div class="line">     estimated during the time a deployment is paused. This is set to the max</div><div class="line">     value of int32 (i.e. 2147483647) by default, which means &quot;no deadline&quot;.</div><div class="line"></div><div class="line">   replicas     &lt;integer&gt;</div><div class="line">     Number of desired pods. This is a pointer to distinguish between explicit</div><div class="line">     zero and not specified. Defaults to 1.</div><div class="line"></div><div class="line">   revisionHistoryLimit &lt;integer&gt;</div><div class="line">     The number of old ReplicaSets to retain to allow rollback. This is a</div><div class="line">     pointer to distinguish between explicit zero and not specified. This is set</div><div class="line">     to the max value of int32 (i.e. 2147483647) by default, which means</div><div class="line">     &quot;retaining all old RelicaSets&quot;.</div><div class="line"></div><div class="line">   rollbackTo   &lt;Object&gt;</div><div class="line">     DEPRECATED. The config this deployment is rolling back to. Will be cleared</div><div class="line">     after rollback is done.</div><div class="line"></div><div class="line">   selector     &lt;Object&gt;</div><div class="line">     Label selector for pods. Existing ReplicaSets whose pods are selected by</div><div class="line">     this will be the ones affected by this deployment.</div><div class="line"></div><div class="line">   strategy     &lt;Object&gt;</div><div class="line">     The deployment strategy to use to replace existing pods with new ones.</div><div class="line"></div><div class="line">   template     &lt;Object&gt; -required-</div><div class="line">     Template describes the pods that will be created.</div></pre></td></tr></table></figure>
+<p>deploy.spec下可定义的字段比rs.spec的要多。其中最重要的一个字段是 <strong>strategy</strong>。这个字段用来定义更新策略，滚动更新只是其中的一个策略。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain deploy.spec.strategy</div><div class="line">KIND:     Deployment</div><div class="line">VERSION:  extensions/v1beta1</div><div class="line"></div><div class="line">RESOURCE: strategy &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     The deployment strategy to use to replace existing pods with new ones.</div><div class="line"></div><div class="line">     DeploymentStrategy describes how to replace existing pods with new ones.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   rollingUpdate        &lt;Object&gt;</div><div class="line">     Rolling update config params. Present only if DeploymentStrategyType =</div><div class="line">     RollingUpdate.</div><div class="line"></div><div class="line">   type &lt;string&gt;</div><div class="line">     Type of deployment. Can be &quot;Recreate&quot; or &quot;RollingUpdate&quot;. Default is</div><div class="line">     RollingUpdate.</div></pre></td></tr></table></figure>
+<p><strong>type：</strong></p>
+<ul>
+<li>Recreate：你删除一个Pod，它就创建1个新的Pod。</li>
+<li>RollingUpdate：滚动更新。</li>
+</ul>
+<p>如果清单文件中定义type的值为RollingUpdate，还可以使用rollingUpdate来定义滚动更新的更新方式的。说白了就是控制更新粒度。比如在更新期间，Pod最多能比清单中定义的期望状态多几个，能少几个。如果type是Recreate，rollingUpdate这个字段就没有用了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain deploy.spec.strategy.rollingUpdate</div><div class="line">KIND:     Deployment</div><div class="line">VERSION:  extensions/v1beta1</div><div class="line"></div><div class="line">RESOURCE: rollingUpdate &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Rolling update config params. Present only if DeploymentStrategyType =</div><div class="line">     RollingUpdate.</div><div class="line"></div><div class="line">     Spec to control the desired behavior of rolling update.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   maxSurge     &lt;string&gt;</div><div class="line">     The maximum number of pods that can be scheduled above the desired number</div><div class="line">     of pods. Value can be an absolute number (ex: 5) or a percentage of desired</div><div class="line">     pods (ex: 10%). This can not be 0 if MaxUnavailable is 0. Absolute number</div><div class="line">     is calculated from percentage by rounding up. By default, a value of 1 is</div><div class="line">     used. Example: when this is set to 30%, the new RC can be scaled up</div><div class="line">     immediately when the rolling update starts, such that the total number of</div><div class="line">     old and new pods do not exceed 130% of desired pods. Once old pods have</div><div class="line">     been killed, new RC can be scaled up further, ensuring that total number of</div><div class="line">     pods running at any time during the update is at most 130% of desired pods.</div><div class="line"></div><div class="line">   maxUnavailable       &lt;string&gt;</div><div class="line">     The maximum number of pods that can be unavailable during the update. Value</div><div class="line">     can be an absolute number (ex: 5) or a percentage of desired pods (ex:</div><div class="line">     10%). Absolute number is calculated from percentage by rounding down. This</div><div class="line">     can not be 0 if MaxSurge is 0. By default, a fixed value of 1 is used.</div><div class="line">     Example: when this is set to 30%, the old RC can be scaled down to 70% of</div><div class="line">     desired pods immediately when the rolling update starts. Once new pods are</div><div class="line">     ready, old RC can be scaled down further, followed by scaling up the new</div><div class="line">     RC, ensuring that the total number of pods available at all times during</div><div class="line">     the update is at least 70% of desired pods.</div></pre></td></tr></table></figure>
+<p>rollingUpdate可定义两个字段，maxSurge和maxUnavailable。这两个值不能同时为0，可以同时为正，或者一个为正，一个为0。</p>
+<ul>
+<li>maxSurge: 能多出期望Pod数量几个，可以直接使用数字，或百分比。</li>
+<li>maxUnavailable: 最多比期望Pod数量少几个，可以使用数字或百分比。比如该值定义为1，期望为5，那么至少要保证有4个Pod可用。</li>
+</ul>
+<p><strong>再看看deploy.spec比rs.spec中多的几个其他字段：</strong></p>
+<ul>
+<li>revisionHistoryLimit <integer><br>做滚动更新后，最多在历史中保存过去多少个历史版本。默认是10个。</integer></li>
+<li>paused       <boolean><br>当启动更新后，没有立即更新，而是一启动就让它暂停了。一般而言默认都是不暂停的，上来就更新。</boolean></li>
+</ul>
+<h2 id="Deploy示例"><a href="#Deploy示例" class="headerlink" title="Deploy示例"></a>Deploy示例</h2><h3 id="示例1：声明式创建deploy"><a href="#示例1：声明式创建deploy" class="headerlink" title="示例1：声明式创建deploy"></a>示例1：声明式创建deploy</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# vim deploy-demo.yaml</div><div class="line">apiVersion: apps/v1</div><div class="line">kind: Deployment</div><div class="line">metadata:</div><div class="line">  name: myapp-deploy</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  replicas: 2</div><div class="line">  selector:</div><div class="line">    matchLabels:</div><div class="line">      app: myapp</div><div class="line">      release: canary</div><div class="line">  template:</div><div class="line">    metadata:</div><div class="line">      labels:</div><div class="line">        app: myapp</div><div class="line">        release: canary</div><div class="line">    spec:</div><div class="line">      containers:</div><div class="line">      - name: myapp</div><div class="line">        image: ikubernetes/myapp:v1</div><div class="line">        imagePullPolicy: IfNotPresent</div><div class="line">        ports:</div><div class="line">        - name: http</div><div class="line">          containerPort: 80</div><div class="line">[root@spark32 manifests]# kubectl apply -f deploy-demo.yaml </div><div class="line">deployment.apps/myapp-deploy created</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/100.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/101.png" alt=""></p>
+<h3 id="示例2：更新"><a href="#示例2：更新" class="headerlink" title="示例2：更新"></a>示例2：更新</h3><p>deploy在实现更新应用时，可以直接通过编辑清单文件来实现或者patch打补丁(使用JSON格式给定补丁信息)实现，比如从副本数从2个改成3个。默认是滚动更新，见下图。如果只是更新镜像文件的，可以使用kubectl set image。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/102.png" alt=""></p>
+<h4 id="通过编辑清单文件更新"><a href="#通过编辑清单文件更新" class="headerlink" title="通过编辑清单文件更新"></a>通过编辑清单文件更新</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# vim deploy-demo.yaml</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/103.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl apply -f deploy-demo.yaml </div><div class="line">deployment.apps/myapp-deploy configured</div><div class="line">[root@spark32 manifests]# kubectl get pods</div><div class="line">NAME                           READY   STATUS    RESTARTS   AGE</div><div class="line">myapp-deploy-67b6dfcd8-knspq   1/1     Running   0          12m</div><div class="line">myapp-deploy-67b6dfcd8-qz9kc   1/1     Running   0          5s</div><div class="line">myapp-deploy-67b6dfcd8-xkgpt   1/1     Running   0          12m</div></pre></td></tr></table></figure></p>
+<p>已经变成3个Pod了。67b6dfcd8这个值依然没变，因为我们没有修改模板。<br>apply可以执行多次，它可以把变化同步到apiserver，apiserver发现与etcd中不一致，从而改变etcd，从而实现修改期望状态，接下来让现有状态不断逼近期望状态。</p>
+<h4 id="跟踪滚动更新效果"><a href="#跟踪滚动更新效果" class="headerlink" title="跟踪滚动更新效果"></a>跟踪滚动更新效果</h4><p>在一个终端上，执行如下命令进行监控：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get pods -l app=myapp -w</div></pre></td></tr></table></figure></p>
+<p>打开另一个终端，编辑清单文件来更新：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# vim deploy-demo.yaml</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/104.png" alt=""><br>更新：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl apply -f deploy-demo.yaml</div></pre></td></tr></table></figure></p>
+<p>接着查看第一个终端：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/105.png" alt=""><br>查看rs：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get rs -o wide</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/106.png" alt=""></p>
+<h3 id="通过patch打补丁更新"><a href="#通过patch打补丁更新" class="headerlink" title="通过patch打补丁更新"></a>通过patch打补丁更新</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl patch --help</div><div class="line">Update field(s) of a resource using strategic merge patch, a JSON merge patch, or a JSON patch.</div><div class="line"></div><div class="line"> JSON and YAML formats are accepted.</div><div class="line"></div><div class="line">Examples:</div><div class="line">  # Partially update a node using a strategic merge patch. Specify the patch as JSON.</div><div class="line">  kubectl patch node k8s-node-1 -p &apos;&#123;&quot;spec&quot;:&#123;&quot;unschedulable&quot;:true&#125;&#125;&apos;</div><div class="line">  </div><div class="line">  # Partially update a node using a strategic merge patch. Specify the patch as YAML.</div><div class="line">  kubectl patch node k8s-node-1 -p $&apos;spec:\n unschedulable: true&apos;</div><div class="line">  </div><div class="line">  # Partially update a node identified by the type and name specified in &quot;node.json&quot; using strategic merge patch.</div><div class="line">  kubectl patch -f node.json -p &apos;&#123;&quot;spec&quot;:&#123;&quot;unschedulable&quot;:true&#125;&#125;&apos;</div><div class="line">  </div><div class="line">  # Update a container&apos;s image; spec.containers[*].name is required because it&apos;s a merge key.</div><div class="line">  kubectl patch pod valid-pod -p &apos;&#123;&quot;spec&quot;:&#123;&quot;containers&quot;:[&#123;&quot;name&quot;:&quot;kubernetes-serve-hostname&quot;,&quot;image&quot;:&quot;new image&quot;&#125;]&#125;&#125;&apos;</div><div class="line">  </div><div class="line">  # Update a container&apos;s image using a json patch with positional arrays.</div><div class="line">  kubectl patch pod valid-pod --type=&apos;json&apos; -p=&apos;[&#123;&quot;op&quot;: &quot;replace&quot;, &quot;path&quot;: &quot;/spec/containers/0/image&quot;, &quot;value&quot;:&quot;new</div><div class="line">image&quot;&#125;]&apos;</div><div class="line"></div><div class="line">Options:</div><div class="line">      --allow-missing-template-keys=true: If true, ignore any errors in templates when a field or map key is missing in</div><div class="line">the template. Only applies to golang and jsonpath output formats.</div><div class="line">      --dry-run=false: If true, only print the object that would be sent, without sending it.</div><div class="line">  -f, --filename=[]: Filename, directory, or URL to files identifying the resource to update</div><div class="line">  -k, --kustomize=&apos;&apos;: Process the kustomization directory. This flag can&apos;t be used together with -f or -R.</div><div class="line">      --local=false: If true, patch will operate on the content of the file, not the server-side resource.</div><div class="line">  -o, --output=&apos;&apos;: Output format. One of:</div><div class="line">json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.</div><div class="line">  -p, --patch=&apos;&apos;: The patch to be applied to the resource JSON file.</div><div class="line">      --record=false: Record current kubectl command in the resource annotation. If set to false, do not record the</div><div class="line">command. If set to true, record the command. If not set, default to updating the existing annotation value only if one</div><div class="line">already exists.</div><div class="line">  -R, --recursive=false: Process the directory used in -f, --filename recursively. Useful when you want to manage</div><div class="line">related manifests organized within the same directory.</div><div class="line">      --template=&apos;&apos;: Template string or path to template file to use when -o=go-template, -o=go-template-file. The</div><div class="line">template format is golang templates [http://golang.org/pkg/text/template/#pkg-overview].</div><div class="line">      --type=&apos;strategic&apos;: The type of patch being provided; one of [json merge strategic]</div><div class="line"></div><div class="line">Usage:</div><div class="line">  kubectl patch (-f FILENAME | TYPE NAME) -p PATCH [options]</div><div class="line"></div><div class="line">Use &quot;kubectl options&quot; for a list of global command-line options (applies to all commands).</div></pre></td></tr></table></figure>
+<p>patch写结构定义很繁琐，不如vim修改清单文件，apply -f运行即可。但是这样会修改原有的清单文件，有些时候我们也许只是临时测试，修改文件不妥当。<br>【示例】：修改Pod副本数为5<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl patch deploy myapp-deploy -p &apos;&#123;&quot;spec&quot;:&#123;&quot;replicas&quot;:5&#125;&#125;&apos;</div><div class="line">deployment.extensions/myapp-deploy patched</div><div class="line">[root@spark32 manifests]# kubectl get pods</div><div class="line">NAME                            READY   STATUS    RESTARTS   AGE</div><div class="line">myapp-deploy-675558bfc5-4pnr7   1/1     Running   0          3h16m</div><div class="line">myapp-deploy-675558bfc5-6vz48   1/1     Running   0          3h16m</div><div class="line">myapp-deploy-675558bfc5-nkm4z   1/1     Running   0          7s</div><div class="line">myapp-deploy-675558bfc5-sjpmm   1/1     Running   0          3h16m</div><div class="line">myapp-deploy-675558bfc5-w729d   1/1     Running   0          7s</div></pre></td></tr></table></figure></p>
+<p>Pod已经变为5个了。</p>
+<p>【示例】：修改滚动更新策略<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl patch deploy myapp-deploy -p &apos;&#123;&quot;spec&quot;:&#123;&quot;strategy&quot;:&#123;&quot;rollingUpdate&quot;:&#123;&quot;maxSurge&quot;:1,&quot;maxUnavailable&quot;:0&#125;&#125;&#125;&#125;&apos;</div><div class="line">deployment.extensions/myapp-deploy patched</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/107.png" alt=""></p>
+<h4 id="kubectl-set-image更新"><a href="#kubectl-set-image更新" class="headerlink" title="kubectl set image更新"></a>kubectl set image更新</h4><p>如果只是更新镜像文件的，可以使用kubectl set image。<br>在一个终端上，执行如下命令进行监控：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get pods -l app=myapp -w</div></pre></td></tr></table></figure></p>
+<p>打开另一个终端，使用kubectl set image来更新镜像文件：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/108.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/109.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/110.png" alt=""><br>下面恢复更新：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl rollout resume deploy myapp-deploy</div><div class="line">deployment.extensions/myapp-deploy resumed</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/111.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/112.png" alt=""></p>
+<h3 id="回滚"><a href="#回滚" class="headerlink" title="回滚"></a>回滚</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl rollout --help</div><div class="line">Manage the rollout of a resource.</div><div class="line">  </div><div class="line"> Valid resource types include:</div><div class="line"></div><div class="line">  *  deployments</div><div class="line">  *  daemonsets</div><div class="line">  *  statefulsets</div><div class="line"></div><div class="line">Examples:</div><div class="line">  # Rollback to the previous deployment</div><div class="line">  kubectl rollout undo deployment/abc</div><div class="line">  </div><div class="line">  # Check the rollout status of a daemonset</div><div class="line">  kubectl rollout status daemonset/foo</div><div class="line"></div><div class="line">Available Commands:</div><div class="line">  history     View rollout history</div><div class="line">  pause       Mark the provided resource as paused</div><div class="line">  resume      Resume a paused resource</div><div class="line">  status      Show the status of the rollout</div><div class="line">  undo        Undo a previous rollout</div><div class="line"></div><div class="line">Usage:</div><div class="line">  kubectl rollout SUBCOMMAND [options]</div><div class="line"></div><div class="line">Use &quot;kubectl &lt;command&gt; --help&quot; for more information about a given command.</div><div class="line">Use &quot;kubectl options&quot; for a list of global command-line options (applies to all commands).</div></pre></td></tr></table></figure>
+<p>其中，子命令undo表示回滚。status查看更新历史。</p>
+<p><strong>回滚，默认是回滚到上一个版本，可以指定回滚到某一版本。</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl rollout undo --help</div><div class="line">Rollback to a previous rollout.</div><div class="line"></div><div class="line">Examples:</div><div class="line">  # Rollback to the previous deployment</div><div class="line">  kubectl rollout undo deployment/abc</div><div class="line">  </div><div class="line">  # Rollback to daemonset revision 3</div><div class="line">  kubectl rollout undo daemonset/abc --to-revision=3</div><div class="line">  </div><div class="line">  # Rollback to the previous deployment with dry-run</div><div class="line">  kubectl rollout undo --dry-run=true deployment/abc</div><div class="line"></div><div class="line">Options:</div><div class="line">      --allow-missing-template-keys=true: If true, ignore any errors in templates when a field or map key is missing in</div><div class="line">the template. Only applies to golang and jsonpath output formats.</div><div class="line">      --dry-run=false: If true, only print the object that would be sent, without sending it.</div><div class="line">  -f, --filename=[]: Filename, directory, or URL to files identifying the resource to get from a server.</div><div class="line">  -k, --kustomize=&apos;&apos;: Process the kustomization directory. This flag can&apos;t be used together with -f or -R.</div><div class="line">  -o, --output=&apos;&apos;: Output format. One of:</div><div class="line">json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.</div><div class="line">  -R, --recursive=false: Process the directory used in -f, --filename recursively. Useful when you want to manage</div><div class="line">related manifests organized within the same directory.</div><div class="line">      --template=&apos;&apos;: Template string or path to template file to use when -o=go-template, -o=go-template-file. The</div><div class="line">template format is golang templates [http://golang.org/pkg/text/template/#pkg-overview].</div><div class="line">      --to-revision=0: The revision to rollback to. Default to 0 (last revision).</div><div class="line"></div><div class="line">Usage:</div><div class="line">  kubectl rollout undo (TYPE NAME | TYPE/NAME) [flags] [options]</div><div class="line"></div><div class="line">Use &quot;kubectl options&quot; for a list of global command-line options (applies to all commands).</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl rollout history deploy myapp-deploy</div><div class="line">deployment.extensions/myapp-deploy </div><div class="line">REVISION  CHANGE-CAUSE</div><div class="line">1         &lt;none&gt;</div><div class="line">2         &lt;none&gt;</div><div class="line">3         &lt;none&gt;</div></pre></td></tr></table></figure>
+<p>比如，回滚到第一个版本：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl rollout undo deploy myapp-deploy --to-revision=1</div><div class="line">deployment.extensions/myapp-deploy rolled back</div></pre></td></tr></table></figure></p>
+<p>此时，在查看更新历史时，第1版已经没有，变成了第4版：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl rollout history deploy myapp-deploy  </div><div class="line">deployment.extensions/myapp-deploy </div><div class="line">REVISION  CHANGE-CAUSE</div><div class="line">2         &lt;none&gt;</div><div class="line">3         &lt;none&gt;</div><div class="line">4         &lt;none&gt;</div></pre></td></tr></table></figure></p>
+<p>查看当前工作pod中镜像是第几个版本：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">[root@spark32 ~]# kubectl get rs -o wide</div><div class="line">NAME                      DESIRED   CURRENT   READY   AGE     CONTAINERS   IMAGES                 SELECTOR</div><div class="line">myapp-deploy-675558bfc5   0         0         0       3h43m   myapp        ikubernetes/myapp:v2   app=myapp,pod-template-hash=675558bfc5,release=canary</div><div class="line">myapp-deploy-67b6dfcd8    5         5         5       4h      myapp        ikubernetes/myapp:v1   app=myapp,pod-template-hash=67b6dfcd8,release=canary</div><div class="line">myapp-deploy-7f577979c8   0         0         0       15m     myapp        ikubernetes/myapp:v3   app=myapp,pod-template-hash=7f577979c8,release=canary</div></pre></td></tr></table></figure></p>
+<p>由此可见，Deployment可以对无状态的应用做到如此的灵活和简单。</p>
+<h2 id="DaemonSet"><a href="#DaemonSet" class="headerlink" title="DaemonSet"></a>DaemonSet</h2><p>简称ds，主要作用在集群上符合条件的每个节点上只运行某个指定Pod，并且只运行1个副本。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain ds</div><div class="line">KIND:     DaemonSet</div><div class="line">VERSION:  extensions/v1beta1</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     DEPRECATED - This group version of DaemonSet is deprecated by</div><div class="line">     apps/v1beta2/DaemonSet. See the release notes for more information.</div><div class="line">     DaemonSet represents the configuration of a daemon set.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   apiVersion   &lt;string&gt;</div><div class="line">     APIVersion defines the versioned schema of this representation of an</div><div class="line">     object. Servers should convert recognized schemas to the latest internal</div><div class="line">     value, and may reject unrecognized values. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#resources</div><div class="line"></div><div class="line">   kind &lt;string&gt;</div><div class="line">     Kind is a string value representing the REST resource this object</div><div class="line">     represents. Servers may infer this from the endpoint the client submits</div><div class="line">     requests to. Cannot be updated. In CamelCase. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds</div><div class="line"></div><div class="line">   metadata     &lt;Object&gt;</div><div class="line">     Standard object&apos;s metadata. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata</div><div class="line"></div><div class="line">   spec &lt;Object&gt;</div><div class="line">     The desired behavior of this daemon set. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status</div><div class="line"></div><div class="line">   status       &lt;Object&gt;</div><div class="line">     The current status of this daemon set. This data may be out of date by some</div><div class="line">     window of time. Populated by the system. Read-only. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status</div></pre></td></tr></table></figure></p>
+<p>一级字段依然是这5个。但是ds.spec中没有replicas字段了，因为符合条件的每个节点上只运行1个Pod。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain ds.spec</div><div class="line">KIND:     DaemonSet</div><div class="line">VERSION:  extensions/v1beta1</div><div class="line"></div><div class="line">RESOURCE: spec &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     The desired behavior of this daemon set. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status</div><div class="line"></div><div class="line">     DaemonSetSpec is the specification of a daemon set.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   minReadySeconds      &lt;integer&gt;</div><div class="line">     The minimum number of seconds for which a newly created DaemonSet pod</div><div class="line">     should be ready without any of its container crashing, for it to be</div><div class="line">     considered available. Defaults to 0 (pod will be considered available as</div><div class="line">     soon as it is ready).</div><div class="line"></div><div class="line">   revisionHistoryLimit &lt;integer&gt;</div><div class="line">     The number of old history to retain to allow rollback. This is a pointer to</div><div class="line">     distinguish between explicit zero and not specified. Defaults to 10.</div><div class="line"></div><div class="line">   selector     &lt;Object&gt;</div><div class="line">     A label query over pods that are managed by the daemon set. Must match in</div><div class="line">     order to be controlled. If empty, defaulted to labels on Pod template. More</div><div class="line">     info:</div><div class="line">     https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors</div><div class="line"></div><div class="line">   template     &lt;Object&gt; -required-</div><div class="line">     An object that describes the pod that will be created. The DaemonSet will</div><div class="line">     create exactly one copy of this pod on every node that matches the</div><div class="line">     template&apos;s node selector (or on every node if no node selector is</div><div class="line">     specified). More info:</div><div class="line">     https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template</div><div class="line"></div><div class="line">   templateGeneration   &lt;integer&gt;</div><div class="line">     DEPRECATED. A sequence number representing a specific generation of the</div><div class="line">     template. Populated by the system. It can be set only during the creation.</div><div class="line"></div><div class="line">   updateStrategy       &lt;Object&gt;</div><div class="line">     An update strategy to replace existing DaemonSet pods with new pods.</div></pre></td></tr></table></figure></p>
+<h2 id="DaemonSet示例"><a href="#DaemonSet示例" class="headerlink" title="DaemonSet示例"></a>DaemonSet示例</h2><p>使用一个事先做好了的镜像filebeat，这个镜像在使用时要给两个变量：redis主机地址和redis日志级别。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# cp deploy-demo.yaml ds-demo.yaml</div><div class="line">[root@spark32 manifests]# vim ds-demo.yaml</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl apply -f ds-demo.yaml </div><div class="line">deployment.apps/redis created</div><div class="line">service/redis created</div><div class="line">daemonset.apps/filebeat-ds created</div><div class="line">[root@spark32 manifests]# kubectl get pods</div><div class="line">NAME                           READY   STATUS    RESTARTS   AGE</div><div class="line">filebeat-ds-2l7vw              1/1     Running   0          97s</div><div class="line">filebeat-ds-fqdmh              1/1     Running   0          97s</div><div class="line">filebeat-ds-ql5kc              1/1     Running   0          97s</div><div class="line">myapp-deploy-67b6dfcd8-ff9xf   1/1     Running   0          35m</div><div class="line">myapp-deploy-67b6dfcd8-msv5x   1/1     Running   0          35m</div><div class="line">myapp-deploy-67b6dfcd8-rp9vj   1/1     Running   0          35m</div><div class="line">myapp-deploy-67b6dfcd8-wls6h   1/1     Running   0          35m</div><div class="line">myapp-deploy-67b6dfcd8-xzgdl   1/1     Running   0          35m</div><div class="line">redis-58b9f5776-tsks5          1/1     Running   0          3m59s</div><div class="line">[root@spark32 manifests]# kubectl get svc</div><div class="line">NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE</div><div class="line">kubernetes   ClusterIP   10.96.0.1        &lt;none&gt;        443/TCP    125d</div><div class="line">redis        ClusterIP   10.101.223.105   &lt;none&gt;        6379/TCP   6m16s</div></pre></td></tr></table></figure>
+<p>【说明】：</p>
+<ul>
+<li>master上不会运行这个pod。除非指定Pod能够容忍master上的污点，master上才会也启动一个Pod。</li>
+<li>启动一个redis pod，然后在default命名空间定义一个服务叫redis，这样filebeat就会连上那个redis服务了。</li>
+<li>在一个清单文件中可定义多个资源，把有关联的资源定义在一起。用 — 分割。</li>
+<li>redis应该用StatefulSet来运行，我这里只运行1个，使用Deployment是没问题的，但是别扩展规模，只运行1个。对于redis来讲，还应该使用存储卷，后面的内容会讲，这里先不做了。</li>
+</ul>
+<h2 id="DaemonSet滚动更新"><a href="#DaemonSet滚动更新" class="headerlink" title="DaemonSet滚动更新"></a>DaemonSet滚动更新</h2><p>DaemonSet也支持滚动更新。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ kubectl explain ds.spec</div></pre></td></tr></table></figure></p>
+<p>有个字段：updateStrategy <object><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain ds.spec.updateStrategy</div><div class="line">KIND:     DaemonSet</div><div class="line">VERSION:  extensions/v1beta1</div><div class="line"></div><div class="line">RESOURCE: updateStrategy &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     An update strategy to replace existing DaemonSet pods with new pods.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   rollingUpdate        &lt;Object&gt;</div><div class="line">     Rolling update config params. Present only if type = &quot;RollingUpdate&quot;.</div><div class="line"></div><div class="line">   type &lt;string&gt;</div><div class="line">     Type of daemon set update. Can be &quot;RollingUpdate&quot; or &quot;OnDelete&quot;. Default is</div><div class="line">     OnDelete.</div></pre></td></tr></table></figure></object></p>
+<p>默认是是OnDelete。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain ds.spec.updateStrategy.rollingUpdate</div><div class="line">KIND:     DaemonSet</div><div class="line">VERSION:  extensions/v1beta1</div><div class="line"></div><div class="line">RESOURCE: rollingUpdate &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Rolling update config params. Present only if type = &quot;RollingUpdate&quot;.</div><div class="line"></div><div class="line">     Spec to control the desired behavior of daemon set rolling update.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   maxUnavailable       &lt;string&gt;</div><div class="line">     The maximum number of DaemonSet pods that can be unavailable during the</div><div class="line">     update. Value can be an absolute number (ex: 5) or a percentage of total</div><div class="line">     number of DaemonSet pods at the start of the update (ex: 10%). Absolute</div><div class="line">     number is calculated from percentage by rounding up. This cannot be 0.</div><div class="line">     Default value is 1. Example: when this is set to 30%, at most 30% of the</div><div class="line">     total number of nodes that should be running the daemon pod (i.e.</div><div class="line">     status.desiredNumberScheduled) can have their pods stopped for an update at</div><div class="line">     any given time. The update starts by stopping at most 30% of those</div><div class="line">     DaemonSet pods and then brings up new DaemonSet pods in their place. Once</div><div class="line">     the new pods are available, it then proceeds onto other DaemonSet pods,</div><div class="line">     thus ensuring that at least 70% of original number of DaemonSet pods are</div><div class="line">     available at all times during the update.</div></pre></td></tr></table></figure></p>
+<p>DaemonSet的滚动更新字段没有maxSurge。<br>【注意】：只能先删除在更新。因为一个节点只能运行一个，假如现在3个节点，你要运行4个，第4个运行到哪去。没有可能性，不支持1个节点上运行两个。所以只能是先删除1个，在更新1个。当然也可以一次删除多个。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/113.png" alt=""></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"><i class="fa fa-tag"></i>Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/12/Kubernetes-Pod控制器——ReplicaSet/" rel="next" title="Kubernetes Pod控制器——ReplicaSet">
+                <i class="fa fa-chevron-left"></i> Kubernetes Pod控制器——ReplicaSet
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">89</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Deployment"><span class="nav-number">1.</span> <span class="nav-text">Deployment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Deploy示例"><span class="nav-number">2.</span> <span class="nav-text">Deploy示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例1：声明式创建deploy"><span class="nav-number">2.1.</span> <span class="nav-text">示例1：声明式创建deploy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例2：更新"><span class="nav-number">2.2.</span> <span class="nav-text">示例2：更新</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#通过编辑清单文件更新"><span class="nav-number">2.2.1.</span> <span class="nav-text">通过编辑清单文件更新</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#跟踪滚动更新效果"><span class="nav-number">2.2.2.</span> <span class="nav-text">跟踪滚动更新效果</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过patch打补丁更新"><span class="nav-number">2.3.</span> <span class="nav-text">通过patch打补丁更新</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#kubectl-set-image更新"><span class="nav-number">2.3.1.</span> <span class="nav-text">kubectl set image更新</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#回滚"><span class="nav-number">2.4.</span> <span class="nav-text">回滚</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DaemonSet"><span class="nav-number">3.</span> <span class="nav-text">DaemonSet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DaemonSet示例"><span class="nav-number">4.</span> <span class="nav-text">DaemonSet示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DaemonSet滚动更新"><span class="nav-number">5.</span> <span class="nav-text">DaemonSet滚动更新</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共240.7k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>
