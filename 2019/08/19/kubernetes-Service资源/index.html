@@ -1,0 +1,933 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Service介绍为了给客户端提供一个固定访问端点，因此在客户端和服务端(Pod)之间添加了一个固定的中间层，这个中间层称为service。这个service的名称解析强依赖于在k8s集群之上部署的一个附件叫k8s的DNS服务。较新版本中，使用的是CoreDNS。1.11之前的版本用的是kube-dns。">
+<meta name="keywords" content="Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes Service资源">
+<meta property="og:url" content="http://yoursite.com/2019/08/19/kubernetes-Service资源/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="Service介绍为了给客户端提供一个固定访问端点，因此在客户端和服务端(Pod)之间添加了一个固定的中间层，这个中间层称为service。这个service的名称解析强依赖于在k8s集群之上部署的一个附件叫k8s的DNS服务。较新版本中，使用的是CoreDNS。1.11之前的版本用的是kube-dns。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/114.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/115.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/116.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/117.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/118.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/119.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/120.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/121.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/122.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/123.png">
+<meta property="og:updated_time" content="2019-08-19T02:46:03.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kubernetes Service资源">
+<meta name="twitter:description" content="Service介绍为了给客户端提供一个固定访问端点，因此在客户端和服务端(Pod)之间添加了一个固定的中间层，这个中间层称为service。这个service的名称解析强依赖于在k8s集群之上部署的一个附件叫k8s的DNS服务。较新版本中，使用的是CoreDNS。1.11之前的版本用的是kube-dns。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/114.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Kubernetes Service资源 | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Kubernetes Service资源
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-08-19T08:49:31+08:00" content="2019-08-19">
+              2019-08-19
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-08-19T10:46:03+08:00" content="2019-08-19">
+              2019-08-19
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/08/19/kubernetes-Service资源/" class="leancloud_visitors" data-flag-title="Kubernetes Service资源">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Service介绍"><a href="#Service介绍" class="headerlink" title="Service介绍"></a>Service介绍</h2><p>为了给客户端提供一个固定访问端点，因此在客户端和服务端(Pod)之间添加了一个固定的中间层，这个中间层称为service。这个service的名称解析强依赖于在k8s集群之上部署的一个附件叫k8s的DNS服务。较新版本中，使用的是CoreDNS。1.11之前的版本用的是kube-dns。<a id="more"></a><br>Kubernetes要想能够向客户端提供网络功能，需要依赖于第三方的方案。在k8s新版本中可通过cni(容器网络插件标准接口)来进行接入任何遵循这种插件标准的第三方方案。<br>在Kubernetes集群中有三类网络：</p>
+<ul>
+<li>node network</li>
+<li>pod network</li>
+<li>service network（cluster network）：虚拟的地址，Virtual IP。</li>
+</ul>
+<p>在每个节点上，有个组件叫kube-proxy。这个组件将始终监视着master上apiserver中有关service资源的变动信息。随时要连到apiserver上获取任何一个与service资源相关的资源变动状态。这种是通过Kubernetes中固有的一种请求方法叫watch来实现的。一旦有service资源的内容发生变动，包括创建、修改、删除，kube-proxy都要把它转换为当前节点之上的能够实现service资源调度到后端特定Pod资源上的规则。这种规则可能是iptables，也有可能是ipvs，取决于service的实现方式。</p>
+<h2 id="Service工作模型"><a href="#Service工作模型" class="headerlink" title="Service工作模型"></a>Service工作模型</h2><p>service的实现方式在Kubernetes之上有三种模型。</p>
+<h3 id="userspace模型"><a href="#userspace模型" class="headerlink" title="userspace模型"></a>userspace模型</h3><p>所谓用户空间可以理解为用户的请求。看下图。一是来自于用户内部的请求，Client Pod发请求，请求某个服务时，一定先到达当前节点内核空间的iptables规则，这个iptables规则其实就是service规则。这个service规则，它的工作方式是请求到达Service IP以后(iptables)，由service先把它转为本地监听在某个套接字上的用户空间的kube-proxy，由它来负责处理，处理完后在转给Service IP，最终代理至这个service关联的相关Pod。kube-proxy是工作在用户空间的进程。所以被称为userspace。这种方式效率很低，原因在于先要到内核空间，然后然后回到当前主机上的用户空间，由kube-proxy封装请求报文代理完以后在回到内核空间，然后有iptables规则进行分发。效率很对。因此后来就到了第2种方式。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/114.png" alt=""></p>
+<h3 id="iptables"><a href="#iptables" class="headerlink" title="iptables"></a>iptables</h3><p>客户端IP请求service时直接请求service IP，这个请求被本地内核空间的service规则所截取，进而直接调度给相关的后端Pod。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/115.png" alt=""></p>
+<h3 id="ipvs"><a href="#ipvs" class="headerlink" title="ipvs"></a>ipvs</h3><p>client请求到达内核空间后，直接由ipvs规则来调度。直接调度给后端的Pod。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/116.png" alt=""></p>
+<p>在安装配置Kubernetes集群时，设定service工作在什么模式下，它应该就会生成对应的模式的规则。1.1及之前的版本用的是userspace，1.1-1.10之间用的是iptables，而1.11默认使用ipvs。当然如果安装时没有激活ipvs，它会自动降级为iptables。<br>如果某个service背后的Pod资源发生改变了，比如Pod多了一个，这个Pod的信息会立即反应到apiserver上，apiserver会把信息更新到etcd上，kube-proxy会检测到apiserver上这个变化，并将该变化立即转为iptables规则。转换是动态的，而且是实时的。<br>kubernetes集群安装完成后，默认有个service的名称叫 kubernetes。集群内的各种Pod需要和Kubernetes集群的apiserver联系时都要通过这个地址联系的。</p>
+<h2 id="Service字段解释"><a href="#Service字段解释" class="headerlink" title="Service字段解释"></a>Service字段解释</h2><p>Service简称svc。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain svc</div><div class="line">KIND:     Service</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Service is a named abstraction of software service (for example, mysql)</div><div class="line">     consisting of local port (for example 3306) that the proxy listens on, and</div><div class="line">     the selector that determines which pods will answer requests sent through</div><div class="line">     the proxy.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   apiVersion   &lt;string&gt;</div><div class="line">     APIVersion defines the versioned schema of this representation of an</div><div class="line">     object. Servers should convert recognized schemas to the latest internal</div><div class="line">     value, and may reject unrecognized values. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#resources</div><div class="line"></div><div class="line">   kind &lt;string&gt;</div><div class="line">     Kind is a string value representing the REST resource this object</div><div class="line">     represents. Servers may infer this from the endpoint the client submits</div><div class="line">     requests to. Cannot be updated. In CamelCase. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds</div><div class="line"></div><div class="line">   metadata     &lt;Object&gt;</div><div class="line">     Standard object&apos;s metadata. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata</div><div class="line"></div><div class="line">   spec &lt;Object&gt;</div><div class="line">     Spec defines the behavior of a service.</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status</div><div class="line"></div><div class="line">   status       &lt;Object&gt;</div><div class="line">     Most recently observed status of the service. Populated by the system.</div><div class="line">     Read-only. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status</div></pre></td></tr></table></figure></p>
+<p>依然是这5个一级字段。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain svc.spec</div></pre></td></tr></table></figure></p>
+<p><strong>svc.spec下有几个重要字段：</strong></p>
+<ul>
+<li>ports        &lt;[]Object&gt;   Service的哪个port和后端Pod的端口建立关联关系。</li>
+<li>selector     <map[string]string>   关联到哪些Pod资源上</map[string]string></li>
+<li>clusterIP    <string>  集群IP，这个IP是动态分配的。可以用这个字段定义固定地址。但是给定后，就无法修改了</string></li>
+<li>type <string>  service类型。如果有必要的话，要指定type。ExternalName, ClusterIP, NodePort, and LoadBalancer。Defaults to ClusterIP.<ul>
+<li>ClusterIP：分配一个集群IP地址，仅用于集群内通信</li>
+<li>NodePort：接入进群外部的流量</li>
+<li>LoadBalancer：这表示把k8s部署在虚拟机上，而虚拟机是工作在云环境中，而云环境支持LBAAS，叫负载均衡级服务的一键调用，创建软负载均衡器使用的</li>
+<li>ExternalName：把集群外部的服务引入到进群内部来</li>
+</ul>
+</string></li>
+</ul>
+<p><strong>svc.spec.ports</strong></p>
+<ul>
+<li>name <string>  port的名称</string></li>
+<li>nodePort     <integer>   指定节点上的端口，这个不用定义，因为只有service的类型是NodePort时，节点端口才有用</integer></li>
+<li>port <integer> -required-  这个service对外提供服务的端口</integer></li>
+<li>protocol     <string>  不指定就是TCP</string></li>
+<li>targetPort   <string>  Pod的端口</string></li>
+</ul>
+<h2 id="Service示例"><a href="#Service示例" class="headerlink" title="Service示例"></a>Service示例</h2><h3 id="示例1：ClusterIP类型的Service"><a href="#示例1：ClusterIP类型的Service" class="headerlink" title="示例1：ClusterIP类型的Service"></a>示例1：ClusterIP类型的Service</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# vim redis-svc.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Service</div><div class="line">metadata:</div><div class="line">  name: redis</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  selector:</div><div class="line">    app: redis</div><div class="line">    role: logstor</div><div class="line">  clusterIP: 10.97.97.97</div><div class="line">  type: ClusterIP</div><div class="line">  ports:</div><div class="line">  - port: 6379</div><div class="line">    targetPort: 6379</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/117.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl apply -f redis-svc.yaml </div><div class="line">service/redis created</div><div class="line">[root@spark32 manifests]# kubectl get svc</div><div class="line">NAME         TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE</div><div class="line">kubernetes   ClusterIP   10.96.0.1     &lt;none&gt;        443/TCP    128d</div><div class="line">redis        ClusterIP   10.97.97.97   &lt;none&gt;        6379/TCP   4s</div><div class="line">[root@spark32 manifests]# kubectl describe svc redis</div><div class="line">Name:              redis</div><div class="line">Namespace:         default</div><div class="line">Labels:            &lt;none&gt;</div><div class="line">Annotations:       kubectl.kubernetes.io/last-applied-configuration:</div><div class="line">                     &#123;&quot;apiVersion&quot;:&quot;v1&quot;,&quot;kind&quot;:&quot;Service&quot;,&quot;metadata&quot;:&#123;&quot;annotations&quot;:&#123;&#125;,&quot;name&quot;:&quot;redis&quot;,&quot;namespace&quot;:&quot;default&quot;&#125;,&quot;spec&quot;:&#123;&quot;clusterIP&quot;:&quot;10.97.97.97&quot;,&quot;...</div><div class="line">Selector:          app=redis,role=logstor</div><div class="line">Type:              ClusterIP</div><div class="line">IP:                10.97.97.97</div><div class="line">Port:              &lt;unset&gt;  6379/TCP</div><div class="line">TargetPort:        6379/TCP</div><div class="line">Endpoints:         10.244.2.53:6379</div><div class="line">Session Affinity:  None</div><div class="line">Events:            &lt;none&gt;</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/118.png" alt=""><br>其实service到pod是有一个中间层的，service不会直接到pod。service是先到endpoints。endpoints也是一个标准的Kubernetes资源对象，endpoints就是地址+端口。然后再由endpoints关联至后端的Pod。只不过作为我们来讲，可以理解为是从service直接到pod。事实上我们可以手动为service创建endpoints资源。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get endpoints</div><div class="line">NAME         ENDPOINTS            AGE</div><div class="line">kubernetes   172.16.206.32:6443   128d</div><div class="line">redis        10.244.2.53:6379     5m3s</div></pre></td></tr></table></figure></p>
+<p>service创建完，只要k8s集群内的dns附件存在，那么我们就可以直接解析服务名。每个service创建，都会在集群dns中动态添加相应的资源记录。<br><strong>资源记录: SVC_NAME.NS_NAME.DOMAIN.LTD.</strong><br>集群的默认域名后缀：<strong>svc.cluster.local.</strong>    如果我们没有改这个特定域名后缀，每一个服务创建后对应的都是这种格式。比如：<br>        <strong>redis.default.svc.cluster.local.</strong></p>
+<h3 id="示例2：NodePort类型的Service"><a href="#示例2：NodePort类型的Service" class="headerlink" title="示例2：NodePort类型的Service"></a>示例2：NodePort类型的Service</h3><p>字段nodePort可以不指定，但是如果指定请确保指定的每一个节点的nodePort都不能被占用。这个端口默认是动态分配的，从30000-32767之间。当然如果你确保两个节点上的80没被占用，你在清单文件中指定80也是可以的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# cp redis-svc.yaml myapp-svc.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Service</div><div class="line">metadata:</div><div class="line">  name: myapp</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  selector:</div><div class="line">    app: myapp</div><div class="line">    release: canary</div><div class="line">  clusterIP: 10.99.99.99</div><div class="line">  type: NodePort</div><div class="line">  ports:</div><div class="line">  - port: 80</div><div class="line">    targetPort: 80</div><div class="line">    nodePort: 30080</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/119.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl apply -f myapp-svc.yaml </div><div class="line">service/myapp created</div><div class="line">[root@spark32 manifests]# kubectl get svc</div><div class="line">NAME         TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE</div><div class="line">kubernetes   ClusterIP   10.96.0.1     &lt;none&gt;        443/TCP        128d</div><div class="line">myapp        NodePort    10.99.99.99   &lt;none&gt;        80:30080/TCP   4s</div><div class="line">redis        ClusterIP   10.97.97.97   &lt;none&gt;        6379/TCP       12m</div></pre></td></tr></table></figure></p>
+<p>Service的80端口映射到节点的30080端口。<br>集群外通过节点IP和PORT访问服务：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# while true; do curl http://172.16.206.32:30080/hostname.html; sleep 1; done</div><div class="line">myapp-deploy-67b6dfcd8-xzgdl</div><div class="line">myapp-deploy-67b6dfcd8-ff9xf</div><div class="line">myapp-deploy-67b6dfcd8-wls6h</div><div class="line">myapp-deploy-67b6dfcd8-msv5x</div><div class="line">myapp-deploy-67b6dfcd8-ff9xf</div><div class="line">myapp-deploy-67b6dfcd8-ff9xf</div></pre></td></tr></table></figure></p>
+<h3 id="示例3：LoadBalancer类型的service"><a href="#示例3：LoadBalancer类型的service" class="headerlink" title="示例3：LoadBalancer类型的service"></a>示例3：LoadBalancer类型的service</h3><p>假如你在阿里云上买了4个虚拟机，同时也买了LB服务LBAAS。在这4个虚拟主机上部署k8s集群，这个k8s集群可以与底层的公有云IaaS的api做交互，k8s具有这样的能力。调的时候能够去请求创建1个外置的负载均衡器。1个master，3个node。3个node上都使用同一个nodePort对外输出服务，它会自动请求底层IaaS的api，用纯软件的方式做一个负载均衡器，并且为这个负载均衡器提供的配置信息是这3个节点的节点端口上提供的服务。这样外部客户在访问时直接访问LBAAS，由它来调度到3个nodePort上。nodePort先代理给service，由service在集群内部负载均衡至Pod。OpenStack也支持LBAAS。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/120.png" alt=""></p>
+<h3 id="示例4：ExternalName类型的service"><a href="#示例4：ExternalName类型的service" class="headerlink" title="示例4：ExternalName类型的service"></a>示例4：ExternalName类型的service</h3><p>集群中建立的Service的endpoints不是集群内的Pod，而是集群外的服务。</p>
+<h2 id="Service会话绑定"><a href="#Service会话绑定" class="headerlink" title="Service会话绑定"></a>Service会话绑定</h2><p>service在实现负载均衡时还支持 sessionAffinity。默认是None，不做会话绑定。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">sessionAffinity      &lt;string&gt;</div><div class="line">  Supports &quot;ClientIP&quot; and &quot;None&quot;. Used to maintain session affinity. Enable</div><div class="line">  client IP based session affinity. Must be ClientIP or None. Defaults to</div><div class="line">  None. More info:</div><div class="line">  https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/121.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl patch svc myapp -p &apos;&#123;&quot;spec&quot;:&#123;&quot;sessionAffinity&quot;:&quot;ClientIP&quot;&#125;&#125;&apos;</div><div class="line">service/myapp patched</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/122.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/123.png" alt=""></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"><i class="fa fa-tag"></i>Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/14/Kubernetes-Pod控制器-Deployment、DaemonSet/" rel="next" title="Kubernetes Pod控制器-Deployment、DaemonSet">
+                <i class="fa fa-chevron-left"></i> Kubernetes Pod控制器-Deployment、DaemonSet
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">90</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Service介绍"><span class="nav-number">1.</span> <span class="nav-text">Service介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Service工作模型"><span class="nav-number">2.</span> <span class="nav-text">Service工作模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#userspace模型"><span class="nav-number">2.1.</span> <span class="nav-text">userspace模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#iptables"><span class="nav-number">2.2.</span> <span class="nav-text">iptables</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ipvs"><span class="nav-number">2.3.</span> <span class="nav-text">ipvs</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Service字段解释"><span class="nav-number">3.</span> <span class="nav-text">Service字段解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Service示例"><span class="nav-number">4.</span> <span class="nav-text">Service示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例1：ClusterIP类型的Service"><span class="nav-number">4.1.</span> <span class="nav-text">示例1：ClusterIP类型的Service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例2：NodePort类型的Service"><span class="nav-number">4.2.</span> <span class="nav-text">示例2：NodePort类型的Service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例3：LoadBalancer类型的service"><span class="nav-number">4.3.</span> <span class="nav-text">示例3：LoadBalancer类型的service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例4：ExternalName类型的service"><span class="nav-number">4.4.</span> <span class="nav-text">示例4：ExternalName类型的service</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Service会话绑定"><span class="nav-number">5.</span> <span class="nav-text">Service会话绑定</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共243.2k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>

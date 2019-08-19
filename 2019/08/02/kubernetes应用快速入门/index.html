@@ -134,7 +134,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/61.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/62.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/63.png">
-<meta property="og:updated_time" content="2019-08-02T07:20:49.000Z">
+<meta property="og:updated_time" content="2019-08-16T08:22:41.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="kubernetes应用快速入门">
 <meta name="twitter:description" content="kubectl简介API Server是Kubernetes集群的网关，任何人只能通过API Server接口与集群进行交互。而kubectl是Kubernetes的终端客户端，此前博客里讲解的使用kubeadm初始化Kubernetes集群时，">
@@ -367,8 +367,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2019-08-02T15:20:49+08:00" content="2019-08-02">
-              2019-08-02
+              <time itemprop="dateUpdated" datetime="2019-08-16T16:22:41+08:00" content="2019-08-16">
+              2019-08-16
               </time>
               </span>
             
@@ -447,6 +447,8 @@
 <ul>
 <li>–dry-run=true：干跑模式，并没有真正运行</li>
 <li>–port=80：不指定这个也会暴露容器中的相应端口</li>
+<li>默认创建的是其实是Deployment，如果想创建一个Pod，而不是想要创建由Deployment控制器控制的pod，可以在创建命令上加一个–restart=…<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># kubectl run nginx --image=nginx:1.14-alpine --port=80 --restart=Never</div><div class="line">pod/nginx created</div></pre></td></tr></table></figure>
+</li>
 </ul>
 <p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/48.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/49.png" alt=""></p>
 <p>这是Pod的地址，只能在k8s集群内使用。Pod的客户端一般有两类：</p>
@@ -617,7 +619,7 @@ nginx-deploy-55d8d67cf-qrd2s   1/1     Running   0          11s   10.244.1.4   s
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">89</span>
+              <span class="site-state-item-count">90</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -750,7 +752,7 @@ nginx-deploy-55d8d67cf-qrd2s   1/1     Running   0          11s   10.244.1.4   s
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共240.7k字</span>
+  <span class="post-count">博客全站共243.2k字</span>
 </div>
 
         
