@@ -1,0 +1,951 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Ingress Controller在Kubernetes集群中，后端被代理的资源，是不配置https的，是纯明文的http，但是我们使用一个独特的调度器或者叫Pod，对这个Pod来讲，它是一个运行在用户空间的应用程序，比如Nginx、traefik、haproxy、Envoy等。">
+<meta name="keywords" content="Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes Ingress及Ingress Controller">
+<meta property="og:url" content="http://yoursite.com/2019/08/21/Kubernetes-Ingress及Ingress-Controller/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="Ingress Controller在Kubernetes集群中，后端被代理的资源，是不配置https的，是纯明文的http，但是我们使用一个独特的调度器或者叫Pod，对这个Pod来讲，它是一个运行在用户空间的应用程序，比如Nginx、traefik、haproxy、Envoy等。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/124.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/125.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/126.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/127.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/128.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/129.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/130.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/131.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/132.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/133.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/134.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/135.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/136.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/137.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/138.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/139.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/140.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/141.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/142.png">
+<meta property="og:updated_time" content="2019-08-22T05:31:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kubernetes Ingress及Ingress Controller">
+<meta name="twitter:description" content="Ingress Controller在Kubernetes集群中，后端被代理的资源，是不配置https的，是纯明文的http，但是我们使用一个独特的调度器或者叫Pod，对这个Pod来讲，它是一个运行在用户空间的应用程序，比如Nginx、traefik、haproxy、Envoy等。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/124.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Kubernetes Ingress及Ingress Controller | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Kubernetes Ingress及Ingress Controller
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-08-21T09:44:12+08:00" content="2019-08-21">
+              2019-08-21
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-08-22T13:31:40+08:00" content="2019-08-22">
+              2019-08-22
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/08/21/Kubernetes-Ingress及Ingress-Controller/" class="leancloud_visitors" data-flag-title="Kubernetes Ingress及Ingress Controller">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Ingress-Controller"><a href="#Ingress-Controller" class="headerlink" title="Ingress Controller"></a>Ingress Controller</h2><p>在Kubernetes集群中，后端被代理的资源，是不配置https的，是纯明文的http，但是我们使用一个独特的调度器或者叫Pod，对这个Pod来讲，它是一个运行在用户空间的应用程序，比如Nginx、traefik、haproxy、Envoy等。<a id="more"></a>当用户试图访问某一服务时，我们不让这些请求先到达这些后端Pod的service，而是先到达这个Pod。这个Pod和service后的Pod是同一个网段的，所以可以让这个Pod和后端Pod直接通信，不要经过service，来完成反向代理。问题是这个Pod怎么接入外部流量呢？它需要NodePort类型的service。<br>客户端通过NodePort类型的service调度以后，与我们专门配置了https的Pod进行通信。但是等请求到达此Pod以后，由此Pod反向代理至后端Pod。所以这个Pod是https会话卸载器了。<br>访问任何一个节点的NodePort都能到达那个反向代理Pod，每一个节点都拥有Pod所在网络的地址，可以跟Pod直接通信。<br>但是这种模式调度次数太多了，集群外负载均衡调度到Node，Node调度到service，service调度到反向代理Pod，反向代理Pod调度到后端Pod。性能太差了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/124.png" alt=""><br>可以让实现反向代理的Pod直接共享节点的网络名称空间，也就是Pod监听着宿主机的地址。这样在集群外做个4层负载均衡，这个四层调度性能损失较少，然后到集群Pod了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/125.png" alt=""><br>但是这样一来，这个Pod在每个node上只能运行1个了。一般来讲，这样的Pod，集群一般只运行1个，这个Pod运行在集群某个节点上就可以了。但是让这个Pod监听在节点的端口上，会有一个问题。使用Service时，用户访问任何一个节点的NodePort都行，但是目前这个Pod只运行1个，只监听在一个节点上。万一这个节点挂了呢？<br>使用DaemonSet，在每个节点上都运行，而且只运行1个这样的Pod。这样调度到任何一个节点都可以了。但是假如集群有非常多的节点，比如1000个节点，没必要在每个节点上都运行这样的Pod，DaemonSet可以实现在部分节点上运行。1000个节点拿出3个节点，打上污点，让别的Pod都调度不上来，我们定义这个DaemonSet控制下的Pod只允许运行在这3个节点上，并且能容忍这个污点。这3个节点专门用来接入集群外部的7层调度的流量。<br>而这个Pod在k8s当中有个专门的称呼，叫<strong>Ingress Controller</strong>。Ingress Controller是一个或一组Pod资源，它通常就是一个应用程序，这个应用程序就是拥有7层代理能力和调度能力的应用程序。目前k8s上的选择通常有4种：Nginx、Traefik、Envoy、HAProxy。最不受待见的就是HAProxy，但是现在在serviceMesh，服务网格中大家倾向的是Envoy。<br>将来在用Ingress Controller时，我们有3种选择：<strong>Nginx、Traefik、Envoy</strong>。去做微服务的，大家都比较倾向于Envoy。Traefik本身也是为微服务设计的，动态生成配置。Nginx是后来改造的。<br>假设这个7层Pod调度多个后端服务，比如有一组Pod提供了电商服务，第二组Pod提供了社交服务，第三组服务提供了API服务，还有一组Pod提供的是论坛服务。这个7层Pod如果来调度这4组http服务。以Nginx为例，这是4组upstream，然后定义4个虚拟主机。假如说这个Pod只有1个IP地址，那么做4个虚拟主机只能根据4个主机名来做了。每个虚拟主机对应后端Pod。这4个虚拟主机要能提供公网能解析的域名。但是假如我们没有那么多主机名，就1个域名怎么办？url映射。每一个location映射不到不同的upstream。</p>
+<h2 id="Ingress"><a href="#Ingress" class="headerlink" title="Ingress"></a>Ingress</h2><p>现在有个问题，Nginx中upstream中要指定有哪些主机的，现在后端不是主机，Pod是有生命周期的，随时有可能挂掉，起来一个新Pod，新Pod的IP地址就变了。另外后端的Pod可以动态升缩的，改一下，Pod就变多或变少了。<br>Service是怎么面对这个问题的：Service通过标签选择器关联标签来解决，而且Service始终watch着apiserver中的api，关心自己对应的资源是否发生变动。<br>这里Nginx怎么办？Nginx是运行在Pod中的，配置是在Pod内部的，upstream对应的Pod变动怎么办？同样的，Ingress Controller，也需要随时watch api当中的后端Pod资源的改变，怎么知道是哪些Pod资源呢？Ingress Controller自己没这个能力，它自己并不知道目前符合自己条件的Pod资源有哪些个，必须要借助于Service来实现。因此我们还是得建Service。每一个upstream服务器组要对应1个Service资源。但是这个Service不是被当做代理时的中间节点，它仅仅是帮忙分组的，知道找哪几个Pod就行了，调度时是不会走Service的。Pod一有变化，Service对应的也变了，这个变化怎么反应到配置文件中呢？依赖于一个专门的资源叫<strong>Ingress</strong>。Ingress和Ingress Controller是两回事，我们定义一个Ingress的时候要说明，期望Ingress Controller是如何给我们建一个前端，又给我们定义一个后端，就是upstream server，这个upstream server中有几个主机，Ingress是通过这个Service来知道的。<br>而且Ingress有一个特点，作为一个资源来讲，它可以直接通过边界注入到Ingress Controller里面来，注入并保存为配置文件。而且一旦Ingress发现Service选定的后端Pod发生改变，这个改变一定会及时反应到Ingress中，Ingress会及时注入到Ingress Controller中定义的Pod中，而且还能触发主容器的进程重载配置文件。但是Nginx并不是很适合这种场景，每次修改配置都得重载，traefik、Envoy天生就是为这种设计而生的，只要动了，它自己可以自动加载生效，不需要重载。或者说它可以自己监控着配置文件，改变了就自己重载了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/126.png" alt=""></p>
+<p><strong>使用步骤：先是定义Ingress Controller这个Pod，然后去定义Ingress，而后在定义后端Pod生成service。</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/127.png" alt=""></p>
+<h2 id="Ingress资源定义字段"><a href="#Ingress资源定义字段" class="headerlink" title="Ingress资源定义字段"></a>Ingress资源定义字段</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain ingress</div><div class="line">KIND:     Ingress</div><div class="line">VERSION:  extensions/v1beta1</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Ingress is a collection of rules that allow inbound connections to reach</div><div class="line">     the endpoints defined by a backend. An Ingress can be configured to give</div><div class="line">     services externally-reachable urls, load balance traffic, terminate SSL,</div><div class="line">     offer name based virtual hosting etc. DEPRECATED - This group version of</div><div class="line">     Ingress is deprecated by networking.k8s.io/v1beta1 Ingress. See the release</div><div class="line">     notes for more information.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   apiVersion   &lt;string&gt;</div><div class="line">     APIVersion defines the versioned schema of this representation of an</div><div class="line">     object. Servers should convert recognized schemas to the latest internal</div><div class="line">     value, and may reject unrecognized values. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#resources</div><div class="line"></div><div class="line">   kind &lt;string&gt;</div><div class="line">     Kind is a string value representing the REST resource this object</div><div class="line">     represents. Servers may infer this from the endpoint the client submits</div><div class="line">     requests to. Cannot be updated. In CamelCase. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds</div><div class="line"></div><div class="line">   metadata     &lt;Object&gt;</div><div class="line">     Standard object&apos;s metadata. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata</div><div class="line"></div><div class="line">   spec &lt;Object&gt;</div><div class="line">     Spec is the desired state of the Ingress. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status</div><div class="line"></div><div class="line">   status       &lt;Object&gt;</div><div class="line">     Status is the current state of the Ingress. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status</div></pre></td></tr></table></figure>
+<p>一级字段依然是这5个。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain ingress.spec</div><div class="line">KIND:     Ingress</div><div class="line">VERSION:  extensions/v1beta1</div><div class="line"></div><div class="line">RESOURCE: spec &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Spec is the desired state of the Ingress. More info:</div><div class="line">     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status</div><div class="line"></div><div class="line">     IngressSpec describes the Ingress the user wishes to exist.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   backend      &lt;Object&gt;</div><div class="line">     A default backend capable of servicing requests that don&apos;t match any rule.</div><div class="line">     At least one of &apos;backend&apos; or &apos;rules&apos; must be specified. This field is</div><div class="line">     optional to allow the loadbalancer controller or defaulting logic to</div><div class="line">     specify a global default.</div><div class="line"></div><div class="line">   rules        &lt;[]Object&gt;</div><div class="line">     A list of host rules used to configure the Ingress. If unspecified, or no</div><div class="line">     rule matches, all traffic is sent to the default backend.</div><div class="line"></div><div class="line">   tls  &lt;[]Object&gt;</div><div class="line">     TLS configuration. Currently the Ingress only supports a single TLS port,</div><div class="line">     443. If multiple members of this list specify different hosts, they will be</div><div class="line">     multiplexed on the same port according to the hostname specified through</div><div class="line">     the SNI TLS extension, if the ingress controller fulfilling the ingress</div><div class="line">     supports SNI.</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain ingress.spec.backend </div><div class="line">[root@spark32 ~]# kubectl explain ingress.spec.rules</div><div class="line">[root@spark32 ~]# kubectl explain ingress.spec.rules.http</div></pre></td></tr></table></figure>
+<p>官方文档中指明Ingress有很多种类型，要么是基于虚拟主机的，要么是url映射的。<br>Ingress Controller已经是作为k8s的附件了。整个k8s集群，有master、node和附件组成，一共有4个核心附件，DNS、heasper、dashboard、Ingress Controller。</p>
+<h2 id="创建Nginx-Ingress-Controller"><a href="#创建Nginx-Ingress-Controller" class="headerlink" title="创建Nginx Ingress Controller"></a>创建Nginx Ingress Controller</h2><p>浏览器输入<a href="https://github.com/kubernetes" target="_blank" rel="external">Kubernetes在github上网址</a>，在这个下面可以找到一个项目叫“ingress-nginx”。点击进去：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/128.png" alt=""><br>部署时只会用到deploy/static目录下的文件，我们可以把项目克隆下来，或者直接进deploy/static目录下载这些清单文件。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/129.png" alt=""><br>在部署前，可以先大概了解下，部署Nginx Ingress Controller需要部署哪些资源：</p>
+<ul>
+<li>namespace.yaml: Nginx Ingress Controller要部署在一个独立的namespace中，可以打开namespace.yaml中看下。</li>
+<li>configmap.yaml: 用到configMap，从外界为Nginx注入配置，可以查看configmap.yaml中的内容</li>
+<li>rbac.yaml: 我们使用kubeadm部署的k8s集群默认启用了rbac，这个rbac.yaml文件定义可一个ClusterRole，做一些授权，必要的让这个Ingress Controller拥有访问它本来到达不了的名称空间的权限</li>
+<li>with-rbac.yaml: 部署Ingress Controller的清单文件，带上了rbac</li>
+<li>mandatory.yaml: 这个清单文件是把所有资源都组合在了一个文件中。</li>
+</ul>
+<p>下载yaml清单文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# cd manifests/</div><div class="line">[root@spark32 manifests]# mkdir ingress-nginx</div><div class="line">[root@spark32 manifests]# cd ingress-nginx/</div><div class="line">[root@spark32 ingress-nginx]# for file in configmap.yaml namespace.yaml rbac.yaml with-rbac.yaml; do wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/$file; done</div><div class="line">[root@spark32 ingress-nginx]# ls</div><div class="line">configmap.yaml  namespace.yaml  rbac.yaml  with-rbac.yaml</div></pre></td></tr></table></figure></p>
+<p>先创建namespace，其他的yaml文件执行顺序没关系：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ingress-nginx]# kubectl apply -f namespace.yaml </div><div class="line">namespace/ingress-nginx created</div></pre></td></tr></table></figure></p>
+<p>创建其他资源：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ingress-nginx]# kubectl apply -f ./</div><div class="line">configmap/nginx-configuration created</div><div class="line">configmap/tcp-services created</div><div class="line">configmap/udp-services created</div><div class="line">namespace/ingress-nginx unchanged</div><div class="line">serviceaccount/nginx-ingress-serviceaccount created</div><div class="line">clusterrole.rbac.authorization.k8s.io/nginx-ingress-clusterrole created</div><div class="line">role.rbac.authorization.k8s.io/nginx-ingress-role created</div><div class="line">rolebinding.rbac.authorization.k8s.io/nginx-ingress-role-nisa-binding created</div><div class="line">clusterrolebinding.rbac.authorization.k8s.io/nginx-ingress-clusterrole-nisa-binding created</div><div class="line">deployment.apps/nginx-ingress-controller created</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ingress-nginx]# kubectl get pods -n ingress-nginx</div><div class="line">NAME                                        READY   STATUS              RESTARTS   AGE</div><div class="line">nginx-ingress-controller-86449c74bb-jth2m   0/1     ContainerCreating   0          16s</div></pre></td></tr></table></figure>
+<p>这个Pod内的镜像在国内拉取速度非常慢，等了好久。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ingress-nginx]# kubectl get pods -n ingress-nginx</div><div class="line">NAME                                        READY   STATUS    RESTARTS   AGE</div><div class="line">nginx-ingress-controller-86449c74bb-jth2m   1/1     Running   0          83m</div></pre></td></tr></table></figure></p>
+<p>可以提前手动拉取：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.25.0</div></pre></td></tr></table></figure></p>
+<p>目前 Nginx Ingress Controller 已经有自己项目的官方站点了: <a href="https://kubernetes.github.io/ingress-nginx/" target="_blank" rel="external">https://kubernetes.github.io/ingress-nginx/</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/130.png" alt=""><br>对于通用部署命令中，只需要执行一条命令即可：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml</div></pre></td></tr></table></figure></p>
+<p>这个mandatory.yaml就是将所有需要的资源定义在了这一个清单文件中了。我这里部署在了虚拟机上，还需要看下裸机章节中需要执行什么额外操作：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/131.png" alt=""><br>如果不加这个service nodeport，你会发现你的Ingress Controller部署完以后，只能在集群内部访问，因为Ingress Controller无法接入集群外部的流量，为了接入流量，我们得为它做一个NodePort类型的service。<br><strong>有两种方案让Ingress Controller接入外部流量：</strong></p>
+<ul>
+<li>一是创建一个NodePort类型的Service，其标签选择器选中Ingress Controller这个Pod</li>
+<li>二是部署Ingress Controller这个Pod时，设置其共享节点网络名称空间，这个方案需要我们在创建Ingress Controller前修改with-rbac.yaml文件。修改如下几个地方：<ul>
+<li>将一级字段kind的值从Deployment改为DaemonSet</li>
+<li>将一级字段spec下的replicas字段删除</li>
+<li>在spec.template.spec下加一个字段 hostNetwork: true</li>
+</ul>
+</li>
+</ul>
+<p>我这里选择第一种方案，那就还需要为Ingress Controller创建一个NodePort类型的service，不然无法在集群外访问。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ingress-nginx]# wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/baremetal/service-nodeport.yaml </div><div class="line">[root@spark32 ingress-nginx]# vim service-nodeport.yaml</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/132.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ingress-nginx]# kubectl apply -f .</div><div class="line">[root@spark32 ingress-nginx]# kubectl get svc -n ingress-nginx</div><div class="line">NAME            TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE</div><div class="line">ingress-nginx   NodePort   10.110.228.115   &lt;none&gt;        80:30080/TCP,443:30443/TCP   24s</div></pre></td></tr></table></figure></p>
+<h2 id="创建Ingress"><a href="#创建Ingress" class="headerlink" title="创建Ingress"></a>创建Ingress</h2><p>看看k8s官网上Ingress的定义示例，打开网址：<a href="https://kubernetes.io/docs/concepts/services-networking/ingress/" target="_blank" rel="external">https://kubernetes.io/docs/concepts/services-networking/ingress/</a> ，有个最简单的示例如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">apiVersion: networking.k8s.io/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: test-ingress</div><div class="line">  annotations:</div><div class="line">    nginx.ingress.kubernetes.io/rewrite-target: /</div><div class="line">spec:</div><div class="line">  rules:</div><div class="line">  - http:</div><div class="line">      paths:</div><div class="line">      - path: /testpath</div><div class="line">        backend:</div><div class="line">          serviceName: test</div><div class="line">          servicePort: 80</div></pre></td></tr></table></figure></p>
+<p>其中，annotations至关重要，必须要定义。在这个annotations中必须指明我们用的Ingress Controller类型是Nginx。</p>
+<h3 id="示例1"><a href="#示例1" class="headerlink" title="示例1"></a>示例1</h3><p>下面定义Ingress，将myapp-deploy里的Pod通过Nginx Ingress Controller向外提供服务。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get deploy</div><div class="line">NAME           READY   UP-TO-DATE   AVAILABLE   AGE</div><div class="line">myapp-deploy   5/5     5            5           5d4h</div><div class="line">redis          1/1     1            1           2d4h</div></pre></td></tr></table></figure></p>
+<p>已经有一个Deployment了，为这个Deployment创建个Service：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl expose deploy myapp-deploy --name=myapp --port=80 --target-port=80</div><div class="line">service/myapp exposed</div><div class="line">[root@spark32 manifests]# kubectl get svc</div><div class="line">NAME                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE</div><div class="line">kubernetes           ClusterIP   10.96.0.1       &lt;none&gt;        443/TCP    130d</div><div class="line">myapp         ClusterIP   10.103.20.216  &lt;none&gt;        80/TCP     8s</div><div class="line">myapp-svc-headless   ClusterIP   None            &lt;none&gt;        80/TCP     2d3h</div><div class="line">redis                ClusterIP   10.97.97.97     &lt;none&gt;        6379/TCP   2d4h</div></pre></td></tr></table></figure></p>
+<p>在定义Ingress时需要加一个注解，说明接下来要用到的Ingress Controller是Nginx，而不是Traefik和Envoy。要靠这个Annotation来识别的。他才能转换成对应的与Controller相匹配的规则。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ingress-nginx]# cd ..</div><div class="line">[root@spark32 manifests]# mkdir ingress</div><div class="line">[root@spark32 manifests]# cd ingress</div><div class="line">[root@spark32 ingress]# vim ingress-myapp.yaml</div><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: ingress-myapp</div><div class="line">  namespace: default</div><div class="line">  annotations:</div><div class="line">    kubernetes.io/ingress.class: &quot;nginx&quot;</div><div class="line">spec:</div><div class="line">  rules:</div><div class="line">  - host: myapp.wisedu.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - path: /</div><div class="line">        backend:</div><div class="line">          serviceName: myapp</div><div class="line">          servicePort: 80</div><div class="line">[root@spark32 ingress]# kubectl apply -f ingress-myapp.yaml </div><div class="line">ingress.extensions/ingress-myapp created</div><div class="line">[root@spark32 ingress]# kubectl get ingress</div><div class="line">NAME            HOSTS              ADDRESS   PORTS   AGE</div><div class="line">ingress-myapp   myapp.wisedu.com             80      5s</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/133.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/134.png" alt=""><br>去看看配置有没有加到Nginx上：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get pods -n ingress-nginx</div><div class="line">NAME                                        READY   STATUS    RESTARTS   AGE</div><div class="line">nginx-ingress-controller-86449c74bb-jth2m   1/1     Running   0          172m</div><div class="line">[root@spark32 manifests]# kubectl exec nginx-ingress-controller-86449c74bb-jth2m -n ingress-nginx -it -- /bin/sh</div><div class="line">$ ls</div><div class="line">geoip  lua  mime.types  modsecurity  modules  nginx.conf  opentracing.json  owasp-modsecurity-crs  template</div><div class="line">$ ps -ef|grep nginx</div><div class="line">www-data     1     0  0 07:17 ?        00:00:00 /usr/bin/dumb-init -- /nginx-ingress-controller --configmap=ingress-nginx/nginx-configuration --tcp-services-configmap=ingress-nginx/tcp-services --udp-services-configmap=ingress-nginx/udp-services --publish-service=ingress-nginx/ingress-nginx --annotations-prefix=nginx.ingress.kubernetes.io</div><div class="line">www-data     6     1  0 07:17 ?        00:00:11 /nginx-ingress-controller --configmap=ingress-nginx/nginx-configuration --tcp-services-configmap=ingress-nginx/tcp-services --udp-services-configmap=ingress-nginx/udp-services --publish-service=ingress-nginx/ingress-nginx --annotations-prefix=nginx.ingress.kubernetes.io</div><div class="line">www-data    35     6  0 07:17 ?        00:00:00 nginx: master process /usr/local/openresty/nginx/sbin/nginx -c /etc/nginx/nginx.conf</div><div class="line">www-data   320    35  0 08:54 ?        00:00:00 nginx: worker process</div><div class="line">www-data   321    35  0 08:54 ?        00:00:00 nginx: worker process</div><div class="line">www-data   322    35  0 08:54 ?        00:00:00 nginx: worker process</div><div class="line">www-data   323    35  0 08:54 ?        00:00:00 nginx: worker process</div><div class="line">www-data   324    35  0 08:54 ?        00:00:00 nginx: worker process</div><div class="line">www-data   325    35  0 08:54 ?        00:00:00 nginx: worker process</div><div class="line">www-data   326    35  0 08:54 ?        00:00:00 nginx: worker process</div><div class="line">www-data   327    35  0 08:54 ?        00:00:00 nginx: worker process</div><div class="line">www-data   600   593  0 09:03 pts/0    00:00:00 grep nginx</div><div class="line">$ cat /etc/nginx/nginx.conf</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/135.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/136.png" alt=""><br>下面修改下客户端hosts文件，我这里修改自己笔记本的/etc/hosts文件，把myapp.wisedu.com这个域名配置解析成k8s集群中所有节点的IP地址，我这里node节点有3个：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">172.16.206.17 myapp.wisedu.com</div><div class="line">172.16.206.31 myapp.wisedu.com</div><div class="line">172.16.206.16 myapp.wisedu.com</div><div class="line">172.16.206.32 myapp.wisedu.com</div></pre></td></tr></table></figure></p>
+<p>打开浏览器访问：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/137.png" alt=""></p>
+<h3 id="示例2"><a href="#示例2" class="headerlink" title="示例2"></a>示例2</h3><p><strong>1、创建Deployment和Service(该示例中我使用的是headless Service)</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# vim tomcat-deploy.yaml </div><div class="line">apiVersion: v1</div><div class="line">kind: Service</div><div class="line">metadata:</div><div class="line">  name: tomcat</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  selector:</div><div class="line">    app: tomcat</div><div class="line">    release: canary</div><div class="line">  clusterIP: None</div><div class="line">  ports:</div><div class="line">  - name: http</div><div class="line">    port: 8080</div><div class="line">    targetPort: 8080</div><div class="line">  - name: ajp</div><div class="line">    port: 8009</div><div class="line">    targetPort: 8009</div><div class="line"></div><div class="line">---</div><div class="line">apiVersion: apps/v1</div><div class="line">kind: Deployment</div><div class="line">metadata:</div><div class="line">  name: tomcat-deploy</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  replicas: 3</div><div class="line">  selector:</div><div class="line">    matchLabels:</div><div class="line">      app: tomcat</div><div class="line">      release: canary</div><div class="line">  template:</div><div class="line">    metadata:</div><div class="line">      labels:</div><div class="line">        app: tomcat</div><div class="line">        release: canary</div><div class="line">    spec:</div><div class="line">      containers:</div><div class="line">      - name: myapp</div><div class="line">        image: tomcat:8.5.32-jre8-alpine</div><div class="line">        ports:</div><div class="line">        - name: http</div><div class="line">          containerPort: 8080</div><div class="line">        - name: ajp</div><div class="line">          containerPort: 8009</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl apply -f tomcat-deploy.yaml </div><div class="line">service/tomcat created</div><div class="line">deployment.apps/tomcat-deploy created</div></pre></td></tr></table></figure>
+<p><strong>2、创建Ingress</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ingress]# vim ingress-tomcat.yaml </div><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: ingress-tomcat</div><div class="line">  namespace: default</div><div class="line">  annotations:</div><div class="line">    kubernetes.io/ingress.class: &quot;nginx&quot;</div><div class="line">spec:</div><div class="line">  rules:</div><div class="line">  - host: tomcat.wisedu.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - path: /</div><div class="line">        backend:</div><div class="line">          serviceName: tomcat</div><div class="line">          servicePort: 8080</div><div class="line">[root@spark32 ingress]# kubectl apply -f ingress-tomcat.yaml </div><div class="line">ingress.extensions/ingress-tomcat created</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/138.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ingress]# kubectl describe ingress ingress-tomcat           </div><div class="line">Name:             ingress-tomcat</div><div class="line">Namespace:        default</div><div class="line">Address:          </div><div class="line">Default backend:  default-http-backend:80 (&lt;none&gt;)</div><div class="line">Rules:</div><div class="line">  Host               Path  Backends</div><div class="line">  ----               ----  --------</div><div class="line">  tomcat.wisedu.com  </div><div class="line">                     /   tomcat:8080 (10.244.1.21:8080,10.244.2.56:8080,10.244.3.9:8080)</div><div class="line">Annotations:</div><div class="line">  kubectl.kubernetes.io/last-applied-configuration:  &#123;&quot;apiVersion&quot;:&quot;extensions/v1beta1&quot;,&quot;kind&quot;:&quot;Ingress&quot;,&quot;metadata&quot;:&#123;&quot;annotations&quot;:&#123;&quot;kubernetes.io/ingress.class&quot;:&quot;nginx&quot;&#125;,&quot;name&quot;:&quot;ingress-tomcat&quot;,&quot;namespace&quot;:&quot;default&quot;&#125;,&quot;spec&quot;:&#123;&quot;rules&quot;:[&#123;&quot;host&quot;:&quot;tomcat.wisedu.com&quot;,&quot;http&quot;:&#123;&quot;paths&quot;:[&#123;&quot;backend&quot;:&#123;&quot;serviceName&quot;:&quot;tomcat&quot;,&quot;servicePort&quot;:8080&#125;,&quot;path&quot;:&quot;/&quot;&#125;]&#125;&#125;]&#125;&#125;</div><div class="line"></div><div class="line">  kubernetes.io/ingress.class:  nginx</div><div class="line">Events:</div><div class="line">  Type    Reason  Age   From                      Message</div><div class="line">  ----    ------  ----  ----                      -------</div><div class="line">  Normal  CREATE  90s   nginx-ingress-controller  Ingress default/ingress-tomcat</div><div class="line">  Normal  UPDATE  31s   nginx-ingress-controller  Ingress default/ingress-tomcat</div></pre></td></tr></table></figure></p>
+<p><strong>3、配置hosts文件</strong><br>在要访问这个服务的客户端机器上配置hosts文件，我这里配置的是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">172.16.206.17 myapp.wisedu.com tomcat.wisedu.com</div><div class="line">172.16.206.31 myapp.wisedu.com tomcat.wisedu.com</div><div class="line">172.16.206.16 myapp.wisedu.com tomcat.wisedu.com</div><div class="line">172.16.206.32 myapp.wisedu.com tomcat.wisedu.com</div></pre></td></tr></table></figure></p>
+<p>打开浏览器访问：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/139.png" alt=""></p>
+<h3 id="示例3：HTTPS"><a href="#示例3：HTTPS" class="headerlink" title="示例3：HTTPS"></a>示例3：HTTPS</h3><p>需要证书和私钥，而这个证书和私钥我们还需要创建为特定格式才能提供给Ingress。不是说做好证书贴到Nginx的Pod里面去就可以了，需要先转成特殊格式，这个特殊的格式叫secret。它也是个标准的k8s对象。secret也是被注入到Pod中，被Pod所引用。<br>这里就不做CA了，直接做一个自签发的证书。</p>
+<p>1、生成私钥和自签发证书<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ingress]# openssl genrsa -out tls.key 2048</div><div class="line">Generating RSA private key, 2048 bit long modulus</div><div class="line">.......+++</div><div class="line">..........................................................................................................+++</div><div class="line">e is 65537 (0x10001)</div><div class="line">[root@spark32 ingress]# ls</div><div class="line">ingress-myapp.yaml  ingress-tomcat.yaml  tls.key</div><div class="line">[root@spark32 ingress]# openssl req -new -x509 -key tls.key -out tls.crt -subj /C=CN/ST=Beijing/O=DevOps/CN=tomcat.wisedu.com</div><div class="line">[root@spark32 ingress]# ls</div><div class="line">ingress-myapp.yaml  ingress-tomcat.yaml  tls.crt  tls.key</div></pre></td></tr></table></figure></p>
+<p>2、创建secret<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ingress]# kubectl create secret tls tomcat-ingress-secret --cert=tls.crt --key=tls.key</div><div class="line">secret/tomcat-ingress-secret created</div><div class="line">[root@spark32 ingress]# kubectl get secret</div><div class="line">NAME                    TYPE                                  DATA   AGE</div><div class="line">default-token-wb7fl     kubernetes.io/service-account-token   3      131d</div><div class="line">tomcat-ingress-secret   kubernetes.io/tls                     2      8s</div><div class="line">[root@spark32 ingress]# kubectl describe secret tomcat-ingress-secret</div><div class="line">Name:         tomcat-ingress-secret</div><div class="line">Namespace:    default</div><div class="line">Labels:       &lt;none&gt;</div><div class="line">Annotations:  &lt;none&gt;</div><div class="line"></div><div class="line">Type:  kubernetes.io/tls</div><div class="line"></div><div class="line">Data</div><div class="line">====</div><div class="line">tls.crt:  1245 bytes</div><div class="line">tls.key:  1675 bytes</div></pre></td></tr></table></figure></p>
+<p>3、创建Ingress，包含这个secret<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain ingress.spec</div><div class="line">...</div><div class="line">   tls  &lt;[]Object&gt;</div><div class="line">     TLS configuration. Currently the Ingress only supports a single TLS port,</div><div class="line">     443. If multiple members of this list specify different hosts, they will be</div><div class="line">     multiplexed on the same port according to the hostname specified through</div><div class="line">     the SNI TLS extension, if the ingress controller fulfilling the ingress</div><div class="line">     supports SNI.</div><div class="line">...</div><div class="line">[root@spark32 manifests]# kubectl explain ingress.spec.tls</div><div class="line">...</div><div class="line">FIELDS:</div><div class="line">   hosts        &lt;[]string&gt;</div><div class="line">     Hosts are a list of hosts included in the TLS certificate. The values in</div><div class="line">     this list must match the name/s used in the tlsSecret. Defaults to the</div><div class="line">     wildcard host setting for the loadbalancer controller fulfilling this</div><div class="line">     Ingress, if left unspecified.</div><div class="line"></div><div class="line">   secretName   &lt;string&gt;</div><div class="line">     SecretName is the name of the secret used to terminate SSL traffic on 443.</div><div class="line">     Field is left optional to allow SSL routing based on SNI hostname alone. If</div><div class="line">     the SNI host in a listener conflicts with the &quot;Host&quot; header field used by</div><div class="line">     an IngressRule, the SNI host is used for termination and value of the Host</div><div class="line">     header is used for routing.</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p>表示把哪个主机做成tls，并且用哪个secret来获取证书和私钥等相关信息。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ingress]# cp ingress-tomcat.yaml ingress-tomcat-tls.yaml </div><div class="line">[root@spark32 ingress]# vim ingress-tomcat-tls.yaml </div><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: ingress-tomcat-tls</div><div class="line">  namespace: default</div><div class="line">  annotations:</div><div class="line">    kubernetes.io/ingress.class: &quot;nginx&quot;</div><div class="line">spec:</div><div class="line">  rules:</div><div class="line">  - host: tomcat.wisedu.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - path: /</div><div class="line">        backend:</div><div class="line">          serviceName: tomcat</div><div class="line">          servicePort: 8080</div><div class="line">  tls:</div><div class="line">  - hosts:</div><div class="line">    - tomcat.wisedu.com</div><div class="line">    secretName: tomcat-ingress-secret</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ingress]# kubectl apply -f ingress-tomcat-tls.yaml </div><div class="line">ingress.extensions/ingress-tomcat-tls created</div><div class="line">[root@spark32 ingress]# kubectl get ingress</div><div class="line">NAME                 HOSTS               ADDRESS   PORTS     AGE</div><div class="line">ingress-myapp        myapp.wisedu.com              80        16h</div><div class="line">ingress-tomcat       tomcat.wisedu.com             80        32m</div><div class="line">ingress-tomcat-tls   tomcat.wisedu.com             80, 443   9s</div><div class="line">[root@spark32 ingress]# kubectl describe ingress ingress-tomcat-tls</div><div class="line">Name:             ingress-tomcat-tls</div><div class="line">Namespace:        default</div><div class="line">Address:          </div><div class="line">Default backend:  default-http-backend:80 (&lt;none&gt;)</div><div class="line">TLS:</div><div class="line">  tomcat-ingress-secret terminates tomcat.wisedu.com</div><div class="line">Rules:</div><div class="line">  Host               Path  Backends</div><div class="line">  ----               ----  --------</div><div class="line">  tomcat.wisedu.com  </div><div class="line">                     /   tomcat:8080 (10.244.1.21:8080,10.244.2.56:8080,10.244.3.9:8080)</div><div class="line">Annotations:</div><div class="line">  kubectl.kubernetes.io/last-applied-configuration:  &#123;&quot;apiVersion&quot;:&quot;extensions/v1beta1&quot;,&quot;kind&quot;:&quot;Ingress&quot;,&quot;metadata&quot;:&#123;&quot;annotations&quot;:&#123;&quot;kubernetes.io/ingress.class&quot;:&quot;nginx&quot;&#125;,&quot;name&quot;:&quot;ingress-tomcat-tls&quot;,&quot;namespace&quot;:&quot;default&quot;&#125;,&quot;spec&quot;:&#123;&quot;rules&quot;:[&#123;&quot;host&quot;:&quot;tomcat.wisedu.com&quot;,&quot;http&quot;:&#123;&quot;paths&quot;:[&#123;&quot;backend&quot;:&#123;&quot;serviceName&quot;:&quot;tomcat&quot;,&quot;servicePort&quot;:8080&#125;,&quot;path&quot;:&quot;/&quot;&#125;]&#125;&#125;],&quot;tls&quot;:[&#123;&quot;hosts&quot;:[&quot;tomcat.wisedu.com&quot;],&quot;secretName&quot;:&quot;tomcat-ingress-secret&quot;&#125;]&#125;&#125;</div><div class="line"></div><div class="line">  kubernetes.io/ingress.class:  nginx</div><div class="line">Events:</div><div class="line">  Type    Reason  Age   From                      Message</div><div class="line">  ----    ------  ----  ----                      -------</div><div class="line">  Normal  CREATE  7s    nginx-ingress-controller  Ingress default/ingress-tomcat-tls</div></pre></td></tr></table></figure>
+<p>查看Nginx Ingress Controller中的配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get pods -n ingress-nginx</div><div class="line">NAME                                        READY   STATUS    RESTARTS   AGE</div><div class="line">nginx-ingress-controller-86449c74bb-bw9fv   1/1     Running   0          16h</div><div class="line">[root@spark32 manifests]# kubectl exec nginx-ingress-controller-86449c74bb-bw9fv -n ingress-nginx -it -- /bin/sh</div><div class="line">$ cat nginx.conf | more</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/140.png" alt=""><br>浏览器访问https：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/141.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/142.png" alt=""></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"><i class="fa fa-tag"></i>Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/19/kubernetes-Service资源/" rel="next" title="Kubernetes Service资源">
+                <i class="fa fa-chevron-left"></i> Kubernetes Service资源
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">91</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Ingress-Controller"><span class="nav-number">1.</span> <span class="nav-text">Ingress Controller</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ingress"><span class="nav-number">2.</span> <span class="nav-text">Ingress</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ingress资源定义字段"><span class="nav-number">3.</span> <span class="nav-text">Ingress资源定义字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Nginx-Ingress-Controller"><span class="nav-number">4.</span> <span class="nav-text">创建Nginx Ingress Controller</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Ingress"><span class="nav-number">5.</span> <span class="nav-text">创建Ingress</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例1"><span class="nav-number">5.1.</span> <span class="nav-text">示例1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例2"><span class="nav-number">5.2.</span> <span class="nav-text">示例2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例3：HTTPS"><span class="nav-number">5.3.</span> <span class="nav-text">示例3：HTTPS</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共249.0k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>
