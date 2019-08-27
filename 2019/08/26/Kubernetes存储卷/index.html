@@ -1,0 +1,973 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="什么是存储卷大多数和数据存储相关的应用和有状态应用都是需要持久存储数据的。容器本身有生命周期，为了使得容器将来终结后我们可以把它删除，甚至是编排到其他节点上运行，意味着数据不能放在容器自己的名称空间中。">
+<meta name="keywords" content="Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes存储卷">
+<meta property="og:url" content="http://yoursite.com/2019/08/26/Kubernetes存储卷/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="什么是存储卷大多数和数据存储相关的应用和有状态应用都是需要持久存储数据的。容器本身有生命周期，为了使得容器将来终结后我们可以把它删除，甚至是编排到其他节点上运行，意味着数据不能放在容器自己的名称空间中。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/143.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/144.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/145.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/146.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/147.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/148.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/149.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/150.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/151.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/152.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/153.png">
+<meta property="og:updated_time" content="2019-08-27T07:31:59.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kubernetes存储卷">
+<meta name="twitter:description" content="什么是存储卷大多数和数据存储相关的应用和有状态应用都是需要持久存储数据的。容器本身有生命周期，为了使得容器将来终结后我们可以把它删除，甚至是编排到其他节点上运行，意味着数据不能放在容器自己的名称空间中。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/143.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Kubernetes存储卷 | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Kubernetes存储卷
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-08-26T13:43:43+08:00" content="2019-08-26">
+              2019-08-26
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-08-27T15:31:59+08:00" content="2019-08-27">
+              2019-08-27
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/08/26/Kubernetes存储卷/" class="leancloud_visitors" data-flag-title="Kubernetes存储卷">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="什么是存储卷"><a href="#什么是存储卷" class="headerlink" title="什么是存储卷"></a>什么是存储卷</h2><p>大多数和数据存储相关的应用和有状态应用都是需要持久存储数据的。容器本身有生命周期，为了使得容器将来终结后我们可以把它删除，甚至是编排到其他节点上运行，意味着数据不能放在容器自己的名称空间中。<a id="more"></a><br>在k8s中，Pod是运行在某个节点上的，只要不出故障，就一直会运行在这个节点上，节点故障了才会调度到其他节点，只要节点不故障，是不会走的，无非就是重启重启而已。这里就有两个问题了，一旦这个Pod故障了被删除，或者节点故障了，此时有可能编排到其他节点上了，为了突破Pod生命周期受限这种现状，我们需要把数据放在Pod自有文件系统之外的地方。<br>我们此前在单独使用docker时，使用存储卷，相当于把容器中的某一目录与节点上某一目录关联起来，随后容器内该目录存储的数据都存到了节点上了。当我们删了容器，在重建容器，只要这个存储卷不受影响，那么数据是没有问题的，在一定程度上拥有了持久功能。<br>但是这个问题在k8s上不能这么来操作，k8s是一个集群，由调度器负责调度，Pod被删掉了可能会被调度到其他节点，所以这种在节点级帮忙提供存储卷的方式来持久存储数据的逻辑在k8s上，只能说只有一定程度上的持久性，不是真正意义上的持久性。应该使用脱离节点而存在的存储设备。<br>为此，k8s提供了能应付各种不同类型的存储卷让我们来使用，没有持久、半持久、或真正意义上的持久功能。对于Pod来说，Pod内的多个容器可共享访问同一组存储卷，因为对k8s来讲，存储卷不属于容器，而属于Pod。在容器中挂载存储卷，如果Pod中两个容器都挂载了某个存储卷，就相当于两个容器共享数据了。Pod底层有个基础容器，不启动，靠一个独特的镜像来创建的，叫pause。所有的Pod，其网络名称空间、存储卷之类的都是分配给这个Pod的，Pod中运行的主容器是共享这个镜像的网络名称空间的，容器挂载存储卷其实是挂载这个容器的存储卷的。所以叫基础架构容器。<br>在Pod上使用存储卷，实际上也就是这个pause容器有了存储卷，而这个容器有存储卷，只不过是这个容器和宿主机目录建立了关联关系。而宿主机目录如果是节点本地的，那么它就随着宿主机而终结了，因此宿主机这个目录为了真正实现持久性，它应该也不是宿主机本地的，而是宿主机挂载的外部存储设备上的存储卷。当然如果这个宿主机的目录没挂载，那就是节点本地的了。只要节点不宕机，数据就是持久的。但是跨节点存储，只能使用脱离节点本地的网络设备。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/143.png" alt=""></p>
+<h2 id="Kubernetes存储卷分类"><a href="#Kubernetes存储卷分类" class="headerlink" title="Kubernetes存储卷分类"></a>Kubernetes存储卷分类</h2><h3 id="emptyDir"><a href="#emptyDir" class="headerlink" title="emptyDir"></a>emptyDir</h3><p>给Pod分配一个存储卷，存储卷只要节点本地，当Pod被删除，节点上存储卷也会一并被删除。这个不是为了持久而设计。只是用来做临时目录使用的。</p>
+<h3 id="hostPath"><a href="#hostPath" class="headerlink" title="hostPath"></a>hostPath</h3><p>主机路径。直接在宿主机找一个目录，与容器建立关联关系。也不具有真正意义上的持久性。如果需要真正以上的持久性，则需要连接网络连接存储。大概分3类：<br>(1)SAN(存储区域网络，比如iSCSI、FC协议)、NAS(网络附加存储，比如nfs协议、cifs协议以及http协议)<br>(2)分布式存储：或是文件系统级别、或者块设备。<br>文件系统级别：glusterfs、cephfs<br>块级别：rbd<br>(3)云存储：亚马逊的EBS(弹性块存储)、Azure Disk。</p>
+<h3 id="pvc"><a href="#pvc" class="headerlink" title="pvc"></a>pvc</h3><p><strong>持久存储卷申请，简称pvc</strong>。从某种意义上来讲，它不是一个存储卷。以rbd为例，当你定义使用rbd类型的存储时，你需要定义很多相关的参数，这需要你对这个存储很熟悉。这会阻断一大部分用户来用k8s。怎么转换成傻瓜的形式来使用？pvc就是干这个事情的。<br>当需要创建一个存储卷时，你只需要告诉我，“我要来个存储卷”，所以叫存储卷创建申请。你不要管它底层存储系统是什么，你只需要说“我就需要这么多”就行。指定告诉它比如说需要个5g的存储空间，而不用管它那个存储到底放在哪个系统上。这叫存储及服务。</p>
+<p>让Pod创建和底层存储解耦。关键是和pvc建立关联关系，而pvc关键是和pv建立关联关系，而pv关键是和存储系统建立关联关系。解释如下：假如一个Pod创建调度到某个节点上，我们在Pod上定义一个pvc，它是一种存储卷类型，pvc要关联到当前这个Pod所在名称空间真正存在的pvc资源，这个pvc只是个申请，申请要与pv建立关联关系，pv是真正存储系统之上的一段存储空间，pv与后端存储建立关联关系。但是这个pvc与哪个pv建立关联关系时，怎么可能有个pv放在那等你来用呢？要做到这一步，用户在创建申请之前，先提需求，然后后端存储工程师或者k8s管理员把这些pv创建好。但是如果是公有云呢？有很多租户在上面跑着，压根不知道他们什么时候要创建pv。因此如果要做到按需创建，我们pv也不建了，我们把所有的存储空间抽象出来，抽象为一个抽象层，叫<strong>存储类</strong>。当用户创建pvc需要用到pv时，它能够向存储类申请说，“你帮我创建出来”，存储类会帮它生成刚好符合用户请求大小的pv来，并让二者建立关联关系。像这种pv由用户的请求触发而动态生成，我们称为pv的动态供给。而这里需要依赖一个前提：要定义好存储类。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/144.png" alt=""><br>什么叫存储类？存储按照其综合服务质量可以分为好几个级别，有的又慢又笨，称为Bronze存储，有的速度算中间，我们对性能没有太高要求，称为Silver存储，而有些特别快，ssd之类组成的，称为Gold存储。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/145.png" alt=""><br>如果我们自己是一个对于存储系统非常了解的人，创建Pod时可直接使用存储空间，如果你不是特别了解，或者我们将来有很多用户、终端用户对于存储技术知之不多的话，那么这个时候我们就应该尽可能地给他们做成动态供给的方式，让他们使用pvc来使用。</p>
+<h2 id="存储卷示例"><a href="#存储卷示例" class="headerlink" title="存储卷示例"></a>存储卷示例</h2><p>存储卷只是在Pod上定义的，容器中要想使用还得挂载和绑定。第一在Pod中要定义volume，这个volume要指明关联到哪个存储设备上去的，第二要在容器中使用volumeMounts，然后你才能使用。</p>
+<h3 id="emptyDir-1"><a href="#emptyDir-1" class="headerlink" title="emptyDir"></a>emptyDir</h3><p>emptyDir不需要依赖任何外部设备。<br>查看定义emptyDir的相关字段：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain pods.spec</div><div class="line">...</div><div class="line">   volumes      &lt;[]Object&gt;</div><div class="line">     List of volumes that can be mounted by containers belonging to the pod.</div><div class="line">     More info: https://kubernetes.io/docs/concepts/storage/volumes</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain pods.spec.volumes</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain pods.spec.volumes.emptyDir</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: emptyDir &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     EmptyDir represents a temporary directory that shares a pod&apos;s lifetime.</div><div class="line">     More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir</div><div class="line"></div><div class="line">     Represents an empty directory for a pod. Empty directory volumes support</div><div class="line">     ownership management and SELinux relabeling.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   medium       &lt;string&gt;</div><div class="line">     What type of storage medium should back this directory. The default is &quot;&quot;</div><div class="line">     which means to use the node&apos;s default medium. Must be an empty string</div><div class="line">     (default) or Memory. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/volumes#emptydir</div><div class="line"></div><div class="line">   sizeLimit    &lt;string&gt;</div><div class="line">     Total amount of local storage required for this EmptyDir volume. The size</div><div class="line">     limit is also applicable for memory medium. The maximum usage on memory</div><div class="line">     medium EmptyDir would be the minimum value between the SizeLimit specified</div><div class="line">     here and the sum of memory limits of all containers in a pod. The default</div><div class="line">     is nil which means that the limit is undefined. More info:</div><div class="line">     http://kubernetes.io/docs/user-guide/volumes#emptydir</div></pre></td></tr></table></figure>
+<p>查看容器中挂载存储卷的相关字段：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain pods.spec.containers</div><div class="line">...</div><div class="line">   volumeMounts &lt;[]Object&gt;</div><div class="line">     Pod volumes to mount into the container&apos;s filesystem. Cannot be updated.</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p><strong>【示例1】：定义个emptyDir类型的存储卷，并让Pod内的容器挂载这个存储卷。</strong><br>1.先定义Pod的存储卷。emptyDir的两个属性medium和sizeLimit可以都不指，都为空，使用默认值，磁盘空间，大小不限制。空代表了一个映射，用{}。因为要映射数据，就是键值，键值。<br>2.然后定义容器挂载这个存储卷，哪个容器用，哪个容器挂载。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# mkdir volume</div><div class="line">[root@spark32 manifests]# cd volume/</div><div class="line">[root@spark32 volume]# vim pod-vol-demo.yaml </div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-vol-demo</div><div class="line">  namespace: default</div><div class="line">  labels:</div><div class="line">    app: myapp</div><div class="line">    tier: frontend</div><div class="line">  annotations:</div><div class="line">    wisedu.com/created-by: &quot;cluster admin&quot;</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: myapp</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">    ports:</div><div class="line">    - name: http</div><div class="line">      containerPort: 80</div><div class="line">    volumeMounts:</div><div class="line">    - name: html</div><div class="line">      mountPath: /data/web/html/</div><div class="line">  - name: busybox</div><div class="line">    image: busybox:latest</div><div class="line">    imagePullPolicy: IfNotPresent</div><div class="line">    command:</div><div class="line">    - &quot;/bin/sh&quot;</div><div class="line">    - &quot;-c&quot;</div><div class="line">    - &quot;sleep 3600&quot;</div><div class="line">    volumeMounts:</div><div class="line">    - name: html</div><div class="line">      mountPath: /data/</div><div class="line">  volumes:</div><div class="line">  - name: html</div><div class="line">    emptyDir: &#123;&#125;</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/146.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl apply -f pod-vol-demo.yaml </div><div class="line">pod/pod-vol-demo created</div><div class="line">You have mail in /var/spool/mail/root</div><div class="line">[root@spark32 volume]# kubectl get pods</div><div class="line">NAME                             READY   STATUS    RESTARTS   AGE</div><div class="line">busybox                          0/1     Error     0          10d</div><div class="line">myapp-deploy-67b6dfcd8-ff9xf     1/1     Running   0          10d</div><div class="line">myapp-deploy-67b6dfcd8-msv5x     1/1     Running   0          10d</div><div class="line">myapp-deploy-67b6dfcd8-rp9vj     1/1     Running   0          10d</div><div class="line">myapp-deploy-67b6dfcd8-wls6h     1/1     Running   0          10d</div><div class="line">myapp-deploy-67b6dfcd8-xzgdl     1/1     Running   0          10d</div><div class="line">nginx                            1/1     Running   0          10d</div><div class="line">pod-vol-demo                     2/2     Running   0          8s</div><div class="line">redis-58b9f5776-fzslw            1/1     Running   0          7d7h</div><div class="line">tomcat-deploy-56699db4f7-4lhql   1/1     Running   0          4d7h</div><div class="line">tomcat-deploy-56699db4f7-ghz7l   1/1     Running   0          4d7h</div><div class="line">tomcat-deploy-56699db4f7-kd5v8   1/1     Running   0          4d7h</div></pre></td></tr></table></figure></p>
+<p>进入Pod中的busybox容器：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl exec pod-vol-demo -c busybox -it -- /bin/sh </div><div class="line">/ # ls</div><div class="line">bin   data  dev   etc   home  proc  root  sys   tmp   usr   var</div><div class="line">/ # echo $(date) &gt;&gt; /data/index.html</div><div class="line">/ # echo $(date) &gt;&gt; /data/index.html</div><div class="line">/ # cat /data/index.html </div><div class="line">Mon Aug 26 09:25:49 UTC 2019</div><div class="line">Mon Aug 26 09:25:54 UTC 2019</div></pre></td></tr></table></figure></p>
+<p>接着进去Pod中的另一个容器myapp：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl exec pod-vol-demo -c myapp -it -- /bin/sh       </div><div class="line">/ # ls</div><div class="line">bin    data   dev    etc    home   lib    media  mnt    proc   root   run    sbin   srv    sys    tmp    usr    var</div><div class="line">/ # ls /data/web/html/</div><div class="line">index.html</div></pre></td></tr></table></figure></p>
+<p><strong>【示例2】：一个Pod中两个容器，一个容器是主容器，另外一个容器辅助容器。辅助容器每隔2s帮我们在一个共享的存储当中往一个网页文件添加新内容，主容器能够用这个新内容加载后响应给请求者。</strong><br>【注意】：是先挂载存储卷，后启动主容器。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl delete -f pod-vol-demo.yaml </div><div class="line">pod &quot;pod-vol-demo&quot; deleted</div><div class="line">[root@spark32 volume]# cp pod-vol-demo.yaml pod-vol-demo2.yaml </div><div class="line">[root@spark32 volume]# vim pod-vol-demo2.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-vol-demo2</div><div class="line">  namespace: default</div><div class="line">  labels:</div><div class="line">    app: myapp</div><div class="line">    tier: frontend</div><div class="line">  annotations:</div><div class="line">    wisedu.com/created-by: &quot;cluster admin&quot;</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: myapp</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">    ports:</div><div class="line">    - name: http</div><div class="line">      containerPort: 80</div><div class="line">    volumeMounts:</div><div class="line">    - name: html</div><div class="line">      mountPath: /usr/share/nginx/html/</div><div class="line">  - name: busybox</div><div class="line">    image: busybox:latest</div><div class="line">    imagePullPolicy: IfNotPresent</div><div class="line">    command: [&quot;/bin/sh&quot;]</div><div class="line">    args: [&quot;-c&quot;, &quot;while true; do echo $(date) &gt;&gt; /data/index.html; sleep 2; done&quot;]</div><div class="line">    volumeMounts:</div><div class="line">    - name: html</div><div class="line">      mountPath: /data/</div><div class="line">  volumes:</div><div class="line">  - name: html</div><div class="line">    emptyDir: &#123;&#125;</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl apply -f pod-vol-demo2.yaml </div><div class="line">pod/pod-vol-demo2 created</div><div class="line">[root@spark32 volume]# kubectl get pods -o wide</div><div class="line">NAME                             READY   STATUS    RESTARTS   AGE     IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">busybox                          0/1     Error     0          10d     10.244.2.49   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-ff9xf     1/1     Running   0          10d     10.244.1.19   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-msv5x     1/1     Running   0          10d     10.244.1.18   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-rp9vj     1/1     Running   0          10d     10.244.2.46   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-wls6h     1/1     Running   0          10d     10.244.3.7    hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-xzgdl     1/1     Running   0          10d     10.244.2.45   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">nginx                            1/1     Running   0          10d     10.244.2.52   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">pod-vol-demo2                    2/2     Running   0          20s     10.244.1.22   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">redis-58b9f5776-fzslw            1/1     Running   0          7d22h   10.244.2.53   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-4lhql   1/1     Running   0          4d22h   10.244.3.9    hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-ghz7l   1/1     Running   0          4d22h   10.244.1.21   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-kd5v8   1/1     Running   0          4d22h   10.244.2.56   ubuntu31   &lt;none&gt;           &lt;none&gt;</div></pre></td></tr></table></figure>
+<p>访问：每隔2s生成一行新的数据。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# curl 10.244.1.22</div><div class="line">Tue Aug 27 01:16:09 UTC 2019</div><div class="line">Tue Aug 27 01:16:11 UTC 2019</div><div class="line">Tue Aug 27 01:16:13 UTC 2019</div><div class="line">Tue Aug 27 01:16:15 UTC 2019</div><div class="line">Tue Aug 27 01:16:17 UTC 2019</div><div class="line">Tue Aug 27 01:16:19 UTC 2019</div><div class="line">Tue Aug 27 01:16:21 UTC 2019</div><div class="line">Tue Aug 27 01:16:23 UTC 2019</div><div class="line">Tue Aug 27 01:16:25 UTC 2019</div><div class="line">Tue Aug 27 01:16:27 UTC 2019</div><div class="line">Tue Aug 27 01:16:29 UTC 2019</div></pre></td></tr></table></figure></p>
+<p>但是emptyDir有个特点，只要把Pod删除了，哪怕Pod重建在同一个节点上，数据也不会继续存在的。emptyDir的生命周期同Pod。</p>
+<h3 id="gitRepo"><a href="#gitRepo" class="headerlink" title="gitRepo"></a>gitRepo</h3><p>把git仓库当做存储卷来使用。并不是Pod真正把git仓库当存储卷来使用，它只不过是把git仓库中的内容，比如说找github或者私有的git服务器，git仓库里一般有数据，可以把网站的源代码放在仓库里，而后当Pod创建时，会自动地连接到这个仓库之上，但是这个连接要依赖于宿主机上有git命令来命令，因为它是基于宿主机来决定的，让宿主机把整个仓库克隆到本地来，并且把它作为存储卷定义在Pod之上。但是，gitRepo是建立在emptyDir之上的。<br>gitRepo本质上来讲还是emptyDir，也是个空目录，对Pod而言也就是上来建立个空目录，仍然是一个空的存储卷，但是所不同的地方在于，要把指定的仓库的内容clone下来，并且扔到这个空目录里面来。因此主容器就可以把这个用户当做服务用户的数据来源。但是你做的修改是不会同步到git仓库里面去的。如果在你的Pod运行过程中，git仓库发生改变了，Pod内存储卷的内容也不会改变。这种持久需要你本地推送到远程仓库才行。</p>
+<h3 id="hostPath-1"><a href="#hostPath-1" class="headerlink" title="hostPath"></a>hostPath</h3><p>把Pod所在的宿主机之上的、脱离Pod中容器的名称空间之外的、宿主机的文件系统的某一个目录与Pod建立关联关系。在Pod被删除时，这个存储卷是不会被删除的。所以只要同一个Pod能够调度到同一个节点上来，在Pod被删除以后，重新调度过来以后，对应的数据依然是存在的。如果要使用hostPath，就要指明在宿主机上哪个路径，万一宿主机上这个路径默认不存在，到底要不要新建取决于type字段。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl explain pods.spec.volumes.hostPath</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: hostPath &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     HostPath represents a pre-existing file or directory on the host machine</div><div class="line">     that is directly exposed to the container. This is generally used for</div><div class="line">     system agents or other privileged things that are allowed to see the host</div><div class="line">     machine. Most containers will NOT need this. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/volumes#hostpath</div><div class="line"></div><div class="line">     Represents a host path mapped into a pod. Host path volumes do not support</div><div class="line">     ownership management or SELinux relabeling.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   path &lt;string&gt; -required-</div><div class="line">     Path of the directory on the host. If the path is a symlink, it will follow</div><div class="line">     the link to the real path. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/volumes#hostpath</div><div class="line"></div><div class="line">   type &lt;string&gt;</div><div class="line">     Type for HostPath Volume Defaults to &quot;&quot; More info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/volumes#hostpath</div></pre></td></tr></table></figure></p>
+<p>访问：<a href="https://kubernetes.io/docs/concepts/storage/volumes#hostpath" target="_blank" rel="external">https://kubernetes.io/docs/concepts/storage/volumes#hostpath</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/147.png" alt=""></p>
+<ul>
+<li>空：为了兼容老版本的</li>
+<li>Socket: 必须是一个socket类型的文件</li>
+<li>CharDevice：必须是一个字符类型的设备文件</li>
+<li>BlockDevice：必须是一个块类型的设备文件</li>
+</ul>
+<p><strong>【示例】:hostPath示例。</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# vim pod-hostpath-vol.yaml </div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-vol-hostpath</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: myapp</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">    volumeMounts:</div><div class="line">    - name: html</div><div class="line">      mountPath: /usr/share/nginx/html/</div><div class="line">  volumes:</div><div class="line">  - name: html</div><div class="line">    hostPath:</div><div class="line">      path: /data/pod/volume1</div><div class="line">      type: DirectoryOrCreate</div></pre></td></tr></table></figure></p>
+<p>在k8s集群的每个node节点上都创建如下的目录和文件，因为我们不清楚这个Pod会被调度到哪个节点上:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mkdir /data/pod/volume1 -p</div><div class="line">vim /data/pod/volume1/index.html</div></pre></td></tr></table></figure></p>
+<p>在index.html中写入当前主机的主机名。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl apply -f pod-hostpath-vol.yaml  </div><div class="line">pod/pod-vol-hostpath created</div><div class="line">[root@spark32 volume]# kubectl get pods -o wide</div><div class="line">NAME                             READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">busybox                          0/1     Error     0          10d   10.244.2.49   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-ff9xf     1/1     Running   0          10d   10.244.1.19   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-msv5x     1/1     Running   0          10d   10.244.1.18   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-rp9vj     1/1     Running   0          10d   10.244.2.46   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-wls6h     1/1     Running   0          10d   10.244.3.7    hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-xzgdl     1/1     Running   0          10d   10.244.2.45   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">nginx                            1/1     Running   0          10d   10.244.2.52   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">pod-vol-hostpath                 1/1     Running   0          8s    10.244.2.58   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">redis-58b9f5776-fzslw            1/1     Running   0          8d    10.244.2.53   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-4lhql   1/1     Running   0          5d    10.244.3.9    hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-ghz7l   1/1     Running   0          5d    10.244.1.21   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-kd5v8   1/1     Running   0          5d    10.244.2.56   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">[root@spark32 volume]# curl 10.244.2.58</div><div class="line">ubuntu31</div></pre></td></tr></table></figure>
+<p>现在我们来删除这个pod，在重新创建这个pod，看看存储卷是否依然存在。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl delete -f pod-hostpath-vol.yaml        </div><div class="line">pod &quot;pod-vol-hostpath&quot; deleted</div><div class="line">[root@spark32 volume]# kubectl apply -f pod-hostpath-vol.yaml </div><div class="line">pod/pod-vol-hostpath created</div><div class="line">[root@spark32 volume]# kubectl get pods -o wide                </div><div class="line">NAME                             READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">busybox                          0/1     Error     0          10d   10.244.2.49   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-ff9xf     1/1     Running   0          10d   10.244.1.19   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-msv5x     1/1     Running   0          10d   10.244.1.18   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-rp9vj     1/1     Running   0          10d   10.244.2.46   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-wls6h     1/1     Running   0          10d   10.244.3.7    hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-xzgdl     1/1     Running   0          10d   10.244.2.45   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">nginx                            1/1     Running   0          10d   10.244.2.52   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">pod-vol-hostpath                 1/1     Running   0          3s    10.244.2.59   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">redis-58b9f5776-fzslw            1/1     Running   0          8d    10.244.2.53   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-4lhql   1/1     Running   0          5d    10.244.3.9    hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-ghz7l   1/1     Running   0          5d    10.244.1.21   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-kd5v8   1/1     Running   0          5d    10.244.2.56   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">[root@spark32 volume]# curl 10.244.2.59</div><div class="line">ubuntu31</div></pre></td></tr></table></figure></p>
+<p>但是这种持久只是节点级的持久，如果节点宕机了，数据也就没了。因此跨节点调度时，数据还是会丢失的。</p>
+<h3 id="nfs"><a href="#nfs" class="headerlink" title="nfs"></a>nfs</h3><p>以NFS为例，做一个共享存储。然后让三个节点挂载这个共享存储。<br>现在有1个节点：172.20.0.76  作为 nfs server。<br>将来集群中的node节点 hadoop16、spark17、ubuntu31要将nfs server上的相应目录挂载到本机的，所以要确定这几台node节点支持nfs。</p>
+<p>1、安装nfs server<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@dingding ~]# yum install -y nfs-utils</div></pre></td></tr></table></figure></p>
+<p>定义共享目录：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@dingding ~]# mkdir /home/data/volumes -pv</div><div class="line">mkdir: created directory ‘/home/data’</div><div class="line">mkdir: created directory ‘/home/data/volumes’</div><div class="line">[root@dingding ~]# vim /etc/exports</div><div class="line">/home/data/volumes 172.16.206.0/24(rw,no_root_squash)</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@dingding ~]# systemctl start nfs</div><div class="line">[root@dingding ~]# netstat -anp|grep &quot;2049&quot;</div><div class="line">tcp        0      0 0.0.0.0:2049            0.0.0.0:*               LISTEN      -                   </div><div class="line">tcp6       0      0 :::2049                 :::*                    LISTEN      -                   </div><div class="line">udp        0      0 0.0.0.0:2049            0.0.0.0:*                           -                   </div><div class="line">udp6       0      0 :::2049                 :::*                                -</div></pre></td></tr></table></figure>
+<p>在这个共享目录下创建个文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@dingding ~]# cd /home/data/volumes/</div><div class="line">[root@dingding volumes]# vim index.html</div><div class="line">&lt;h1&gt;NFS Server&lt;/h1&gt;</div></pre></td></tr></table></figure></p>
+<p>下面手动找个节点去挂载下试试可否挂载：<br>要确保挂载节点都要能驱动这个存储设备。安装下工具。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"># CentOS</div><div class="line">[root@hadoop16 ~]# yum install nfs-utils -y</div><div class="line"># Ubuntu</div><div class="line">jkzhao@ubuntu31:~$ sudo apt-get install nfs-common -y</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@hadoop16 ~]# mount -t nfs 172.16.6.73:/home/data/volumes /mnt</div><div class="line">[root@hadoop16 ~]# mount | grep mnt</div><div class="line">172.16.6.73:/home/data/volumes on /mnt type nfs4 (rw,relatime,vers=4.0,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,port=0,timeo=600,retrans=2,sec=sys,clientaddr=172.16.206.16,local_lock=none,addr=172.16.6.73)</div></pre></td></tr></table></figure>
+<p>卸载：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@hadoop16 ~]# umount /mnt</div></pre></td></tr></table></figure></p>
+<p><strong>【注意】；这里在k8s集群node节点宿主机上不需要挂载，在容器里取挂载这个NFS server导出的目录。</strong></p>
+<p><strong>【示例】：nfs存储卷示例。</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain pods.spec.volumes.nfs</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: nfs &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     NFS represents an NFS mount on the host that shares a pod&apos;s lifetime More</div><div class="line">     info: https://kubernetes.io/docs/concepts/storage/volumes#nfs</div><div class="line"></div><div class="line">     Represents an NFS mount that lasts the lifetime of a pod. NFS volumes do</div><div class="line">     not support ownership management or SELinux relabeling.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   path &lt;string&gt; -required-</div><div class="line">     Path that is exported by the NFS server. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/volumes#nfs</div><div class="line"></div><div class="line">   readOnly     &lt;boolean&gt;</div><div class="line">     ReadOnly here will force the NFS export to be mounted with read-only</div><div class="line">     permissions. Defaults to false. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/volumes#nfs</div><div class="line"></div><div class="line">   server       &lt;string&gt; -required-</div><div class="line">     Server is the hostname or IP address of the NFS server. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/volumes#nfs</div></pre></td></tr></table></figure></p>
+<ul>
+<li>path: NFS server上导出的路径。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# vim pod-nfs-vol.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-vol-nfs</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: myapp</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">    volumeMounts:</div><div class="line">    - name: html</div><div class="line">      mountPath: /usr/share/nginx/html/</div><div class="line">  volumes:</div><div class="line">  - name: html</div><div class="line">    nfs:</div><div class="line">      path: /home/data/volumes</div><div class="line">      server: 172.16.6.73</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl apply -f pod-nfs-vol.yaml </div><div class="line">pod/pod-vol-nfs created</div><div class="line">[root@spark32 volume]# kubectl get pods -o wide</div><div class="line">NAME                             READY   STATUS    RESTARTS   AGE    IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">busybox                          0/1     Error     0          10d    10.244.2.49   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-ff9xf     1/1     Running   0          10d    10.244.1.19   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-msv5x     1/1     Running   0          10d    10.244.1.18   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-rp9vj     1/1     Running   0          10d    10.244.2.46   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-wls6h     1/1     Running   0          10d    10.244.3.7    hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-xzgdl     1/1     Running   0          10d    10.244.2.45   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">nginx                            1/1     Running   0          10d    10.244.2.52   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">pod-vol-nfs                      1/1     Running   0          9s     10.244.1.24   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">redis-58b9f5776-fzslw            1/1     Running   0          8d     10.244.2.53   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-4lhql   1/1     Running   0          5d1h   10.244.3.9    hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-ghz7l   1/1     Running   0          5d1h   10.244.1.21   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-kd5v8   1/1     Running   0          5d1h   10.244.2.56   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">[root@spark32 volume]# curl 10.244.1.24</div><div class="line">&lt;h1&gt;NFS Server&lt;/h1&gt;</div></pre></td></tr></table></figure>
+<p>接下来删除这个pod，然后重新创建这个pod，即使这个pod被调度到其他节点，都能正常工作：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl delete -f pod-nfs-vol.yaml </div><div class="line">pod &quot;pod-vol-nfs&quot; deleted</div><div class="line">[root@spark32 volume]# kubectl apply -f pod-nfs-vol.yaml  </div><div class="line">pod/pod-vol-nfs created</div><div class="line">[root@spark32 volume]# kubectl get pods -o wide           </div><div class="line">NAME                             READY   STATUS    RESTARTS   AGE    IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">busybox                          0/1     Error     0          10d    10.244.2.49   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-ff9xf     1/1     Running   0          10d    10.244.1.19   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-msv5x     1/1     Running   0          10d    10.244.1.18   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-rp9vj     1/1     Running   0          10d    10.244.2.46   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-wls6h     1/1     Running   0          10d    10.244.3.7    hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-67b6dfcd8-xzgdl     1/1     Running   0          10d    10.244.2.45   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">nginx                            1/1     Running   0          10d    10.244.2.52   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">pod-vol-nfs                      1/1     Running   0          3s     10.244.2.60   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">redis-58b9f5776-fzslw            1/1     Running   0          8d     10.244.2.53   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-4lhql   1/1     Running   0          5d1h   10.244.3.9    hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-ghz7l   1/1     Running   0          5d1h   10.244.1.21   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">tomcat-deploy-56699db4f7-kd5v8   1/1     Running   0          5d1h   10.244.2.56   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">[root@spark32 volume]# curl 10.244.2.60</div><div class="line">&lt;h1&gt;NFS Server&lt;/h1&gt;</div></pre></td></tr></table></figure></p>
+<p>假设这里改成新建Deployment，里面有多个Pod，Deployment中template都定义挂载这个存储卷，nfs是否支持多路读写。nfs支持多客户端同时挂载，支持多客户端同时写操作。因为nfs server有持锁能力。<br>虽然这使得Pod有了真正意义上的持久能力，但是万一nfs server宕机了？数据一样会丢失，nfs不是一个分布式存储，没有冗余能力。应该使用glusterfs、ceph(rbd、cephfs)这样的自建的分布式存储，再不然使用云端存储。ceph可以直接提供restful的接口给k8s用。</p>
+<h3 id="pvc-1"><a href="#pvc-1" class="headerlink" title="pvc"></a>pvc</h3><p>我们上面在使用NFS的时候，就得指定NFS的共享路径、NFS服务器地址之类的，所以很多要使用Pod的人，比如就是要运行一个应用程序，这个程序就要持久存数据，假设用户能做出镜像来，但是还得让用户去懂各种各样的存储，这是有点难为用户了。因此我们可以把这个所谓的存储功能隔离开来。就像k8s向用户提供所谓的运算能力，用户不用担心自己的应用程序怎么被启动的，运行在哪里，因此简化了部署操作的过程。存储能力也是这样子的，我们定义成生产者-消费者模型，有人去生产存储空间，有人去消费就行，不需要了解背后是什么。现在我们要用存储空间，得自己先去做，找个nfs服务器，创建nfs服务，提供存储空间。<br>能不能这样子，让存储工程师来管理存储服务，让k8s管理员来管理k8s。作为用户来讲，我们只需要创建Pod。如果Pod中需要用存储，我们只需要说“要用存储”就可以了，这就是所谓的pvc要帮我们达到的效果。但是pvc的使用逻辑比较复杂。我们可以这样来组织我们的存储，我们在Pod中定义pvc类型的存储卷，告诉要用多大的存储卷，而pvc类型的存储卷必须与当前名称空间中的pvc建立绑定关系，而且pvc必须pv建立绑定关系，而pv应该是某个真正存储设备的存储空间。所以pv和pvc这两个东西是k8s之上的抽象的、但也算是标准的资源。pvc是一种资源，pv也是一种资源，他们的创建方式和创建Ingress、Service几乎没有什么太大的区别。它们就是标准的资源。<br>但是用户需要怎么做呢？存储工程师把存储这一端，每一个存储空间先划分好，k8s管理员需要把每一个存储空间映射到系统上做成pv，pv是划分好的一个个大小的存储空间，一个pvc与pv建立关联关系后，完全占有这个pv。用户就自己定义Pod，在Pod中定义使用pvc就可以了。pvc可以是用户去定义，也可以是k8s管理员去定义，pvc是属于当前名称空间的资源。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/148.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/149.png" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl explain pods.spec.volumes.persistentVolumeClaim</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: persistentVolumeClaim &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     PersistentVolumeClaimVolumeSource represents a reference to a</div><div class="line">     PersistentVolumeClaim in the same namespace. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims</div><div class="line"></div><div class="line">     PersistentVolumeClaimVolumeSource references the user&apos;s PVC in the same</div><div class="line">     namespace. This volume finds the bound PV and mounts that volume for the</div><div class="line">     pod. A PersistentVolumeClaimVolumeSource is, essentially, a wrapper around</div><div class="line">     another type of volume that is owned by someone else (the system).</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   claimName    &lt;string&gt; -required-</div><div class="line">     ClaimName is the name of a PersistentVolumeClaim in the same namespace as</div><div class="line">     the pod using this volume. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims</div><div class="line"></div><div class="line">   readOnly     &lt;boolean&gt;</div><div class="line">     Will force the ReadOnly setting in VolumeMounts. Default false.</div></pre></td></tr></table></figure>
+<p>pvc也是标准的k8s资源。下面看看pvc定义使用的一些字段：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl explain pvc</div><div class="line">[root@spark32 volume]# kubectl explain pvc.spec</div><div class="line">KIND:     PersistentVolumeClaim</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: spec &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Spec defines the desired characteristics of a volume requested by a pod</div><div class="line">     author. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims</div><div class="line"></div><div class="line">     PersistentVolumeClaimSpec describes the common attributes of storage</div><div class="line">     devices and allows a Source for provider-specific attributes</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   accessModes  &lt;[]string&gt;</div><div class="line">     AccessModes contains the desired access modes the volume should have. More</div><div class="line">     info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1</div><div class="line"></div><div class="line">   dataSource   &lt;Object&gt;</div><div class="line">     This field requires the VolumeSnapshotDataSource alpha feature gate to be</div><div class="line">     enabled and currently VolumeSnapshot is the only supported data source. If</div><div class="line">     the provisioner can support VolumeSnapshot data source, it will create a</div><div class="line">     new volume and data will be restored to the volume at the same time. If the</div><div class="line">     provisioner does not support VolumeSnapshot data source, volume will not be</div><div class="line">     created and the failure will be reported as an event. In the future, we</div><div class="line">     plan to support more data source types and the behavior of the provisioner</div><div class="line">     may change.</div><div class="line"></div><div class="line">   resources    &lt;Object&gt;</div><div class="line">     Resources represents the minimum resources the volume should have. More</div><div class="line">     info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources</div><div class="line"></div><div class="line">   selector     &lt;Object&gt;</div><div class="line">     A label query over volumes to consider for binding.</div><div class="line"></div><div class="line">   storageClassName     &lt;string&gt;</div><div class="line">     Name of the StorageClass required by the claim. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1</div><div class="line"></div><div class="line">   volumeMode   &lt;string&gt;</div><div class="line">     volumeMode defines what type of volume is required by the claim. Value of</div><div class="line">     Filesystem is implied when not included in claim spec. This is a beta</div><div class="line">     feature.</div><div class="line"></div><div class="line">   volumeName   &lt;string&gt;</div><div class="line">     VolumeName is the binding reference to the PersistentVolume backing this</div><div class="line">     claim.</div></pre></td></tr></table></figure></p>
+<ul>
+<li>accessModes  &lt;[]string&gt;<br>访问模型，无非就是支不支持多人同时访问之类的。<br><a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1" target="_blank" rel="external">https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1</a></li>
+<li>resources    <object><br>资源限制条件，期望对应的存储空间最少有多大，比如10g。我们创建个10g的pvc，背后的pv一定要10g以上，找到10g的就绑10g的pv，如果我们找到了pv有12g的，就绑这个。所以是至少多少。</object></li>
+<li>selector     <object><br>pv是可以有标签的，pvc上使用标签选择器就表示必须与哪个pv建立关联关系，但是 你也可以不加标签，就会在所有pv里找最佳匹配</object></li>
+<li>storageClassName     <string><br>存储类名称，后续在谈。</string></li>
+<li>volumeMode   <string><br>后端存储卷的模式。</string></li>
+<li>volumeName   <string><br>卷名称，后端persistentVolume(pv)的name。精确选择，就是要绑定哪个pv。也可以用选择器来选定。</string></li>
+</ul>
+<p>pv也是标准的k8s资源。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl explain pv</div><div class="line">[root@spark32 volume]# kubectl explain pv.spec</div></pre></td></tr></table></figure></p>
+<p>而 pv.spec 与我们定义存储卷时的 pods.spec.volumes 一模一样。只不过把此前应该定义在Pod上的，现在定义在pv上了。</p>
+<p>创建pvc后，系统就会去找符合等价的pv，找到就绑定，找不到就会一直pending，挂起。<br>存储工程师将存储划分了很多个存储空间，然后k8s集群管理员把这些存储都引入到集群中来，定义成pv。随后k8s用户创建Pod，在创建Pod之前，要先创建pvc，这是个claim，这个claim表示要在当前k8s集群中找一个能符合我们条件的存储空间来用。而后系统就在pv里面找哪个合适，然后分给它。pv和pvc是一一对应关系，意思是说如果某个pv被某个pvc占用了，意味着这个pv就不能被其他pvc占用了。会显示这个pv的状态是binding。但是一个pvc创建以后，这个pvc就相当于一个存储卷了，这个存储卷却可以被多个Pod所访问，多路访问。到底支持不支持多个Pod同时访问，你要定义这个pvc的访问模式。因此我们在创建pvc的时候，最好底下有匹配的pv存在，如果不存在就绑定不了了，绑定不了，pvc的状态就是pending。直到有符合条件的pv出现。</p>
+<p><strong>【示例】：我们在nfs上先准备几个空间，然后把它们做成pv放在那里，然后用户才能使用pvc去申请绑定和使用它们。</strong><br>先把上面的示例中的Pod删除了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl delete -f pod-nfs-vol.yaml </div><div class="line">pod &quot;pod-vol-nfs&quot; deleted</div></pre></td></tr></table></figure></p>
+<p>在nfs server服务器上执行如下操作：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">[root@dingding volumes]# pwd</div><div class="line">/home/data/volumes</div><div class="line">[root@dingding volumes]# mkdir v&#123;1,2,3,4,5&#125;</div><div class="line">[root@dingding volumes]# ls</div><div class="line">index.html  v1  v2  v3  v4  v5</div><div class="line">[root@dingding volumes]# vim /etc/exports</div><div class="line">/home/data/volumes/v1 172.16.206.0/24(rw,no_root_squash)</div><div class="line">/home/data/volumes/v2 172.16.206.0/24(rw,no_root_squash)</div><div class="line">/home/data/volumes/v3 172.16.206.0/24(rw,no_root_squash)</div><div class="line">/home/data/volumes/v4 172.16.206.0/24(rw,no_root_squash)</div><div class="line">/home/data/volumes/v5 172.16.206.0/24(rw,no_root_squash)</div><div class="line">[root@dingding volumes]# exportfs -arv</div><div class="line">exporting 172.16.206.0/24:/home/data/volumes/v5</div><div class="line">exporting 172.16.206.0/24:/home/data/volumes/v4</div><div class="line">exporting 172.16.206.0/24:/home/data/volumes/v3</div><div class="line">exporting 172.16.206.0/24:/home/data/volumes/v2</div><div class="line">exporting 172.16.206.0/24:/home/data/volumes/v1</div><div class="line">[root@dingding volumes]# showmount -e 172.16.6.73</div><div class="line">Export list for 172.16.6.73:</div><div class="line">/home/data/volumes/v5 172.16.206.0/24</div><div class="line">/home/data/volumes/v4 172.16.206.0/24</div><div class="line">/home/data/volumes/v3 172.16.206.0/24</div><div class="line">/home/data/volumes/v2 172.16.206.0/24</div><div class="line">/home/data/volumes/v1 172.16.206.0/24</div></pre></td></tr></table></figure></p>
+<p>我们先把这5个存储定义成pv。正常使用的场景中，这部分工作是k8s管理员做的。<br><strong>定义一个nfs格式的pv:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# kubectl explain pv.spec</div></pre></td></tr></table></figure></p>
+<p><strong>重要字段：</strong><br><strong>- accessModes  &lt;[]string&gt;</strong><br>     AccessModes contains all ways the volume can be mounted. More info:<br>     <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes" target="_blank" rel="external">https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/150.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/151.png" alt=""><br>看表中，NFS这3种模型都支持。accessModes 是个列表，意味着我们可以同时定义支持3种模型。但是即使支持多种访问模型，但是挂载时只能选定一种模式。<br><strong>- capacity     <map[string]string>  ：指定存储空间大小的。</map[string]string></strong><br>     A description of the persistent volume’s resources and capacity. More info:<br>     <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity" target="_blank" rel="external">https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity</a><br>对于存储空间来讲，它其实只有1路能输出的资源限制功能，叫Storage，无非就是存储空间是多大。支持这么几种单位。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/152.png" alt=""><br>我们使用Ki、Mi，Gi，不要像硬盘生产厂商那样子，说是500GB，是以1000为单位的，拿回来一看可能只有480GB。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div></pre></td><td class="code"><pre><div class="line">[root@spark32 volume]# mkdir pvc-pv</div><div class="line">[root@spark32 volume]# cd pvc-pv/</div><div class="line">[root@spark32 pvc-pv]# vim pv-demo.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: PersistentVolume</div><div class="line">metadata:</div><div class="line">  name: pv001</div><div class="line">  labels: </div><div class="line">    name: pv001</div><div class="line">spec:</div><div class="line">  nfs:</div><div class="line">    path: /home/data/volumes/v1</div><div class="line">    server: 172.16.6.73</div><div class="line">  accessModes: [&quot;ReadWriteMany&quot;,&quot;ReadWriteOnce&quot;]</div><div class="line">  capacity:</div><div class="line">    storage: 10Mi</div><div class="line">---</div><div class="line">apiVersion: v1</div><div class="line">kind: PersistentVolume</div><div class="line">metadata:</div><div class="line">  name: pv002</div><div class="line">  labels: </div><div class="line">    name: pv002</div><div class="line">spec:</div><div class="line">  nfs:</div><div class="line">    path: /home/data/volumes/v2</div><div class="line">    server: 172.16.6.73</div><div class="line">  accessModes: [&quot;ReadWriteOnce&quot;]</div><div class="line">  capacity:</div><div class="line">    storage: 20Mi</div><div class="line">---</div><div class="line">apiVersion: v1</div><div class="line">kind: PersistentVolume</div><div class="line">metadata:</div><div class="line">  name: pv003</div><div class="line">  labels: </div><div class="line">    name: pv003</div><div class="line">spec:</div><div class="line">  nfs:</div><div class="line">    path: /home/data/volumes/v3</div><div class="line">    server: 172.16.6.73</div><div class="line">  accessModes: [&quot;ReadWriteMany&quot;,&quot;ReadWriteOnce&quot;]</div><div class="line">  capacity:</div><div class="line">    storage: 50Mi</div><div class="line">---</div><div class="line">apiVersion: v1</div><div class="line">kind: PersistentVolume</div><div class="line">metadata:</div><div class="line">  name: pv004</div><div class="line">  labels: </div><div class="line">    name: pv004</div><div class="line">spec:</div><div class="line">  nfs:</div><div class="line">    path: /home/data/volumes/v4</div><div class="line">    server: 172.16.6.73</div><div class="line">  accessModes: [&quot;ReadWriteMany&quot;,&quot;ReadWriteOnce&quot;]</div><div class="line">  capacity:</div><div class="line">    storage: 50Mi</div><div class="line">---</div><div class="line">apiVersion: v1</div><div class="line">kind: PersistentVolume</div><div class="line">metadata:</div><div class="line">  name: pv005</div><div class="line">  labels: </div><div class="line">    name: pv005</div><div class="line">spec:</div><div class="line">  nfs:</div><div class="line">    path: /home/data/volumes/v5</div><div class="line">    server: 172.16.6.73</div><div class="line">  accessModes: [&quot;ReadWriteMany&quot;,&quot;ReadWriteOnce&quot;]</div><div class="line">  capacity:</div><div class="line">    storage: 50Mi</div></pre></td></tr></table></figure>
+<p>【注意】：定义pv的时候一定不要加名称空间，因为pv是属于集群级别的，不属于名称空间，属于整个集群。但是pvc是属于名称空间级别的。namespace不能嵌套，namespace也是属于集群级别的资源。所谓集群级别的，意思就是不能定义在名称空间中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pvc-pv]# kubectl apply -f pv-demo.yaml </div><div class="line">persistentvolume/pv001 created</div><div class="line">persistentvolume/pv002 created</div><div class="line">persistentvolume/pv003 created</div><div class="line">persistentvolume/pv004 created</div><div class="line">persistentvolume/pv005 created</div><div class="line">[root@spark32 pvc-pv]# kubectl get pv</div><div class="line">NAME    CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   REASON   AGE</div><div class="line">pv001   10Mi       RWO,RWX        Retain           Available                                   71s</div><div class="line">pv002   20Mi       RWO            Retain           Available                                   71s</div><div class="line">pv003   50Mi       RWO,RWX        Retain           Available                                   70s</div><div class="line">pv004   50Mi       RWO,RWX        Retain           Available                                   70s</div><div class="line">pv005   50Mi       RWO,RWX        Retain           Available                                   70s</div></pre></td></tr></table></figure>
+<p><strong>RECLAIM POLICY：回收策略。</strong><br>比如说某个pvc和某个pv绑定了，在里面存数据了，但是后来这pvc被删了，此时绑定就不存在了。一旦绑定不存在以后，这个pv怎么处理？它里面还放着数据呢。</p>
+<ul>
+<li>Retain：表示保留。pv默认就是这个策略。</li>
+<li>Recycle：回收，表示把里面数据都删了，pv给其他pvc绑定。</li>
+<li>Delete：解绑后，把pv也删除了，当然数据也没了。后面这两种都很危险。</li>
+</ul>
+<p><strong>下面定义pvc，然后给pod使用。</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pvc-pv]# kubectl explain pvc.spec</div><div class="line">KIND:     PersistentVolumeClaim</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: spec &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Spec defines the desired characteristics of a volume requested by a pod</div><div class="line">     author. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims</div><div class="line"></div><div class="line">     PersistentVolumeClaimSpec describes the common attributes of storage</div><div class="line">     devices and allows a Source for provider-specific attributes</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   accessModes  &lt;[]string&gt;</div><div class="line">     AccessModes contains the desired access modes the volume should have. More</div><div class="line">     info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1</div><div class="line"></div><div class="line">   dataSource   &lt;Object&gt;</div><div class="line">     This field requires the VolumeSnapshotDataSource alpha feature gate to be</div><div class="line">     enabled and currently VolumeSnapshot is the only supported data source. If</div><div class="line">     the provisioner can support VolumeSnapshot data source, it will create a</div><div class="line">     new volume and data will be restored to the volume at the same time. If the</div><div class="line">     provisioner does not support VolumeSnapshot data source, volume will not be</div><div class="line">     created and the failure will be reported as an event. In the future, we</div><div class="line">     plan to support more data source types and the behavior of the provisioner</div><div class="line">     may change.</div><div class="line"></div><div class="line">   resources    &lt;Object&gt;</div><div class="line">     Resources represents the minimum resources the volume should have. More</div><div class="line">     info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources</div><div class="line"></div><div class="line">   selector     &lt;Object&gt;</div><div class="line">     A label query over volumes to consider for binding.</div><div class="line"></div><div class="line">   storageClassName     &lt;string&gt;</div><div class="line">     Name of the StorageClass required by the claim. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1</div><div class="line"></div><div class="line">   volumeMode   &lt;string&gt;</div><div class="line">     volumeMode defines what type of volume is required by the claim. Value of</div><div class="line">     Filesystem is implied when not included in claim spec. This is a beta</div><div class="line">     feature.</div><div class="line"></div><div class="line">   volumeName   &lt;string&gt;</div><div class="line">     VolumeName is the binding reference to the PersistentVolume backing this</div><div class="line">     claim.</div></pre></td></tr></table></figure></p>
+<p>重要字段解释：</p>
+<ul>
+<li>accessModes：必须是想绑定的pv的accessModes的子集。</li>
+<li>resources：pv的值要大于等于这个值才能是候选之一的pv</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pvc-pv]# vim pod-vol-pvc.yaml  </div><div class="line">apiVersion: v1</div><div class="line">kind: PersistentVolumeClaim</div><div class="line">metadata:</div><div class="line">  name: mypvc</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  accessModes: [&quot;ReadWriteMany&quot;]</div><div class="line">  resources:</div><div class="line">    requests:</div><div class="line">      storage: 30Mi</div><div class="line">---</div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-vol-pvc</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: myapp</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">    volumeMounts:</div><div class="line">    - name: html</div><div class="line">      mountPath: /usr/share/nginx/html</div><div class="line">  volumes:</div><div class="line">  - name: html</div><div class="line">    persistentVolumeClaim:</div><div class="line">      claimName: mypvc            </div><div class="line">[root@spark32 pvc-pv]# kubectl apply -f pod-vol-pvc.yaml </div><div class="line">persistentvolumeclaim/mypvc unchanged</div><div class="line">pod/pod-vol-pvc created</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/153.png" alt=""><br>将来一般删Pod时不会删pvc，只要pvc不删除，pv就算你定义的策略为回收或删除，pv也会一直在那，数据也在那。pvc不属于节点，存储在etcd中的，只要etcd不出问题，pvc就不会有问题。k8s资源，只有Pod是需要运行在节点上的，所有的其他资源基本都是保存在apiserver的存储，叫集群状态存储etcd中。<br>假如我现在要请求使用30G的pvc，目前这5个pv是满足不了条件的，所以得事先联系管理员，告诉他要用这么大，事先帮我们创建好。不然pvc就pending了，从而Pod也就pending了。因此我们要比较灵活地解决这个问题，动态供给。意思是定义好<strong>存储类</strong>，而后用户创建pvc的时候，动态地给他生成一个pv，pv事先是不存在的。</p>
+<p>pvc申请的时候，未必有现成的pv正好符合pvc在申请中指定的条件。因此k8s有意设计了这么一种工作逻辑，能够让pvc在申请pv时，不针对某个pv进行。或者说是针对某个存储类(StorageClass)进行，存储类也是k8s之上的一个标准资源，借助这么个中间层，来完成资源分配。意思是k8s管理员可以事先把存储管理员准备的众多的存储设备，可能有NFS、glusterfs、ceph、rbd、甚至是一些云端的存储，把这些提供好的存储空间，我们事先不做pv，把这些存储资源做一个分类，根据综合服务质量，或者根据哪怕是I/O性能等等，做一个简单的分类。<br>比如有两个节点的NFS集群，把这两个NFS所能提供的存储空间分为一类，另外我们还有一个ceph的rbd集群，我们将这个集群定义成另一个分类。这就是存储类。我们分类可以根据自己评估的任何维度，甚至地理位置等。然后我们定义出来这个类StorageClass。随后pvc申请pv时，不在针对某个pv直接进行，而是针对存储类来进行。假如说ceph集群我们定义为Gold StorageClass，NFS集群定义为silver StorageClass。我们向金牌存储类中申请，就在金牌存储类中给pvc动态创建一个pv来。<br>对这些存储设备，有一个前提，必须支持restful风格的请求的创建接口才行。比如NFS，我们上面输出了v1，v2，一直到v5。这几个大小都是定义时设定好了，但是pvc在申请时你之前是不知道大小的。存储工程师只提供了存储服务器，或者说是存储集群，在这个存储上没有任何已经划分好的卷，以NFS为例，在NFS server上并没有一个导出的v1，v2…  假设服务器本地有一块硬盘，我们可以把它划分成很多分区来，每一个分区输出一个共享点。但是现状是分区还没创建呢，更别提共享点了。而后我们在NFS前端定义好restful风格的接口，用户可以通过api直接请求，请求什么呢？<br>1.在磁盘上划分一个刚好符合pvc大小的分区；<br>2.编辑exports文件，把对应的分区挂载至本地的某个目录上，并且导出。<br>3.动态创建出一个pv，刚好使用刚才导出的空间。<br>但是NFS是不支持刚才描述的功能的，只是举例子说明动态供给是怎么工作的。有些存储是支持的，比如ceph。比如我们准备了很多本地的磁盘，大概一共4PB的空间，但是这4PB不是拿来直接用的，将来在划分成子单位，子单位一般叫image。每个image相当于一块硬盘或一个分区。当我们想申请一个20GB的pv时，我们通过ceph的restful接口请求，立即划分成一个大小为20G的image，把它格式化完成，而后通过ceph导出出来，接着在集群中定义成20G大小的pv，接着跟pvc绑定。所以后端存储设备得支持restful风格的管理接口，才能实现动态pv供给的。、<br>glusterfs也可以。比ceph要简单多。但是glustefs自身不携带restful风格的接口，你得找一个第三方项目在上面补一个restful风格的接口。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"><i class="fa fa-tag"></i>Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/21/Kubernetes-Ingress及Ingress-Controller/" rel="next" title="Kubernetes Ingress及Ingress Controller">
+                <i class="fa fa-chevron-left"></i> Kubernetes Ingress及Ingress Controller
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">92</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是存储卷"><span class="nav-number">1.</span> <span class="nav-text">什么是存储卷</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes存储卷分类"><span class="nav-number">2.</span> <span class="nav-text">Kubernetes存储卷分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#emptyDir"><span class="nav-number">2.1.</span> <span class="nav-text">emptyDir</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hostPath"><span class="nav-number">2.2.</span> <span class="nav-text">hostPath</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pvc"><span class="nav-number">2.3.</span> <span class="nav-text">pvc</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储卷示例"><span class="nav-number">3.</span> <span class="nav-text">存储卷示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#emptyDir-1"><span class="nav-number">3.1.</span> <span class="nav-text">emptyDir</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gitRepo"><span class="nav-number">3.2.</span> <span class="nav-text">gitRepo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hostPath-1"><span class="nav-number">3.3.</span> <span class="nav-text">hostPath</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nfs"><span class="nav-number">3.4.</span> <span class="nav-text">nfs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pvc-1"><span class="nav-number">3.5.</span> <span class="nav-text">pvc</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共259.0k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>
