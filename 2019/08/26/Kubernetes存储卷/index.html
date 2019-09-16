@@ -123,7 +123,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/151.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/152.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/153.png">
-<meta property="og:updated_time" content="2019-08-27T07:31:59.000Z">
+<meta property="og:updated_time" content="2019-09-04T09:08:02.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kubernetes存储卷">
 <meta name="twitter:description" content="什么是存储卷大多数和数据存储相关的应用和有状态应用都是需要持久存储数据的。容器本身有生命周期，为了使得容器将来终结后我们可以把它删除，甚至是编排到其他节点上运行，意味着数据不能放在容器自己的名称空间中。">
@@ -356,8 +356,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2019-08-27T15:31:59+08:00" content="2019-08-27">
-              2019-08-27
+              <time itemprop="dateUpdated" datetime="2019-09-04T17:08:02+08:00" content="2019-09-04">
+              2019-09-04
               </time>
               </span>
             
@@ -512,7 +512,13 @@
 <li>resources：pv的值要大于等于这个值才能是候选之一的pv</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pvc-pv]# vim pod-vol-pvc.yaml  </div><div class="line">apiVersion: v1</div><div class="line">kind: PersistentVolumeClaim</div><div class="line">metadata:</div><div class="line">  name: mypvc</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  accessModes: [&quot;ReadWriteMany&quot;]</div><div class="line">  resources:</div><div class="line">    requests:</div><div class="line">      storage: 30Mi</div><div class="line">---</div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-vol-pvc</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: myapp</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">    volumeMounts:</div><div class="line">    - name: html</div><div class="line">      mountPath: /usr/share/nginx/html</div><div class="line">  volumes:</div><div class="line">  - name: html</div><div class="line">    persistentVolumeClaim:</div><div class="line">      claimName: mypvc            </div><div class="line">[root@spark32 pvc-pv]# kubectl apply -f pod-vol-pvc.yaml </div><div class="line">persistentvolumeclaim/mypvc unchanged</div><div class="line">pod/pod-vol-pvc created</div></pre></td></tr></table></figure>
-<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/153.png" alt=""><br>将来一般删Pod时不会删pvc，只要pvc不删除，pv就算你定义的策略为回收或删除，pv也会一直在那，数据也在那。pvc不属于节点，存储在etcd中的，只要etcd不出问题，pvc就不会有问题。k8s资源，只有Pod是需要运行在节点上的，所有的其他资源基本都是保存在apiserver的存储，叫集群状态存储etcd中。<br>假如我现在要请求使用30G的pvc，目前这5个pv是满足不了条件的，所以得事先联系管理员，告诉他要用这么大，事先帮我们创建好。不然pvc就pending了，从而Pod也就pending了。因此我们要比较灵活地解决这个问题，动态供给。意思是定义好<strong>存储类</strong>，而后用户创建pvc的时候，动态地给他生成一个pv，pv事先是不存在的。</p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/153.png" alt=""><br>将来一般删Pod时不会删pvc，只要pvc不删除，pv就算你定义的策略为回收或删除，pv也会一直在那，数据也在那。pvc不属于节点，存储在etcd中的，只要etcd不出问题，pvc就不会有问题。k8s资源，只有Pod是需要运行在节点上的，所有的其他资源基本都是保存在apiserver的存储，叫集群状态存储etcd中。</p>
+<p><strong>【注意】：</strong></p>
+<ul>
+<li>当pvc被Pod挂载时，我们直接删除pvc是删除不了的，除非先删除相应的Pod。</li>
+<li>假设pv的回收策略是Retain，当删除了pvc后，pv状态会从Bound变成Released，数据依然在pv对应的存储空间上。虽然 pv 中的数据得到了保留，但其 PV 状态会一直处于 Released，不能被其他 PVC 申请。为了重新使用存储资源，可以删除并重新创建 这个pv。删除操作只是删除了 PV 对象，存储空间中的数据并不会被删除。</li>
+</ul>
+<p>假如现在要请求使用30G的pvc，目前这5个pv是满足不了条件的，所以得事先联系管理员，告诉他要用这么大，事先帮我们创建好。不然pvc就pending了，从而Pod也就pending了。因此我们要比较灵活地解决这个问题，动态供给。意思是定义好<strong>存储类</strong>，而后用户创建pvc的时候，动态地给他生成一个pv，pv事先是不存在的。</p>
 <p>pvc申请的时候，未必有现成的pv正好符合pvc在申请中指定的条件。因此k8s有意设计了这么一种工作逻辑，能够让pvc在申请pv时，不针对某个pv进行。或者说是针对某个存储类(StorageClass)进行，存储类也是k8s之上的一个标准资源，借助这么个中间层，来完成资源分配。意思是k8s管理员可以事先把存储管理员准备的众多的存储设备，可能有NFS、glusterfs、ceph、rbd、甚至是一些云端的存储，把这些提供好的存储空间，我们事先不做pv，把这些存储资源做一个分类，根据综合服务质量，或者根据哪怕是I/O性能等等，做一个简单的分类。<br>比如有两个节点的NFS集群，把这两个NFS所能提供的存储空间分为一类，另外我们还有一个ceph的rbd集群，我们将这个集群定义成另一个分类。这就是存储类。我们分类可以根据自己评估的任何维度，甚至地理位置等。然后我们定义出来这个类StorageClass。随后pvc申请pv时，不在针对某个pv直接进行，而是针对存储类来进行。假如说ceph集群我们定义为Gold StorageClass，NFS集群定义为silver StorageClass。我们向金牌存储类中申请，就在金牌存储类中给pvc动态创建一个pv来。<br>对这些存储设备，有一个前提，必须支持restful风格的请求的创建接口才行。比如NFS，我们上面输出了v1，v2，一直到v5。这几个大小都是定义时设定好了，但是pvc在申请时你之前是不知道大小的。存储工程师只提供了存储服务器，或者说是存储集群，在这个存储上没有任何已经划分好的卷，以NFS为例，在NFS server上并没有一个导出的v1，v2…  假设服务器本地有一块硬盘，我们可以把它划分成很多分区来，每一个分区输出一个共享点。但是现状是分区还没创建呢，更别提共享点了。而后我们在NFS前端定义好restful风格的接口，用户可以通过api直接请求，请求什么呢？<br>1.在磁盘上划分一个刚好符合pvc大小的分区；<br>2.编辑exports文件，把对应的分区挂载至本地的某个目录上，并且导出。<br>3.动态创建出一个pv，刚好使用刚才导出的空间。<br>但是NFS是不支持刚才描述的功能的，只是举例子说明动态供给是怎么工作的。有些存储是支持的，比如ceph。比如我们准备了很多本地的磁盘，大概一共4PB的空间，但是这4PB不是拿来直接用的，将来在划分成子单位，子单位一般叫image。每个image相当于一块硬盘或一个分区。当我们想申请一个20GB的pv时，我们通过ceph的restful接口请求，立即划分成一个大小为20G的image，把它格式化完成，而后通过ceph导出出来，接着在集群中定义成20G大小的pv，接着跟pvc绑定。所以后端存储设备得支持restful风格的管理接口，才能实现动态pv供给的。、<br>glusterfs也可以。比ceph要简单多。但是glustefs自身不携带restful风格的接口，你得找一个第三方项目在上面补一个restful风格的接口。</p>
 
       
@@ -624,7 +630,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">93</span>
+              <span class="site-state-item-count">97</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -757,7 +763,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共265.1k字</span>
+  <span class="post-count">博客全站共279.2k字</span>
 </div>
 
         

@@ -1,0 +1,987 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Kubernetes安全概述对于k8s api接口的访问不会是任何人能够轻易使用的，此前我们是通过kubectl这个客户端工具进行访问的，如果人人都可以通过kubectl来访问，那么就很可能会删除别人的应用，这是非常危险的。因此k8s对于整个系统的认证、授权和所谓的后续的访问控制做了非常精密和精细的设计。当然考虑k8s从诞生到现在还不算太长，可能会陆续有一些漏洞和缺陷被发现，但至少到现在为止，它在">
+<meta name="keywords" content="Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes认证及serviceaccount">
+<meta property="og:url" content="http://yoursite.com/2019/09/02/Kubernetes认证及serviceaccount/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="Kubernetes安全概述对于k8s api接口的访问不会是任何人能够轻易使用的，此前我们是通过kubectl这个客户端工具进行访问的，如果人人都可以通过kubectl来访问，那么就很可能会删除别人的应用，这是非常危险的。因此k8s对于整个系统的认证、授权和所谓的后续的访问控制做了非常精密和精细的设计。当然考虑k8s从诞生到现在还不算太长，可能会陆续有一些漏洞和缺陷被发现，但至少到现在为止，它在">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/171.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/172.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/173.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/174.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/175.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/176.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/177.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/178.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/179.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/180.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/181.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/182.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/183.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/184.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/185.png">
+<meta property="og:updated_time" content="2019-09-12T07:17:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kubernetes认证及serviceaccount">
+<meta name="twitter:description" content="Kubernetes安全概述对于k8s api接口的访问不会是任何人能够轻易使用的，此前我们是通过kubectl这个客户端工具进行访问的，如果人人都可以通过kubectl来访问，那么就很可能会删除别人的应用，这是非常危险的。因此k8s对于整个系统的认证、授权和所谓的后续的访问控制做了非常精密和精细的设计。当然考虑k8s从诞生到现在还不算太长，可能会陆续有一些漏洞和缺陷被发现，但至少到现在为止，它在">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/171.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Kubernetes认证及serviceaccount | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Kubernetes认证及serviceaccount
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-09-02T15:14:20+08:00" content="2019-09-02">
+              2019-09-02
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-09-12T15:17:30+08:00" content="2019-09-12">
+              2019-09-12
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/09/02/Kubernetes认证及serviceaccount/" class="leancloud_visitors" data-flag-title="Kubernetes认证及serviceaccount">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Kubernetes安全概述"><a href="#Kubernetes安全概述" class="headerlink" title="Kubernetes安全概述"></a>Kubernetes安全概述</h2><p>对于k8s api接口的访问不会是任何人能够轻易使用的，此前我们是通过kubectl这个客户端工具进行访问的，如果人人都可以通过kubectl来访问，那么就很可能会删除别人的应用，这是非常危险的。因此k8s对于整个系统的认证、授权和所谓的后续的访问控制做了非常精密和精细的设计。当然考虑k8s从诞生到现在还不算太长，可能会陆续有一些漏洞和缺陷被发现，但至少到现在为止，它在模型设计上已经做得足够安全了。<a id="more"></a><br>对于管理员来讲，整个k8s集群的apiserver是访问控制的唯一入口，但是如果我们在集群上部署了应用程序，通过Ingress或者通过Service把后端服务暴露出去，这些服务是不需要通过apiserver来访问的，只需要通过节点的NodePort或Ingress中Ingress Controller中的DaemonSet共享宿主机节点网络名称所监听的宿主机的地址来访问。<br>apiserver中的 api 是分了群组的，而且每一个群组还可以迭代，但是不管怎么样，任何用户试图到这平台上来操作资源对象，他们必须要经历所谓三种安全相关的操作：</p>
+<ul>
+<li>1、认证：任何客户端访问之前，经过apiserver操作之前，得先完成认证操作。用户得有正确的账号。</li>
+<li>2、授权检查：认证通过以后，只是证明了他是当前系统合法的用户，是否拥有删除对应资源的权限，还需要做授权检查。</li>
+<li>3、准入控制：授权检查完后，我们可以操作某些资源了，但是有些资源的操作还要级联到其他资源和相应的环境，才能满足它的相应条件。因此，级联到的其他资源用户是否有权限，以及他是不是在我们所指定的操作范围内。</li>
+</ul>
+<p>k8s是高度模块化设计的，它的认证、授权和准入控制各自都通过插件的方式，可由用户自定义选择经由什么样的插件来完成何种控制逻辑。</p>
+<h2 id="认证"><a href="#认证" class="headerlink" title="认证"></a>认证</h2><p>对认证来讲，可能有n多个插件，支持多种不同的认证方式。</p>
+<h3 id="令牌认证"><a href="#令牌认证" class="headerlink" title="令牌认证"></a>令牌认证</h3><p>所谓<strong>令牌认证</strong>就是双方有一个域共享密钥，服务端存了一个密码，就像mysql认证一样，我们在服务器上先创建一个密码存放下来，随后登录时就拿这个密码登录。这种称为对称密钥登录方式。但是由于k8s提供的是restful风格的接口，它的所有服务都是通过http协议提供的，因此认证信息只能经由http协议的首部进行传递，这种首部在传递时，域共享密钥的编码信息我们称为认证令牌，就叫token。这是最简单的认证方式，<strong>但是这种认证，一般只是双方交换下是否拥有域共享密钥就足够了。</strong></p>
+<h3 id="ssl认证"><a href="#ssl认证" class="headerlink" title="ssl认证"></a>ssl认证</h3><p>ssl认证能让客户端去确认服务器的身份。去和服务器端通信之前，先要求服务器发一个服务器证书过来，先看一看这个证书是否是我们认可的CA签署的。这是第一步。如果是我们认可的CA签署的，而且里面的签署信息与我们访问的服务器信息保持一致，那我们就认为这个服务器的身份得到认证了。但是在k8s通信当中，服务器还要认证客户端的身份。因此kubectl自己也应该有一个证书，有自己的私钥，而且这个证书必须是server端认可的CA所签署的证书。客户端身份也要与证书中标识的身份保持一致。所以双方都需要互相做双向证书认证。认证后双方实现ssl加密通信。</p>
+<h3 id="其它认证方式"><a href="#其它认证方式" class="headerlink" title="其它认证方式"></a>其它认证方式</h3><p>其实认证还有很多种，以上只是比较常见的两种方式。认证插件可能会有很多，但是用户经过任何一个认证插件通过以后，即表示认证通过，无需经由其他插件进行检查。无需进行串行检查。</p>
+<h2 id="授权"><a href="#授权" class="headerlink" title="授权"></a>授权</h2><p>k8s支持n种授权插件来完成用户的权限检查。k8s 1.6之后开始支持RBAC的认证，此前有ABAC之类的认证。现在用的比较广泛的、安全的就是RBAC。除此之外还有基于节点认证。最重要的是RBAC授权检查机制。Role Based Access Control，基于角色的访问控制机制。这种基于角色的访问控制机制一般只有许可授权，没有拒绝授权，因为默认都是拒绝的。<br>默认情况下使用kubeadm部署的k8s集群是强制启用了RBAC认证的，此前的操作到现在还没涉及到所谓授权操作控制逻辑，我们一直在使用k8s的最高管理权限，系统管理员cluster admin来实现操作，而不是普通用户。这就相当于在Linux上使用root用户去操作。随后如果使用admin这样的用户，或者其他普通用户，会发现很有可能这些用户只有只读权限，只能看见有哪些资源对象，而无法去创建、编辑和删除资源对象。所以RBAC可以做到非常灵活。<br>常见的插件：Node、ABAC、RBAC、Webhook。同样的，不需要串行检查。这些插件可以同时启用。我们也可以定义比较独特的访问控制逻辑。</p>
+<h2 id="准入控制"><a href="#准入控制" class="headerlink" title="准入控制"></a>准入控制</h2><p>一般而言，准入控制本身只是用来定义对应授权检查完后，后续的其他安全检查操作。了解即可。</p>
+<h2 id="apiserver如何校验请求"><a href="#apiserver如何校验请求" class="headerlink" title="apiserver如何校验请求"></a>apiserver如何校验请求</h2><p>客户端对apiserver发起操作请求，apiserver要识别这个用户能不能执行他请求的操作：<br>1、用户账号user：username、uid<br>2、用户所属的组group：<br>3、extra：用来提供一些额外信息</p>
+<p>用户拿着这用户账号去请求时，一定会请求某个特定的api资源，而k8s的apiserver是分了组的，所以到底向哪个组的哪个版本的api资源对象发出请求，必须要进行标识，而标识则通过用户在http协议当中，request path来标识，比如访问apps下的v1版本的某个资源，资源要么属于集群，要么在名称空间下，名称空间属于集群级别的，所有名称空间级别的资源访问时都要指明名称空间：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">http://172.20.0.70:6443/apis/apps/v1/namespaces/default/deployments/myapp-deploy/</div></pre></td></tr></table></figure></p>
+<p>我们可以基于请求这个url来增删改查，此前执行的kubectl create、delete等事实上都被转换成一个http协议的请求来请求的。<br>可以演示下，api服务只监听在6443上，它是https的，双向都要做证书认证。我们的curl本地是没有认证的。可以换一种方式。在本地启一个代理。这是kubectl自带的功能。首先kubectl自身有认证能力，其自带的配置文件中拥有认证信息，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# cat .kube/config</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/171.png" alt=""><br>所以如果要使用curl请求apiserver是要带着认证信息的，但是curl没有认证信息。在kubectl节点上，运行kubectl proxy命令，就相当于这个家伙在本地作为服务运行了，它监听在我们指定的端口上，为了安全起见，一般监听在127.0.0.1:8080，端口可以自己指定。随后使用curl命令，就访问本地的8080端口，然后由kubectl反向代理至apiserver。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/172.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl proxy --port=8080</div><div class="line">Starting to serve on 127.0.0.1:8080</div></pre></td></tr></table></figure></p>
+<p>在另一个终端上使用curl访问apiserver：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# curl http://localhost:8080/api/v1/namespaces</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/173.png" alt=""><br><strong>【注意】：只有是核心群组的资源，访问时是/api/，其他的都是/apis/group_name/version/</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# curl http://localhost:8080/apis/apps/v1/namespaces/kube-system/deployments</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/174.png" alt=""><br>只看某个具体的对象:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# curl http://localhost:8080/apis/apps/v1/namespaces/kube-system/deployments/coredns</div></pre></td></tr></table></figure></p>
+<ul>
+<li>HTTP request verb: 对于指定的资源做什么操作。在restful风格中我们称为action，操作，verb也是操作的。<br>get, post, put, delete API </li>
+<li>requests verb: 上面http的请求方法要转成对API对象的请求。也就是映射到k8s语境中对应的请求有哪些：<br>get, list, create, update, patch, watch, proxy, redirect, delete, deletecollection </li>
+<li>Resource: 请求哪个资源，一般是资源的id，或者资源的名称，不同的方法中可能不一样</li>
+<li>Subresource: 有些资源可能还有子资源，restful风格中允许有子资源的</li>
+<li>Namespace：名称空间</li>
+<li>API group：所属的api群组</li>
+</ul>
+<p>上述示例中的request path中已经把上述的都表达出来了。</p>
+<h2 id="serviceaccount"><a href="#serviceaccount" class="headerlink" title="serviceaccount"></a>serviceaccount</h2><ul>
+<li>1、集群外部的客户端：比如访问apiserver对外通信的监听地址 6443端口</li>
+<li>2、Pod中容器里的应用程序访问api<br>比如运行系统级的服务CoreDNS，需要从api获取用户到底创建什么Service，给Service创建解析记录。创建k8s的图形控制接口Dashboard，这个Dashboard的Pod可以通过Service暴露到集群外部去，可以通过一个浏览器打开它，而用户有可能通过此Dashboard在当前集群中增删改查资源，所以这个Pod也得跟apiserver打交道。Pod和apiserver通信使用的是apiserver在集群内的地址。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/175.png" alt=""><br><strong>客户端与apiserver通信，</strong>首先apiserver要把自己的证书传给客户端，客户端去校验apiserver身份，同时apiserver还要去校验客户端身份。服务器apiserver发给它的客户端Pod的时候，证书中标明自己的身份不能是172.16.206.32这个地址，而应该是10.96.0.1，因为客户端访问的是10.96.0.1。所以在apiserver上，如果自己手动建立证书，那么必须确保这个证书的持有者的名称能解析到两条A记录。或者在证书里使用IP地址，这两个地址都得包含进来。另外，Pod客户端也得有证书，apiserver也得验证客户端。此前我们使用kubectl，我们给它提供了配置文件，能进行认证。Pod跟apiserver打交道，怎么认证呢？认证不应该是由Pod内的应用程序来提供的，而是应该由Pod来提供。这些信息在哪里？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain pod.spec</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/176.png" alt=""><br><strong>整个k8s的apiserver的账号有两类：</strong></p>
+<ul>
+<li>一类是实实在在的现实中的人类用户。kubectl不会自己去访问，一定是人去发起它去访问的；</li>
+<li>第二类用户叫 Pod客户端。人用的账号叫<strong>useraccount</strong>，Pod去连接apiserver时使用的账号叫<strong>serviceaccount</strong>。事实上每一个Pod都需要与apiserver打交道，只不过它的权限有大有小而已。默认每一个Pod在运行时，它都会有相关信息的。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl get pods</div><div class="line">kubeNAME      READY   STATUS    RESTARTS   AGE</div><div class="line">myapp-0   1/1     Running   0          2d15h</div><div class="line">myapp-1   1/1     Running   0          2d15h</div><div class="line">myapp-2   1/1     Running   0          2d15h</div><div class="line">myapp-3   1/1     Running   0          2d15h</div><div class="line">myapp-4   1/1     Running   0          2d15h</div><div class="line">[root@spark32 ~]# kubectl describe pod myapp-0</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/177.png" alt=""><br>随便看一个Pod，里面默认就有一个存储卷下面有个default-token，token是令牌，这就是Pod serviceaccount认证时用到认证信息，因为认证信息毕竟是敏感信息，所以通过secret来定义。并以存储卷的形式关联到Pod之上，从而让Pod内运行的应用通过secret中保存的认证信息来连接apiserver，并完成认证的。这就是每一个名称空间中都有一个默认的secret的原因。让名称空间所有的Pod资源试图去联系apiserver时预置的一个认证信息。所以所有Pod都可以连接apiserver。当然这个secret中包含的认证信息仅仅是获取当前Pod自身的相关属性，不能随便看别人的。如果我们想扩展一个Pod，比如有个pod，打算让它去管其他pod的，那我们就必须得自己手动创建一个serviceaccount，并且创建pod时附加这个我们自己定义的serviceaccount。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/178.png" alt=""></p>
+<h2 id="serviceaccount示例"><a href="#serviceaccount示例" class="headerlink" title="serviceaccount示例"></a>serviceaccount示例</h2><p>serviceaccount也属于标准的k8s资源，可以创建一个serviceaccount，创建完以后，然后在定义Pod时，有个spec.serviceAccountName字段可以加载这个我们定义的serviceaccount。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl create serviceaccount --help</div><div class="line">Create a service account with the specified name.</div><div class="line"></div><div class="line">Aliases:</div><div class="line">serviceaccount, sa</div><div class="line"></div><div class="line">Examples:</div><div class="line">  # Create a new service account named my-service-account</div><div class="line">  kubectl create serviceaccount my-service-account</div><div class="line"></div><div class="line">Options:</div><div class="line">      --allow-missing-template-keys=true: If true, ignore any errors in templates when a field or map key is missing in</div><div class="line">the template. Only applies to golang and jsonpath output formats.</div><div class="line">      --dry-run=false: If true, only print the object that would be sent, without sending it.</div><div class="line">      --generator=&apos;serviceaccount/v1&apos;: The name of the API generator to use.</div><div class="line">  -o, --output=&apos;&apos;: Output format. One of:</div><div class="line">json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.</div><div class="line">      --save-config=false: If true, the configuration of current object will be saved in its annotation. Otherwise, the</div><div class="line">annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future.</div><div class="line">      --template=&apos;&apos;: Template string or path to template file to use when -o=go-template, -o=go-template-file. The</div><div class="line">template format is golang templates [http://golang.org/pkg/text/template/#pkg-overview].</div><div class="line">      --validate=true: If true, use a schema to validate the input before sending it</div><div class="line"></div><div class="line">Usage:</div><div class="line">  kubectl create serviceaccount NAME [--dry-run] [options]</div><div class="line"></div><div class="line">Use &quot;kubectl options&quot; for a list of global command-line options (applies to all commands).</div></pre></td></tr></table></figure></p>
+<p><strong>创建时可以只给个serviceaccount名字，因为serviceaccount本身不带权限，只不过是个账号而已，我们将来可以使用RBAC来实现对这个serviceaccount授予更大的权限。所以授权不属于serviceaccount，我们只不过可以换个专用账号给这个Pod。回头可以给这个专用账号授予更大的权限。肯定不能把权限授予默认的serviceaccount，会导致这个名称空间的所有Pod都会拥有这个serviceaccount所拥有的权限。能认证不代表权限。</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl create serviceaccount mysa --dry-run</div><div class="line">serviceaccount/mysa created (dry run)</div><div class="line">You have mail in /var/spool/mail/root</div><div class="line">[root@spark32 ~]# kubectl create serviceaccount mysa -o yaml --dry-run</div><div class="line">apiVersion: v1</div><div class="line">kind: ServiceAccount</div><div class="line">metadata:</div><div class="line">  creationTimestamp: null</div><div class="line">  name: mysa</div></pre></td></tr></table></figure></p>
+<p>此前创建每个资源都是自己手动写yaml文件，现在这是快捷方法了。如果某个资源支持在命令行创建，那么可以使用–dry-run这种方式生成一个框架。可以使用输出重定向保存到文件中，拿来改一改就行了。还有一种方式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl get pods myapp-0 -o yaml --export</div></pre></td></tr></table></figure></p>
+<p>–export：显示的内容比较贴切我们手动写的yaml文件的内容。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl create sa admin</div><div class="line">serviceaccount/admin created</div><div class="line">[root@spark32 ~]# kubectl get sa</div><div class="line">NAME      SECRETS   AGE</div><div class="line">admin     1         47s</div><div class="line">default   1         152d</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/179.png" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl apply -f pod-sa-demo.yaml </div><div class="line">pod/pod-sa-demo created</div><div class="line">[root@spark32 manifests]# kubectl describe pod pod-sa-demo</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/180.png" alt=""></p>
+<p>【补充】：我们写的资源清单，提交给apiserver时，apiserver告诉kubelet，node节点要创建运行一个Pod，而这个Pod中的容器的启动要依赖于一个私有registry之上的镜像时，认证信息是放到secret中的。然后Pod清单文件中，pods.spec.imagePullSecrets引用secret。但是这种认证方式可能有一些缺陷，因此我们也可以在Pod中不使用imagePullSecrets，而是直接使用serviceAccountName。这个sa账号是可以附带认证到私有registry上的secret信息的。这样子我们在Pod配置文件清单中就不会泄露出去secret到底用的是哪个相关信息了。因为只能看见sa。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/181.png" alt=""></p>
+<p>上面我们已经看到了serviceaccount可以使用token信息，而token其实就是一串base64编码的子串，它实际上是个域共享密钥。我们系统会自动生成，当然你也可以手动创建。<br>TLS认证，双向认证无非是双方都配置证书和私钥，而且双方都要认可CA颁发的证书。不过这在k8s上用的证书一般都是私有CA做的证书，而且这个私有CA千万不要轻易授权证书出去，因为做的任何一个证书出去，都可以被人家拿来当做客户端来连接apiserver完成认证。所以这个CA应该是专用CA，不会去做任何其他事情。</p>
+<h2 id="kubectl认证"><a href="#kubectl认证" class="headerlink" title="kubectl认证"></a>kubectl认证</h2><p>kubectl使用配置文件来认证。<br>kubectl config –help  用来管理kubectl的配置文件。所有连往apiserver的客户端，在认证时，如果我们要基于配置文件来保存认证信息，而不是刚才看到serviceaccount使用token来认证，我们就应该为它配置一个配置文件。<br>k8s集群中的所有组件，除了apiserver之外的组件，像controller-manager、Scheduler都想要连入apiserver，都需要被apiserver所认证。所以它们都算的上是apiserver的客户端，包括kubectl。那么这每个组件为了能够连入正确的apiserver，需要提供正确的账号、证书、私钥等认证需要的信息，或者token。我们需要把这些信息保存为一个配置文件。这个配置文件有个专门的称呼，叫<strong>kubeconfig</strong>。是apiserver的客户端连入apiserver时使用的认证格式的客户端配置文件。kubectl也是这样的客户端，它也有自己的配置文件，可以使用kubectl config view来查看。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl config view</div><div class="line">apiVersion: v1</div><div class="line">clusters:</div><div class="line">- cluster:</div><div class="line">    certificate-authority-data: DATA+OMITTED</div><div class="line">    server: https://172.16.206.32:6443</div><div class="line">  name: kubernetes</div><div class="line">contexts:</div><div class="line">- context:</div><div class="line">    cluster: kubernetes</div><div class="line">    user: kubernetes-admin</div><div class="line">  name: kubernetes-admin@kubernetes</div><div class="line">current-context: kubernetes-admin@kubernetes</div><div class="line">kind: Config</div><div class="line">preferences: &#123;&#125;</div><div class="line">users:</div><div class="line">- name: kubernetes-admin</div><div class="line">  user:</div><div class="line">    client-certificate-data: REDACTED</div><div class="line">    client-key-data: REDACTED</div></pre></td></tr></table></figure></p>
+<p>kubectl的配置文件是 ~/.kube/config。<br><strong>这个配置文件格式和资源清单文件有点像，解释几个字段：</strong></p>
+<ul>
+<li>clusters：集群列表。可以有多个集群。<ul>
+<li>certificate-authority-data: REDACTED 认证到这个集群，这个集群发过来的证书用什么方式去检验</li>
+<li>server: <a href="https://172.20.0.70:6443" target="_blank" rel="external">https://172.20.0.70:6443</a> –集群的apiserver监听的外部地址</li>
+</ul>
+</li>
+<li>users：用户列表，可以有多个。<ul>
+<li>certificate-authority-data: REDACTED –客户端证书</li>
+<li>client-key-data: REDACTED  –客户端私钥</li>
+</ul>
+</li>
+<li>contents：上下文列表。用哪个账号访问哪个集群。<br>列表，每个content还有个name</li>
+<li>current-content：当前上下文。当前是用哪个账号访问哪个集群的。</li>
+</ul>
+<p>这个配置文件不单单是用来访问一个集群的，如果有多个k8s集群，但是只有一台机器作为客户端，一会想访问A集群，一会想访问B集群。为了让一个kubectl能控制多个集群，比如下面有3个集群，每个集群上所用的账号可能是不一样的，所以配置文件中有这么几项配置：</p>
+<ul>
+<li>集群列表，A、B、C三个集群</li>
+<li>对于每个集群来讲，可能会用到不同的账号，于是有了用户列表。</li>
+<li>打算用哪个用户访问哪个集群，假设第一个账号和第二个账号都是访问第一个集群的，而第二个集群和第三个集群的账号都是第三个账号，两个集群有着同一个名字的账号，这是有这种可能性的。因此就需要定义contents了，使用哪个账号访问哪个集群。</li>
+</ul>
+<p>使用kubeadm创建集群，它会把当前这个集群初始化的过程中创建多个私有CA，其中有一个CA是跟apiserver相关的。如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# ls /etc/kubernetes/pki/</div><div class="line">apiserver.crt              apiserver-etcd-client.key  apiserver-kubelet-client.crt  ca.crt  etcd                front-proxy-ca.key      front-proxy-client.key  sa.pub</div><div class="line">apiserver-etcd-client.crt  apiserver.key              apiserver-kubelet-client.key  ca.key  front-proxy-ca.crt  front-proxy-client.crt  sa.key</div></pre></td></tr></table></figure></p>
+<p>其中ca.crt 和 ca.key。<br>如果有需要，我们也可以自己用这个ca来签署一个自己自定义的证书和私钥，拿来做认证都没问题。只要是apiserver信任的ca签署的证书，都可以认证连入集群的。<br>接下来可以来创建自己的账号了，不可以使用这个目录下的其他证书和私钥，主要证书里的CN是用户名，pki下面的证书的里的CN都是已经定义了的名字。这里自做一组证书和私钥，作为另外一个账号去认证到apiserver上的证书文件。<br>创建的账号不是操作系统账号，而是连接apiserver的账号，需要先创建一个私钥，生成一个签署证书，证书中的证书持有者跟用户的用户名必须保持一致，就是证书的subject。</p>
+<p>生成私钥：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# cd /etc/kubernetes/pki/</div><div class="line">[root@spark32 pki]# (umask 077; openssl genrsa -out wisedu.key 2048)</div><div class="line">Generating RSA private key, 2048 bit long modulus</div><div class="line">.+++</div><div class="line">....+++</div><div class="line">e is 65537 (0x10001)</div></pre></td></tr></table></figure></p>
+<p>生成证书签署请求：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pki]# openssl req -new -key wisedu.key -out wisedu.csr -subj &quot;/CN=wisedu&quot;</div></pre></td></tr></table></figure></p>
+<p>使用CA去签署证书：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pki]# openssl x509 -req -in wisedu.csr -CA ./ca.crt  -CAkey ./ca.key -CAcreateserial -out wisedu.crt -days 3650 </div><div class="line">Signature ok</div><div class="line">subject=/CN=wisedu</div><div class="line">Getting CA Private Key</div></pre></td></tr></table></figure></p>
+<p>查看证书内容，以文本输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pki]# openssl x509 -in wisedu.crt -text -noout</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/182.png" alt=""></p>
+<p>接下来我们把这个用户账号信息添加到kubectl配置文件中，这个账号是由Kubernetes集群的CA创建的证书，所以认证不会有任何问题。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pki]# kubectl config --help</div><div class="line">Modify kubeconfig files using subcommands like &quot;kubectl config set current-context my-context&quot;</div><div class="line"></div><div class="line"> The loading order follows these rules:</div><div class="line"></div><div class="line">  1.  If the --kubeconfig flag is set, then only that file is loaded. The flag may only be set once and no merging takes</div><div class="line">place.</div><div class="line">  2.  If $KUBECONFIG environment variable is set, then it is used as a list of paths (normal path delimiting rules for</div><div class="line">your system). These paths are merged. When a value is modified, it is modified in the file that defines the stanza. When</div><div class="line">a value is created, it is created in the first file that exists. If no files in the chain exist, then it creates the</div><div class="line">last file in the list.</div><div class="line">  3.  Otherwise, $&#123;HOME&#125;/.kube/config is used and no merging takes place.</div><div class="line"></div><div class="line">Available Commands:</div><div class="line">  current-context Displays the current-context</div><div class="line">  delete-cluster  Delete the specified cluster from the kubeconfig</div><div class="line">  delete-context  Delete the specified context from the kubeconfig</div><div class="line">  get-clusters    Display clusters defined in the kubeconfig</div><div class="line">  get-contexts    Describe one or many contexts</div><div class="line">  rename-context  Renames a context from the kubeconfig file.</div><div class="line">  set             Sets an individual value in a kubeconfig file</div><div class="line">  set-cluster     Sets a cluster entry in kubeconfig</div><div class="line">  set-context     Sets a context entry in kubeconfig</div><div class="line">  set-credentials Sets a user entry in kubeconfig</div><div class="line">  unset           Unsets an individual value in a kubeconfig file</div><div class="line">  use-context     Sets the current-context in a kubeconfig file</div><div class="line">  view            Display merged kubeconfig settings or a specified kubeconfig file</div><div class="line"></div><div class="line">Usage:</div><div class="line">  kubectl config SUBCOMMAND [options]</div><div class="line"></div><div class="line">Use &quot;kubectl &lt;command&gt; --help&quot; for more information about a given command.</div><div class="line">Use &quot;kubectl options&quot; for a list of global command-line options (applies to all commands).</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pki]# kubectl config set-credentials --help</div><div class="line">Sets a user entry in kubeconfig</div><div class="line"></div><div class="line"> Specifying a name that already exists will merge new fields on top of existing values.</div><div class="line"></div><div class="line">  Client-certificate flags:</div><div class="line">  --client-certificate=certfile --client-key=keyfile</div><div class="line">  </div><div class="line">  Bearer token flags:</div><div class="line">    --token=bearer_token</div><div class="line">  </div><div class="line">  Basic auth flags:</div><div class="line">    --username=basic_user --password=basic_password</div><div class="line">  </div><div class="line"> Bearer token and basic auth are mutually exclusive.</div><div class="line"></div><div class="line">Examples:</div><div class="line">  # Set only the &quot;client-key&quot; field on the &quot;cluster-admin&quot;</div><div class="line">  # entry, without touching other values:</div><div class="line">  kubectl config set-credentials cluster-admin --client-key=~/.kube/admin.key</div><div class="line">  </div><div class="line">  # Set basic auth for the &quot;cluster-admin&quot; entry</div><div class="line">  kubectl config set-credentials cluster-admin --username=admin --password=uXFGweU9l35qcif</div><div class="line">  </div><div class="line">  # Embed client certificate data in the &quot;cluster-admin&quot; entry</div><div class="line">  kubectl config set-credentials cluster-admin --client-certificate=~/.kube/admin.crt --embed-certs=true</div><div class="line">  </div><div class="line">  # Enable the Google Compute Platform auth provider for the &quot;cluster-admin&quot; entry</div><div class="line">  kubectl config set-credentials cluster-admin --auth-provider=gcp</div><div class="line">  </div><div class="line">  # Enable the OpenID Connect auth provider for the &quot;cluster-admin&quot; entry with additional args</div><div class="line">  kubectl config set-credentials cluster-admin --auth-provider=oidc --auth-provider-arg=client-id=foo</div><div class="line">--auth-provider-arg=client-secret=bar</div><div class="line">  </div><div class="line">  # Remove the &quot;client-secret&quot; config value for the OpenID Connect auth provider for the &quot;cluster-admin&quot; entry</div><div class="line">  kubectl config set-credentials cluster-admin --auth-provider=oidc --auth-provider-arg=client-secret-</div><div class="line"></div><div class="line">Options:</div><div class="line">      --auth-provider=&apos;&apos;: Auth provider for the user entry in kubeconfig</div><div class="line">      --auth-provider-arg=[]: &apos;key=value&apos; arguments for the auth provider</div><div class="line">      --embed-certs=false: Embed client cert/key for the user entry in kubeconfig</div><div class="line"></div><div class="line">Usage:</div><div class="line">  kubectl config set-credentials NAME [--client-certificate=path/to/certfile] [--client-key=path/to/keyfile]</div><div class="line">[--token=bearer_token] [--username=basic_user] [--password=basic_password] [--auth-provider=provider_name]</div><div class="line">[--auth-provider-arg=key=value] [options]</div><div class="line"></div><div class="line">Use &quot;kubectl options&quot; for a list of global command-line options (applies to all commands).</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/183.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pki]# kubectl config set-credentials wisedu --client-certificate=./wisedu.crt --client-key=./wisedu.key --embed-certs=true</div><div class="line">User &quot;wisedu&quot; set.</div></pre></td></tr></table></figure></p>
+<p>–embed-certs=true 表示把证书隐藏起来。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pki]# kubectl config view</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/184.png" alt=""></p>
+<p>设置个上下文，让wisedu这个用户账号也能访问k8s集群。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pki]# kubectl config set-context wisedu@kubernetes --cluster=kubernetes --user=wisedu</div><div class="line">Context &quot;wisedu@kubernetes&quot; created.</div><div class="line">[root@spark32 pki]# kubectl config view</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/185.png" alt=""></p>
+<p>设置当前上下文，即设置使用这个用户wisedu访问集群kubernetes：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pki]# kubectl config use-context wisedu@kubernetes</div><div class="line">Switched to context &quot;wisedu@kubernetes&quot;.</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pki]# kubectl get pods</div><div class="line">Error from server (Forbidden): pods is forbidden: User &quot;wisedu&quot; cannot list resource &quot;pods&quot; in API group &quot;&quot; in the namespace &quot;default&quot;</div></pre></td></tr></table></figure>
+<p>这个用户可没有管理员权限。<br>以上少演示了一个步骤，就是添加集群，因为这里只有一个集群。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pki]# kubectl config set-cluster --help</div><div class="line">Sets a cluster entry in kubeconfig.</div><div class="line"></div><div class="line"> Specifying a name that already exists will merge new fields on top of existing values for those fields.</div><div class="line"></div><div class="line">Examples:</div><div class="line">  # Set only the server field on the e2e cluster entry without touching other values.</div><div class="line">  kubectl config set-cluster e2e --server=https://1.2.3.4</div><div class="line">  </div><div class="line">  # Embed certificate authority data for the e2e cluster entry</div><div class="line">  kubectl config set-cluster e2e --certificate-authority=~/.kube/e2e/kubernetes.ca.crt</div><div class="line">  </div><div class="line">  # Disable cert checking for the dev cluster entry</div><div class="line">  kubectl config set-cluster e2e --insecure-skip-tls-verify=true</div><div class="line"></div><div class="line">Options:</div><div class="line">      --embed-certs=false: embed-certs for the cluster entry in kubeconfig</div><div class="line"></div><div class="line">Usage:</div><div class="line">  kubectl config set-cluster NAME [--server=server] [--certificate-authority=path/to/certificate/authority]</div><div class="line">[--insecure-skip-tls-verify=true] [options]</div><div class="line"></div><div class="line">Use &quot;kubectl options&quot; for a list of global command-line options (applies to all commands).</div></pre></td></tr></table></figure></p>
+<p><strong>现在把当前上下文切换回来，使用一个新的配置文件来演示，有一个选项–kubeconfig可以指定配置文件路径。</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pki]# kubectl config use-context kubernetes-admin@kubernetes</div><div class="line">Switched to context &quot;kubernetes-admin@kubernetes&quot;.</div></pre></td></tr></table></figure></p>
+<p>设置一个集群：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">[root@spark32 pki]# kubectl config set-cluster mycluster --kubeconfig=/tmp/test.conf --server=&quot;https://172.16.206.32:6443&quot; --certificate-authority=/etc/kubernetes/pki/ca.crt --embed-certs=true   </div><div class="line">Cluster &quot;mycluster&quot; set.</div><div class="line">You have mail in /var/spool/mail/root</div><div class="line">[root@spark32 pki]# kubectl config view --kubeconfig=/tmp/test.conf </div><div class="line">apiVersion: v1</div><div class="line">clusters:</div><div class="line">- cluster:</div><div class="line">    certificate-authority-data: DATA+OMITTED</div><div class="line">    server: https://172.16.206.32:6443</div><div class="line">  name: mycluster</div><div class="line">contexts: []</div><div class="line">current-context: &quot;&quot;</div><div class="line">kind: Config</div><div class="line">preferences: &#123;&#125;</div><div class="line">users: []</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"><i class="fa fa-tag"></i>Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/30/Kubernetes-StatefulSet控制器/" rel="next" title="Kubernetes StatefulSet控制器">
+                <i class="fa fa-chevron-left"></i> Kubernetes StatefulSet控制器
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/09/Kubernetes-RBAC/" rel="prev" title="Kubernetes RBAC">
+                Kubernetes RBAC <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">97</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes安全概述"><span class="nav-number">1.</span> <span class="nav-text">Kubernetes安全概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#认证"><span class="nav-number">2.</span> <span class="nav-text">认证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#令牌认证"><span class="nav-number">2.1.</span> <span class="nav-text">令牌认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ssl认证"><span class="nav-number">2.2.</span> <span class="nav-text">ssl认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其它认证方式"><span class="nav-number">2.3.</span> <span class="nav-text">其它认证方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#授权"><span class="nav-number">3.</span> <span class="nav-text">授权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#准入控制"><span class="nav-number">4.</span> <span class="nav-text">准入控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#apiserver如何校验请求"><span class="nav-number">5.</span> <span class="nav-text">apiserver如何校验请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#serviceaccount"><span class="nav-number">6.</span> <span class="nav-text">serviceaccount</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#serviceaccount示例"><span class="nav-number">7.</span> <span class="nav-text">serviceaccount示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kubectl认证"><span class="nav-number">8.</span> <span class="nav-text">kubectl认证</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共279.2k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>

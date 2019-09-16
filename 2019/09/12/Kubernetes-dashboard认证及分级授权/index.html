@@ -1,0 +1,908 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="dashboardKubernetes的子项目之一，是Kubernetes核心附件之一。作为Kubernetes的Web用户界面，用户可以通过Dashboard在Kubernetes集群中部署容器化的应用，对应用进行问题处理和管理，并对集群本身进行管理。通过Dashboard，用户可以查看集群中应用的运行情况，同时也能够基于Dashboard创建或修改部署、任务、服务等Kubernetes的资源。">
+<meta name="keywords" content="Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes dashboard认证及分级授权">
+<meta property="og:url" content="http://yoursite.com/2019/09/12/Kubernetes-dashboard认证及分级授权/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="dashboardKubernetes的子项目之一，是Kubernetes核心附件之一。作为Kubernetes的Web用户界面，用户可以通过Dashboard在Kubernetes集群中部署容器化的应用，对应用进行问题处理和管理，并对集群本身进行管理。通过Dashboard，用户可以查看集群中应用的运行情况，同时也能够基于Dashboard创建或修改部署、任务、服务等Kubernetes的资源。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/197.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/198.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/199.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/200.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/201.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/202.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/203.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/204.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/205.png">
+<meta property="og:updated_time" content="2019-09-16T07:20:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kubernetes dashboard认证及分级授权">
+<meta name="twitter:description" content="dashboardKubernetes的子项目之一，是Kubernetes核心附件之一。作为Kubernetes的Web用户界面，用户可以通过Dashboard在Kubernetes集群中部署容器化的应用，对应用进行问题处理和管理，并对集群本身进行管理。通过Dashboard，用户可以查看集群中应用的运行情况，同时也能够基于Dashboard创建或修改部署、任务、服务等Kubernetes的资源。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/197.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Kubernetes dashboard认证及分级授权 | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Kubernetes dashboard认证及分级授权
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-09-12T13:50:22+08:00" content="2019-09-12">
+              2019-09-12
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-09-16T15:20:48+08:00" content="2019-09-16">
+              2019-09-16
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/09/12/Kubernetes-dashboard认证及分级授权/" class="leancloud_visitors" data-flag-title="Kubernetes dashboard认证及分级授权">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="dashboard"><a href="#dashboard" class="headerlink" title="dashboard"></a>dashboard</h2><p>Kubernetes的子项目之一，是Kubernetes核心附件之一。作为Kubernetes的Web用户界面，用户可以通过Dashboard在Kubernetes集群中部署容器化的应用，对应用进行问题处理和管理，并对集群本身进行管理。通过Dashboard，用户可以查看集群中应用的运行情况，同时也能够基于Dashboard创建或修改部署、任务、服务等Kubernetes的资源。通过部署向导，用户能够对部署进行扩缩容，进行滚动更新、重启Pod和部署新应用。在Kubernetes 1.8之后，在部署dashboard时，有着更复杂的权限检查了。传统的在互联网上看到的开放访问的方式不一定支持了。<a id="more"></a></p>
+<h2 id="安装部署dashboard"><a href="#安装部署dashboard" class="headerlink" title="安装部署dashboard"></a>安装部署dashboard</h2><p>打开 <a href="https://github.com/kubernetes/dashboard" target="_blank" rel="external">dashboard github地址</a>，<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/197.png" alt=""><br>我这里把这个yaml文件下载下来，这样可以看看里面的内容，然后进行安装。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# mkdir dashboard</div><div class="line">[root@spark32 manifests]# cd dashboard/</div><div class="line">[root@spark32 dashboard]# ls</div><div class="line">[root@spark32 dashboard]# wget https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml</div><div class="line">[root@spark32 dashboard]# kubectl apply -f kubernetes-dashboard.yaml </div><div class="line">secret/kubernetes-dashboard-certs created</div><div class="line">serviceaccount/kubernetes-dashboard created</div><div class="line">role.rbac.authorization.k8s.io/kubernetes-dashboard-minimal created</div><div class="line">rolebinding.rbac.authorization.k8s.io/kubernetes-dashboard-minimal created</div><div class="line">deployment.apps/kubernetes-dashboard created</div><div class="line">service/kubernetes-dashboard created</div></pre></td></tr></table></figure></p>
+<p>如果dashboard镜像拉取不下来，可以如下操作：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 dashboard]# docker pull mirrorgooglecontainers/kubernetes-dashboard-amd64:v1.10.1</div><div class="line">[root@spark32 dashboard]# docker tag mirrorgooglecontainers/kubernetes-dashboard-amd64:v1.10.1 k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.1</div></pre></td></tr></table></figure></p>
+<p>dashboard自身是https的，可以查看yaml中定义的Service：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/198.png" alt=""><br>并且这个Service的类型是默认的cluserIP类型的，可以改为NodePort类型的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[root@spark32 dashboard]# kubectl get svc -n kube-system</div><div class="line">NAME                   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                  AGE</div><div class="line">kube-dns               ClusterIP   10.96.0.10      &lt;none&gt;        53/UDP,53/TCP,9153/TCP   156d</div><div class="line">kubernetes-dashboard   ClusterIP   10.108.56.150   &lt;none&gt;        443/TCP                  73s</div><div class="line">[root@spark32 dashboard]# kubectl patch svc kubernetes-dashboard -p &apos;&#123;&quot;spec&quot;:&#123;&quot;type&quot;:&quot;NodePort&quot;&#125;&#125;&apos; -n kube-system</div><div class="line">service/kubernetes-dashboard patched</div><div class="line">[root@spark32 dashboard]# kubectl get svc -n kube-system                                           </div><div class="line">NAME                   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                  AGE</div><div class="line">kube-dns               ClusterIP   10.96.0.10      &lt;none&gt;        53/UDP,53/TCP,9153/TCP   156d</div><div class="line">kubernetes-dashboard   NodePort    10.108.56.150   &lt;none&gt;        443:30763/TCP            4m3s</div></pre></td></tr></table></figure></p>
+<p>浏览器输入：<a href="https://172.16.206.32:30763" target="_blank" rel="external">https://172.16.206.32:30763</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/199.png" alt=""></p>
+<ul>
+<li>令牌认证可以直接输入令牌。</li>
+<li>Kubeconfig：kubectl就能使用kubeconfig，但是注意认证时必须使用serviceaccount账号认证。dashboard自己是个Pod，我们所提供的信息是让dashboard Pod认证到k8s集群上去的。不是让我们自己认证，是让dashboard Pod认证k8s，因为我们是通过这个Pod去访问管理集群上的Pod的。因此我们是为dashboard这个pod提供一个kubeconfig，所以主体必须是一个serviceaccount。</li>
+</ul>
+<h2 id="token认证"><a href="#token认证" class="headerlink" title="token认证"></a>token认证</h2><p>token认证也需要先定义一个serviceaccount。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 dashboard]# kubectl create serviceaccount dashboard-admin -n kube-system </div><div class="line">serviceaccount/dashboard-admin created</div></pre></td></tr></table></figure></p>
+<p>接下来需要通过RoleBinding把dashboard-admin这个serviceaccount和集群管理员绑定起来。不然这个serviceaccount不能通过RBAC的检查。dashboard部署完后，登录进来期望借助于dashboard做什么事情，假如要做整个集群的管理，也就是说该serviceaccount应该具有整个集群的访问权限，那么就应该通过ClusterRoleBinding把这个serviceaccount和cluster-admin角色绑定在一起。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 dashboard]# kubectl create clusterrolebinding dashboard-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:dashboard-admin</div><div class="line">clusterrolebinding.rbac.authorization.k8s.io/dashboard-cluster-admin created</div></pre></td></tr></table></figure></p>
+<p>绑定完成后，我们去获取对应的serviceaccount的secret信息。并且通过这个secret就可以访问集群了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@spark32 dashboard]# kubectl get secret -n kube-system</div><div class="line">NAME                                             TYPE                                  DATA   AGE</div><div class="line">...</div><div class="line">dashboard-admin-token-9sbkc                      kubernetes.io/service-account-token   3      98s</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p>这个 dashboard-admin-token-9sbkc 是上面创建serviceaccount时自动生成的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[root@spark32 dashboard]# kubectl describe secret dashboard-admin-token-9sbkc -n kube-system</div><div class="line">Name:         dashboard-admin-token-9sbkc</div><div class="line">Namespace:    kube-system</div><div class="line">Labels:       &lt;none&gt;</div><div class="line">Annotations:  kubernetes.io/service-account.name: dashboard-admin</div><div class="line">              kubernetes.io/service-account.uid: 1531c9c1-d84c-11e9-9e1c-60a44c223099</div><div class="line"></div><div class="line">Type:  kubernetes.io/service-account-token</div><div class="line"></div><div class="line">Data</div><div class="line">====</div><div class="line">ca.crt:     1025 bytes</div><div class="line">namespace:  11 bytes</div><div class="line">token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJkYXNoYm9hcmQtYWRtaW4tdG9rZW4tOXNia2MiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGFzaGJvYXJkLWFkbWluIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiMTUzMWM5YzEtZDg0Yy0xMWU5LTllMWMtNjBhNDRjMjIzMDk5Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRhc2hib2FyZC1hZG1pbiJ9.P4EXyMjsqbWEVu5aDD0LYhBteFIpvlj1AxNIH2eNAweqQyzeePqSmAUVQ825wUItIlhD0H-OLgoxuQOozYy-XNxonH-ixhe5S3o5uhAOzgxIydPAxZqle9b-SKjJHtnWPh48RMy1uVtAk7zTwXftvCjr8QNSWUDN60CKjoaOGLLuo1UPh2UQBuC5KcMg_FkROvXmiBoaw-EjECq_gV6_6f3FnveJGj0pSFITXXayux9tv3lRFjQiE7-wd-0OKfOlNnEPDkkrrSzaLbg5536AL_mdjI3ZjuA93ybavtH_so40K19TXy6sOTQwT38nArGdWikcZra-g8HYTN4CVYFYxA</div></pre></td></tr></table></figure></p>
+<p>这个token信息就是当前 dashboard-admin 这个serviceaccount的认证令牌。</p>
+<p>在浏览器dashboard的登录界面，选择”令牌”，然后将上面的token信息复制上去，点击”登录”。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/200.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/201.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/202.png" alt=""><br>登录进来了，可以查看所有的名称空间。</p>
+<h2 id="Kubeconfig认证"><a href="#Kubeconfig认证" class="headerlink" title="Kubeconfig认证"></a>Kubeconfig认证</h2><p>这里创建个权限小一点的，只让它对默认名称空间有权限的管理员。还得在创建个serviceaccount。仅能够通过dashboard访问default一个名称空间，不让他做分级管理。所以需要把这个serviceaccount绑定在admin上，admin也是ClusterRole。但是可以使用RoleBinding去绑定。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@spark32 dashboard]# kubectl create sa def-ns-admin </div><div class="line">serviceaccount/def-ns-admin created</div><div class="line">[root@spark32 dashboard]# kubectl create rolebinding def-ns-admin --clusterrole=admin --serviceaccount=default:def-ns-admin</div><div class="line">rolebinding.rbac.authorization.k8s.io/def-ns-admin created</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">[root@spark32 dashboard]# kubectl get secret </div><div class="line">NAME                       TYPE                                  DATA   AGE</div><div class="line">admin-token-th7zd          kubernetes.io/service-account-token   3      4d3h</div><div class="line">def-ns-admin-token-b9s8n   kubernetes.io/service-account-token   3      100s</div><div class="line">default-token-wb7fl        kubernetes.io/service-account-token   3      156d</div><div class="line">mysql-root-passwd          Opaque                                1      18d</div><div class="line">tomcat-ingress-secret      kubernetes.io/tls                     2      25d</div><div class="line">[root@spark32 dashboard]# kubectl describe secret def-ns-admin-token-b9s8n</div><div class="line">Name:         def-ns-admin-token-b9s8n</div><div class="line">Namespace:    default</div><div class="line">Labels:       &lt;none&gt;</div><div class="line">Annotations:  kubernetes.io/service-account.name: def-ns-admin</div><div class="line">              kubernetes.io/service-account.uid: e1497fb6-d84d-11e9-9e1c-60a44c223099</div><div class="line"></div><div class="line">Type:  kubernetes.io/service-account-token</div><div class="line"></div><div class="line">Data</div><div class="line">====</div><div class="line">ca.crt:     1025 bytes</div><div class="line">namespace:  7 bytes</div><div class="line">token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZi1ucy1hZG1pbi10b2tlbi1iOXM4biIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJkZWYtbnMtYWRtaW4iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJlMTQ5N2ZiNi1kODRkLTExZTktOWUxYy02MGE0NGMyMjMwOTkiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDpkZWYtbnMtYWRtaW4ifQ.MaWQQSVdVzC67wHFqbFRaAEoC_KBtijs9lmcfV1GbUboJ3k-BswmWmHozSnREY1G2kpFWrnR3gETuodDLujeE4hUyix8vLh473iQ5TciP7Uw0FTdxKXqMkn9a_pb_dz5RUQn3tt2JGqd_v44nXRjgUuUnJIifyUv23U7iwmSN4riREhfYLvrNBbTBNIApaahn-9REWePXNllH93MLJSpGsbzpvDQcVCbUhgVxHUWsfAeNa9xAqOoUqJqbfe7QivKFXoEntU1BwTNOTl8j7YwQt_JQt2LpMkFg7R-T1CuZzohePas8tNmNfrEDGSavamQ56SDtlW7HVeGiM2IANX2eQ</div></pre></td></tr></table></figure>
+<p>使用这个token去登录dashboard，只能管理default名称空间的资源。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/203.png" alt=""><br>但是我们希望使用装载一个kubeconfig配置文件来认证，所以接下来不得不为这个serviceaccount创建一个配置文件。配置文件和之前kubectl配置文件基本一致。注意去设置的时候要放上面看到的token，不要放证书进去，证书只是为了做k8s系统认证的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 dashboard]# kubectl config set-cluster kubernetes  --certificate-authority=/etc/kubernetes/pki/ca.crt --server=&quot;https://172.16.206.32:6443&quot; --embed-certs=true --kubeconfig=/root/def-ns-admin.conf</div><div class="line">Cluster &quot;kubernetes&quot; set.</div></pre></td></tr></table></figure></p>
+<p>需要把 token 写到kubeconfig中。使用token进行认证。注意在设置认证token时不要把加密后的token设置进去，直接写入上面看到的那个token。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 dashboard]# kubectl config set-cluster kubernetes  --certificate-authority=/etc/kubernetes/pki/ca.crt --server=&quot;https://172.16.206.32:6443&quot; --embed-certs=true --kubeconfig=/root/def-ns-admin.conf</div><div class="line">Cluster &quot;kubernetes&quot; set.</div><div class="line">[root@spark32 dashboard]# kubectl config set-credentials def-ns-admin --token=&quot;ZXlKaGJHY2lPaUpTVXpJMU5pSXNJbXRwWkNJNklpSjkuZXlKcGMzTWlPaUpyZFdKbGNtNWxkR1Z6TDNObGNuWnBZMlZoWTJOdmRXNTBJaXdpYTNWaVpYSnVaWFJsY3k1cGJ5OXpaWEoyYVdObFlXTmpiM1Z1ZEM5dVlXMWxjM0JoWTJVaU9pSmtaV1poZFd4MElpd2lhM1ZpWlhKdVpYUmxjeTVwYnk5elpYSjJhV05sWVdOamIzVnVkQzl6WldOeVpYUXVibUZ0WlNJNkltUmxaaTF1Y3kxaFpHMXBiaTEwYjJ0bGJpMWlPWE00YmlJc0ltdDFZbVZ5Ym1WMFpYTXVhVzh2YzJWeWRtbGpaV0ZqWTI5MWJuUXZjMlZ5ZG1salpTMWhZMk52ZFc1MExtNWhiV1VpT2lKa1pXWXRibk10WVdSdGFXNGlMQ0pyZFdKbGNtNWxkR1Z6TG1sdkwzTmxjblpwWTJWaFkyTnZkVzUwTDNObGNuWnBZMlV0WVdOamIzVnVkQzUxYVdRaU9pSmxNVFE1TjJaaU5pMWtPRFJrTFRFeFpUa3RPV1V4WXkwMk1HRTBOR015TWpNd09Ua2lMQ0p6ZFdJaU9pSnplWE4wWlcwNmMyVnlkbWxqWldGalkyOTFiblE2WkdWbVlYVnNkRHBrWldZdGJuTXRZV1J0YVc0aWZRLk1hV1FRU1ZkVnpDNjd3SEZxYkZSYUFFb0NfS0J0aWpzOWxtY2ZWMUdiVWJvSjNrLUJzd21XbUhvelNuUkVZMUcya3BGV3JuUjNnRVR1b2RETHVqZUU0aFV5aXg4dkxoNDczaVE1VGNpUDdVdzBGVGR4S1hxTWtuOWFfcGJfZHo1UlVRbjN0dDJKR3FkX3Y0NG5YUmpnVXVVbkpJaWZ5VXYyM1U3aXdtU040cmlSRWhmWUx2ck5CYlRCTklBcGFhaG4tOVJFV2VQWE5sbEg5M01MSlNwR3NienB2RFFjVkNiVWhnVnhIVVdzZkFlTmE5eEFxT29VcUpxYmZlN1FpdktGWG9FbnRVMUJ3VE5PVGw4ajdZd1F0X0pRdDJMcE1rRmc3Ui1UMUN1WnpvaGVQYXM4dE5tTmZyRURHU2F2YW1RNTZTRHRsVzdIVmVHaU0ySUFOWDJlUQ==&quot; --kubeconfig=/root/def-ns-admin.conf</div><div class="line">[root@spark32 dashboard]# kubectl config set-context def-ns-admin@kubernetes --cluster=kubernetes --user=def-ns-admin --kubeconfig=/root/def-ns-admin.conf</div><div class="line">Context &quot;def-ns-admin@kubernetes&quot; created.</div><div class="line">[root@spark32 dashboard]# kubectl config use-context def-ns-admin@kubernetes --kubeconfig=/root/def-ns-admin.conf</div><div class="line">Switched to context &quot;def-ns-admin@kubernetes&quot;.</div></pre></td></tr></table></figure></p>
+<p>查看生成的配置文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl config view --kubeconfig=/root/def-ns-admin.conf</div><div class="line">apiVersion: v1</div><div class="line">clusters:</div><div class="line">- cluster:</div><div class="line">    certificate-authority-data: DATA+OMITTED</div><div class="line">    server: https://172.16.206.32:6443</div><div class="line">  name: kubernetes</div><div class="line">contexts:</div><div class="line">- context:</div><div class="line">    cluster: kubernetes</div><div class="line">    user: def-ns-admin</div><div class="line">  name: def-ns-admin@kubernetes</div><div class="line">current-context: def-ns-admin@kubernetes</div><div class="line">kind: Config</div><div class="line">preferences: &#123;&#125;</div><div class="line">users:</div><div class="line">- name: def-ns-admin</div><div class="line">  user:</div><div class="line">    token: eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZi1ucy1hZG1pbi10b2tlbi1iOXM4biIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJkZWYtbnMtYWRtaW4iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJlMTQ5N2ZiNi1kODRkLTExZTktOWUxYy02MGE0NGMyMjMwOTkiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDpkZWYtbnMtYWRtaW4ifQ.MaWQQSVdVzC67wHFqbFRaAEoC_KBtijs9lmcfV1GbUboJ3k-BswmWmHozSnREY1G2kpFWrnR3gETuodDLujeE4hUyix8vLh473iQ5TciP7Uw0FTdxKXqMkn9a_pb_dz5RUQn3tt2JGqd_v44nXRjgUuUnJIifyUv23U7iwmSN4riREhfYLvrNBbTBNIApaahn-9REWePXNllH93MLJSpGsbzpvDQcVCbUhgVxHUWsfAeNa9xAqOoUqJqbfe7QivKFXoEntU1BwTNOTl8j7YwQt_JQt2LpMkFg7R-T1CuZzohePas8tNmNfrEDGSavamQ56SDtlW7HVeGiM2IANX2eQ</div></pre></td></tr></table></figure></p>
+<p>将配置文件传到自己本地，然后在dashboard界面选择kubeconfig认证，使用该配置文件认证：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/204.png" alt=""><br>以后可以使用dashboard来管理资源了，比如创建资源：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/205.png" alt=""></p>
+<p><strong>【总结】：</strong><br>认证时的账号必须为ServiceAccount: 被dashboard pod拿来由kubernetes进行认证;<br><strong>token认证: </strong><br>(1)创建ServiceAccount,根据其管理目标,使用rolebinding或clusterrolebinding绑定至合理role或<br>clusterrole;<br>(2)获取到此ServiceAccount的secret, 这个secret是创建serviceaccount自动生成的。作为此serviceaccount去k8s认证的信息。查看secret的详细信息, 其中就有token;</p>
+<p><strong>kubeconfig认证:</strong> 把ServiceAccount的token封装为kubeconfig文件<br>(1)创建ServiceAccount,根据其管理目标,使用rolebinding或clusterrolebinding绑定至合理role或clusterrole;<br>(2)kubectl get secret | awk ‘/^ServiceAccount/{print $1}’   ##这里的ServiceAccount指的是你创建的serviceaccount的名字<br>            KUBE_TOKEN=$(kubectl get secret SERVCIEACCOUNT_SERRET_NAME -o jsonpath={.data.token} | base64 -d)<br>(3)生成kubeconfig文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">kubectl config set-cluster --kubeconfig=/PATH/TO/SOMEFILE</div><div class="line">kubectl config set-credentials NAME --token=$KUBE_TOKEN --kubeconfig=/PATH/TO/SOMEFILE    #这里的NAME只是个自定义的名字，认证时k8s识别的此名字是你第一步创建的serviceaccount。</div><div class="line">kubectl config set-context</div><div class="line">kubectl config use-context</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"><i class="fa fa-tag"></i>Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/09/Kubernetes-RBAC/" rel="next" title="Kubernetes RBAC">
+                <i class="fa fa-chevron-left"></i> Kubernetes RBAC
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">97</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#dashboard"><span class="nav-number">1.</span> <span class="nav-text">dashboard</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装部署dashboard"><span class="nav-number">2.</span> <span class="nav-text">安装部署dashboard</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#token认证"><span class="nav-number">3.</span> <span class="nav-text">token认证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubeconfig认证"><span class="nav-number">4.</span> <span class="nav-text">Kubeconfig认证</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共279.2k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>
