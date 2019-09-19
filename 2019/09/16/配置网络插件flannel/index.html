@@ -1,0 +1,975 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="docker的4种常用的网络模型 bridge joined：共享使用另外一个容器的网络名称空间 open：使用宿主机网络名称空间。 none  无论是哪一种方式，跨节点容器之间进行通信时，必须使用NAT机制来实现。出宿主机时做源地址转换，必须拿着物理机的地址出去。">
+<meta name="keywords" content="Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="配置网络插件flannel">
+<meta property="og:url" content="http://yoursite.com/2019/09/16/配置网络插件flannel/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="docker的4种常用的网络模型 bridge joined：共享使用另外一个容器的网络名称空间 open：使用宿主机网络名称空间。 none  无论是哪一种方式，跨节点容器之间进行通信时，必须使用NAT机制来实现。出宿主机时做源地址转换，必须拿着物理机的地址出去。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/206.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/207.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/208.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/209.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/210.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/211.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/212.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/213.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/214.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/215.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/217.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/216.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/218.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/219.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/220.png">
+<meta property="og:updated_time" content="2019-09-18T05:37:25.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="配置网络插件flannel">
+<meta name="twitter:description" content="docker的4种常用的网络模型 bridge joined：共享使用另外一个容器的网络名称空间 open：使用宿主机网络名称空间。 none  无论是哪一种方式，跨节点容器之间进行通信时，必须使用NAT机制来实现。出宿主机时做源地址转换，必须拿着物理机的地址出去。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/206.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> 配置网络插件flannel | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                配置网络插件flannel
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-09-16T16:49:40+08:00" content="2019-09-16">
+              2019-09-16
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-09-18T13:37:25+08:00" content="2019-09-18">
+              2019-09-18
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/09/16/配置网络插件flannel/" class="leancloud_visitors" data-flag-title="配置网络插件flannel">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="docker的4种常用的网络模型"><a href="#docker的4种常用的网络模型" class="headerlink" title="docker的4种常用的网络模型"></a>docker的4种常用的网络模型</h2><ul>
+<li>bridge</li>
+<li>joined：共享使用另外一个容器的网络名称空间</li>
+<li>open：使用宿主机网络名称空间。</li>
+<li>none</li>
+</ul>
+<p>无论是哪一种方式，跨节点容器之间进行通信时，必须使用NAT机制来实现。出宿主机时做源地址转换，必须拿着物理机的地址出去。<a id="more"></a></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/206.png" alt=""><br>在上图中，左边节点上有个container1，container1用纯软件的方式生成一个网络接口，通常是veth格式的网络接口，一半在容器上，一半在宿主机上并关联到docker0桥上来了，很显然是个私网地址，需要在报文离开本机时做源地址转换SNAT。同样的，如果container2想被别人访问到，需要做DNAT把服务暴露出去。<br>所以如果是contaner1和container2通信，那就需要两级NAT转换了。所以网络通信性能很差，container1其实一直不知道自己访问的是谁，它本意访问的是container2，但是目标地址只能是节点2的eth0的地址。container2也不知道是谁访问的自己，一直收到的都是节点1的eth0地址。<br>所以这种通信方式实在是效率低，而且很难构建我们真正需要的通信网络模型。因此k8s作为一个编排工具来讲，本身就必须要让容器运行在多个节点之上，而且是以Pod的形式。各Pod之间是需要进行通信的。</p>
+<h2 id="Kubernetes网络通信"><a href="#Kubernetes网络通信" class="headerlink" title="Kubernetes网络通信"></a>Kubernetes网络通信</h2><p><strong>1.容器间通信:</strong> 同一个Pod内的多个容器间的通信, lo<br><strong>2.Pod通信: Pod IP &lt;–&gt; Pod IP。</strong>k8s要求直达，不允许做任何地址转换，要使用自己的IP与对方的IP直接通信。意思是通信双方所见的地址就是通信双方的地址。<br><strong>3.Pod与Service通信: PodIP &lt;–&gt; ClusterIP。</strong>他两不在同一个网段，但是通过本地的iptables或ipvs规则能实现通信。如何启用ipvs，之前讲的有点问题，系统上有个configMap，kube-proxy，这里面定义了kube-proxy到底使用哪种模式工作。但是注意ipvs取代不了iptables，因为ipvs只能拿来做负载均衡，做NAT转换这个功能就做不到。<br><strong>4.Service与集群外部客户端的通信。</strong></p>
+<p>k8s的网络实现不是自己来实现的，要靠网络插件来实现。通过CNI标准实现的插件都可以在k8s上使用。<br>CNI: 有几十种现有的解决方案，常用的如下：</p>
+<ul>
+<li>flannel</li>
+<li>calico</li>
+<li>canel：flannel和calico拼凑起来的</li>
+<li>kube-router<br>…</li>
+</ul>
+<p>无论是哪一种插件，他们去试图解决以上4种通信时，所用的解决方案无非是以下几种：</p>
+<ul>
+<li><strong>虚拟网桥：bridge，</strong>纯软件的方式实现虚拟网卡，接入到网桥上去。每一对虚拟网卡，一半留在Pod之上，一半留在宿主机之上，并接入到网桥中去使用。甚至接入到物理接口上，使用物理桥接的方式。</li>
+<li><strong>多路复用: MacVLAN。</strong>基于MAC的方式去创建VLAN，为每个虚拟接口配置一个独有的MAC地址，使得一个物理网卡可以承载多个容器使用，这样他们就直接使用物理网卡并基于物理网卡中的MacVLAN机制进行跨节点之间进行通信。</li>
+<li><strong>硬件交换: SR-IOV，单根IO虚拟化。</strong>网卡支持硬件交换。一个网卡支持直接在物理级虚拟出多个接口来，叫单根IO虚拟化。现在市面上很多网卡都支持单根IO虚拟化。它是创建虚拟设备的一种很高性能的方式。一块网卡能虚拟出硬件级多块网卡来，然后我们可以让每个容器使用一个。</li>
+</ul>
+<p>这几种方案里硬件交换的性能最好。而MacVLAN是一个网卡基于VLAN方式构建多个网络，也算可行。而虚拟网桥不得不靠叠加的方式来确保Pod通信是从Pod IP直接到Pod IP。很多情况下，用户期望创建L3或L2的逻辑网络子网，就需要借助于叠加的网络协议来实现。所以多种解决方案中，第一种虚拟网桥我们确实可以实现更为强大的控制能力，但是对网络传输来讲有额外的性能开销，毕竟是要使用隧道网络，或者称为叠加网络，需要多封装IP首部或者多封装MAC首部，具体看是几层隧道。不过一般来讲，我们使用叠加网络时，控制平面还没有很好的标准化，用起来彼此之间可能有很多不兼容。另外，我们如果要使用VXLAN这种技术，叫扩展的VLAN技术，可能会引入更多的开销，但是这种方式给了用户更大的腾挪空间。</p>
+<p>使用CNI时要用到的配置文件：<br>kubelet 或者 /etc/cni/net.d/ 下找配置文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# ls /etc/cni/net.d/ </div><div class="line">10-flannel.conflist</div><div class="line">[root@spark32 manifests]# cat /etc/cni/net.d/10-flannel.conflist</div><div class="line">cat /etc/cni/net.d/10-flannel.conflist</div><div class="line">&#123;</div><div class="line">  &quot;name&quot;: &quot;cbr0&quot;,</div><div class="line">  &quot;plugins&quot;: [</div><div class="line">    &#123;</div><div class="line">      &quot;type&quot;: &quot;flannel&quot;,</div><div class="line">      &quot;delegate&quot;: &#123;</div><div class="line">        &quot;hairpinMode&quot;: true,</div><div class="line">        &quot;isDefaultGateway&quot;: true</div><div class="line">      &#125;</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">      &quot;type&quot;: &quot;portmap&quot;,</div><div class="line">      &quot;capabilities&quot;: &#123;</div><div class="line">        &quot;portMappings&quot;: true</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>任何其他网络插件部署上来后，一般都是把配置文件放到 /etc/cni/net.d/ 目录下，从而可以被kubelet所加载，从而能够被kubelet作为必要时创建一个Pod，这个Pod应该有网络和网卡，kubelet调 /etc/cni/net.d/ 指定配置文件中定义的网络插件，由网络插件代为实现地址分配、接口创建、网络创建等。<br>目前flannel仍然占据着主要份额，毕竟简单。但是flannel有缺陷，在k8s之上网络插件不但要实现网络地址分配、管理等功能，还应该实现网络策略，可以控制Pod与Pod之间能不能通信。k8s之上存在名称空间，但是这个名称空间并不隔离Pod的访问，虽然隔离了用户权限。flannel是不支持网络策略的。<br>而calico的部署确实比flannel复杂很多，但是calico不仅支持地址分配、管理等功能，还支持网络策略。因此虽然calico复杂，但是仍然受到很多用户接受。另外，calico在实现地址转发的方式中，可以基于BGP的方式来实现二层网络转发和三层网络路由。性能上比flannel好，但是flannel也是三层网络方式，默认网络是叠加。<br>使用时可以同时使用flannel和calico，用flannel来实现网络功能，用calico来实现网络策略。</p>
+<h2 id="flannel介绍"><a href="#flannel介绍" class="headerlink" title="flannel介绍"></a>flannel介绍</h2><p>flannel默认使用的VXLAN的方式来做后端网络传输机制的。如果基于宿主机桥接通信，那么Pod就应该可以借助虚拟网卡实现报文交换了，但现在我们要组成一个叠加网络。那就意味着两台主机之上应该有个专门用于叠加报文封装的隧道，这个通常是被叫做flannel.0，flannel.1这样的接口，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# ifconfig</div><div class="line">...</div><div class="line">flannel.1: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450</div><div class="line">        inet 10.244.0.0  netmask 255.255.255.255  broadcast 0.0.0.0</div><div class="line">        inet6 fe80::b86d:87ff:fe95:7cd4  prefixlen 64  scopeid 0x20&lt;link&gt;</div><div class="line">        ether ba:6d:87:95:7c:d4  txqueuelen 0  (Ethernet)</div><div class="line">        RX packets 2070  bytes 1140135 (1.0 MiB)</div><div class="line">        RX errors 0  dropped 0  overruns 0  frame 0</div><div class="line">        TX packets 2242  bytes 536917 (524.3 KiB)</div><div class="line">        TX errors 0  dropped 28 overruns 0  carrier 0  collisions 0</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p>这个接口专门用来封装隧道协议报文的，物理网卡的mtu是1500，而flannel.1网卡的mtu为 1450，要留出来一部分，因为要做叠加时有额外的开销，把额外的开销留出来了。而额外的空间不是不被占用的，而是留给隧道使用的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">cni0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450</div><div class="line">        inet 10.244.0.1  netmask 255.255.255.0  broadcast 0.0.0.0</div><div class="line">        inet6 fe80::b03f:bcff:fe63:9952  prefixlen 64  scopeid 0x20&lt;link&gt;</div><div class="line">        ether b2:3f:bc:63:99:52  txqueuelen 1000  (Ethernet)</div><div class="line">        RX packets 54049595  bytes 3683516535 (3.4 GiB)</div><div class="line">        RX errors 0  dropped 0  overruns 0  frame 0</div><div class="line">        TX packets 55354293  bytes 16544397952 (15.4 GiB)</div><div class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</div></pre></td></tr></table></figure></p>
+<p>另外ifconfig里还看到cni0接口。cni0是被当前主机作为隧道协议上在本地通信时使用的接口。但是要创建完Pod后，这个cni0接口才会出现。<br>在两个主机的flannel接口之间要构建一个额外添加了报文传输通道，使用两个节点上的Pod之间通信借助这个传输通道来实现，就好像两个Pod之间直接通信了。这个通信使用的功能就是所谓的flannel.1接口，每次通信报文之外在封装一个二层或三层或四层的报文首部，这取决于工作模式。默认情况下用的是VXLAN技术，外层的隧道使用的VxLAN协议，扩展的虚拟局域网。扩展的虚拟局域网在实现报文通信时，可以理解为类似四层隧道这样的协议。正常传输一个以太网帧的时候，应该是在二层链路层直接进行传输以太网帧报文。那这个报文真正传输报文怎么传的？当一个帧发过来的时候，它要经由这个隧道接口在额外封装一个首部，第一VxLAN首部，而VxLAN首部之外，还有个UDP首部，借助于UDP来传输。UDP之外是IP首部，IP之外又有个以太网首部，所以这几层都是额外的开销。所以说基于VxLAN，性能可能会比较低，但好处在于可以独立管理一个网络，而且彼此之间跟物理网络是不相干扰的。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/207.png" alt=""><br>以上只是flannel网络后端传输的第一种方式，所以flannel支持多种后端承载方式，就是报文是怎么发过去的：</p>
+<ul>
+<li><strong>VxLAN</strong><ul>
+<li>(1) vxlan</li>
+<li>(2) Directrouting：如果源Pod所在的节点与目标Pod所在的节点在同一个二层网络中，就是在同一个网咯中，那么大家直接使用host-gw通信，但是假如源Pod所在的节点与目标Pod所在的节点不在同一个网络中，就是中间有路由的，那么就自动降级为VxLAN叠加隧道进行通信。</li>
+</ul>
+</li>
+<li><strong>host-gw: Host Gateway。</strong>两个节点上的Pod各自拥有一个网段，我们把主机自己所在的网络接口当做是网关来使用。在物理机上创建一个虚拟接口，每一个Pod也有个虚拟接口，Pod的虚拟接口在传输报文时，不是通过隧道承载传送过去的，当它需要传输报文时，发现目标主机不是本地的，它把报文传给物理机上的虚拟接口，把它当做网关来用，这个网关看到报文后要查路由表，这个路由表中记录了到达哪个网络要发给谁。比如发给10.244.1.0网络的要发给对端主机的物理网卡，然后经过物理网卡就发出去了。对端的物理网卡收到后一看是本物理机的另外一块虚拟网卡接口，所以报文传给那个虚拟网卡接口，然后在传到到Pod的虚拟接口。这里面没有使用叠加，报文通过路由就到达对端主机了，把主机所在的节点所在的地址额外加一个接口当网关，但是这样子就使得路由表很大。这种方式比vxlan性能要好很多，几乎没有什么多余的开销，除了本地路由之外。但是默认没有使用这种方式，因为有个缺陷，要求k8s节点必须在同一个二层网络中，如果两台主机之间要有路由，就没办法定义清楚了，不知道发哪去了。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/208.png" alt=""></li>
+<li><strong>UDP: 就用纯粹的UDP报文进行传输，</strong>这种比VxLAN方式性能更差。因为它是用普通的UDP报文转发的，不是VxLAN专用的UDP报文转发的。</li>
+</ul>
+<p>flannel刚刚被发明出来的时候，Linux内核不支持VxLAN，Linux内核级没有VxLAN模块，而那个时候host-gw又有很高的门槛，所以早期flannel用的是UDP，最差的方式。因此在网上产生了一种偏见，认为flannel性能很差，现在使用host-gw方式的性能比calico性能都要好。</p>
+<h2 id="部署flannel"><a href="#部署flannel" class="headerlink" title="部署flannel"></a>部署flannel</h2><p>flannel本身和k8s没有关系，它事先等存在，没有网络插件，k8s没法跑起来。他是被kubelet所调用的。凡是有kubelet的节点上都应该部署flannel。kubelet存在是为了运行Pod，而Pod就需要网络，而网络是kubelet调用flannel或者其他网络插件来实现网络功能。<br>flannel可以部署为系统的守护进程，也可以部署为k8s之上的Pod。当部署为k8s之上的Pod时，一定是个DaemonSet，在每一个节点上运行一个Pod副本，而且这个Pod副本是直接共享宿主机的网络名称空间的，这样Pod才能设置宿主机网络名称空间的。不然的话，就不能代为在Pod中运行又能改宿主机的网络接口了，比如创建个cni，每一个Pod启动时还能创建另外一对虚拟网卡，有一个在宿主机上，还能添加到桥上去，这些功能如果flannel不能共享宿主机网络名称空间的话，显然是做不到的。<br>当我们使用kubeadm部署k8s集群的时候，部署flannel是作为Pod托管在k8s之上的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get daemonset -n kube-system</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/209.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/210.png" alt=""></p>
+<p>配置flannel时使用的是configMap，用来配置这几个Pod是怎么来运行的。有个configMap叫 kube-flannel-cfg。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get configmap -n kube-system     </div><div class="line">NAME                                 DATA   AGE</div><div class="line">coredns                              1      158d</div><div class="line">extension-apiserver-authentication   6      158d</div><div class="line">kube-flannel-cfg                     2      158d</div><div class="line">kube-proxy                           2      158d</div><div class="line">kubeadm-config                       2      158d</div><div class="line">kubelet-config-1.14                  1      158d</div><div class="line">[root@spark32 manifests]# kubectl get configmap kube-flannel-cfg -o yaml -n kube-system</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/211.png" alt=""><br>也可以配置为Directrouting方式。</p>
+<h2 id="flannel的配置参数"><a href="#flannel的配置参数" class="headerlink" title="flannel的配置参数"></a>flannel的配置参数</h2><ul>
+<li><p>Network: flannel使用的CIDR格式的网络地址,用于为Pod配置网络功能。这个是个全局的网络，通常是8位或16位掩码的。然后这个全局网络会划分成子网，每个节点使用一个子网。比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">             10.244.0.0/16 -&gt; </div><div class="line">                 master节点: 10.244.0.0/24</div><div class="line">                 node01节点: 10.244.1.0/24</div><div class="line">                 ...</div><div class="line">                 node255节点: 10.244.255.0/24</div><div class="line">意味着整个集群最多256个节点。</div><div class="line">             10.0.0.0/8 -&gt;  </div><div class="line">                 10.0.0.0/24</div><div class="line">                 ...</div><div class="line">                 10.255.255.0/24</div><div class="line">意味着整个集群最多2^16=65356个节点。 太大了，一般可以使用12或16位掩码，自己配置。注意要留出service使用的网络，比如service使用10.96.0.0/12，pod可以使用10.10.0.0/12。</div></pre></td></tr></table></figure>
+</li>
+<li><p>SubnetLen: 把Network切分子网供各节点使用时, 使用多长的掩码进行切分, 默认为24位;                         </p>
+</li>
+<li>SubnetMin:10.244.10.0/24  子网中地址段中最小是多少给节点使用。比如如果是10.244.0.0/16网络，那么最小是10.244.0.0/24，最大是 10.244.255.0/24</li>
+<li>SubnetMax: 10.244.100.0/24</li>
+<li>Backend: vxlan, host-gw, udp。各Pod之间怎么通信。</li>
+</ul>
+<h2 id="示例1：抓包看flannel的默认vxlan报文通信"><a href="#示例1：抓包看flannel的默认vxlan报文通信" class="headerlink" title="示例1：抓包看flannel的默认vxlan报文通信"></a>示例1：抓包看flannel的默认vxlan报文通信</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl apply -f deploy-demo.yaml </div><div class="line">deployment.apps/myapp-deploy created</div><div class="line">[root@spark32 manifests]# kubectl get pods -o wide</div><div class="line">NAME                            READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">myapp-deploy-675558bfc5-c9kw9   1/1     Running   0          79s   10.244.2.92   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-675558bfc5-f5v6m   1/1     Running   0          79s   10.244.3.21   hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-675558bfc5-lwbz6   1/1     Running   0          79s   10.244.1.55   spark17    &lt;none&gt;           &lt;none&gt;</div></pre></td></tr></table></figure>
+<p>进入ubuntu31主机上运行的pod：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl exec myapp-deploy-675558bfc5-c9kw9 -it -- /bin/sh</div><div class="line">/ #</div></pre></td></tr></table></figure></p>
+<p>打开另一个终端，进入spark7主机上运行的pod，然后ping ubuntu31上的pod的IP：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl exec myapp-deploy-675558bfc5-lwbz6 -it -- /bin/sh</div><div class="line">/ # ping 10.244.2.92</div><div class="line">PING 10.244.2.92 (10.244.2.92): 56 data bytes</div><div class="line">64 bytes from 10.244.2.92: seq=0 ttl=62 time=0.756 ms</div><div class="line">64 bytes from 10.244.2.92: seq=1 ttl=62 time=0.384 ms</div><div class="line">64 bytes from 10.244.2.92: seq=2 ttl=62 time=0.408 ms</div></pre></td></tr></table></figure></p>
+<p>在打开一个终端，连接ubuntu31和spark17，分别在上面抓icmp包：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">jkzhao@ubuntu31:~$ sudo tcpdump -i enp3s0 -nn icmp</div><div class="line">tcpdump: verbose output suppressed, use -v or -vv for full protocol decode</div><div class="line">listening on enp3s0, link-type EN10MB (Ethernet), capture size 262144 bytes</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# tcpdump -i enp0s25 -nn icmp </div><div class="line">tcpdump: verbose output suppressed, use -v or -vv for full protocol decode</div><div class="line">listening on enp0s25, link-type EN10MB (Ethernet), capture size 65535 bytes</div></pre></td></tr></table></figure>
+<p>两个主机上都抓不到icmp报文。因为报文到物理接口上时已经被封装成UDP报文了，实际上是通过cni0或者flannel.1接口来接入的。所以报文到达这些接口的时候，应该还没有被隧道转发，至少是在它自己网卡的前后端还没有被隧道转发。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/212.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# brctl show flannel.1</div><div class="line">bridge name     bridge id               STP enabled     interfaces</div><div class="line">flannel.1               can&apos;t get info Operation not supported</div><div class="line">[root@spark17 ~]# brctl show cni0</div><div class="line">bridge name     bridge id               STP enabled     interfaces</div><div class="line">cni0            8000.46c489cb0a37       no              vethe3b43012</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">jkzhao@ubuntu31:~$ brctl show cni0</div><div class="line">-bash: brctl: command not found</div><div class="line">jkzhao@ubuntu31:~$ sudo apt-get install bridge-utils</div><div class="line">jkzhao@ubuntu31:~$ brctl show cni0                  </div><div class="line">bridge name     bridge id               STP enabled     interfaces</div><div class="line">cni0            8000.6e57635fa57b       no              veth71751fdf</div><div class="line">                                                        vetha7ffd48d</div><div class="line">                                                        vethcca0b8bd</div></pre></td></tr></table></figure>
+<p>Pod的网络接口都桥接到cni0，因此在cni上抓包应该都没被隧道封装。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/213.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/214.png" alt=""></p>
+<p>虽然这里看到的是10.244.1.55直接到10.244.2.92，但是实际上报文在被送达到flannel.1接口的时候，报文先从cni0进来，从flannel.1出去，然后借助于物理网卡发出去。<br>抓取到达物理网卡上的报文：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/215.png" alt=""></p>
+<p>不支持抓取vxlan：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# tcpdump -i enp0s25 -nn vxlan</div><div class="line">tcpdump: syntax error</div></pre></td></tr></table></figure></p>
+<h2 id="示例2：配置使用Directrouting的通信方式"><a href="#示例2：配置使用Directrouting的通信方式" class="headerlink" title="示例2：配置使用Directrouting的通信方式"></a>示例2：配置使用Directrouting的通信方式</h2><p>先看下当前主机的路由表：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# ip route show</div><div class="line">default via 172.16.206.1 dev enp3s0  proto static  metric 100 </div><div class="line">10.244.0.0/24 dev cni0  proto kernel  scope link  src 10.244.0.1 </div><div class="line">10.244.1.0/24 via 10.244.1.0 dev flannel.1 onlink </div><div class="line">10.244.2.0/24 via 10.244.2.0 dev flannel.1 onlink </div><div class="line">10.244.3.0/24 via 10.244.3.0 dev flannel.1 onlink </div><div class="line">172.16.206.0/24 dev enp3s0  proto kernel  scope link  src 172.16.206.32  metric 100 </div><div class="line">172.17.0.0/16 dev docker0  proto kernel  scope link  src 172.17.0.1 </div><div class="line">172.18.0.0/16 dev br-39b34343d087  proto kernel  scope link  src 172.18.0.1 </div><div class="line">192.168.122.0/24 dev virbr0  proto kernel  scope link  src 192.168.122.1</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/217.png" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# mkdir flannel</div><div class="line">[root@spark32 manifests]# cd flannel/</div><div class="line">[root@spark32 flannel]# vim net-conf.json</div><div class="line">&#123;</div><div class="line">  &quot;Network&quot;: &quot;10.244.0.0/16&quot;,</div><div class="line">  &quot;Backend&quot;: &#123;</div><div class="line">    &quot;Type&quot;: &quot;vxlan&quot;,</div><div class="line">    &quot;Directrouting&quot;: true</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>需要把配置的内容应用到集群中，这实际上是configMap中的数据，所以需要把它定义成独立的configMap，或者合并到flannel现在用的configMap中。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 flannel]# kubectl edit configmap kube-flannel-cfg -n kube-system</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/216.png" alt=""><br>看下现在的路由表：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[root@spark32 flannel]# ip route show</div><div class="line">default via 172.16.206.1 dev enp3s0  proto static  metric 100 </div><div class="line">10.244.0.0/24 dev cni0  proto kernel  scope link  src 10.244.0.1 </div><div class="line">10.244.1.0/24 via 10.244.1.0 dev flannel.1 onlink </div><div class="line">10.244.2.0/24 via 10.244.2.0 dev flannel.1 onlink </div><div class="line">10.244.3.0/24 via 10.244.3.0 dev flannel.1 onlink </div><div class="line">172.16.206.0/24 dev enp3s0  proto kernel  scope link  src 172.16.206.32  metric 100 </div><div class="line">172.17.0.0/16 dev docker0  proto kernel  scope link  src 172.17.0.1 </div><div class="line">172.18.0.0/16 dev br-39b34343d087  proto kernel  scope link  src 172.18.0.1 </div><div class="line">192.168.122.0/24 dev virbr0  proto kernel  scope link  src 192.168.122.1</div></pre></td></tr></table></figure></p>
+<p>这两条路由条目应该是送往物理接口才对，改完没有生效。</p>
+<p>把pod删除，重新创建，然后在查看路由表：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[root@spark32 flannel]# kubectl delete -f ../deploy-demo.yaml </div><div class="line">deployment.apps &quot;myapp-deploy&quot; deleted</div><div class="line">[root@spark32 flannel]# kubectl apply -f ../deploy-demo.yaml       </div><div class="line">deployment.apps/myapp-deploy created</div><div class="line">[root@spark32 flannel]# ip route show                         </div><div class="line">default via 172.16.206.1 dev enp3s0  proto static  metric 100 </div><div class="line">10.244.0.0/24 dev cni0  proto kernel  scope link  src 10.244.0.1 </div><div class="line">10.244.1.0/24 via 10.244.1.0 dev flannel.1 onlink </div><div class="line">10.244.2.0/24 via 10.244.2.0 dev flannel.1 onlink </div><div class="line">10.244.3.0/24 via 10.244.3.0 dev flannel.1 onlink </div><div class="line">172.16.206.0/24 dev enp3s0  proto kernel  scope link  src 172.16.206.32  metric 100 </div><div class="line">172.17.0.0/16 dev docker0  proto kernel  scope link  src 172.17.0.1 </div><div class="line">172.18.0.0/16 dev br-39b34343d087  proto kernel  scope link  src 172.18.0.1 </div><div class="line">192.168.122.0/24 dev virbr0  proto kernel  scope link  src 192.168.122.1</div></pre></td></tr></table></figure></p>
+<p>还是不行。</p>
+<p>此前安装flannel时是kubectl appy -f，而我们这里修改是kubectl edit，不建议这么做，可能不会直接生效。现在去下载flannel的yaml文件，直接改这个文件，在apply一下。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 flannel]# wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</div><div class="line">[root@spark32 flannel]# vim kube-flannel.yml</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/218.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">[root@spark32 flannel]# kubectl apply -f kube-flannel.yml </div><div class="line">podsecuritypolicy.policy/psp.flannel.unprivileged configured</div><div class="line">clusterrole.rbac.authorization.k8s.io/flannel unchanged</div><div class="line">clusterrolebinding.rbac.authorization.k8s.io/flannel unchanged</div><div class="line">serviceaccount/flannel unchanged</div><div class="line">configmap/kube-flannel-cfg configured</div><div class="line">daemonset.apps/kube-flannel-ds-amd64 unchanged</div><div class="line">daemonset.apps/kube-flannel-ds-arm64 unchanged</div><div class="line">daemonset.apps/kube-flannel-ds-arm unchanged</div><div class="line">daemonset.apps/kube-flannel-ds-ppc64le unchanged</div><div class="line">daemonset.apps/kube-flannel-ds-s390x unchanged</div><div class="line">[root@spark32 flannel]# ip route show                     </div><div class="line">default via 172.16.206.1 dev enp3s0  proto static  metric 100 </div><div class="line">10.244.0.0/24 dev cni0  proto kernel  scope link  src 10.244.0.1 </div><div class="line">10.244.1.0/24 via 10.244.1.0 dev flannel.1 onlink </div><div class="line">10.244.2.0/24 via 10.244.2.0 dev flannel.1 onlink </div><div class="line">10.244.3.0/24 via 10.244.3.0 dev flannel.1 onlink </div><div class="line">172.16.206.0/24 dev enp3s0  proto kernel  scope link  src 172.16.206.32  metric 100 </div><div class="line">172.17.0.0/16 dev docker0  proto kernel  scope link  src 172.17.0.1 </div><div class="line">172.18.0.0/16 dev br-39b34343d087  proto kernel  scope link  src 172.18.0.1 </div><div class="line">192.168.122.0/24 dev virbr0  proto kernel  scope link  src 192.168.122.1</div></pre></td></tr></table></figure></p>
+<p>还是没有生效。</p>
+<p>只能删除flannel，然后重新创建了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">[root@spark32 flannel]# kubectl delete -f kube-flannel.yml </div><div class="line">podsecuritypolicy.policy &quot;psp.flannel.unprivileged&quot; deleted</div><div class="line">clusterrole.rbac.authorization.k8s.io &quot;flannel&quot; deleted</div><div class="line">clusterrolebinding.rbac.authorization.k8s.io &quot;flannel&quot; deleted</div><div class="line">serviceaccount &quot;flannel&quot; deleted</div><div class="line">configmap &quot;kube-flannel-cfg&quot; deleted</div><div class="line">daemonset.apps &quot;kube-flannel-ds-amd64&quot; deleted</div><div class="line">daemonset.apps &quot;kube-flannel-ds-arm64&quot; deleted</div><div class="line">daemonset.apps &quot;kube-flannel-ds-arm&quot; deleted</div><div class="line">daemonset.apps &quot;kube-flannel-ds-ppc64le&quot; deleted</div><div class="line">daemonset.apps &quot;kube-flannel-ds-s390x&quot; deleted</div><div class="line">[root@spark32 flannel]# kubectl get pods -n kube-system</div><div class="line">NAME                                    READY   STATUS        RESTARTS   AGE</div><div class="line">coredns-fb8b8dccf-t2xj8                 1/1     Running       0          158d</div><div class="line">coredns-fb8b8dccf-xdjkx                 1/1     Running       0          158d</div><div class="line">etcd-spark32                            1/1     Running       1          158d</div><div class="line">kube-apiserver-spark32                  1/1     Running       0          158d</div><div class="line">kube-controller-manager-spark32         1/1     Running       0          158d</div><div class="line">kube-flannel-ds-amd64-8h57w             1/1     Terminating   0          23h</div><div class="line">kube-flannel-ds-amd64-blwzz             1/1     Terminating   0          158d</div><div class="line">kube-flannel-ds-amd64-lmmvh             1/1     Terminating   0          158d</div><div class="line">kube-flannel-ds-amd64-tql5w             1/1     Terminating   0          23h</div><div class="line">kube-proxy-czhfc                        1/1     Running       0          158d</div><div class="line">kube-proxy-gzhqw                        1/1     Running       0          41d</div><div class="line">kube-proxy-rfxjw                        1/1     Running       0          158d</div><div class="line">kube-proxy-xmkxq                        1/1     Running       0          158d</div><div class="line">kube-scheduler-spark32                  1/1     Running       0          158d</div><div class="line">kubernetes-dashboard-5f7b999d65-ngrr7   1/1     Running       0          2d1h</div></pre></td></tr></table></figure></p>
+<p><strong>【注意】:正常在生产环境不能这么搞，flannel一删除，所有Pod都不能运行了，因为没有网络。系统刚装完就要去调整flannel。</strong><br>等flannel的pod都终止完成，在重新创建：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">[root@spark32 flannel]# kubectl apply -f kube-flannel.yml         </div><div class="line">podsecuritypolicy.policy/psp.flannel.unprivileged created</div><div class="line">clusterrole.rbac.authorization.k8s.io/flannel created</div><div class="line">clusterrolebinding.rbac.authorization.k8s.io/flannel created</div><div class="line">serviceaccount/flannel created</div><div class="line">configmap/kube-flannel-cfg created</div><div class="line">daemonset.apps/kube-flannel-ds-amd64 created</div><div class="line">daemonset.apps/kube-flannel-ds-arm64 created</div><div class="line">daemonset.apps/kube-flannel-ds-arm created</div><div class="line">daemonset.apps/kube-flannel-ds-ppc64le created</div><div class="line">daemonset.apps/kube-flannel-ds-s390x created</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/219.png" alt=""></p>
+<p>在测试下跨节点通信：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">[root@spark32 flannel]# kubectl get pods -o wide</div><div class="line">NAME                            READY   STATUS    RESTARTS   AGE    IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">myapp-deploy-675558bfc5-4sn9w   1/1     Running   0          101m   10.244.3.22   hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-675558bfc5-7qn59   1/1     Running   0          101m   10.244.2.93   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-675558bfc5-jww2c   1/1     Running   0          101m   10.244.1.56   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">[root@spark32 flannel]# kubectl exec myapp-deploy-675558bfc5-7qn59 -it -- /bin/sh</div><div class="line">/ # ping 10.244.1.56</div><div class="line">PING 10.244.1.56 (10.244.1.56): 56 data bytes</div><div class="line">64 bytes from 10.244.1.56: seq=0 ttl=62 time=0.629 ms</div><div class="line">64 bytes from 10.244.1.56: seq=1 ttl=62 time=0.573 ms</div><div class="line">64 bytes from 10.244.1.56: seq=2 ttl=62 time=0.516 ms</div></pre></td></tr></table></figure></p>
+<p>在物理节点上抓ICMP包，这时能抓到了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark17 ~]# tcpdump -i enp0s25 -nn icmp</div><div class="line">tcpdump: verbose output suppressed, use -v or -vv for full protocol decode</div><div class="line">listening on enp0s25, link-type EN10MB (Ethernet), capture size 65535 bytes</div><div class="line">13:39:01.090246 IP 10.244.2.93 &gt; 10.244.1.56: ICMP echo request, id 3328, seq 0, length 64</div><div class="line">13:39:01.090349 IP 10.244.1.56 &gt; 10.244.2.93: ICMP echo reply, id 3328, seq 0, length 64</div><div class="line">13:39:02.007033 IP 10.244.2.93 &gt; 10.244.1.56: ICMP echo request, id 3328, seq 1, length 64</div><div class="line">13:39:02.007133 IP 10.244.1.56 &gt; 10.244.2.93: ICMP echo reply, id 3328, seq 1, length 64</div></pre></td></tr></table></figure></p>
+<p>这和物理桥接很相像了。但是如果两个节点是跨网段的，会直接降级为overlay。</p>
+<p><strong>如果想要使用host-gw模式，修改如下：</strong><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/220.png" alt=""><br>host-gw要求k8s节点必须在同一个网络，不允许跨网段。这种方式有个缺陷，那么多的Pod，成千上万个都在同一个二层网络中，不隔网段，将来一旦有广播报文，大家都会受到影响。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"><i class="fa fa-tag"></i>Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/12/Kubernetes-dashboard认证及分级授权/" rel="next" title="Kubernetes dashboard认证及分级授权">
+                <i class="fa fa-chevron-left"></i> Kubernetes dashboard认证及分级授权
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/18/基于canel的网络策略/" rel="prev" title="基于canel的网络策略">
+                基于canel的网络策略 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#docker的4种常用的网络模型"><span class="nav-number">1.</span> <span class="nav-text">docker的4种常用的网络模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes网络通信"><span class="nav-number">2.</span> <span class="nav-text">Kubernetes网络通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#flannel介绍"><span class="nav-number">3.</span> <span class="nav-text">flannel介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署flannel"><span class="nav-number">4.</span> <span class="nav-text">部署flannel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#flannel的配置参数"><span class="nav-number">5.</span> <span class="nav-text">flannel的配置参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例1：抓包看flannel的默认vxlan报文通信"><span class="nav-number">6.</span> <span class="nav-text">示例1：抓包看flannel的默认vxlan报文通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例2：配置使用Directrouting的通信方式"><span class="nav-number">7.</span> <span class="nav-text">示例2：配置使用Directrouting的通信方式</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共288.2k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>
