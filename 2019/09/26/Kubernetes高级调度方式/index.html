@@ -1,0 +1,953 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="scheduler调度过程概述scheduler在实现调度时，分为三步实现调度过程。首先是预选，从所有节点当中选择基本符合条件的节点；而后在众多符合条件的节点当中，在使用优选函数去计算各自的得分并且加以比较，并从最高得分的节点当中随机选择出一个作为运行Pod的节点。这就是控制平面当中scheduler所实现负责的主要工作。">
+<meta name="keywords" content="Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes高级调度方式">
+<meta property="og:url" content="http://yoursite.com/2019/09/26/Kubernetes高级调度方式/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="scheduler调度过程概述scheduler在实现调度时，分为三步实现调度过程。首先是预选，从所有节点当中选择基本符合条件的节点；而后在众多符合条件的节点当中，在使用优选函数去计算各自的得分并且加以比较，并从最高得分的节点当中随机选择出一个作为运行Pod的节点。这就是控制平面当中scheduler所实现负责的主要工作。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/230.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/231.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/232.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/233.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/234.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/235.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/236.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/237.png">
+<meta property="og:updated_time" content="2019-09-26T01:20:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kubernetes高级调度方式">
+<meta name="twitter:description" content="scheduler调度过程概述scheduler在实现调度时，分为三步实现调度过程。首先是预选，从所有节点当中选择基本符合条件的节点；而后在众多符合条件的节点当中，在使用优选函数去计算各自的得分并且加以比较，并从最高得分的节点当中随机选择出一个作为运行Pod的节点。这就是控制平面当中scheduler所实现负责的主要工作。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/230.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> Kubernetes高级调度方式 | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Kubernetes高级调度方式
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-09-26T09:10:06+08:00" content="2019-09-26">
+              2019-09-26
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-09-26T09:20:42+08:00" content="2019-09-26">
+              2019-09-26
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/09/26/Kubernetes高级调度方式/" class="leancloud_visitors" data-flag-title="Kubernetes高级调度方式">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="scheduler调度过程概述"><a href="#scheduler调度过程概述" class="headerlink" title="scheduler调度过程概述"></a>scheduler调度过程概述</h2><p>scheduler在实现调度时，分为三步实现调度过程。首先是预选，从所有节点当中选择基本符合条件的节点；而后在众多符合条件的节点当中，在使用优选函数去计算各自的得分并且加以比较，并从最高得分的节点当中随机选择出一个作为运行Pod的节点。这就是控制平面当中scheduler所实现负责的主要工作。<a id="more"></a><br>同时如果在某些调度场景当中，我们期望通过自己的预设去影响它的一些调度方式，比如把Pod运行在一些特定的节点之上，可以通过自己的预设操作来影响scheduler的预选和优选的过程，从而使用调度操作能符合我们的期望。<br>此类的影响方式通常有3种，我们通常称为高级调度设置机制：<br><strong>节点选择器: nodeSelector, nodeName</strong><br><strong>节点亲和调度: nodeAffinity</strong></p>
+<h2 id="示例1：nodeSelector"><a href="#示例1：nodeSelector" class="headerlink" title="示例1：nodeSelector"></a>示例1：nodeSelector</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# mkdir schedule</div><div class="line">[root@spark32 manifests]# cd schedule/</div><div class="line">[root@spark32 schedule]# vim pod-demo.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-schedule-demo</div><div class="line">  namespace: default</div><div class="line">  labels:</div><div class="line">    app: myapp</div><div class="line">    tier: frontend</div><div class="line">  annotations:</div><div class="line">    wisedu.com/created-by: &quot;cluster admin&quot;</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: myapp</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">  nodeSelector:</div><div class="line">    disktype: ssd</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/230.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl get nodes --show-labels</div><div class="line">NAME       STATUS   ROLES    AGE    VERSION   LABELS</div><div class="line">hadoop16   Ready    &lt;none&gt;   40d    v1.14.1   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=hadoop16,kubernetes.io/os=linux</div><div class="line">spark17    Ready    &lt;none&gt;   157d   v1.14.1   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=spark17,kubernetes.io/os=linux</div><div class="line">spark32    Ready    master   157d   v1.14.1   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=spark32,kubernetes.io/os=linux,node-role.kubernetes.io/master=</div><div class="line">ubuntu31   Ready    &lt;none&gt;   157d   v1.14.1   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,disktype=ssd,kubernetes.io/arch=amd64,kubernetes.io/hostname=ubuntu31,kubernetes.io/os=linux</div><div class="line">[root@spark32 manifests]# kubectl get pods -o wide</div><div class="line">NAME                READY   STATUS    RESTARTS   AGE     IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">pod-schedule-demo   1/1     Running   0          2m19s   10.244.2.76   ubuntu31   &lt;none&gt;           &lt;none&gt;</div></pre></td></tr></table></figure></p>
+<p>此前在集群中一个节点ubuntu31上打上过标签 disktype=ssd，所以这个Pod运行会运行在这个节点上。打标签和删除标签的方式如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl label node ubuntu31 disktype=ssd</div><div class="line">node/ubuntu31 labeled</div><div class="line">[root@spark32 manifests]# kubectl label node ubuntu31 disktype-</div><div class="line">node/ubuntu31 labeled</div></pre></td></tr></table></figure></p>
+<p>当从node节点上删除这个 disktype=ssd 标签，只要删除前pod已经运行在这个节点上，那么删除这个标签，pod依然会运行着，不会因此而终止。<br>现在来修改下这个pod的nodeSelector的值，需要先删除这个pod，修改完重新apply一下这个清单文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl delete -f pod-demo.yaml </div><div class="line">pod &quot;pod-schedule-demo&quot; deleted</div><div class="line">[root@spark32 schedule]# vim pod-demo.yaml</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/231.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl apply -f pod-demo.yaml </div><div class="line">pod/pod-schedule-demo created</div><div class="line">[root@spark32 schedule]# kubectl get pods</div><div class="line">NAME                READY   STATUS    RESTARTS   AGE</div><div class="line">pod-schedule-demo   0/1     Pending   0          8s</div></pre></td></tr></table></figure></p>
+<p>此时pod一直处于pending状态。这也就意味着nodeSelector是强约束，在预选阶段就不能满足了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl describe pod pod-schedule-demo</div><div class="line">Events:</div><div class="line">  Type     Reason            Age                From               Message</div><div class="line">  ----     ------            ----               ----               -------</div><div class="line">  Warning  FailedScheduling  10s (x3 over 79s)  default-scheduler  0/4 nodes are available: 4 node(s) didn&apos;t match node selector.</div></pre></td></tr></table></figure></p>
+<p>给集群中其中一个节点打上该标签，pod立马被调度到这台节点上运行了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl label node spark17 disktype=harddisk</div><div class="line">node/spark17 labeled</div><div class="line">[root@spark32 schedule]# kubectl get pods -o wide</div><div class="line">NAME                READY   STATUS    RESTARTS   AGE     IP            NODE      NOMINATED NODE   READINESS GATES</div><div class="line">pod-schedule-demo   1/1     Running   0          2m25s   10.244.1.36   spark17   &lt;none&gt;           &lt;none&gt;</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl delete -f pod-demo.yaml </div><div class="line">pod &quot;pod-schedule-demo&quot; deleted</div></pre></td></tr></table></figure>
+<h2 id="示例2：pods-spec-affinity中nodeAffinity"><a href="#示例2：pods-spec-affinity中nodeAffinity" class="headerlink" title="示例2：pods.spec.affinity中nodeAffinity"></a>示例2：pods.spec.affinity中nodeAffinity</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain pods.spec.affinity</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: affinity &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     If specified, the pod&apos;s scheduling constraints</div><div class="line"></div><div class="line">     Affinity is a group of affinity scheduling rules.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   nodeAffinity &lt;Object&gt;</div><div class="line">     Describes node affinity scheduling rules for the pod.</div><div class="line"></div><div class="line">   podAffinity  &lt;Object&gt;</div><div class="line">     Describes pod affinity scheduling rules (e.g. co-locate this pod in the</div><div class="line">     same node, zone, etc. as some other pod(s)).</div><div class="line"></div><div class="line">   podAntiAffinity      &lt;Object&gt;</div><div class="line">     Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod</div><div class="line">     in the same node, zone, etc. as some other pod(s)).</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain pods.spec.affinity.nodeAffinity</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: nodeAffinity &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Describes node affinity scheduling rules for the pod.</div><div class="line"></div><div class="line">     Node affinity is a group of node affinity scheduling rules.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   preferredDuringSchedulingIgnoredDuringExecution      &lt;[]Object&gt;</div><div class="line">     The scheduler will prefer to schedule pods to nodes that satisfy the</div><div class="line">     affinity expressions specified by this field, but it may choose a node that</div><div class="line">     violates one or more of the expressions. The node that is most preferred is</div><div class="line">     the one with the greatest sum of weights, i.e. for each node that meets all</div><div class="line">     of the scheduling requirements (resource request, requiredDuringScheduling</div><div class="line">     affinity expressions, etc.), compute a sum by iterating through the</div><div class="line">     elements of this field and adding &quot;weight&quot; to the sum if the node matches</div><div class="line">     the corresponding matchExpressions; the node(s) with the highest sum are</div><div class="line">     the most preferred.</div><div class="line"></div><div class="line">   requiredDuringSchedulingIgnoredDuringExecution       &lt;Object&gt;</div><div class="line">     If the affinity requirements specified by this field are not met at</div><div class="line">     scheduling time, the pod will not be scheduled onto the node. If the</div><div class="line">     affinity requirements specified by this field cease to be met at some point</div><div class="line">     during pod execution (e.g. due to an update), the system may or may not try</div><div class="line">     to eventually evict the pod from its node.</div></pre></td></tr></table></figure>
+<ul>
+<li>preferredDuringSchedulingIgnoredDuringExecution      &lt;[]Object&gt;<br>倾向，尽量满足的条件。不满足也行。尽量运行在满足这里定义的亲和条件的节点上。</li>
+<li>requiredDuringSchedulingIgnoredDuringExecution       <object><br>硬亲和性，必须得满足的条件。如果用required，实现的效果就和nodeSelector一样，如果没有任何节点满足这里的亲和定义，那么一定不会去运行，就处于pending状态了。</object></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# kubectl explain pods.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: requiredDuringSchedulingIgnoredDuringExecution &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     If the affinity requirements specified by this field are not met at</div><div class="line">     scheduling time, the pod will not be scheduled onto the node. If the</div><div class="line">     affinity requirements specified by this field cease to be met at some point</div><div class="line">     during pod execution (e.g. due to an update), the system may or may not try</div><div class="line">     to eventually evict the pod from its node.</div><div class="line"></div><div class="line">     A node selector represents the union of the results of one or more label</div><div class="line">     queries over a set of nodes; that is, it represents the OR of the selectors</div><div class="line">     represented by the node selector terms.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   nodeSelectorTerms    &lt;[]Object&gt; -required-</div><div class="line">     Required. A list of node selector terms. The terms are ORed.</div><div class="line"></div><div class="line">You have mail in /var/spool/mail/root</div><div class="line">[root@spark32 ~]# kubectl explain pods.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: nodeSelectorTerms &lt;[]Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Required. A list of node selector terms. The terms are ORed.</div><div class="line"></div><div class="line">     A null or empty node selector term matches no objects. The requirements of</div><div class="line">     them are ANDed. The TopologySelectorTerm type implements a subset of the</div><div class="line">     NodeSelectorTerm.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   matchExpressions     &lt;[]Object&gt;</div><div class="line">     A list of node selector requirements by node&apos;s labels.</div><div class="line"></div><div class="line">   matchFields  &lt;[]Object&gt;</div><div class="line">     A list of node selector requirements by node&apos;s fields.</div></pre></td></tr></table></figure>
+<ul>
+<li>matchExpressions     &lt;[]Object&gt;<br>A list of node selector requirements by node’s labels. 匹配表达式的</li>
+<li>matchFields  &lt;[]Object&gt;<br>A list of node selector requirements by node’s fields. 匹配字段的</li>
+</ul>
+<p>下面定义示例yaml文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# vim pod-nodeaffinity.yaml </div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-nodeaffinity-demo</div><div class="line">  namespace: default</div><div class="line">  labels:</div><div class="line">    app: myapp</div><div class="line">    tier: frontend</div><div class="line">  annotations:</div><div class="line">    wisedu.com/created-by: &quot;cluster admin&quot;</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: myapp</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">  affinity:</div><div class="line">    nodeAffinity:</div><div class="line">      requiredDuringSchedulingIgnoredDuringExecution:</div><div class="line">        nodeSelectorTerms:</div><div class="line">        - matchExpressions:</div><div class="line">          - key: zone</div><div class="line">            operator: In</div><div class="line">            values: [&quot;foo&quot;, &quot;bar&quot;]</div><div class="line">[root@spark32 schedule]# kubectl apply -f pod-nodeaffinity.yaml </div><div class="line">pod/pod-nodeaffinity-demo created</div></pre></td></tr></table></figure></p>
+<p>清单中定义的是硬亲和性，目前还没有节点拥有标签zone，并且值在foo和bar内。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl get pods</div><div class="line">NAME                    READY   STATUS    RESTARTS   AGE</div><div class="line">pod-nodeaffinity-demo   0/1     Pending   0          5s</div></pre></td></tr></table></figure></p>
+<p>找一个集群中的节点打上一个标签 zone=bar:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl label node hadoop16 zone=bar</div><div class="line">node/hadoop16 labeled</div><div class="line">[root@spark32 schedule]# kubectl get pods</div><div class="line">NAME                     READY   STATUS    RESTARTS   AGE</div><div class="line">pod-nodeaffinity-demo    1/1     Running   0          11m</div></pre></td></tr></table></figure></p>
+<p>删除标签和pod：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl label node hadoop16 zone-</div><div class="line">node/hadoop16 labeled</div><div class="line">[root@spark32 schedule]# kubectl delete -f pod-nodeaffinity.yaml </div><div class="line">pod &quot;pod-nodeaffinity-demo&quot; deleted</div></pre></td></tr></table></figure></p>
+<p>下面定义一个软亲和性的清单文件（即使定义的条件不满足，也会勉为其难地找一个节点运行pod）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# vim pod-nodeaffinity-demo2.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-nodeaffinity-demo2</div><div class="line">  namespace: default</div><div class="line">  labels:</div><div class="line">    app: myapp</div><div class="line">    tier: frontend</div><div class="line">  annotations:</div><div class="line">    wisedu.com/created-by: &quot;cluster admin&quot;</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: myapp</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">  affinity:</div><div class="line">    nodeAffinity:</div><div class="line">      preferredDuringSchedulingIgnoredDuringExecution:</div><div class="line">      - preference:</div><div class="line">          matchExpressions:</div><div class="line">          - key: zone</div><div class="line">            operator: In</div><div class="line">            values: [&quot;foo&quot;, &quot;bar&quot;]</div><div class="line">        weight: 60</div><div class="line">[root@spark32 schedule]# kubectl apply -f pod-nodeaffinity-demo2.yaml </div><div class="line">pod/pod-nodeaffinity-demo2 created</div><div class="line">[root@spark32 schedule]# kubectl get pods</div><div class="line">NAME                     READY   STATUS    RESTARTS   AGE</div><div class="line">pod-nodeaffinity-demo2   1/1     Running   0          6s</div></pre></td></tr></table></figure></p>
+<p>删除这个pod：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl delete -f pod-nodeaffinity-demo2.yaml </div><div class="line">pod &quot;pod-nodeaffinity-demo2&quot; deleted</div></pre></td></tr></table></figure></p>
+<h2 id="示例3：pods-spec-affinity中的podAffinity和podAntiAffinity"><a href="#示例3：pods-spec-affinity中的podAffinity和podAntiAffinity" class="headerlink" title="示例3：pods.spec.affinity中的podAffinity和podAntiAffinity"></a>示例3：pods.spec.affinity中的podAffinity和podAntiAffinity</h2><p>一般是出于高效通信的需求，偶尔需要把一些pod对象组织在相近的位置，比如运行在同一节点，同一机架，同一区域，同一地区等等，这样子pod和pod通信效率更高。<br>主要目的是把pod运行在一起，或不运行在一起，其实通过节点亲和性就能达到目的。比如3个Pod，NMP，使用3个同样的节点标签，而后我们在节点上打标签的时候就确保它3个选择的标签的节点就在同一个位置，就在同一个机架上，也能达到这个目的。但是为何还要定义pod亲和性和反亲和性呢？是因为使用节点亲和性去限制pod，它不是一种较优的选择方式，需要精心布局节点是被打上什么标签的才能实现目的。这种方式使用起来可能难度较大。<br>较理想的方式是，允许调度器把第一个Pod随机选择一个位置，但是第二个Pod就要根据第一个pod所在的位置来进行调度。Pod的亲和性并不强制一定要在同一个节点，相近的就可以了。所以要定义什么叫同一位置，什么叫不同位置。<br>如何判定是哪些节点是相同位置，哪些节点是不同位置是需要定义的。比如现在有4个正常运行的主机，当第一个Pod运行在第一个节点上之后，如何判定第2、3、4节点是否可以运行与第一个Pod亲和的Pod？比如NMP是亲和的，N被放在了第一个节点，M是应该放在第一个节点上，还是其他节点都不能放？Pod的亲和性并不强制一定要在同一个节点，非要把NMP放在同一个节点，假如这个节点资源不够，这样也不是一个最佳选择。比如我们定义，把N、M、P分别运行在一个节点上，只要这3个节点在一个机柜内，那就认为这是满足亲和条件的。所以在定义Pod亲和性时必须有个判断前提，Pod和Pod要在同一位置和不要在同一位置的判断标准是什么。因此什么叫同一位置，什么叫不同位置就很关键了。当以节点名称来判定这几个节点是不是同一位置，很显然这4个节点都是不同的位置。节点名相同的就认为是同一位置，不同的就认为是不同位置。所以如果把N这个Pod运行在节点1上，M和P也是会被调度到节点1上的。<br>换个判定标准，比如判定是否是同一位置的标准是：节点标签rack(机架)相同的就是同一位置。比如rack=rack1，两个节点都有这个标签，并且值为rack1的，那么两个节点就是同一位置。另外两个节点的标签是rack=rack2。所以此时假如第一个Pod运行在第一个节点上，也就是rack=rack1的节点上，那么M和P可以运行在第一个和第二个节点上。</p>
+<h3 id="podAffinity"><a href="#podAffinity" class="headerlink" title="podAffinity"></a>podAffinity</h3><p>Pod亲和性也有硬亲和性和软亲和性。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain pods.spec.affinity.podAffinity</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: podAffinity &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Describes pod affinity scheduling rules (e.g. co-locate this pod in the</div><div class="line">     same node, zone, etc. as some other pod(s)).</div><div class="line"></div><div class="line">     Pod affinity is a group of inter pod affinity scheduling rules.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   preferredDuringSchedulingIgnoredDuringExecution      &lt;[]Object&gt;</div><div class="line">     The scheduler will prefer to schedule pods to nodes that satisfy the</div><div class="line">     affinity expressions specified by this field, but it may choose a node that</div><div class="line">     violates one or more of the expressions. The node that is most preferred is</div><div class="line">     the one with the greatest sum of weights, i.e. for each node that meets all</div><div class="line">     of the scheduling requirements (resource request, requiredDuringScheduling</div><div class="line">     affinity expressions, etc.), compute a sum by iterating through the</div><div class="line">     elements of this field and adding &quot;weight&quot; to the sum if the node has pods</div><div class="line">     which matches the corresponding podAffinityTerm; the node(s) with the</div><div class="line">     highest sum are the most preferred.</div><div class="line"></div><div class="line">   requiredDuringSchedulingIgnoredDuringExecution       &lt;[]Object&gt;</div><div class="line">     If the affinity requirements specified by this field are not met at</div><div class="line">     scheduling time, the pod will not be scheduled onto the node. If the</div><div class="line">     affinity requirements specified by this field cease to be met at some point</div><div class="line">     during pod execution (e.g. due to a pod label update), the system may or</div><div class="line">     may not try to eventually evict the pod from its node. When there are</div><div class="line">     multiple elements, the lists of nodes corresponding to each podAffinityTerm</div><div class="line">     are intersected, i.e. all terms must be satisfied.</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain pods.spec.affinity.podAffinity.requiredDuringSchedulingIgnoredDuringExecution</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: requiredDuringSchedulingIgnoredDuringExecution &lt;[]Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     If the affinity requirements specified by this field are not met at</div><div class="line">     scheduling time, the pod will not be scheduled onto the node. If the</div><div class="line">     affinity requirements specified by this field cease to be met at some point</div><div class="line">     during pod execution (e.g. due to a pod label update), the system may or</div><div class="line">     may not try to eventually evict the pod from its node. When there are</div><div class="line">     multiple elements, the lists of nodes corresponding to each podAffinityTerm</div><div class="line">     are intersected, i.e. all terms must be satisfied.</div><div class="line"></div><div class="line">     Defines a set of pods (namely those matching the labelSelector relative to</div><div class="line">     the given namespace(s)) that this pod should be co-located (affinity) or</div><div class="line">     not co-located (anti-affinity) with, where co-located is defined as running</div><div class="line">     on a node whose value of the label with key &lt;topologyKey&gt; matches that of</div><div class="line">     any node on which a pod of the set of pods is running</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   labelSelector        &lt;Object&gt;</div><div class="line">     A label query over a set of resources, in this case pods.</div><div class="line"></div><div class="line">   namespaces   &lt;[]string&gt;</div><div class="line">     namespaces specifies which namespaces the labelSelector applies to (matches</div><div class="line">     against); null or empty list means &quot;this pod&apos;s namespace&quot;</div><div class="line"></div><div class="line">   topologyKey  &lt;string&gt; -required-</div><div class="line">     This pod should be co-located (affinity) or not co-located (anti-affinity)</div><div class="line">     with the pods matching the labelSelector in the specified namespaces, where</div><div class="line">     co-located is defined as running on a node whose value of the label with</div><div class="line">     key topologyKey matches that of any node on which any of the selected pods</div><div class="line">     is running. Empty topologyKey is not allowed.</div></pre></td></tr></table></figure>
+<ul>
+<li>labelSelector        <object><br>A label query over a set of resources, in this case pods. 和哪个Pod亲和，用来选定一组pod</object></li>
+<li>namespaces   &lt;[]string&gt;<br>namespaces specifies which namespaces the labelSelector applies to (matches against); null or empty list means “this pod’s namespace” 指明labelSelector匹配到一组pod到底是哪个名称空间的，不指意味着与要创建的新pod一个名称空间的</li>
+<li>topologyKey  <string> -required-<br>位置拓扑的键，用来判定是不是同一个位置。用哪个键来判定是不是同一位置</string></li>
+</ul>
+<p><strong>接下来定义两个pod，第一个是基准，第二个跟第一个走。</strong><br>每一个节点都有个标签叫 kubernetes.io/hostname。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get nodes --show-labels</div><div class="line">NAME       STATUS   ROLES    AGE    VERSION   LABELS</div><div class="line">hadoop16   Ready    &lt;none&gt;   40d    v1.14.1   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=hadoop16,kubernetes.io/os=linux</div><div class="line">spark17    Ready    &lt;none&gt;   157d   v1.14.1   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,disktype=harddisk,kubernetes.io/arch=amd64,kubernetes.io/hostname=spark17,kubernetes.io/os=linux</div><div class="line">spark32    Ready    master   157d   v1.14.1   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=spark32,kubernetes.io/os=linux,node-role.kubernetes.io/master=</div><div class="line">ubuntu31   Ready    &lt;none&gt;   157d   v1.14.1   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,disktype=ssd,kubernetes.io/arch=amd64,kubernetes.io/hostname=ubuntu31,kubernetes.io/os=linux</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# vim pod-podaffinity-demo.yaml </div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-podaffinity-first</div><div class="line">  labels:</div><div class="line">    app: myapp</div><div class="line">    tier: frontend</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: myapp</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">---</div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-podaffinity-second</div><div class="line">  namespace: default</div><div class="line">  labels:</div><div class="line">    app: backend</div><div class="line">    tier: db</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: busybox</div><div class="line">    image: busybox:latest</div><div class="line">    imagePullPolicy: IfNotPresent</div><div class="line">    command: [&quot;sh&quot;, &quot;-c&quot;, &quot;sleep 3600&quot;]</div><div class="line">  affinity:</div><div class="line">    podAffinity:</div><div class="line">      requiredDuringSchedulingIgnoredDuringExecution:</div><div class="line">      - labelSelector:</div><div class="line">          matchExpressions:</div><div class="line">          #- &#123;key: app, operator: In, values: [&quot;myapp&quot;]&#125;</div><div class="line">          - key: app</div><div class="line">            operator: In</div><div class="line">            values: [&quot;myapp&quot;]</div><div class="line">        topologyKey: kubernetes.io/hostname</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/232.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl apply -f pod-podaffinity-demo.yaml </div><div class="line">pod/pod-podaffinity-first created</div><div class="line">pod/pod-podaffinity-second created</div><div class="line">[root@spark32 schedule]# kubectl get pods -o wide</div><div class="line">NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">pod-podaffinity-first    1/1     Running   0          7s    10.244.2.77   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">pod-podaffinity-second   1/1     Running   0          6s    10.244.2.78   ubuntu31   &lt;none&gt;           &lt;none&gt;</div></pre></td></tr></table></figure></p>
+<p>两个pod都运行在第二个节点上。<br>删除这两个pod：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl delete -f pod-podaffinity-demo.yaml </div><div class="line">pod &quot;pod-podaffinity-first&quot; deleted</div><div class="line">pod &quot;pod-podaffinity-second&quot; deleted</div></pre></td></tr></table></figure></p>
+<h3 id="podAntiAffinity"><a href="#podAntiAffinity" class="headerlink" title="podAntiAffinity"></a>podAntiAffinity</h3><p>podAffinity和podAntiAffinity区别是：二者的标签的值不能是相同的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# vim pod-podantiaffinity-demo.yaml</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/233.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl apply -f pod-podantiaffinity-demo.yaml</div><div class="line">pod/pod-podaffinity-first created</div><div class="line">pod/pod-podaffinity-second created</div><div class="line">[root@spark32 schedule]# kubectl get pods -o wide</div><div class="line">NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">pod-podaffinity-first    1/1     Running   0          7s    10.244.2.79   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">pod-podaffinity-second   1/1     Running   0          7s    10.244.1.40   spark17    &lt;none&gt;           &lt;none&gt;</div></pre></td></tr></table></figure></p>
+<p>一定不在同一个节点上。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl delete -f pod-podantiaffinity-demo.yaml</div><div class="line">pod &quot;pod-podaffinity-first&quot; deleted</div><div class="line">pod &quot;pod-podaffinity-second&quot; deleted</div></pre></td></tr></table></figure></p>
+<p>将集群中的三个node节点，都打上同一个标签 zone=foo，其中spark32为master节点：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl get nodes</div><div class="line">NAME       STATUS   ROLES    AGE    VERSION</div><div class="line">hadoop16   Ready    &lt;none&gt;   40d    v1.14.1</div><div class="line">spark17    Ready    &lt;none&gt;   157d   v1.14.1</div><div class="line">spark32    Ready    master   157d   v1.14.1</div><div class="line">ubuntu31   Ready    &lt;none&gt;   157d   v1.14.1</div><div class="line">[root@spark32 schedule]# kubectl label node spark17 zone=foo</div><div class="line">node/spark17 labeled</div><div class="line">[root@spark32 schedule]# kubectl label node ubuntu31 zone=foo</div><div class="line">node/ubuntu31 labeled</div><div class="line">[root@spark32 schedule]# kubectl label node hadoop16 zone=foo</div><div class="line">node/hadoop16 labeled</div></pre></td></tr></table></figure></p>
+<p>修改 pod-podantiaffinity-demo.yaml 中topologyKey的值：<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/234.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl apply -f pod-podantiaffinity-demo.yaml </div><div class="line">pod/pod-podaffinity-first created</div><div class="line">pod/pod-podaffinity-second created</div><div class="line">[root@spark32 schedule]# kubectl get pods -o wide                                    </div><div class="line">NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">pod-podaffinity-first    1/1     Running   0          2s    10.244.2.81   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">pod-podaffinity-second   0/1     Pending   0          2s    &lt;none&gt;        &lt;none&gt;     &lt;none&gt;           &lt;none&gt;</div></pre></td></tr></table></figure></p>
+<p>第一个Pod在运行，第二个Pod处于pending状态。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl delete -f pod-podantiaffinity-demo.yaml     </div><div class="line">pod &quot;pod-podaffinity-first&quot; deleted</div><div class="line">pod &quot;pod-podaffinity-second&quot; deleted</div></pre></td></tr></table></figure></p>
+<h2 id="示例4：污点调度"><a href="#示例4：污点调度" class="headerlink" title="示例4：污点调度"></a>示例4：污点调度</h2><p>污点就是定义在节点上的键值数据。键值数据有三类：标签、注解、污点。污点是运行在节点上的，不像标签和注解，所有资源都能用。<br>这就给了节点选择权，给节点打一些污点，pod不容忍就不能运行上来。我们需要在Pod上定义容忍度。容忍度tolerations是Pod对象上的第三种键值数据。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl explain nodes</div><div class="line">[root@spark32 schedule]# kubectl explain nodes.spec</div><div class="line">[root@spark32 schedule]# kubectl explain nodes.spec.taints</div><div class="line">KIND:     Node</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: taints &lt;[]Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     If specified, the node&apos;s taints.</div><div class="line"></div><div class="line">     The node this Taint is attached to has the &quot;effect&quot; on any pod that does</div><div class="line">     not tolerate the Taint.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   effect       &lt;string&gt; -required-</div><div class="line">     Required. The effect of the taint on pods that do not tolerate the taint.</div><div class="line">     Valid effects are NoSchedule, PreferNoSchedule and NoExecute.</div><div class="line"></div><div class="line">   key  &lt;string&gt; -required-</div><div class="line">     Required. The taint key to be applied to a node.</div><div class="line"></div><div class="line">   timeAdded    &lt;string&gt;</div><div class="line">     TimeAdded represents the time at which the taint was added. It is only</div><div class="line">     written for NoExecute taints.</div><div class="line"></div><div class="line">   value        &lt;string&gt;</div><div class="line">     Required. The taint value corresponding to the taint key.</div></pre></td></tr></table></figure></p>
+<ul>
+<li>effect       <string> -required-<br>当Pod不能容忍这个污点时，要采取的行为是什么。taint的effect定义对Pod排斥效果: </string></li>
+<li>NoSchedule:仅影响调度过程,对现存的Pod对象不产生影响; </li>
+<li>NoExecute:既影响调度过程,也影响现在的Pod对象;不容忍的Pod对象将被驱逐; </li>
+<li>PreferNoSchedule: 不能容忍，但是没地方运行也可以过来运行。最好不，表示也可以。</li>
+</ul>
+<p>在Pod对象上定义容忍度的时候，还支持两种操作。<strong>等值比较和存在性判断</strong>。所谓等值比较，需要在key、value、effect上完全匹配。存在性判断表示二者的key和effect必须匹配，但是value可以使用空值，即判断存在不存在与否即可。一个节点可以配置多个污点，一个Pod也可以有多个容忍度。只不过二者匹配时要遵循如下的逻辑。<br>比如在Pod上定义了3个容忍度，在节点之上定义了2个污点，这个pod一定能运行在这个节点上吗？不一定，pod容忍了其中一个污点，另外一个没有容忍，这种情况是可能的。要逐一检查节点的污点，节点的每一个污点都必须被Pod容忍。如果某个污点被Pod的容忍度匹配到了，那么这个污点就过了，检查下一个。如果存在污点不被pod所容忍，就要看这个污点的条件了。如果这个污点的行为是PreferNoSchedule，那么事实上还是可以运行在这个节点上的。但是如果这个污点的行为是NoSchedule，就一定不能被调度到这个节点上了。<br>此前在运行pod时，没有一个pod会被调度到master节点上运行，是因为master上默认就有污点，我们定义的Pod都没有去定义容忍度去匹配master节点上的这个污点。master是用来运行集群控制平面组件的，可以看看这几个Pod，肯定定义了容忍度去匹配这个污点。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/235.png" alt=""><br>master节点上打的污点，value为空值，即判断表示存在不存在。<br>看下api-server这个pod中定义的容忍度：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl get pod kube-apiserver-spark32 -n kube-system -o yaml</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/236.png" alt=""></p>
+<p>管理节点的污点：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl taint --help</div><div class="line">Update the taints on one or more nodes.</div><div class="line"></div><div class="line">  *  A taint consists of a key, value, and effect. As an argument here, it is expressed as key=value:effect.</div><div class="line">  *  The key must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to</div><div class="line">253 characters.</div><div class="line">  *  Optionally, the key can begin with a DNS subdomain prefix and a single &apos;/&apos;, like example.com/my-app</div><div class="line">  *  The value must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up</div><div class="line">to  63 characters.</div><div class="line">  *  The effect must be NoSchedule, PreferNoSchedule or NoExecute.</div><div class="line">  *  Currently taint can only apply to node.</div><div class="line"></div><div class="line">Examples:</div><div class="line">  # Update node &apos;foo&apos; with a taint with key &apos;dedicated&apos; and value &apos;special-user&apos; and effect &apos;NoSchedule&apos;.</div><div class="line">  # If a taint with that key and effect already exists, its value is replaced as specified.</div><div class="line">  kubectl taint nodes foo dedicated=special-user:NoSchedule</div><div class="line">  </div><div class="line">  # Remove from node &apos;foo&apos; the taint with key &apos;dedicated&apos; and effect &apos;NoSchedule&apos; if one exists.</div><div class="line">  kubectl taint nodes foo dedicated:NoSchedule-</div><div class="line">  </div><div class="line">  # Remove from node &apos;foo&apos; all the taints with key &apos;dedicated&apos;</div><div class="line">  kubectl taint nodes foo dedicated-</div><div class="line">  </div><div class="line">  # Add a taint with key &apos;dedicated&apos; on nodes having label mylabel=X</div><div class="line">  kubectl taint node -l myLabel=X  dedicated=foo:PreferNoSchedule</div><div class="line"></div><div class="line">Options:</div><div class="line">      --all=false: Select all nodes in the cluster</div><div class="line">      --allow-missing-template-keys=true: If true, ignore any errors in templates when a field or map key is missing in</div><div class="line">the template. Only applies to golang and jsonpath output formats.</div><div class="line">  -o, --output=&apos;&apos;: Output format. One of:</div><div class="line">json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.</div><div class="line">      --overwrite=false: If true, allow taints to be overwritten, otherwise reject taint updates that overwrite existing</div><div class="line">taints.</div><div class="line">  -l, --selector=&apos;&apos;: Selector (label query) to filter on, supports &apos;=&apos;, &apos;==&apos;, and &apos;!=&apos;.(e.g. -l key1=value1,key2=value2)</div><div class="line">      --template=&apos;&apos;: Template string or path to template file to use when -o=go-template, -o=go-template-file. The</div><div class="line">template format is golang templates [http://golang.org/pkg/text/template/#pkg-overview].</div><div class="line">      --validate=true: If true, use a schema to validate the input before sending it</div><div class="line"></div><div class="line">Usage:</div><div class="line">  kubectl taint NODE NAME KEY_1=VAL_1:TAINT_EFFECT_1 ... KEY_N=VAL_N:TAINT_EFFECT_N [options]</div><div class="line"></div><div class="line">Use &quot;kubectl options&quot; for a list of global command-line options (applies to all commands).</div></pre></td></tr></table></figure></p>
+<p>现在集群中有3个node节点，给其中两个node节点打上污点如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl taint node spark17 node-type=production:NoSchedule         </div><div class="line">node/spark17 tainted</div><div class="line">[root@spark32 schedule]# kubectl taint node ubuntu31 node-type=production:NoSchedule </div><div class="line">node/ubuntu31 tainted</div><div class="line">[root@spark32 schedule]# kubectl get node ubuntu31 -o yaml</div><div class="line">...</div><div class="line">spec:</div><div class="line">  podCIDR: 10.244.2.0/24</div><div class="line">  taints:</div><div class="line">  - effect: NoSchedule</div><div class="line">    key: node-type</div><div class="line">    value: production</div><div class="line">...</div><div class="line">[root@spark32 schedule]# kubectl describe node ubuntu31</div><div class="line">...</div><div class="line">Taints:             node-type=production:NoSchedule</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p>定义一个Deployment，不定义其中Pod的污点容忍度：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# vim deploy-taint-demo.yaml </div><div class="line">apiVersion: apps/v1</div><div class="line">kind: Deployment</div><div class="line">metadata:</div><div class="line">  name: myapp-deploy</div><div class="line">  namespace: default</div><div class="line">spec:</div><div class="line">  replicas: 3</div><div class="line">  selector:</div><div class="line">    matchLabels:</div><div class="line">      app: myapp</div><div class="line">      release: canary</div><div class="line">  template:</div><div class="line">    metadata:</div><div class="line">      labels:</div><div class="line">        app: myapp</div><div class="line">        release: canary</div><div class="line">    spec:</div><div class="line">      containers:</div><div class="line">      - name: myapp</div><div class="line">        image: ikubernetes/myapp:v2</div><div class="line">        imagePullPolicy: IfNotPresent</div><div class="line">        ports:</div><div class="line">        - name: http</div><div class="line">          containerPort: 80</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl apply -f deploy-taint-demo.yaml </div><div class="line">deployment.apps/myapp-deploy created</div><div class="line">[root@spark32 schedule]# kubectl get pods -o wide</div><div class="line">NAME                            READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">myapp-deploy-675558bfc5-99xj9   1/1     Running   0          7s    10.244.3.18   hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-675558bfc5-scqtz   1/1     Running   0          7s    10.244.3.19   hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-675558bfc5-wsrdp   1/1     Running   0          7s    10.244.3.17   hadoop16   &lt;none&gt;           &lt;none&gt;</div></pre></td></tr></table></figure>
+<p>这样这个Deployment中的Pod都运行在没打污点的那个节点上。</p>
+<p>将没打污点的节点hadoop16也打上污点，并且effect为NoExecute：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl taint node hadoop16 node-type=production:NoExecute</div><div class="line">node/hadoop16 tainted</div><div class="line">[root@spark32 schedule]# kubectl get pods -o wide</div><div class="line">NAME                            READY   STATUS        RESTARTS   AGE     IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">myapp-deploy-675558bfc5-99xj9   1/1     Terminating   0          2m38s   10.244.3.18   hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-675558bfc5-bl5nk   0/1     Pending       0          2s      &lt;none&gt;        &lt;none&gt;     &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-675558bfc5-fdmq2   0/1     Pending       0          2s      &lt;none&gt;        &lt;none&gt;     &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-675558bfc5-scqtz   1/1     Terminating   0          2m38s   10.244.3.19   hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-675558bfc5-wsrdp   1/1     Terminating   0          2m38s   10.244.3.17   hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-675558bfc5-xd98m   0/1     Pending       0          2s      &lt;none&gt;        &lt;none&gt;     &lt;none&gt;           &lt;none&gt;</div><div class="line">[root@spark32 schedule]# kubectl get pods -o wide</div><div class="line">NAME                            READY   STATUS    RESTARTS   AGE   IP       NODE     NOMINATED NODE   READINESS GATES</div><div class="line">myapp-deploy-675558bfc5-bl5nk   0/1     Pending   0          18s   &lt;none&gt;   &lt;none&gt;   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-675558bfc5-fdmq2   0/1     Pending   0          18s   &lt;none&gt;   &lt;none&gt;   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-675558bfc5-xd98m   0/1     Pending   0          18s   &lt;none&gt;   &lt;none&gt;   &lt;none&gt;           &lt;none&gt;</div></pre></td></tr></table></figure></p>
+<p>运行在hadoop16上的pod被驱逐了。</p>
+<p><strong>下面看看如何在pod上定义tolerations。</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl explain pods.spec.tolerations</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: tolerations &lt;[]Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     If specified, the pod&apos;s tolerations.</div><div class="line"></div><div class="line">     The pod this Toleration is attached to tolerates any taint that matches the</div><div class="line">     triple &lt;key,value,effect&gt; using the matching operator &lt;operator&gt;.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   effect       &lt;string&gt;</div><div class="line">     Effect indicates the taint effect to match. Empty means match all taint</div><div class="line">     effects. When specified, allowed values are NoSchedule, PreferNoSchedule</div><div class="line">     and NoExecute.</div><div class="line"></div><div class="line">   key  &lt;string&gt;</div><div class="line">     Key is the taint key that the toleration applies to. Empty means match all</div><div class="line">     taint keys. If the key is empty, operator must be Exists; this combination</div><div class="line">     means to match all values and all keys.</div><div class="line"></div><div class="line">   operator     &lt;string&gt;</div><div class="line">     Operator represents a key&apos;s relationship to the value. Valid operators are</div><div class="line">     Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for</div><div class="line">     value, so that a pod can tolerate all taints of a particular category.</div><div class="line"></div><div class="line">   tolerationSeconds    &lt;integer&gt;</div><div class="line">     TolerationSeconds represents the period of time the toleration (which must</div><div class="line">     be of effect NoExecute, otherwise this field is ignored) tolerates the</div><div class="line">     taint. By default, it is not set, which means tolerate the taint forever</div><div class="line">     (do not evict). Zero and negative values will be treated as 0 (evict</div><div class="line">     immediately) by the system.</div><div class="line"></div><div class="line">   value        &lt;string&gt;</div><div class="line">     Value is the taint value the toleration matches to. If the operator is</div><div class="line">     Exists, the value should be empty, otherwise just a regular string.</div></pre></td></tr></table></figure></p>
+<ul>
+<li>tolerationSeconds：被驱逐时可以等待多久被驱逐，默认是0，立即驱逐。</li>
+</ul>
+<p>修改deploy-taint-demo.yaml，定义tolerations：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# vim deploy-taint-demo.yaml</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl apply -f deploy-taint-demo.yaml </div><div class="line">deployment.apps/myapp-deploy configured</div><div class="line">[root@spark32 schedule]# kubectl get pods -o wide    </div><div class="line">NAME                            READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">myapp-deploy-6bc4494c9b-695lm   1/1     Running   0          7s    10.244.1.43   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-6bc4494c9b-qjg2h   1/1     Running   0          11s   10.244.2.82   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-6bc4494c9b-qsslj   1/1     Running   0          9s    10.244.1.42   spark17    &lt;none&gt;           &lt;none&gt;</div></pre></td></tr></table></figure>
+<p>运行在了spark17和ubuntu31节点上。将spark17上污点的effect改为NoExecute：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl taint node spark17 node-type=production:NoExecute</div><div class="line">node/spark17 tainted</div><div class="line">[root@spark32 schedule]# kubectl get pods -o wide</div><div class="line">NAME                            READY   STATUS              RESTARTS   AGE    IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">myapp-deploy-6bc4494c9b-695lm   1/1     Terminating         0          96s    10.244.1.43   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-6bc4494c9b-mtxp2   0/1     ContainerCreating   0          2s     &lt;none&gt;        ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-6bc4494c9b-pl5j9   0/1     ContainerCreating   0          2s     &lt;none&gt;        ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-6bc4494c9b-qjg2h   1/1     Running             0          100s   10.244.2.82   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-6bc4494c9b-qsslj   0/1     Terminating         0          98s    10.244.1.42   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">[root@spark32 schedule]# kubectl get pods -o wide</div><div class="line">NAME                            READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">myapp-deploy-6bc4494c9b-mtxp2   1/1     Running   0          22s   10.244.2.84   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-6bc4494c9b-pl5j9   1/1     Running   0          22s   10.244.2.83   ubuntu31   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-6bc4494c9b-qjg2h   1/1     Running   0          2m    10.244.2.82   ubuntu31   &lt;none&gt;           &lt;none&gt;</div></pre></td></tr></table></figure></p>
+<p>如果想让pod调度到spark17和hadoop16上，必须使得effect值也一样。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/237.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@spark32 schedule]# kubectl apply -f deploy-taint-demo.yaml </div><div class="line">deployment.apps/myapp-deploy configured</div><div class="line">[root@spark32 schedule]# kubectl get pods -o wide</div><div class="line">NAME                            READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES</div><div class="line">myapp-deploy-84dd787cff-nz899   1/1     Running   0          8s    10.244.1.44   spark17    &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-84dd787cff-rcgwq   1/1     Running   0          5s    10.244.3.20   hadoop16   &lt;none&gt;           &lt;none&gt;</div><div class="line">myapp-deploy-84dd787cff-zjsr9   1/1     Running   0          11s   10.244.2.85   ubuntu31   &lt;none&gt;           &lt;none&gt;</div></pre></td></tr></table></figure></p>
+<p>去掉三个节点上的污点：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl taint node spark17 node-type-</div><div class="line">node/spark17 untainted</div><div class="line">[root@spark32 manifests]# kubectl taint node hadoop16 node-type-</div><div class="line">node/hadoop16 untainted</div><div class="line">[root@spark32 manifests]# kubectl taint node ubuntu31 node-type-</div><div class="line">node/ubuntu31 untainted</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"><i class="fa fa-tag"></i>Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/23/调度器、预选策略及优选函数/" rel="next" title="调度器、预选策略及优选函数">
+                <i class="fa fa-chevron-left"></i> 调度器、预选策略及优选函数
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">101</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#scheduler调度过程概述"><span class="nav-number">1.</span> <span class="nav-text">scheduler调度过程概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例1：nodeSelector"><span class="nav-number">2.</span> <span class="nav-text">示例1：nodeSelector</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例2：pods-spec-affinity中nodeAffinity"><span class="nav-number">3.</span> <span class="nav-text">示例2：pods.spec.affinity中nodeAffinity</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例3：pods-spec-affinity中的podAffinity和podAntiAffinity"><span class="nav-number">4.</span> <span class="nav-text">示例3：pods.spec.affinity中的podAffinity和podAntiAffinity</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#podAffinity"><span class="nav-number">4.1.</span> <span class="nav-text">podAffinity</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#podAntiAffinity"><span class="nav-number">4.2.</span> <span class="nav-text">podAntiAffinity</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例4：污点调度"><span class="nav-number">5.</span> <span class="nav-text">示例4：污点调度</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共297.9k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>
