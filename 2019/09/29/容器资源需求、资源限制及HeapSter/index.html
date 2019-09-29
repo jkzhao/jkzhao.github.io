@@ -1,0 +1,906 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="容器的资源需求和资源限制定义在容器级别的属性pods.spec.containers。目前支持定义CPU和内存资源。  requests: 需求,最低保障;  limits:限制,硬限制;">
+<meta name="keywords" content="Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="容器资源需求、资源限制及HeapSter">
+<meta property="og:url" content="http://yoursite.com/2019/09/29/容器资源需求、资源限制及HeapSter/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="容器的资源需求和资源限制定义在容器级别的属性pods.spec.containers。目前支持定义CPU和内存资源。  requests: 需求,最低保障;  limits:限制,硬限制;">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/238.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/239.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/240.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/241.png">
+<meta property="og:updated_time" content="2019-09-29T09:29:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="容器资源需求、资源限制及HeapSter">
+<meta name="twitter:description" content="容器的资源需求和资源限制定义在容器级别的属性pods.spec.containers。目前支持定义CPU和内存资源。  requests: 需求,最低保障;  limits:限制,硬限制;">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/238.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> 容器资源需求、资源限制及HeapSter | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                容器资源需求、资源限制及HeapSter
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-09-29T08:52:16+08:00" content="2019-09-29">
+              2019-09-29
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-09-29T17:29:30+08:00" content="2019-09-29">
+              2019-09-29
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/09/29/容器资源需求、资源限制及HeapSter/" class="leancloud_visitors" data-flag-title="容器资源需求、资源限制及HeapSter">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="容器的资源需求和资源限制"><a href="#容器的资源需求和资源限制" class="headerlink" title="容器的资源需求和资源限制"></a>容器的资源需求和资源限制</h2><p>定义在容器级别的属性pods.spec.containers。目前支持定义CPU和内存资源。</p>
+<ul>
+<li>requests: 需求,最低保障; </li>
+<li>limits:限制,硬限制; <a id="more"></a></li>
+</ul>
+<p>CPU: CPU资源属于可压缩型的，一个Pod或一个容器在获取本应该获得的CPU资源却获取不到时，无非就是等待就行了。<br>CPU的单位：在k8s之上，1颗逻辑CPU可以化为1000颗millicores，我这里称为毫核心或微核心。比如：500m=0.5CPU。</p>
+<p>内存: 但是对内存来讲不是如此，假如它所需要用到的内存资源不够时，有可能会因为内存资源耗尽而被kill掉。因为内存资源属于非可压缩性资源。单位为E、P、T、G、M、K 和 Ei、Pi、Ti、Gi、Mi、Ki，i表示1024。</p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/238.png" alt=""><br>在定义资源需求时，最好把资源限制也定义了，防止容器中的应用程序因为bug或其它原因把CPU都吃掉。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# mkdir resources</div><div class="line">[root@spark32 manifests]# cd resources/</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# kubectl explain pod.spec.containers.resources</div><div class="line">KIND:     Pod</div><div class="line">VERSION:  v1</div><div class="line"></div><div class="line">RESOURCE: resources &lt;Object&gt;</div><div class="line"></div><div class="line">DESCRIPTION:</div><div class="line">     Compute Resources required by this container. Cannot be updated. More info:</div><div class="line">     https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/</div><div class="line"></div><div class="line">     ResourceRequirements describes the compute resource requirements.</div><div class="line"></div><div class="line">FIELDS:</div><div class="line">   limits       &lt;map[string]string&gt;</div><div class="line">     Limits describes the maximum amount of compute resources allowed. More</div><div class="line">     info:</div><div class="line">     https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/</div><div class="line"></div><div class="line">   requests     &lt;map[string]string&gt;</div><div class="line">     Requests describes the minimum amount of compute resources required. If</div><div class="line">     Requests is omitted for a container, it defaults to Limits if that is</div><div class="line">     explicitly specified, otherwise to an implementation-defined value. More</div><div class="line">     info:</div><div class="line">     https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">[root@spark32 resources]# vim pod-resources-demo.yaml </div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-resources-demo</div><div class="line">  namespace: default</div><div class="line">  labels:</div><div class="line">    app: myapp</div><div class="line">    tier: frontend</div><div class="line">  annotations:</div><div class="line">    wisedu.com/created-by: &quot;cluster admin&quot;</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: myapp</div><div class="line">    image: ikubernetes/stress-ng</div><div class="line">    command: [&quot;/usr/bin/stress-ng&quot;, &quot;-c 1&quot;, &quot;--metrics-brief&quot;]</div><div class="line">    resources:</div><div class="line">      requests:</div><div class="line">        cpu: &quot;200m&quot;</div><div class="line">        memory: &quot;128Mi&quot;</div><div class="line">      limits:</div><div class="line">        cpu: &quot;500m&quot;</div><div class="line">        memory: &quot;512Mi&quot;</div><div class="line">[root@spark32 resources]# kubectl apply -f pod-resources-demo.yaml </div><div class="line">pod/pod-resources-demo created</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/239.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">[root@spark32 resources]# kubectl get pods -o wide</div><div class="line">NAME                 READY   STATUS    RESTARTS   AGE     IP            NODE      NOMINATED NODE   READINESS GATES</div><div class="line">pod-resources-demo   1/1     Running   0          5m27s   10.244.1.45   spark17   &lt;none&gt;           &lt;none&gt;</div><div class="line">[root@spark32 resources]# kubectl exec pod-resources-demo -- top    </div><div class="line">Mem: 7710724K used, 195564K free, 350524K shrd, 278040K buff, 4441320K cached</div><div class="line">CPU:  18% usr   2% sys   0% nic  78% idle   0% io   0% irq   0% sirq</div><div class="line">Load average: 0.00 0.01 0.05 3/566 11</div><div class="line">  PID  PPID USER     STAT   VSZ %VSZ CPU %CPU COMMAND</div><div class="line">    6     1 root     R     6888   0%   1  13% &#123;stress-ng-cpu&#125; /usr/bin/stress-ng</div><div class="line">    1     0 root     S     6244   0%   1   0% /usr/bin/stress-ng -c 1 --metrics-</div><div class="line">    7     0 root     R     1500   0%   3   0% top</div></pre></td></tr></table></figure></p>
+<p>pod运行在节点spark17上，这台服务器是4核CPU。而这个pod内的主程序占用CPU比例为13%，其实是12.5%，500m是0.5CPU，也就是1/8。<br>【说明】：容器的可见资源量和可用资源量不是一回事，在容器内使用free命令看到的是整个节点上的内存，而不会仅仅是当前容器中的内存，这会有问题的。比如，在一个容器中运行一个jvm，jvm上很多程序在跑起来要分堆内存的，如果在容器中看到的内存可用量不是容器的最大限额，而是节点的内存量，可能使用节点可用内存的%几十，这就比较麻烦。计算结果很可能会吞掉整个容器的内存都不够。所以目前来讲，在容器的资源限制，在这个维度上还是存在一些问题的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@spark32 resources]# kubectl describe pod pod-resources-demo</div><div class="line">...</div><div class="line">QoS Class:       Burstable</div><div class="line">...</div></pre></td></tr></table></figure>
+<p>QoS Class: 服务质量 类别。<br>在容器中限制了资源以后，系统会自动分配属于一个QoS类别。一般有3个类别：</p>
+<ul>
+<li>Guranteed: 确保保证。<br>这类Pod具有最高的优先级。最先可被运行起来<br>一个Pod中的每个容器同时设置CPU和内存的requests和limits，并且满足requests=limits<br>cpu.limits=cpu.requests<br>memory.limits=memory.request</li>
+<li>Burstable: 一个Pod中至少有一个容器设置CPU或内存资源的requests属性。<br>这类Pod具有中等优先级。</li>
+<li>BestEffort: 一个Pod中没有任何一个容器设置了requests或limits属性;<br>最低优先级别;</li>
+</ul>
+<p>创建一个新的清单文件，将requests和limits中的值都设置为一样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">[root@spark32 resources]# vim pod-resources-demo2.yaml </div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: pod-resources-demo2</div><div class="line">  namespace: default</div><div class="line">  labels:</div><div class="line">    app: myapp</div><div class="line">    tier: frontend</div><div class="line">  annotations:</div><div class="line">    wisedu.com/created-by: &quot;cluster admin&quot;</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">  - name: myapp</div><div class="line">    image: ikubernetes/myapp:v1</div><div class="line">    resources:</div><div class="line">      requests:</div><div class="line">        cpu: &quot;200m&quot;</div><div class="line">        memory: &quot;128Mi&quot;</div><div class="line">      limits:</div><div class="line">        cpu: &quot;200m&quot;</div><div class="line">        memory: &quot;128Mi&quot;</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@spark32 resources]# kubectl apply -f pod-resources-demo2.yaml </div><div class="line">pod/pod-resources-demo2 created</div><div class="line">[root@spark32 resources]# kubectl describe pod  pod-resources-demo2</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/240.png" alt=""><br>当系统上资源不够用时，会优先终止BestEffort类别的Pod，以腾出资源来确保另外两类Pod中的容器能够正常运行。假设系统上只有Burstable和Guranteed时，Burstable类别有很多Pod，先终止哪一个？因此需要有一种计算标准去终止。其实在k8s代码中有一段设置的是尽可能把它对应的request资源占用量比例较大的给关掉。比如现在有两个Pod，以内存为例，第一个Pod中limits是1Gi，requests是512Mi，此时已经占了500Mi，不会一上来就立马占用了512Mi。第二个Pod中limits是2Gi，requests是1Gi，此时已经占了512Mi。这两个Pod终止的是第一个，因为第一个占据的量已经接近它的requests的量了。认为第二个Pod是比较温和的，声称要1Gi，目前只用到了512Mi。而第一个声称要512Mi，现在已经用了500Mi。</p>
+<h2 id="Heapster"><a href="#Heapster" class="headerlink" title="Heapster"></a>Heapster</h2><h3 id="heapster介绍"><a href="#heapster介绍" class="headerlink" title="heapster介绍"></a>heapster介绍</h3><p>在k8s上创建运行了Pod后，想知道Pod到底占用了多少资源了，比如定义了limits为512Mi，requests是256Mi，现在想看看到底用了多少了。docker有命令docker status，k8s之上也有命令可以看kubectl top。但是现在没法用。这个top命令的使用依赖于集群上部署一个叫 heapster 的附件。包括此前部署的dashboard上有些资源使用显示也是依赖heapster的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 resources]# kubectl top nodes</div><div class="line">Error from server (NotFound): the server could not find the requested resource (get services http:heapster:)</div></pre></td></tr></table></figure></p>
+<p>统一的资源指标收集和存储工具，至少有个收集功能，当用户需要看的时候，它能联系到每一个节点上，通过每个节点上本地的agent来获取到这个节点之上的每一个进程甚至是节点本身的资源用量。传统的k8s集群中默认使用的指标采集和存储工具叫heapster，但是heapster只是个汇聚工具。在每个节点上运行的有一个组件叫kubelet，kubelet是可以获取当前节点上由它来创建和管理的各种资源对象尤其是Pod的相关信息数据的，但是真正完整去采集节点级和Pod的数据是kubelet当中的一个子组件，也是kubelet的插件叫 cAdvisor。早期的kubelet版本中1.8之后，这个cAdvisor已经是kubelet内建的功能了。cAdvisor专门负责收集当前节点上各Pod上的各容器以及节点级各种系统级资源指标的占用量。比如节点级的CPU、内存和存储用量，以及Pod级的各CPU、内存和存储用量。收集完后早期版本是支持单节点查看，现在不支持了。以前cAdvisor是监听在节点的4194端口，现在已经关掉了，不需要用户主动连接它来收集，而是由它来报告，报告给heapster。<br>heapster早期是专门为cAdvisor在每个节点上采集的数据为一个统一的存储工具。我们在集群上托管运行一个Pod，heapster。然后每个cAdvisor会去主动向heapster报告采集到的数据。heapster可以将数据缓存到内存中，但是内存是有限的，只能缓存一段时间的数据，以供kubectl top查看。如果想长期存储，得靠另外一个组件，heapster调用外部的时序数据库系统，叫InfluxDB。以后还可以查看历史中的信息数据。不过得借助另外一个工具来查看，grafana。grafana是可以把InfluxDB当数据源的。 </p>
+<p>但是从k8s 1.11开始，heapster已经废弃了，转向了新的监控模型：metric-server。<br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/241.png" alt=""></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"><i class="fa fa-tag"></i>Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/26/Kubernetes高级调度方式/" rel="next" title="Kubernetes高级调度方式">
+                <i class="fa fa-chevron-left"></i> Kubernetes高级调度方式
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">102</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#容器的资源需求和资源限制"><span class="nav-number">1.</span> <span class="nav-text">容器的资源需求和资源限制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例"><span class="nav-number">2.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Heapster"><span class="nav-number">3.</span> <span class="nav-text">Heapster</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#heapster介绍"><span class="nav-number">3.1.</span> <span class="nav-text">heapster介绍</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共299.9k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>
