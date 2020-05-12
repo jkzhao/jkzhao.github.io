@@ -115,7 +115,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/10.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/11.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Nginx/12.png">
-<meta property="og:updated_time" content="2018-04-24T10:27:29.000Z">
+<meta property="og:updated_time" content="2020-05-12T09:33:30.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx配置详解及优化">
 <meta name="twitter:description" content="上篇博文中介绍了安装部署OpenResty，这篇博文主要记录下Nginx的配置及优化。  NginxNginx的代码是由一个核心和一系列的模块组成, 核心主要用于提供Web Server的基本功能，以及Web和Mail反向代理的功能；">
@@ -348,8 +348,8 @@
             
               <span class="post-updated">
               &nbsp; | &nbsp; 更新于
-              <time itemprop="dateUpdated" datetime="2018-04-24T18:27:29+08:00" content="2018-04-24">
-              2018-04-24
+              <time itemprop="dateUpdated" datetime="2020-05-12T17:33:30+08:00" content="2020-05-12">
+              2020-05-12
               </time>
               </span>
             
@@ -577,7 +577,7 @@ http://www.wisedu.com/images/logo.jpg --&gt; /data/imgs/images/logo.jpg
 <li>location URI{}：对当前路径及所有对象都生效。</li>
 <li>location = URI{}：只对当前路径生效，不包括子路径。这是精确匹配。</li>
 <li>location ~ URI{}：</li>
-<li>location ~<em> URI{}：模式匹配URI，此处的URI可使用正则表达式，~区分字符大小写。~</em>不区分字符大小写。</li>
+<li>location <code>~*</code> URI{}：模式匹配URI，此处的URI可使用正则表达式，~区分字符大小写。<code>~*</code>不区分字符大小写。</li>
 <li>location ^~ URI{}：明确说明不使用正则表达式。</li>
 </ul>
 <p>【注意】：如果被两个location匹配到，nginx是有优先级的。=优先级最高，^~优先级第二，模式匹配优先级第三，没加任何符号的优先级最低。<br>官方例子：<a href="http://nginx.org/en/docs/http/ngx_http_core_module.html#location" target="_blank" rel="external">http://nginx.org/en/docs/http/ngx_http_core_module.html#location</a></p>
@@ -1029,7 +1029,7 @@ $document_root：当前请求映射到的root配置；
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">102</span>
+              <span class="site-state-item-count">103</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1136,7 +1136,7 @@ $document_root：当前请求映射到的root配置；
 <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -1162,7 +1162,7 @@ $document_root：当前请求映射到的root配置；
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共299.9k字</span>
+  <span class="post-count">博客全站共302.4k字</span>
 </div>
 
         

@@ -1,0 +1,896 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="jkzhao's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Kubernetes资源指标官方文档的changelog中讲从1.11版本开始，开始将监控体系，指标数据获取机制移向新一代的监控模型。对于k8s来讲，现在有两种资源指标被使用：1、资源指标2、自定义指标">
+<meta name="keywords" content="Kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="资源指标API及自定义指标API">
+<meta property="og:url" content="http://yoursite.com/2019/10/08/资源指标API及自定义指标API/index.html">
+<meta property="og:site_name" content="jkzhao&#39;s blog">
+<meta property="og:description" content="Kubernetes资源指标官方文档的changelog中讲从1.11版本开始，开始将监控体系，指标数据获取机制移向新一代的监控模型。对于k8s来讲，现在有两种资源指标被使用：1、资源指标2、自定义指标">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/242.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/243.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/244.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/245.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/246.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/247.png">
+<meta property="og:updated_time" content="2019-10-10T09:19:32.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="资源指标API及自定义指标API">
+<meta name="twitter:description" content="Kubernetes资源指标官方文档的changelog中讲从1.11版本开始，开始将监控体系，指标数据获取机制移向新一代的监控模型。对于k8s来讲，现在有两种资源指标被使用：1、资源指标2、自定义指标">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/242.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6287775856811050000,
+      author: 'Author'
+    }
+  };
+</script>
+
+  <title> 资源指标API及自定义指标API | jkzhao's blog </title>
+</head>
+<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c179eb46ac47d3b4b1b9203b82ee5821";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jkzhao"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">jkzhao's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">学习 总结 思考</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            留言
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CziK4aDdRyzFJrfygnHH','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                资源指标API及自定义指标API
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-10-08T16:06:11+08:00" content="2019-10-08">
+              2019-10-08
+            </time>
+            
+              <span class="post-updated">
+              &nbsp; | &nbsp; 更新于
+              <time itemprop="dateUpdated" datetime="2019-10-10T17:19:32+08:00" content="2019-10-10">
+              2019-10-10
+              </time>
+              </span>
+            
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/" itemprop="url" rel="index">
+                    <span itemprop="name">容器编排</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/容器编排/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2019/10/08/资源指标API及自定义指标API/" class="leancloud_visitors" data-flag-title="资源指标API及自定义指标API">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Kubernetes资源指标"><a href="#Kubernetes资源指标" class="headerlink" title="Kubernetes资源指标"></a>Kubernetes资源指标</h2><p>官方文档的changelog中讲从1.11版本开始，开始将监控体系，指标数据获取机制移向新一代的监控模型。对于k8s来讲，现在有两种资源指标被使用：<br>1、资源指标<br>2、自定义指标 <a id="more"></a><br>heapster提供的指标收集和存储的功能，并支持多个数据接收器，或者说是sink，比如说influxdb。每个存储后端的代码都驻留在heapster代码仓库中。意思是说heapster为了支持多种各种各样的存储后端，不得不去适配和驱动每一个不同的后端。这每一个适配器都是第三方组织研发的，第三方组织哪一天没兴趣了，就不维护了。以至于heapster为了适配很多存储后端，整合了近十几个后端存储的适配器，有些适配器自从整合进heapster以后在也没改动过，但heapster为此就不得不付出代码量很庞大的局面，所以这就意味着heapster里的设计架构不适用于这种云原生。所以要设计新一代的监控架构。k8s本身如此强大，一个方面就在于很多功能是可以基于addons来实现，非常灵活。而且现在版本中的k8s还支持开发人员轻松自己定义自己的api服务器，来扩展核心api服务。意思是如果用户觉得现有的资源类型，比如service、pod，不能够解决我们自己的问题，我们可以根据自己实际的需要扩展k8s系统所支持的资源类型。<br>传统heapster时代，大多数功能都是通过apiserver获取的，除了一个功能不是，就是要想获取资源指标数据，得专门部署一个addon，叫heapster。能不能干脆把资源指标这样的数据也直接整合进apiserver。让用户能通过apiserver获取所有数据，包括指标。<br>从1.8以后引入了资源指标API。另外，k8s从1.6引入了自定义指标。很多系统级的组件都是依赖于这些指标API的功能的，比如kubectl top。没有资源指标供给，是没办法运行的。另外像HPA，水平Pod自动伸缩器。这也是必须根据获取当前Pod使用的资源量，比如CPU负载80%已经很高了，可以额外加几个Pod。如果Pod的CPU使用率一直低于5%，可以删除几个，腾出一些资源和空间，留给其他Pod使用。Pod无论运行与否，requests一直会预留给这个Pod使用，这些资源放那不用，不运行，很可惜。可以移除一些这样的Pod，腾出空间给其他Pod使用。这些组件都是依赖资源指标工作的，早期都是依赖heapster来实现的。新一代的资源指标API获取的主要方式是靠metric-server实现的。</p>
+<p><strong>资源指标: metrics-server</strong><br><strong>自定义指标: prometheus, k8s-prometheus-adapter。</strong> prometheus要想把它的监控的采集数据转成指标格式，需要一个特殊的组件来实现，k8s-prometheus-adapter。这是早期的版本，还没来得及看现有版本是否有了改进。prometheus已经被CNCF收录进去了，是个强大的监控系统。</p>
+<h2 id="新一代架构"><a href="#新一代架构" class="headerlink" title="新一代架构"></a>新一代架构</h2><p><strong>核心指标流水线:</strong> 由kubelet、metrics-server以及由API server提供的api组成;<br>主要提供CPU累积使用率(这个程序累计使用CPU多长时间占整个CPU时长多大比例)、内存实时使用率、Pod的资源占用率及容器的磁盘占用率。<br>除了这些指标，可能你还需要评估网络、连接数量、可用网络带宽等等，这些度量标准一般而言就需要用第三方组件了。核心指标是不适合第三方来提供的，因为这些核心指标将会被系统中的很多组件使用。<br><strong>监控流水线:</strong> 在系统上部署一个监控系统，用于从系统收集各种指标数据并提供终端用户、存储系统以及HPA，它们包含核心指标及许多非核心指标，并不仅限于CPU、内存、Pod的资源占用率及容器的磁盘占用率等数据。所以HPA既能够使用核心指标，也可以使用监控流水线中的扩展指标。监控流水线提供的指标我们称为非核心指标，但它通常也包括核心指标。<br>非核心指标本身不能被k8s所解析。比如prometheus采集到的数据，那是prometheus语境中保存的，prometheus能理解没问题，但是k8s理解不了，这就是为什么需要一个叫k8s-prometheus-adapter的原因。</p>
+<h2 id="metrics-server"><a href="#metrics-server" class="headerlink" title="metrics-server"></a>metrics-server</h2><p>metrics-server 是一个外部的API服务器，它是提供资源指标服务的。metrics-server本身不是k8s的组成部分，它是托管运行在k8s之上的一个Pod。<br>k8s apiserver该怎么运行怎么运行，除此之外我们又运行了一个metrics-server，它提供另外一组API，我们需要把这两组API合并成一个使用，在它两个之间加一个代理，这个代理称为kube-aggregator，聚合器。相当于把来自多个地方的API聚合成一个来使用。不光光能聚合这两个，还能聚合第三方用户定义的API server。而这个聚合器提供的资源指标将通过apis下的一个群组叫 <strong>/apis/metrics.k8s.io/v1beta1</strong> 来获取。在没部署metrics-server之前，通过kubectl api-versions是获取不到这个群组的，部署完后是可以获取到的。以后通过这个聚合器kube-aggregator既可以访问apiserver下的群组，也可以访问metrics-server下的群组。<br>heapster被废了，因此metrics-server已经成为k8s多个核心组件的先决条件，没有它就没办法运行。比如kubectl top，HPA等。</p>
+<h2 id="部署metrics-server"><a href="#部署metrics-server" class="headerlink" title="部署metrics-server"></a>部署metrics-server</h2><p>打开metrics-server在github上的主页：<a href="https://github.com/kubernetes-incubator/metrics-server" target="_blank" rel="external">https://github.com/kubernetes-incubator/metrics-server</a><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/242.png" alt=""><br>点击进入deploy目录下，我这里k8s集群是1.14.1，所以点击进入1.8+目录，把这些yaml文件下载下来执行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@spark32 manifests]# mkdir metrics-server</div><div class="line">[root@spark32 manifests]# cd metrics-server</div><div class="line">[root@spark32 metrics-server]# for file in auth-delegator.yaml auth-reader.yaml metrics-apiservice.yaml metrics-server-deployment.yaml metrics-server-service.yaml resource-reader.yaml aggregated-metrics-reader.yaml; do wget ht</div><div class="line">tps://raw.githubusercontent.com/kubernetes-incubator/metrics-server/master/deploy/1.8%2B/$file; done</div><div class="line">[root@spark32 metrics-server]# kubectl apply -f .</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">[root@spark32 metrics-server]# kubectl get pods -n kube-system</div><div class="line">NAME                                    READY   STATUS    RESTARTS   AGE</div><div class="line">canal-p9v5f                             2/2     Running   0          22d</div><div class="line">canal-sksfk                             2/2     Running   0          22d</div><div class="line">canal-zchqq                             2/2     Running   0          22d</div><div class="line">canal-zgwsq                             2/2     Running   0          22d</div><div class="line">coredns-fb8b8dccf-t2xj8                 1/1     Running   0          180d</div><div class="line">coredns-fb8b8dccf-xdjkx                 1/1     Running   0          180d</div><div class="line">etcd-spark32                            1/1     Running   1          180d</div><div class="line">kube-apiserver-spark32                  1/1     Running   0          180d</div><div class="line">kube-controller-manager-spark32         1/1     Running   0          180d</div><div class="line">kube-flannel-ds-amd64-2mcd2             1/1     Running   0          22d</div><div class="line">kube-flannel-ds-amd64-jsx8s             1/1     Running   0          22d</div><div class="line">kube-flannel-ds-amd64-kk8cx             1/1     Running   0          22d</div><div class="line">kube-flannel-ds-amd64-vdjn4             1/1     Running   0          22d</div><div class="line">kube-proxy-czhfc                        1/1     Running   0          180d</div><div class="line">kube-proxy-gzhqw                        1/1     Running   0          64d</div><div class="line">kube-proxy-rfxjw                        1/1     Running   0          180d</div><div class="line">kube-proxy-xmkxq                        1/1     Running   0          180d</div><div class="line">kube-scheduler-spark32                  1/1     Running   0          180d</div><div class="line">kubernetes-dashboard-5f7b999d65-ngrr7   1/1     Running   0          24d</div><div class="line">metrics-server-7967c9877f-m4jl8         1/1     Running   0          21d</div></pre></td></tr></table></figure>
+<p>但是查看pod日志，一直在报错：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">unable to fully collect metrics: [unable to fully scrape metrics from source kubelet_summary:&lt;hostname&gt;: unable to fetch metrics from Kubelet &lt;hostname&gt; (&lt;hostname&gt;): Get https://&lt;hostname&gt;:10250/stats/summary/: dial tcp: lookup &lt;hostname&gt; on 10.96.0.10:53: no such host</div></pre></td></tr></table></figure></p>
+<p>解决：<a href="https://github.com/kubernetes-incubator/metrics-server/issues/143" target="_blank" rel="external">https://github.com/kubernetes-incubator/metrics-server/issues/143</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 metrics-server]# kubectl delete -f .</div><div class="line">[root@spark32 metrics-server]# vim metrics-server-deployment.yaml</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/243.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 metrics-server]# kubectl apply -f .</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/244.png" alt=""><br>部署完后，如果metrics-server已经收集到数据了，我们就可以使用curl命令去获取数据了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@spark32 metrics-server]# curl http://localhost:8080/apis/metrics.k8s.io/v1beta1</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/245.png" alt=""><br><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/246.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">[root@spark32 metrics-server]# kubectl top nodes</div><div class="line">NAME       CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%   </div><div class="line">hadoop16   148m         7%     4470Mi          58%       </div><div class="line">spark17    86m          2%     4824Mi          63%       </div><div class="line">spark32    282m         3%     16629Mi         69%       </div><div class="line">ubuntu31   130m         1%     2724Mi          17%       </div><div class="line">[root@spark32 metrics-server]# kubectl top pods</div><div class="line">NAME                            CPU(cores)   MEMORY(bytes)   </div><div class="line">initcontainer-myapp-pod         0m           1Mi             </div><div class="line">myapp-deploy-675558bfc5-4sn9w   0m           2Mi             </div><div class="line">myapp-deploy-675558bfc5-7qn59   0m           3Mi             </div><div class="line">myapp-deploy-675558bfc5-jww2c   0m           2Mi             </div><div class="line">pod-demo                        0m           4Mi             </div><div class="line">[root@spark32 metrics-server]# kubectl top pods -n kube-system</div><div class="line">NAME                                    CPU(cores)   MEMORY(bytes)   </div><div class="line">canal-p9v5f                             16m          31Mi            </div><div class="line">canal-sksfk                             30m          47Mi            </div><div class="line">canal-zchqq                             16m          33Mi            </div><div class="line">canal-zgwsq                             28m          49Mi            </div><div class="line">coredns-fb8b8dccf-t2xj8                 4m           18Mi            </div><div class="line">coredns-fb8b8dccf-xdjkx                 3m           19Mi            </div><div class="line">etcd-spark32                            31m          361Mi           </div><div class="line">kube-apiserver-spark32                  37m          436Mi           </div><div class="line">kube-controller-manager-spark32         20m          65Mi            </div><div class="line">kube-flannel-ds-amd64-2mcd2             3m           21Mi            </div><div class="line">kube-flannel-ds-amd64-jsx8s             2m           15Mi            </div><div class="line">kube-flannel-ds-amd64-kk8cx             3m           22Mi            </div><div class="line">kube-flannel-ds-amd64-vdjn4             2m           13Mi            </div><div class="line">kube-proxy-czhfc                        1m           20Mi            </div><div class="line">kube-proxy-gzhqw                        2m           13Mi            </div><div class="line">kube-proxy-rfxjw                        1m           25Mi            </div><div class="line">kube-proxy-xmkxq                        3m           26Mi            </div><div class="line">kube-scheduler-spark32                  2m           21Mi            </div><div class="line">kubernetes-dashboard-5f7b999d65-ngrr7   1m           21Mi            </div><div class="line">metrics-server-7967c9877f-m4jl8         1m           17Mi</div></pre></td></tr></table></figure></p>
+<h2 id="Prometheus"><a href="#Prometheus" class="headerlink" title="Prometheus"></a>Prometheus</h2><h3 id="Prometheus介绍"><a href="#Prometheus介绍" class="headerlink" title="Prometheus介绍"></a>Prometheus介绍</h3><p>Prometheus是个监控系统，和zabbix一样，都是server-agent模式。在每个节点上都要部署agent，node_exporter，但是这个组件只是用来采集当前节点的系统级指标数据的，如果要采集其他指标数据，比如采集mysql的，还需要部署mysql的exporter，还有很多重量级服务的专用exporter。<br>要去采集Pod的话，Pod在k8s上本身就有获取采集数据的接口，倒也不一定非得额外去部署，更何况其实每个容器的日志都在节点上。 这些日志信息是通过对应的接口输出出来的。简单来讲，prometheus是通过metrics-url来到各Pod获取数据的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@spark32 ~]# cd /var/log/containers/</div><div class="line">[root@spark32 containers]# ll</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jkzhao/MarkdownPictures/master/Kubernetes/247.png" alt=""><br>采集以后，如何看呢？prometheus提供一个非常强大的接口叫PromQL。mysql有个查询语句叫sql。PromQL支持非常强大的restful风格接口的查询条件表达式。但是这种数据是不能被apiserver解析的，数据格式不兼容。因此如果期望能够让这些数据通过k8s的apiserver，像在apiserver中请求获取数据一样来获取指标数据，那么必须把PromQL所查询到的数据格式转为k8s的api查询接口的格式。这就需要k8s-prometheus-adapter，这是第三方开发的。这个k8s-prometheus-adapter能够用PromQL语句完成从prometheus这里查询到一些指标数据，并转为k8s apiserver上的格式的数据。</p>
+<h3 id="部署Prometheus"><a href="#部署Prometheus" class="headerlink" title="部署Prometheus"></a>部署Prometheus</h3><p>建议将prometheus放到单独的名称空间里去。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"><i class="fa fa-tag"></i>Kubernetes</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/29/容器资源需求、资源限制及HeapSter/" rel="next" title="容器资源需求、资源限制及HeapSter">
+                <i class="fa fa-chevron-left"></i> 容器资源需求、资源限制及HeapSter
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODkyNi81NDk1"></div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Zhao Jiankai" />
+          <p class="site-author-name" itemprop="name">Zhao Jiankai</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jkzhao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3566507667/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.importnew.com/" title="ImportNew" target="_blank">ImportNew</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes资源指标"><span class="nav-number">1.</span> <span class="nav-text">Kubernetes资源指标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新一代架构"><span class="nav-number">2.</span> <span class="nav-text">新一代架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#metrics-server"><span class="nav-number">3.</span> <span class="nav-text">metrics-server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署metrics-server"><span class="nav-number">4.</span> <span class="nav-text">部署metrics-server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Prometheus"><span class="nav-number">5.</span> <span class="nav-text">Prometheus</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Prometheus介绍"><span class="nav-number">5.1.</span> <span class="nav-text">Prometheus介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署Prometheus"><span class="nav-number">5.2.</span> <span class="nav-text">部署Prometheus</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhao Jiankai</span>
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共302.4k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("r9OTvh5qdm5WfVnhJBm4XoP9-gzGzoHsz", "VAES8qziiwbdUq0IzdQVj5xD");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+<!--    -->
+</body>
+</html>
